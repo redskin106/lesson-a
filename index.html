@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Getting There — Lesson A</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+
+    /* ══════════════════════════════════════════
+       THEME VARIABLES — swap per lesson
+    ══════════════════════════════════════════ */
+    :root {
+      --accent:       #F5C518;
+      --accent-dim:   #8A6E0A;
+      --accent-glow:  rgba(245,197,24,0.12);
+
+      --bg:           #0D1B2A;
+      --surface:      #152236;
+      --raised:       #1E3250;
+      --border:       #1E3A5F;
+      --dim:          #2A4060;
+
+      --text:         #E8F0FE;
+      --muted:        #6B8CAE;
+
+      --ok:           #3DD68C;
+      --ok-bg:        rgba(61,214,140,0.10);
+      --err:          #F87171;
+      --err-bg:       rgba(248,113,113,0.10);
+
+      --bronze:       #CD7F32;
+      --silver:       #A8A9AD;
+      --gold:         #F5C518;
+
+      --r:  12px;
+      --rs:  8px;
+      --fd: 'Barlow Condensed', sans-serif;
+      --fb: 'Inter', sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ══════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════ */
+    .hdr {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .banner {
+      background: linear-gradient(135deg, var(--raised), var(--surface));
+      padding: 12px 16px 10px;
+      border-bottom: 2px solid var(--accent);
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .banner-emoji { font-size: 26px; line-height: 1; flex-shrink: 0; }
+
+    .banner-text { flex: 1; }
+    .banner-title {
+      font-family: var(--fd); font-weight: 900; font-size: 19px;
+      letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; line-height: 1;
+    }
+    .banner-tagline { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .lvl-pill {
+      font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px;
+    }
+    .lvl-pill.bronze { background: rgba(205,127,50,.15); color: var(--bronze); }
+    .lvl-pill.silver { background: rgba(168,169,173,.15); color: var(--silver); }
+    .lvl-pill.gold   { background: rgba(245,197,24,.15);  color: var(--gold);   }
+
+    /* progress stamps */
+    .stamps {
+      display: flex; align-items: center;
+      padding: 8px 16px; gap: 6px;
+    }
+    .stamp {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid var(--dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--dim);
+      transition: all .3s;
+      flex-shrink: 0;
+    }
+    .stamp.active   { border-color: var(--accent); color: var(--text); }
+    .stamp.complete { background: var(--accent); border-color: var(--accent); color: #000; }
+    .connector { flex: 1; height: 2px; background: var(--dim); }
+    .connector.done { background: var(--accent); }
+
+    /* ══════════════════════════════════════════
+       SCREEN WRAPPER
+    ══════════════════════════════════════════ */
+    .screen {
+      flex: 1;
+      padding: 18px 16px 110px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+
+    /* ══════════════════════════════════════════
+       CARDS / GENERIC
+    ══════════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      border-radius: var(--r); border: 1px solid var(--border);
+      padding: 16px;
+    }
+    .card-label {
+      font-family: var(--fd); font-weight: 700; font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
+    }
+    .txt-muted { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+    /* ══════════════════════════════════════════
+       BUTTONS
+    ══════════════════════════════════════════ */
+    .btn-primary {
+      width: 100%; padding: 16px;
+      background: var(--accent); color: #000;
+      font-family: var(--fd); font-weight: 900; font-size: 18px;
+      letter-spacing: 2px; text-transform: uppercase;
+      border: none; border-radius: var(--r);
+      cursor: pointer; transition: opacity .15s;
+    }
+    .btn-primary:active { opacity: .8; }
+    .btn-primary:disabled { opacity: .35; cursor: default; }
+
+    .btn-ghost {
+      width: 100%; padding: 13px;
+      background: transparent; color: var(--muted);
+      font-family: var(--fb); font-weight: 600; font-size: 14px;
+      border: 1px solid var(--border); border-radius: var(--r); cursor: pointer;
+    }
+
+    .bottom-cta {
+      position: fixed; bottom: 0;
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
+      padding: 12px 16px 20px;
+      background: linear-gradient(to top, var(--bg) 65%, transparent);
+      z-index: 50;
+    }
+
+    /* ══════════════════════════════════════════
+       NAV BUTTONS
+    ══════════════════════════════════════════ */
+    .nav-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px 0;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 5px; padding: 7px 12px;
+      background: var(--raised); border: 1px solid var(--border);
+      border-radius: 20px; color: var(--muted);
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: all .15s;
+    }
+    .nav-btn:active { opacity: .7; }
+    .nav-btn.home { margin-left: auto; }
+
+    .confirm-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.7);
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    .confirm-box {
+      width: 100%; max-width: 480px;
+      background: var(--surface); border-radius: var(--r) var(--r) 0 0;
+      padding: 24px 20px 32px; text-align: center;
+      border-top: 2px solid var(--border);
+    }
+    .confirm-title { font-family: var(--fd); font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: 1px; }
+    .confirm-sub   { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+    .confirm-row   { display: flex; gap: 10px; }
+    .confirm-row .btn-primary { flex: 2; }
+    .confirm-row .btn-ghost   { flex: 1; }
+
+    /* ══════════════════════════════════════════
+       BRIEFING SCREEN
+    ══════════════════════════════════════════ */
+    .intro-card {
+      background: linear-gradient(135deg, var(--raised), var(--surface));
+      border: 1px solid var(--accent-dim);
+      border-radius: var(--r); padding: 22px 18px;
+      text-align: center;
+    }
+    .intro-icon  { font-size: 52px; margin-bottom: 12px; }
+    .intro-title {
+      font-family: var(--fd); font-weight: 900; font-size: 30px;
+      color: var(--accent); letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .intro-body  { font-size: 14px; color: var(--muted); line-height: 1.75; }
+
+    select.pick {
+      width: 100%; padding: 13px 42px 13px 14px;
+      background: var(--raised);
+      border: 1px solid var(--border); border-radius: var(--rs);
+      color: var(--text); font-family: var(--fb); font-size: 16px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B8CAE' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+
+    .vocab-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .vocab-pill  {
+      background: var(--raised); border: 1px solid var(--border);
+      border-radius: var(--rs); padding: 10px;
+      font-family: var(--fd); font-weight: 800; font-size: 13px;
+      letter-spacing: 1px; color: var(--accent); text-align: center;
+    }
+
+    /* ══════════════════════════════════════════
+       LEVEL SELECT
+    ══════════════════════════════════════════ */
+    .lvl-card {
+      border-radius: var(--r); padding: 16px;
+      border: 2px solid transparent; cursor: pointer;
+      display: flex; align-items: center; gap: 14px;
+      transition: transform .15s;
+    }
+    .lvl-card:active { transform: scale(.98); }
+    .lvl-card.bronze { background: rgba(205,127,50,.08); border-color: rgba(205,127,50,.3); }
+    .lvl-card.silver { background: rgba(168,169,173,.08); border-color: rgba(168,169,173,.3); }
+    .lvl-card.gold   { background: rgba(245,197,24,.08); border-color: rgba(245,197,24,.3); }
+
+    .lvl-icon  { font-size: 30px; flex-shrink: 0; }
+    .lvl-info  { flex: 1; }
+    .lvl-name  { font-family: var(--fd); font-weight: 900; font-size: 20px; letter-spacing: 1px; text-transform: uppercase; }
+    .lvl-name.bronze { color: var(--bronze); }
+    .lvl-name.silver { color: var(--silver); }
+    .lvl-name.gold   { color: var(--gold);   }
+    .lvl-desc  { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+    .lvl-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      padding: 3px 8px; border-radius: 20px; text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .lvl-badge.req { background: rgba(205,127,50,.2); color: var(--bronze); }
+    .lvl-badge.opt { background: rgba(61,214,140,.15); color: var(--ok); }
+
+    /* ══════════════════════════════════════════
+       EXERCISE SCREEN
+    ══════════════════════════════════════════ */
+    .ex-meta {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 2px;
+    }
+    .ex-stage  { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+    .ex-count  { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+    .vocab-strip { display: flex; gap: 5px; flex-wrap: wrap; }
+    .v-tag {
+      font-family: var(--fd); font-size: 12px; font-weight: 800;
+      letter-spacing: 1px; color: var(--accent);
+      background: var(--accent-glow); border: 1px solid var(--accent-dim);
+      border-radius: 4px; padding: 2px 8px; text-transform: uppercase;
+    }
+
+    .type-badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px;
+      background: var(--raised); color: var(--muted);
+    }
+
+    .q-text { font-size: 15px; color: var(--text); line-height: 1.65; margin-bottom: 14px; }
+
+    /* image match */
+    .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .img-opt {
+      background: var(--raised); border: 2px solid var(--border);
+      border-radius: var(--r); padding: 18px 10px;
+      text-align: center; cursor: pointer; transition: all .15s;
+    }
+    .img-opt:active { transform: scale(.97); }
+    .img-opt.sel    { border-color: var(--accent); background: var(--accent-glow); }
+    .img-opt.ok     { border-color: var(--ok);  background: var(--ok-bg); }
+    .img-opt.err    { border-color: var(--err); background: var(--err-bg); }
+    .opt-emoji  { font-size: 38px; display: block; margin-bottom: 7px; }
+    .opt-label  { font-size: 13px; color: var(--muted); }
+
+    /* true / false */
+    .tf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+    .tf-btn {
+      padding: 20px 8px; border-radius: var(--r);
+      border: 2px solid var(--border); background: var(--raised);
+      font-family: var(--fd); font-weight: 900; font-size: 19px;
+      letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; color: var(--text); transition: all .15s;
+    }
+    .tf-btn:active { transform: scale(.97); }
+    .tf-btn.sel { border-color: var(--accent); }
+    .tf-btn.ok  { border-color: var(--ok);  background: var(--ok-bg);  color: var(--ok);  }
+    .tf-btn.err { border-color: var(--err); background: var(--err-bg); color: var(--err); }
+
+    /* fill gap */
+    .sentence-box {
+      background: var(--raised); border: 1px solid var(--border);
+      border-radius: var(--rs); padding: 14px 16px;
+      font-size: 16px; color: var(--text); line-height: 2.2;
+      margin-bottom: 14px;
+    }
+    .gap {
+      display: inline-block; min-width: 90px;
+      border-bottom: 2px solid var(--accent);
+      text-align: center; margin: 0 3px; padding: 0 6px;
+      color: var(--accent); font-weight: 600; cursor: pointer;
+    }
+    .gap.ok  { border-color: var(--ok);  color: var(--ok);  }
+    .gap.err { border-color: var(--err); color: var(--err); }
+
+    .word-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .chip {
+      padding: 10px 16px; background: var(--raised);
+      border: 1px solid var(--border); border-radius: 20px;
+      font-size: 14px; font-weight: 600; color: var(--text);
+      cursor: pointer; transition: all .15s;
+    }
+    .chip:active { transform: scale(.95); }
+    .chip.used  { opacity: .3; pointer-events: none; }
+
+    .hint-txt { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+
+    .gap-input {
+      width: 100%; padding: 13px 14px;
+      background: var(--raised); border: 1px solid var(--border);
+      border-radius: var(--rs); color: var(--text);
+      font-family: var(--fb); font-size: 16px;
+      outline: none; transition: border-color .2s;
+    }
+    .gap-input:focus { border-color: var(--accent); }
+
+    /* ══════════════════════════════════════════
+       AUDIO RECORDER
+    ══════════════════════════════════════════ */
+    .audio-prompt {
+      background: var(--raised); border-left: 3px solid var(--accent);
+      border-radius: var(--rs); padding: 13px 16px;
+      font-size: 14px; color: var(--text); line-height: 1.65;
+      margin-bottom: 10px;
+    }
+    .audio-prompt strong { color: var(--accent); }
+
+    .rec-area { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+    .rec-btn {
+      width: 76px; height: 76px; border-radius: 50%;
+      border: 3px solid var(--accent); background: var(--raised);
+      font-size: 30px; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rec-btn.on  { background: var(--err); border-color: var(--err); animation: pulse 1s infinite; }
+    .rec-btn.has { border-color: var(--ok); }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.06); }
+    }
+
+    .rec-status { font-size: 13px; color: var(--muted); text-align: center; }
+    .rec-status.on  { color: var(--err); font-weight: 600; }
+    .rec-status.has { color: var(--ok);  font-weight: 600; }
+
+    audio.playback { width: 100%; border-radius: var(--rs); }
+
+    /* ══════════════════════════════════════════
+       FEEDBACK PANEL
+    ══════════════════════════════════════════ */
+    .feedback {
+      position: fixed; bottom: 0;
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
+      background: var(--surface);
+      border-top: 3px solid var(--ok);
+      border-radius: var(--r) var(--r) 0 0;
+      padding: 18px 16px 28px;
+      z-index: 200;
+      animation: up .28s ease;
+    }
+    .feedback.err { border-color: var(--err); }
+
+    @keyframes up {
+      from { transform: translateX(-50%) translateY(100%); }
+      to   { transform: translateX(-50%) translateY(0); }
+    }
+
+    .fb-result {
+      font-family: var(--fd); font-weight: 900; font-size: 22px;
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;
+    }
+    .fb-result.ok  { color: var(--ok); }
+    .fb-result.err { color: var(--err); }
+    .fb-msg { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+
+    /* ══════════════════════════════════════════
+       STAGE / LESSON COMPLETE
+    ══════════════════════════════════════════ */
+    .complete-wrap { text-align: center; padding: 36px 16px; }
+
+    .big-stamp {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 46px;
+      margin: 0 auto 18px;
+      animation: stamp-in .4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @keyframes stamp-in {
+      from { transform: scale(0) rotate(-20deg); }
+      to   { transform: scale(1) rotate(0deg); }
+    }
+
+    .comp-title {
+      font-family: var(--fd); font-weight: 900; font-size: 30px;
+      color: var(--accent); letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .comp-sub { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+
+/* ════════════════════════════════════════════════════════
+   CONTENT LAYER
+   Edit this section only to update lesson content.
+   Adding a new lesson = copy this object with new data.
+════════════════════════════════════════════════════════ */
+
+const LESSON = {
+  id: "lesson-a",
+  title: "Getting There",
+  subtitle: "Lesson A · Airport Journey",
+  banner: {
+    emoji: "✈️",
+    tagline: "Your journey begins...",
+    accent: "#F5C518",
+  },
+  nicknames: [
+    "Sophy","Davit","Sam","Nu","Tue",
+    "Yee","Lee Ga","Felix","Tin","Ken","Thai"
+  ],
+  vocab: [
+    { word:"TAXI",         stage:1 },
+    { word:"SUITCASE",     stage:1 },
+    { word:"AIRPORT",      stage:2 },
+    { word:"BOARDING PASS",stage:2 },
+    { word:"PASSPORT",     stage:3 },
+    { word:"CHECK-IN",     stage:3 },
+    { word:"SECURITY",     stage:4 },
+    { word:"QUEUE",        stage:4 },
+  ],
+  stages: [
+
+    /* ─── STAGE 1: TAXI ─── */
+    {
+      id:"taxi", label:"Stage 1", title:"Taxi", emoji:"🚕",
+      vocab:["TAXI","SUITCASE"],
+      exercises:[
+
+        /* 1-A  Image Match */
+        {
+          id:"s1-e1", type:"image-match", typelabel:"Image Match",
+          question:"Which picture shows a SUITCASE?",
+          options:[
+            { emoji:"🧳", label:"Suitcase",  correct:true  },
+            { emoji:"🚗", label:"Car",        correct:false },
+            { emoji:"🛏️", label:"Bed",        correct:false },
+            { emoji:"🍕", label:"Pizza",      correct:false },
+          ],
+          feedback:{
+            correct:"Yes! 🧳 A suitcase is the bag you pack for travel.",
+            wrong:"Not quite. A suitcase is the bag you pack for your trip — look for 🧳."
+          }
+        },
+
+        /* 1-B  Fill the Gap */
+        {
+          id:"s1-e2", type:"fill-gap", typelabel:"Fill the Gap",
+          bronze:{
+            instruction:"Tap the correct words to fill the gaps.",
+            parts:["Put your "," in the ","."],
+            gaps:["SUITCASE","TAXI"],
+            wordBank:["suitcase","taxi","airport","queue"],
+          },
+          silver:{
+            instruction:"Fill in the gap. Hint: S _ _ _ C _ _ E",
+            template:"Put your _______ in the taxi.",
+            answer:"suitcase",
+          },
+          gold:{
+            instruction:"Fill in the gap. No hints this time!",
+            template:"Put your _______ in the taxi.",
+            answer:"suitcase",
+          },
+          feedback:{
+            correct:"Correct! Your suitcase goes in the boot of the taxi.",
+            wrong:"Not quite. The missing word is SUITCASE — the bag you pack for travel."
+          }
+        },
+
+        /* 1-C  Audio */
+        {
+          id:"s1-e3", type:"audio", typelabel:"Audio Response",
+          bronze:{ prompt:'Say your nickname, then: "I am going to [your destination] please."' },
+          silver:{ prompt:'Tell the taxi driver your destination and one thing about it.' },
+          gold:  { prompt:'Tell the driver where you are going AND ask how long it will take. Use two sentences.' },
+          feedback:{
+            correct:"Great work! Your teacher will listen to your recording and leave feedback.",
+            wrong:""
+          }
+        },
+      ]
+    },
+
+    /* ─── STAGE 2: AIRPORT ─── */
+    {
+      id:"airport", label:"Stage 2", title:"Airport", emoji:"✈️",
+      vocab:["AIRPORT","BOARDING PASS"],
+      exercises:[
+
+        /* 2-A  True or False */
+        {
+          id:"s2-e1", type:"true-false", typelabel:"True or False",
+          statement:"You need a boarding pass to get on the plane.",
+          correct:true,
+          feedback:{
+            correct:"Correct! A boarding pass shows your seat number and flight details.",
+            wrong:"Actually, you DO need a boarding pass to board the plane!"
+          }
+        },
+
+        /* 2-B  Fill the Gap */
+        {
+          id:"s2-e2", type:"fill-gap", typelabel:"Fill the Gap",
+          bronze:{
+            instruction:"Tap the correct word to fill the gap.",
+            parts:["Show your "," at the gate."],
+            gaps:["BOARDING PASS"],
+            wordBank:["boarding pass","suitcase","queue","security"],
+          },
+          silver:{
+            instruction:"Fill in the gap. Hint: B _ _ _ _ _ _ G   P _ _ _",
+            template:"Show your _____________ at the gate.",
+            answer:"boarding pass",
+          },
+          gold:{
+            instruction:"Fill in the gap. No hints this time!",
+            template:"Show your _____________ at the gate.",
+            answer:"boarding pass",
+          },
+          feedback:{
+            correct:"Correct! You show your boarding pass before you board the plane.",
+            wrong:"Not quite. The answer is BOARDING PASS — the document that lets you board."
+          }
+        },
+
+        /* 2-C  Audio */
+        {
+          id:"s2-e3", type:"audio", typelabel:"Audio Response",
+          bronze:{ prompt:'Say your nickname, then say: "This is the airport."' },
+          silver:{ prompt:'Describe what you see at the airport. Use one sentence.' },
+          gold:  { prompt:'You cannot find your boarding pass! Tell an airport worker. Use two sentences.' },
+          feedback:{
+            correct:"Great work! Your teacher will listen to your recording and leave feedback.",
+            wrong:""
+          }
+        },
+      ]
+    },
+
+  ] // end stages
+}; // end LESSON
+
+
+/* ════════════════════════════════════════════════════════
+   ENGINE LAYER
+   State machine + logic. Never touches CSS directly.
+════════════════════════════════════════════════════════ */
+
+const S = {
+  screen:      "briefing",  // briefing | level-select | exercise | stage-done | lesson-done
+  nickname:    "",
+  level:       "bronze",    // bronze | silver | gold
+
+  stageIdx:    0,
+  exIdx:       0,
+  done:        [],          // completed stage ids
+  lastStage:   null,        // stage obj just completed
+
+  feedback:    null,        // { ok:bool, msg:string }
+
+  // exercise scratch
+  sel:         null,        // image-match / true-false selection
+  gaps:        {},          // fill-gap bronze tapped answers { 0:"word", 1:"word" }
+
+  showConfirm: false,
+
+  // audio
+  recorder:    null,
+  blobs:       {},          // { exId: Blob }
+  urls:        {},          // { exId: ObjectURL }
+  recording:   false,
+  hasAudio:    {},          // { exId: true }
+};
+
+const stage = () => LESSON.stages[S.stageIdx];
+const ex    = () => stage().exercises[S.exIdx];
+
+function ld(exercise) {
+  // returns the level-specific data object for fill-gap and audio
+  return exercise[S.level] || exercise.bronze;
+}
+
+function go(screen) {
+  S.screen   = screen;
+  S.feedback = null;
+  S.sel      = null;
+  S.gaps     = {};
+  render();
+  window.scrollTo(0,0);
+}
+
+function setNickname(n) { S.nickname = n; }
+function setLevel(l)    { S.level = l; S.stageIdx = 0; S.exIdx = 0; go("exercise"); }
+
+function pickOpt(i)     { if (!S.feedback) { S.sel = i; render(); } }
+function pickTF(v)      { if (!S.feedback) { S.sel = v; render(); } }
+
+function tapChip(word) {
+  if (S.feedback) return;
+  const e   = ex();
+  const lvd = ld(e);
+  const gc  = lvd.gaps.length;
+  for (let i = 0; i < gc; i++) {
+    if (S.gaps[i] === undefined) { S.gaps[i] = word; render(); return; }
+  }
+}
+function clearGap(i) { if (!S.feedback) { delete S.gaps[i]; render(); } }
+
+function check() {
+  const e = ex();
+  let ok = false;
+
+  if (e.type === "image-match") {
+    ok = e.options[S.sel]?.correct === true;
+
+  } else if (e.type === "true-false") {
+    ok = S.sel === e.correct;
+
+  } else if (e.type === "fill-gap") {
+    const lvd = ld(e);
+    if (lvd.wordBank) {
+      ok = lvd.gaps.every((g, i) => (S.gaps[i] || "").toLowerCase() === g.toLowerCase());
+    } else {
+      const inp = document.getElementById("gap-input");
+      const val = inp ? inp.value.trim().toLowerCase() : "";
+      ok = val === (lvd.answer || "").toLowerCase();
+    }
+
+  } else if (e.type === "audio") {
+    ok = S.hasAudio[e.id] === true;
+  }
+
+  S.feedback = { ok, msg: ok ? e.feedback.correct : e.feedback.wrong };
+  render();
+}
+
+function advance() {
+  const st = stage();
+  if (S.exIdx < st.exercises.length - 1) {
+    S.exIdx++;
+    go("exercise");
+  } else {
+    S.done.push(st.id);
+    S.lastStage = st;
+    if (S.stageIdx < LESSON.stages.length - 1) S.stageIdx++;
+    S.exIdx = 0;
+    go("stage-done");
+  }
+}
+
+function nextStage() {
+  if (S.done.length < LESSON.stages.length) {
+    go("exercise");
+  } else {
+    go("lesson-done");
+  }
+}
+
+/* Audio */
+const BYPASS_AUDIO = false; // ← set true to bypass audio for local testing
+
+function canRecord() {
+  return !BYPASS_AUDIO &&
+         window.isSecureContext &&
+         navigator.mediaDevices &&
+         typeof navigator.mediaDevices.getUserMedia === "function";
+}
+
+async function startRec(exId) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    const types  = ["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg"];
+    let mime = "";
+    for (const t of types) { if (MediaRecorder.isTypeSupported(t)) { mime = t; break; } }
+    const rec    = new MediaRecorder(stream, mime ? { mimeType:mime } : {});
+    const chunks = [];
+    rec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    rec.onstop = () => {
+      const blob = new Blob(chunks, { type: mime || "audio/webm" });
+      S.blobs[exId]    = blob;
+      S.urls[exId]     = URL.createObjectURL(blob);
+      S.hasAudio[exId] = true;
+      S.recording      = false;
+      stream.getTracks().forEach(t => t.stop());
+      render();
+    };
+    S.recorder  = rec;
+    S.recording = true;
+    rec.start();
+    render();
+  } catch (err) {
+    alert("Could not access microphone. Please check your browser permissions and try again.");
+  }
+}
+
+function stopRec() {
+  if (S.recorder && S.recorder.state !== "inactive") S.recorder.stop();
+}
+
+function handleFileUpload(exId, file) {
+  if (!file) return;
+  S.blobs[exId]    = file;
+  S.urls[exId]     = URL.createObjectURL(file);
+  S.hasAudio[exId] = true;
+  render();
+}
+
+
+/* ════════════════════════════════════════════════════════
+   UI LAYER
+   Pure rendering. No logic lives here.
+════════════════════════════════════════════════════════ */
+
+function render() {
+  document.documentElement.style.setProperty("--accent",      LESSON.banner.accent);
+  document.documentElement.style.setProperty("--accent-dim",  darken(LESSON.banner.accent));
+  document.documentElement.style.setProperty("--accent-glow", hex2rgba(LESSON.banner.accent, .12));
+
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  const showHeader = ["exercise","stage-done","lesson-done"].includes(S.screen);
+  if (showHeader) app.appendChild(mkHeader());
+
+  const scr = mk("div","screen");
+  switch (S.screen) {
+    case "briefing":    scr.appendChild(mkBriefing());   break;
+    case "level-select":scr.appendChild(mkLevelSelect());break;
+    case "exercise":    scr.appendChild(mkExercise());   break;
+    case "stage-done":  scr.appendChild(mkStageDone());  break;
+    case "lesson-done": scr.appendChild(mkLessonDone()); break;
+  }
+  app.appendChild(scr);
+
+  if (S.feedback) app.appendChild(mkFeedback());
+  if (S.showConfirm) app.appendChild(mkConfirm());
+}
+
+/* Header */
+function mkHeader() {
+  const h   = mk("div","hdr");
+  const ban = mk("div","banner");
+  ban.appendChild(mk("div","banner-emoji",LESSON.banner.emoji));
+  const bt = mk("div","banner-text");
+  bt.appendChild(mk("div","banner-title",LESSON.title));
+  bt.appendChild(mk("div","banner-tagline",LESSON.banner.tagline));
+  ban.appendChild(bt);
+  const icons = { bronze:"🥉", silver:"🥈", gold:"🥇" };
+  const pill  = mk("div","lvl-pill "+S.level, icons[S.level]+" "+S.level);
+  ban.appendChild(pill);
+  h.appendChild(ban);
+
+  // nav row
+  const nav = mk("div","nav-row");
+  const back = mk("div","nav-btn","← Back");
+  back.addEventListener("click", goBack);
+  nav.appendChild(back);
+  const home = mk("div","nav-btn home","🏠 Home");
+  home.addEventListener("click", goHome);
+  nav.appendChild(home);
+  h.appendChild(nav);
+
+  const stamps = mk("div","stamps");
+  LESSON.stages.forEach((st, i) => {
+    const done = S.done.includes(st.id);
+    const act  = i === S.stageIdx && !done;
+    stamps.appendChild(mk("div","stamp"+(done?" complete":act?" active":""), done?"✓":st.emoji));
+    if (i < LESSON.stages.length-1) {
+      stamps.appendChild(mk("div","connector"+(done?" done":"")));
+    }
+  });
+  h.appendChild(stamps);
+  return h;
+}
+
+/* Confirm home dialog */
+function mkConfirm() {
+  const overlay = mk("div","confirm-overlay");
+  const box     = mk("div","confirm-box");
+  box.appendChild(mk("div","confirm-title","Go back to Home?"));
+  box.appendChild(mk("div","confirm-sub","Your progress will be lost.\nAre you sure you want to start again?"));
+  const row = mk("div","confirm-row");
+  const yes = mk("button","btn-primary","Yes, go home");
+  yes.addEventListener("click", confirmHome);
+  const no  = mk("button","btn-ghost","Cancel");
+  no.addEventListener("click", cancelHome);
+  row.appendChild(no);
+  row.appendChild(yes);
+  box.appendChild(row);
+  overlay.appendChild(box);
+  overlay.addEventListener("click", e => { if (e.target === overlay) cancelHome(); });
+  return overlay;
+}
+
+/* Briefing */
+function mkBriefing() {
+  const f = frag();
+
+  const ban = mk("div","banner", null, "border-radius:12px");
+  ban.appendChild(mk("div","banner-emoji",LESSON.banner.emoji));
+  const bt = mk("div","banner-text");
+  bt.appendChild(mk("div","banner-title",LESSON.title));
+  bt.appendChild(mk("div","banner-tagline",LESSON.subtitle));
+  ban.appendChild(bt);
+  f.appendChild(ban);
+
+  const intro = mk("div","intro-card");
+  intro.appendChild(mk("div","intro-icon","🌍"));
+  intro.appendChild(mk("div","intro-title","Mission Briefing"));
+  intro.appendChild(mk("div","intro-body","You are about to travel to your dream destination. Complete each stage of your journey — in English. You may use Google Translate to understand, but always speak or write your answer yourself."));
+  f.appendChild(intro);
+
+  const nc = mk("div","card");
+  nc.appendChild(mk("div","card-label","01 — Your Name"));
+  const sel = document.createElement("select");
+  sel.className = "pick";
+  const def = mk("option","","Choose your nickname...");
+  def.value = ""; sel.appendChild(def);
+  LESSON.nicknames.forEach(n => {
+    const o = mk("option","",n); o.value = n;
+    if (S.nickname === n) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.addEventListener("change", e => setNickname(e.target.value));
+  nc.appendChild(sel);
+  f.appendChild(nc);
+
+  const vc = mk("div","card");
+  vc.appendChild(mk("div","card-label","02 — Lesson Vocabulary"));
+  vc.appendChild(mk("div","txt-muted","Learn these 8 words. They appear throughout all 4 stages.",null,"margin-bottom:10px"));
+  const vg = mk("div","vocab-grid");
+  LESSON.vocab.forEach(v => vg.appendChild(mk("div","vocab-pill",v.word)));
+  vc.appendChild(vg);
+  f.appendChild(vc);
+
+  const cta = mk("div","bottom-cta");
+  const btn = mk("button","btn-primary","Begin Mission →");
+  btn.addEventListener("click", () => {
+    if (!S.nickname) { alert("Please choose your nickname first!"); return; }
+    go("level-select");
+  });
+  cta.appendChild(btn);
+  f.appendChild(cta);
+  return f;
+}
+
+/* Level Select */
+function mkLevelSelect() {
+  const f = frag();
+  const ban = mk("div","banner",null,"border-radius:12px");
+  ban.appendChild(mk("div","banner-emoji",LESSON.banner.emoji));
+  const bt = mk("div","banner-text");
+  bt.appendChild(mk("div","banner-title","Choose Your Level"));
+  bt.appendChild(mk("div","banner-tagline","You can pick a different level each time you practise"));
+  ban.appendChild(bt);
+  f.appendChild(ban);
+
+  f.appendChild(mk("div","txt-muted","Bronze is always required. Silver and Gold are extra challenges.", null, "text-align:center;font-size:12px"));
+
+  const levels = [
+    { id:"bronze", icon:"🥉", name:"Bronze", desc:"Word banks and hints. Everyone starts here.", badge:"Required", bc:"req" },
+    { id:"silver", icon:"🥈", name:"Silver", desc:"First letter hints only. A bigger challenge.",  badge:"Optional", bc:"opt" },
+    { id:"gold",   icon:"🥇", name:"Gold",   desc:"No hints at all. Do you dare?",                badge:"Optional", bc:"opt" },
+  ];
+
+  levels.forEach(l => {
+    const c = mk("div","lvl-card "+l.id);
+    c.appendChild(mk("div","lvl-icon",l.icon));
+    const info = mk("div","lvl-info");
+    info.appendChild(mk("div","lvl-name "+l.id, l.name));
+    info.appendChild(mk("div","lvl-desc", l.desc));
+    c.appendChild(info);
+    c.appendChild(mk("div","lvl-badge "+l.bc, l.badge));
+    c.addEventListener("click", () => setLevel(l.id));
+    f.appendChild(c);
+  });
+  return f;
+}
+
+/* Exercise */
+function mkExercise() {
+  const f   = frag();
+  const st  = stage();
+  const e   = ex();
+  const tot = st.exercises.length;
+
+  // meta row
+  const meta = mk("div","ex-meta");
+  meta.appendChild(mk("span","ex-stage", st.label+": "+st.title));
+  meta.appendChild(mk("span","ex-count", (S.exIdx+1)+" of "+tot));
+  f.appendChild(meta);
+
+  // vocab strip
+  const vs = mk("div","vocab-strip");
+  st.vocab.forEach(w => vs.appendChild(mk("div","v-tag",w)));
+  f.appendChild(vs);
+
+  // level pill
+  const icons = { bronze:"🥉", silver:"🥈", gold:"🥇" };
+  f.appendChild(mk("div","lvl-pill "+S.level, icons[S.level]+" "+S.level, "margin-top:2px"));
+
+  // type badge
+  f.appendChild(mk("div","type-badge", e.typelabel || e.type));
+
+  // exercise body
+  switch (e.type) {
+    case "image-match": f.appendChild(mkImageMatch(e)); break;
+    case "true-false":  f.appendChild(mkTrueFalse(e));  break;
+    case "fill-gap":    f.appendChild(mkFillGap(e));    break;
+    case "audio":       f.appendChild(mkAudio(e));      break;
+  }
+
+  // bottom CTA
+  if (!S.feedback) {
+    const canGo = canProceed(e);
+    const cta   = mk("div","bottom-cta");
+    const btn   = mk("button","btn-primary", e.type==="audio" ? "Submit Recording →" : "Check Answer →");
+    btn.disabled = !canGo;
+    if (canGo) btn.addEventListener("click", check);
+    cta.appendChild(btn);
+    f.appendChild(cta);
+  }
+  return f;
+}
+
+function canProceed(e) {
+  if (e.type === "image-match" || e.type === "true-false") return S.sel !== null;
+  if (e.type === "audio") return S.hasAudio[e.id] === true;
+  if (e.type === "fill-gap") {
+    const lvd = ld(e);
+    if (lvd.wordBank) return lvd.gaps.every((_,i) => S.gaps[i] !== undefined);
+    const inp = document.getElementById("gap-input");
+    return inp && inp.value.trim().length > 0;
+  }
+  return false;
+}
+
+/* Image Match */
+function mkImageMatch(e) {
+  const f = frag();
+  f.appendChild(mk("div","q-text", e.question));
+  const grid = mk("div","img-grid");
+  e.options.forEach((opt, i) => {
+    let cls = "img-opt";
+    if (!S.feedback && S.sel === i) cls += " sel";
+    if (S.feedback) {
+      if (opt.correct) cls += " ok";
+      else if (S.sel === i) cls += " err";
+    }
+    const c = mk("div",cls);
+    c.appendChild(mk("span","opt-emoji",opt.emoji));
+    c.appendChild(mk("span","opt-label",opt.label));
+    if (!S.feedback) c.addEventListener("click", () => pickOpt(i));
+    grid.appendChild(c);
+  });
+  f.appendChild(grid);
+  return f;
+}
+
+/* True / False */
+function mkTrueFalse(e) {
+  const f = frag();
+  f.appendChild(mk("div","sentence-box", "\u201C"+e.statement+"\u201D"));
+  const row = mk("div","tf-row");
+  [true, false].forEach(v => {
+    let cls = "tf-btn";
+    if (!S.feedback && S.sel === v) cls += " sel";
+    if (S.feedback) {
+      if (v === e.correct) cls += " ok";
+      else if (S.sel === v) cls += " err";
+    }
+    const btn = mk("div",cls, v ? "✓ TRUE" : "✗ FALSE");
+    if (!S.feedback) btn.addEventListener("click", () => pickTF(v));
+    row.appendChild(btn);
+  });
+  f.appendChild(row);
+  return f;
+}
+
+/* Fill Gap */
+function mkFillGap(e) {
+  const f   = frag();
+  const lvd = ld(e);
+  f.appendChild(mk("div","q-text", lvd.instruction));
+
+  if (lvd.wordBank) {
+    // Bronze tap-to-fill
+    const box = mk("div","sentence-box");
+
+    lvd.parts.forEach((part, pi) => {
+      box.appendChild(document.createTextNode(part));
+      if (pi < lvd.gaps.length) {
+        const filled = S.gaps[pi];
+        let gcls = "gap" + (S.feedback ? (filled?.toLowerCase() === lvd.gaps[pi].toLowerCase() ? " ok" : " err") : "");
+        const span = mk("span", gcls, filled || "________");
+        if (filled && !S.feedback) span.addEventListener("click", () => clearGap(pi));
+        box.appendChild(span);
+      }
+    });
+    f.appendChild(box);
+
+    if (!S.feedback) {
+      const bank = mk("div","word-bank");
+      shuffledWordBank(lvd.wordBank).forEach(word => {
+        const used = Object.values(S.gaps).some(v => v?.toLowerCase() === word.toLowerCase());
+        const chip = mk("div","chip"+(used?" used":""), word);
+        if (!used) chip.addEventListener("click", () => tapChip(word));
+        bank.appendChild(chip);
+      });
+      f.appendChild(bank);
+      f.appendChild(mk("div","txt-muted","Tap a word to fill the gap. Tap the gap to clear it.",null,"font-size:11px;text-align:center"));
+    }
+
+  } else {
+    // Silver / Gold text input
+    f.appendChild(mk("div","sentence-box", lvd.template));
+    if (lvd.hint) f.appendChild(mk("div","hint-txt","Hint: "+lvd.hint));
+    if (!S.feedback) {
+      const inp = document.createElement("input");
+      inp.id          = "gap-input";
+      inp.className   = "gap-input";
+      inp.type        = "text";
+      inp.placeholder = "Type your answer here...";
+      inp.autocomplete= "off";
+      inp.autocorrect = "off";
+      inp.spellcheck  = false;
+      inp.addEventListener("input", () => {
+        // update button without full re-render to preserve focus
+        const btn = document.querySelector(".btn-primary");
+        if (btn) btn.disabled = inp.value.trim().length === 0;
+      });
+      f.appendChild(inp);
+    }
+  }
+  return f;
+}
+
+/* Audio */
+function mkAudio(e) {
+  const f   = frag();
+  const lvd = ld(e);
+  const id  = e.id;
+
+  const prompt = mk("div","audio-prompt");
+  prompt.innerHTML = "<strong>🎤 Say this:</strong><br>" + lvd.prompt;
+  f.appendChild(prompt);
+
+  f.appendChild(mk("div","txt-muted","Say your nickname first, then your answer.",null,"font-size:12px;text-align:center;margin-bottom:4px"));
+
+  const area = mk("div","rec-area");
+
+  if (BYPASS_AUDIO) {
+    /* ── Testing bypass — no audio required ── */
+    const notice = mk("div","audio-prompt",null,"border-left-color:#F5C518");
+    notice.innerHTML = "<strong>🛠️ Testing mode:</strong> Audio recording bypassed.<br>Tap the button below to simulate a submission and continue testing.";
+    area.appendChild(notice);
+    if (!S.hasAudio[id]) {
+      const skipBtn = mk("button","btn-primary","✓ Simulate Recording");
+      skipBtn.style.cssText = "margin-top:12px;background:var(--raised);color:var(--ok);border:2px solid var(--ok)";
+      skipBtn.addEventListener("click", () => {
+        S.hasAudio[id] = true;
+        render();
+      });
+      area.appendChild(skipBtn);
+    } else {
+      area.appendChild(mk("div","rec-status has","✓ Simulated — ready to submit"));
+    }
+
+  } else if (canRecord()) {
+    /* ── In-browser recorder (HTTPS / localhost) ── */
+    let btnCls = "rec-btn";
+    if (S.recording)         btnCls += " on";
+    else if (S.hasAudio[id]) btnCls += " has";
+
+    const rbtn = mk("div", btnCls, S.recording ? "⏹" : S.hasAudio[id] ? "🔄" : "🎤");
+    rbtn.addEventListener("click", () => S.recording ? stopRec() : startRec(id));
+    area.appendChild(rbtn);
+
+    let stCls = "rec-status";
+    if (S.recording)         stCls += " on";
+    else if (S.hasAudio[id]) stCls += " has";
+    const stTxt = S.recording        ? "Recording… tap to stop"
+                : S.hasAudio[id]     ? "✓ Saved — tap to re-record"
+                : "Tap to start recording";
+    area.appendChild(mk("div", stCls, stTxt));
+
+  } else {
+    /* ── File upload fallback (file:// / HTTP) ── */
+    const notice = mk("div","audio-prompt",null,"border-left-color:#F5C518;margin-bottom:12px");
+    notice.innerHTML = "<strong>⚠️ Testing mode:</strong> In-browser recording requires HTTPS.<br>Record a voice memo on your phone and upload it below.";
+    area.appendChild(notice);
+
+    const uploadBtn = mk("div","rec-btn"+(S.hasAudio[id]?" has":""), S.hasAudio[id] ? "✓" : "📎");
+    uploadBtn.style.cursor = "pointer";
+    uploadBtn.addEventListener("click", () => {
+      document.getElementById("audio-file-"+id)?.click();
+    });
+    area.appendChild(uploadBtn);
+
+    const fileInput = document.createElement("input");
+    fileInput.id     = "audio-file-"+id;
+    fileInput.type   = "file";
+    fileInput.accept = "audio/*";
+    fileInput.style.display = "none";
+    fileInput.addEventListener("change", e => {
+      if (e.target.files[0]) handleFileUpload(id, e.target.files[0]);
+    });
+    area.appendChild(fileInput);
+
+    const stTxt = S.hasAudio[id] ? "✓ File uploaded — tap to replace" : "Tap to upload your recording";
+    const stCls = "rec-status" + (S.hasAudio[id] ? " has" : "");
+    area.appendChild(mk("div", stCls, stTxt));
+  }
+
+  if (S.urls[id]) {
+    const aud = document.createElement("audio");
+    aud.className = "playback"; aud.controls = true; aud.src = S.urls[id];
+    area.appendChild(aud);
+  }
+
+  f.appendChild(area);
+  return f;
+}
+
+/* Feedback panel */
+function mkFeedback() {
+  const { ok, msg } = S.feedback;
+  const panel = mk("div","feedback"+(ok?"":" err"));
+  panel.appendChild(mk("div","fb-result "+(ok?"ok":"err"), ok?"✓ Correct!":"✗ Not quite"));
+  panel.appendChild(mk("div","fb-msg", msg));
+  const btn = mk("button","btn-primary","Continue →");
+  btn.addEventListener("click", advance);
+  panel.appendChild(btn);
+  return panel;
+}
+
+/* Stage Done */
+function mkStageDone() {
+  const f  = frag();
+  const st = S.lastStage || stage();
+  const hasNext = S.done.length < LESSON.stages.length;
+
+  const w = mk("div","complete-wrap");
+  w.appendChild(mk("div","big-stamp",st.emoji));
+  w.appendChild(mk("div","comp-title","Stage Complete!"));
+  w.appendChild(mk("div","comp-sub","You finished "+st.label+": "+st.title+".\nWell done, "+S.nickname+"!"));
+  f.appendChild(w);
+
+  const cta = mk("div","bottom-cta");
+  const nextLabel = hasNext
+    ? "Next: "+LESSON.stages[S.stageIdx].title+" →"
+    : "Mission Complete →";
+  const btn = mk("button","btn-primary",nextLabel);
+  btn.addEventListener("click", nextStage);
+  cta.appendChild(btn);
+  f.appendChild(cta);
+  return f;
+}
+
+/* Lesson Done */
+function mkLessonDone() {
+  const f = frag();
+  const w = mk("div","complete-wrap");
+  w.appendChild(mk("div","big-stamp","🏆"));
+  w.appendChild(mk("div","comp-title","Lesson Complete!"));
+  w.appendChild(mk("div","comp-sub","Amazing work, "+S.nickname+"!\n\nYou completed all stages of Lesson A.\n\nYour teacher will listen to your recordings and leave you personal feedback."));
+  f.appendChild(w);
+
+  const cta = mk("div","bottom-cta");
+  const restart = mk("button","btn-primary","↩ Try Again");
+  restart.addEventListener("click", confirmHome);
+  cta.appendChild(restart);
+  const home = mk("button","btn-ghost","🏠 Back to Home");
+  home.style.marginTop = "8px";
+  home.addEventListener("click", confirmHome);
+  cta.appendChild(home);
+  f.appendChild(cta);
+  return f;
+}
+
+
+/* ════════════════════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════════════════════ */
+
+/* Shuffle array in place (Fisher-Yates) */
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* Shuffle lesson content on load — image match options only */
+function shuffleLesson() {
+  LESSON.stages.forEach(st => {
+    st.exercises.forEach(ex => {
+      if (ex.type === "image-match") shuffle(ex.options);
+    });
+  });
+}
+
+/* Shuffle wordbank fresh each time fill-gap is rendered */
+function shuffledWordBank(wordBank) {
+  return shuffle([...wordBank]); // copy so source data stays clean
+}
+
+/* Home navigation */
+function goHome() {
+  S.showConfirm = true;
+  render();
+}
+
+function confirmHome() {
+  Object.assign(S, {
+    screen:"briefing", nickname:"", level:"bronze",
+    stageIdx:0, exIdx:0, done:[], lastStage:null,
+    feedback:null, sel:null, gaps:{},
+    blobs:{}, urls:{}, recording:false, hasAudio:{},
+    showConfirm:false,
+  });
+  render();
+}
+
+function cancelHome() {
+  S.showConfirm = false;
+  render();
+}
+
+function goBack() {
+  if (S.feedback) { S.feedback = null; render(); return; }
+  if (S.screen === "exercise" && S.exIdx > 0) {
+    S.exIdx--;
+    S.sel = null; S.gaps = {};
+    go("exercise");
+  } else if (S.screen === "exercise" && S.exIdx === 0 && S.stageIdx > 0) {
+    goHome();
+  } else if (S.screen === "level-select") {
+    go("briefing");
+  } else {
+    goHome();
+  }
+}
+
+function frag() { return document.createDocumentFragment(); }
+
+function mk(tag, cls, txt, style) {
+  const e = document.createElement(tag);
+  if (cls)   e.className = cls;
+  if (txt)   e.textContent = txt;
+  if (style) e.style.cssText = style;
+  return e;
+}
+
+function darken(hex) {
+  const n = parseInt(hex.slice(1),16);
+  const r = Math.max(0,((n>>16)&0xff)-100);
+  const g = Math.max(0,((n>>8) &0xff)-100);
+  const b = Math.max(0,( n     &0xff)-100);
+  return "#"+[r,g,b].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+
+function hex2rgba(hex,a) {
+  const n = parseInt(hex.slice(1),16);
+  return `rgba(${(n>>16)&0xff},${(n>>8)&0xff},${n&0xff},${a})`;
+}
+
+/* ── Init ── */
+shuffleLesson();
+render();
+
+</script>
+</body>
+</html>
