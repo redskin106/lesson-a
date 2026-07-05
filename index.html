@@ -361,6 +361,76 @@
     .gap-input:focus { border-color: var(--accent); }
 
     /* ══════════════════════════════════════════
+       SEQUENCING
+    ══════════════════════════════════════════ */
+    .seq-item {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--raised); border: 1px solid var(--border);
+      border-radius: var(--rs); padding: 12px 14px; margin-bottom: 8px;
+    }
+    .seq-emoji { font-size: 22px; flex-shrink: 0; }
+    .seq-text  { flex: 1; font-size: 14px; color: var(--text); }
+    .seq-input {
+      width: 48px; height: 48px; text-align: center;
+      background: var(--bg); border: 2px solid var(--border);
+      border-radius: var(--rs); color: var(--text);
+      font-size: 20px; font-weight: 700; font-family: var(--fd);
+      outline: none; flex-shrink: 0;
+    }
+    .seq-input:focus { border-color: var(--accent); }
+    .seq-item.ok  { border-color: var(--ok);  background: var(--ok-bg); }
+    .seq-item.err { border-color: var(--err); background: var(--err-bg); }
+
+    /* ══════════════════════════════════════════
+       SPOT THE MISTAKE
+    ══════════════════════════════════════════ */
+    .mistake-sentence {
+      background: var(--raised); border: 1px solid var(--err);
+      border-radius: var(--rs); padding: 14px 16px;
+      font-size: 16px; color: var(--text); line-height: 1.8;
+      margin-bottom: 14px;
+    }
+    .wrong-word {
+      color: var(--err); font-weight: 700;
+      text-decoration: line-through; margin: 0 2px;
+    }
+    .spot-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .spot-opt {
+      padding: 14px 10px; text-align: center;
+      background: var(--raised); border: 2px solid var(--border);
+      border-radius: var(--rs); font-weight: 700; font-size: 14px;
+      color: var(--text); cursor: pointer;
+      font-family: var(--fd); letter-spacing: 1px;
+      transition: all .15s;
+    }
+    .spot-opt:active { transform: scale(.97); }
+    .spot-opt.sel { border-color: var(--accent); background: var(--accent-glow); }
+    .spot-opt.ok  { border-color: var(--ok);  background: var(--ok-bg);  color: var(--ok);  }
+    .spot-opt.err { border-color: var(--err); background: var(--err-bg); color: var(--err); }
+
+    /* ══════════════════════════════════════════
+       GOLD TRACK
+    ══════════════════════════════════════════ */
+    .gold-unlock {
+      background: linear-gradient(135deg, #1A0A00, #2A1500);
+      border: 2px solid var(--gold); border-radius: var(--r);
+      padding: 24px 20px; text-align: center;
+    }
+    .gold-title {
+      font-family: var(--fd); font-weight: 900; font-size: 26px;
+      color: var(--gold); letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .gold-body { font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 20px; }
+    .disaster-card {
+      background: var(--bg); border: 1px solid var(--err);
+      border-radius: var(--rs); padding: 12px 16px;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 12px;
+    }
+    .disaster-emoji { font-size: 28px; flex-shrink: 0; }
+    .disaster-text  { font-size: 13px; color: var(--err); font-weight: 700; line-height: 1.4; }
+
+    /* ══════════════════════════════════════════
        AUDIO RECORDER
     ══════════════════════════════════════════ */
     .audio-prompt {
@@ -602,6 +672,176 @@ const LESSON = {
       ]
     },
 
+    /* ─── STAGE 3: CHECK-IN ─── */
+    {
+      id:"checkin", label:"Stage 3", title:"Check-in", emoji:"🧳",
+      vocab:["PASSPORT","CHECK-IN"],
+      exercises:[
+
+        /* 3-A  Sequencing */
+        {
+          id:"s3-e1", type:"sequencing", typelabel:"Put in Order",
+          instruction:"Number these steps in the correct order (1 to 4).",
+          items:[
+            { text:"Show your passport",           emoji:"🛂", correct:2 },
+            { text:"Go to the check-in desk",      emoji:"🧳", correct:1 },
+            { text:"Put your suitcase on the belt",emoji:"⚖️", correct:3 },
+            { text:"Take your boarding pass",      emoji:"🎫", correct:4 },
+          ],
+          feedback:{
+            correct:"Correct order! That is exactly how check-in works. Well done!",
+            wrong:"Not quite. Think about what happens first when you arrive at the airport."
+          }
+        },
+
+        /* 3-B  Spot the Mistake */
+        {
+          id:"s3-e2", type:"spot-mistake", typelabel:"Spot the Mistake",
+          instruction:"One word is wrong. Which word should replace it?",
+          sentence:"Please show your TICKET at the check-in desk.",
+          wrongWord:"TICKET",
+          correctWord:"PASSPORT",
+          options:["PASSPORT","QUEUE","SUITCASE","AIRPORT"],
+          feedback:{
+            correct:"Correct! You show your PASSPORT at check-in, not your ticket.",
+            wrong:"Not quite. At check-in you need to show your PASSPORT — your ID document."
+          }
+        },
+
+        /* 3-C  Audio */
+        {
+          id:"s3-e3", type:"audio", typelabel:"Audio Response",
+          bronze:{ prompt:'Say your nickname, then: "Here is my passport."' },
+          silver:{ prompt:'Ask the check-in agent for a window seat.' },
+          gold:  { prompt:'Check in your bag AND ask for a window seat. Use two sentences.' },
+          feedback:{
+            correct:"Great work! Your teacher will listen to your recording and leave feedback.",
+            wrong:""
+          }
+        },
+      ]
+    },
+
+    /* ─── STAGE 4: SECURITY ─── */
+    {
+      id:"security", label:"Stage 4", title:"Security", emoji:"🛂",
+      vocab:["SECURITY","QUEUE"],
+      exercises:[
+
+        /* 4-A  Fill the Gap — no hints */
+        {
+          id:"s4-e1", type:"fill-gap", typelabel:"Fill the Gap",
+          bronze:{
+            instruction:"Tap the correct word to fill the gap.",
+            parts:["Please join the "," and wait for security."],
+            gaps:["QUEUE"],
+            wordBank:["queue","passport","check-in","taxi"],
+          },
+          silver:{
+            instruction:"Fill in the gap. Hint: Q _ _ _ _",
+            template:"Please join the _______ and wait for security.",
+            answer:"queue",
+          },
+          gold:{
+            instruction:"Fill in the gap. No hints at all!",
+            template:"Please join the _______ and wait for security.",
+            answer:"queue",
+          },
+          feedback:{
+            correct:"Correct! You always join the queue before going through security.",
+            wrong:"Not quite. The missing word is QUEUE — the line of people waiting."
+          }
+        },
+
+        /* 4-B  Spot the Mistake */
+        {
+          id:"s4-e2", type:"spot-mistake", typelabel:"Spot the Mistake",
+          instruction:"One word is wrong. Which word should replace it?",
+          sentence:"Put your bag through the CHECK-IN scanner.",
+          wrongWord:"CHECK-IN",
+          correctWord:"SECURITY",
+          options:["SECURITY","PASSPORT","QUEUE","AIRPORT"],
+          feedback:{
+            correct:"Correct! You put your bag through the SECURITY scanner, not check-in.",
+            wrong:"Not quite. The scanner at the gate is called SECURITY — not check-in."
+          }
+        },
+
+        /* 4-C  Audio */
+        {
+          id:"s4-e3", type:"audio", typelabel:"Audio Response",
+          bronze:{ prompt:'Say your nickname, then: "Here is my passport."' },
+          silver:{ prompt:'What does the security officer say to you? Say their words.' },
+          gold:  { prompt:'The alarm beeped but you have nothing metal. Explain to the officer. Use two sentences.' },
+          feedback:{
+            correct:"Great work! Your teacher will listen to your recording and leave feedback.",
+            wrong:""
+          }
+        },
+      ]
+    },
+
+    /* ─── GOLD TRACK: THE GREAT ESCAPE ─── */
+    {
+      id:"gold-track", label:"Gold Track", title:"The Great Escape", emoji:"🔥",
+      vocab:["TAXI","SUITCASE","AIRPORT","BOARDING PASS","PASSPORT","CHECK-IN","SECURITY","QUEUE"],
+      isGoldTrack: true,
+      exercises:[
+
+        /* G-1  Taxi — disaster card */
+        {
+          id:"g-e1", type:"audio", typelabel:"Gold Challenge",
+          disasterCard:{ emoji:"🚕💨", problem:"The taxi driver is going the WRONG WAY!" },
+          bronze:{ prompt:'You are a celebrity in disguise. Say your character name and tell the driver to stop.' },
+          silver:{ prompt:'Tell the driver he is going the wrong way. Use the word TAXI. Two sentences.' },
+          gold:  { prompt:'The driver is going the wrong way and your suitcase is falling out! What do you say? Three sentences.' },
+          feedback:{
+            correct:"Mission progressing! Your teacher will review your performance.",
+            wrong:""
+          }
+        },
+
+        /* G-2  Airport — disaster card */
+        {
+          id:"g-e2", type:"audio", typelabel:"Gold Challenge",
+          disasterCard:{ emoji:"✈️😱", problem:"You dropped your boarding pass — and someone picked it up!" },
+          bronze:{ prompt:'Say: "Excuse me, that is my boarding pass!"' },
+          silver:{ prompt:'Ask for help at the airport. Use the word AIRPORT. Two sentences.' },
+          gold:  { prompt:'You lost your boarding pass and your flight leaves in 10 minutes! Explain to the airport worker. Three sentences.' },
+          feedback:{
+            correct:"Mission progressing! Your teacher will review your performance.",
+            wrong:""
+          }
+        },
+
+        /* G-3  Check-in — disaster card */
+        {
+          id:"g-e3", type:"audio", typelabel:"Gold Challenge",
+          disasterCard:{ emoji:"🧳⚠️", problem:"Your suitcase is 10kg overweight!" },
+          bronze:{ prompt:'Say: "I am sorry, my suitcase is too heavy."' },
+          silver:{ prompt:'Explain the problem at check-in. Use the word PASSPORT. Two sentences.' },
+          gold:  { prompt:'Your bag is overweight AND your passport photo looks nothing like your disguise. Talk your way through check-in. Three sentences.' },
+          feedback:{
+            correct:"Mission progressing! Your teacher will review your performance.",
+            wrong:""
+          }
+        },
+
+        /* G-4  Security — disaster card */
+        {
+          id:"g-e4", type:"audio", typelabel:"Gold Challenge",
+          disasterCard:{ emoji:"🚨🤔", problem:"The security alarm keeps beeping — but you have NOTHING metal!" },
+          bronze:{ prompt:'Say: "I have nothing in my pockets. I do not understand."' },
+          silver:{ prompt:'Explain to the security officer. Use the word QUEUE. Two sentences.' },
+          gold:  { prompt:'The alarm is beeping, your disguise is slipping, and people in the queue are staring. What do you say? Three sentences.' },
+          feedback:{
+            correct:"🎉 MISSION COMPLETE! You escaped! Your teacher will review your full performance.",
+            wrong:""
+          }
+        },
+      ]
+    },
+
   ] // end stages
 }; // end LESSON
 
@@ -627,7 +867,8 @@ const S = {
   sel:         null,        // image-match / true-false selection
   gaps:        {},          // fill-gap bronze tapped answers { 0:"word", 1:"word" }
 
-  showConfirm: false,
+  seq:         {},          // sequencing answers { itemIndex: number }
+  spotSel:     null,        // spot-mistake selected option index
 
   // audio
   recorder:    null,
@@ -650,6 +891,8 @@ function go(screen) {
   S.feedback = null;
   S.sel      = null;
   S.gaps     = {};
+  S.seq      = {};
+  S.spotSel  = null;
   render();
   window.scrollTo(0,0);
 }
@@ -691,6 +934,12 @@ function check() {
       ok = val === (lvd.answer || "").toLowerCase();
     }
 
+  } else if (e.type === "sequencing") {
+    ok = e.items.every((item, i) => parseInt(S.seq[i]) === item.correct);
+
+  } else if (e.type === "spot-mistake") {
+    ok = e.options[S.spotSel] === e.correctWord;
+
   } else if (e.type === "audio") {
     ok = S.hasAudio[e.id] === true;
   }
@@ -707,6 +956,18 @@ function advance() {
   } else {
     S.done.push(st.id);
     S.lastStage = st;
+    // Check if this was the gold track final exercise
+    if (st.isGoldTrack) {
+      go("gold-done");
+      return;
+    }
+    // Check if all standard stages complete — offer gold unlock
+    const standardStages = LESSON.stages.filter(s => !s.isGoldTrack);
+    const allStandardDone = standardStages.every(s => S.done.includes(s.id));
+    if (allStandardDone) {
+      go("gold-unlock");
+      return;
+    }
     if (S.stageIdx < LESSON.stages.length - 1) S.stageIdx++;
     S.exIdx = 0;
     go("stage-done");
@@ -714,11 +975,24 @@ function advance() {
 }
 
 function nextStage() {
-  if (S.done.length < LESSON.stages.length) {
-    go("exercise");
+  const standardStages = LESSON.stages.filter(s => !s.isGoldTrack);
+  const allStandardDone = standardStages.every(s => S.done.includes(s.id));
+  if (allStandardDone) {
+    go("gold-unlock");
   } else {
-    go("lesson-done");
+    go("exercise");
   }
+}
+
+function startGoldTrack() {
+  const goldIdx = LESSON.stages.findIndex(s => s.isGoldTrack);
+  S.stageIdx = goldIdx;
+  S.exIdx    = 0;
+  go("exercise");
+}
+
+function declineGold() {
+  go("lesson-done");
 }
 
 /* Audio */
@@ -784,7 +1058,7 @@ function render() {
   const app = document.getElementById("app");
   app.innerHTML = "";
 
-  const showHeader = ["exercise","stage-done","lesson-done"].includes(S.screen);
+  const showHeader = ["exercise","stage-done","lesson-done","gold-unlock"].includes(S.screen);
   if (showHeader) app.appendChild(mkHeader());
 
   const scr = mk("div","screen");
@@ -793,7 +1067,9 @@ function render() {
     case "level-select":scr.appendChild(mkLevelSelect());break;
     case "exercise":    scr.appendChild(mkExercise());   break;
     case "stage-done":  scr.appendChild(mkStageDone());  break;
-    case "lesson-done": scr.appendChild(mkLessonDone()); break;
+    case "lesson-done":  scr.appendChild(mkLessonDone());  break;
+    case "gold-unlock":  scr.appendChild(mkGoldUnlock());  break;
+    case "gold-done":    scr.appendChild(mkGoldDone());    break;
   }
   app.appendChild(scr);
 
@@ -825,12 +1101,13 @@ function mkHeader() {
   nav.appendChild(home);
   h.appendChild(nav);
 
+  const visibleStages = LESSON.stages.filter(s => !s.isGoldTrack);
   const stamps = mk("div","stamps");
-  LESSON.stages.forEach((st, i) => {
+  visibleStages.forEach((st, i) => {
     const done = S.done.includes(st.id);
     const act  = i === S.stageIdx && !done;
     stamps.appendChild(mk("div","stamp"+(done?" complete":act?" active":""), done?"✓":st.emoji));
-    if (i < LESSON.stages.length-1) {
+    if (i < visibleStages.length-1) {
       stamps.appendChild(mk("div","connector"+(done?" done":"")));
     }
   });
@@ -972,7 +1249,9 @@ function mkExercise() {
     case "image-match": f.appendChild(mkImageMatch(e)); break;
     case "true-false":  f.appendChild(mkTrueFalse(e));  break;
     case "fill-gap":    f.appendChild(mkFillGap(e));    break;
-    case "audio":       f.appendChild(mkAudio(e));      break;
+    case "audio":        f.appendChild(mkAudio(e));       break;
+    case "sequencing":   f.appendChild(mkSequencing(e));  break;
+    case "spot-mistake": f.appendChild(mkSpotMistake(e)); break;
   }
 
   // bottom CTA
@@ -990,6 +1269,8 @@ function mkExercise() {
 
 function canProceed(e) {
   if (e.type === "image-match" || e.type === "true-false") return S.sel !== null;
+  if (e.type === "sequencing")   return e.items.every((_,i) => S.seq[i] !== undefined && S.seq[i] !== "");
+  if (e.type === "spot-mistake") return S.spotSel !== null;
   if (e.type === "audio") return S.hasAudio[e.id] === true;
   if (e.type === "fill-gap") {
     const lvd = ld(e);
@@ -1106,6 +1387,14 @@ function mkAudio(e) {
   const lvd = ld(e);
   const id  = e.id;
 
+  // Disaster card (Gold Track only)
+  if (e.disasterCard) {
+    const dc = mk("div","disaster-card");
+    dc.appendChild(mk("div","disaster-emoji", e.disasterCard.emoji));
+    dc.appendChild(mk("div","disaster-text", "⚠️ PROBLEM: " + e.disasterCard.problem));
+    f.appendChild(dc);
+  }
+
   const prompt = mk("div","audio-prompt");
   prompt.innerHTML = "<strong>🎤 Say this:</strong><br>" + lvd.prompt;
   f.appendChild(prompt);
@@ -1187,6 +1476,116 @@ function mkAudio(e) {
   return f;
 }
 
+/* Sequencing */
+function mkSequencing(e) {
+  const f = frag();
+  f.appendChild(mk("div","q-text", e.instruction));
+  e.items.forEach((item, i) => {
+    const answered = S.seq[i] !== undefined && S.seq[i] !== "";
+    let cls = "seq-item";
+    if (S.feedback) {
+      cls += parseInt(S.seq[i]) === item.correct ? " ok" : " err";
+    }
+    const row = mk("div", cls);
+    row.appendChild(mk("div","seq-emoji", item.emoji));
+    row.appendChild(mk("div","seq-text", item.text));
+    if (!S.feedback) {
+      const inp = document.createElement("input");
+      inp.className   = "seq-input";
+      inp.type        = "number";
+      inp.min         = "1";
+      inp.max         = String(e.items.length);
+      inp.placeholder = "?";
+      inp.value       = S.seq[i] !== undefined ? S.seq[i] : "";
+      inp.addEventListener("input", ev => {
+        S.seq[i] = ev.target.value;
+        const btn = document.querySelector(".btn-primary");
+        if (btn) btn.disabled = !e.items.every((_,j) => S.seq[j] !== undefined && S.seq[j] !== "");
+      });
+      row.appendChild(inp);
+    } else {
+      row.appendChild(mk("div","seq-input", String(item.correct), "display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:inherit"));
+    }
+    f.appendChild(row);
+  });
+  return f;
+}
+
+/* Spot the Mistake */
+function mkSpotMistake(e) {
+  const f = frag();
+  f.appendChild(mk("div","q-text", e.instruction));
+
+  // Sentence with highlighted wrong word
+  const box = mk("div","mistake-sentence");
+  const parts = e.sentence.split(e.wrongWord);
+  box.appendChild(document.createTextNode(parts[0]));
+  box.appendChild(mk("span","wrong-word", e.wrongWord));
+  if (parts[1]) box.appendChild(document.createTextNode(parts[1]));
+  f.appendChild(box);
+
+  f.appendChild(mk("div","txt-muted","Which word should replace it?",null,"margin-bottom:10px;font-size:13px"));
+
+  const grid = mk("div","spot-options");
+  e.options.forEach((opt, i) => {
+    let cls = "spot-opt";
+    if (!S.feedback && S.spotSel === i) cls += " sel";
+    if (S.feedback) {
+      if (opt === e.correctWord) cls += " ok";
+      else if (S.spotSel === i) cls += " err";
+    }
+    const btn = mk("div", cls, opt);
+    if (!S.feedback) btn.addEventListener("click", () => { S.spotSel = i; render(); });
+    grid.appendChild(btn);
+  });
+  f.appendChild(grid);
+  return f;
+}
+
+/* Gold Track unlock screen */
+function mkGoldUnlock() {
+  const f = frag();
+  const card = mk("div","gold-unlock");
+  card.appendChild(mk("div","","🔥",null));
+  card.querySelector("div").style.cssText = "font-size:52px;margin-bottom:12px";
+  card.appendChild(mk("div","gold-title","Mission Complete"));
+  card.appendChild(mk("div","gold-body",
+    "You have completed all 4 stages of your journey.\n\nA new assignment has arrived...\n\nYou are a celebrity in disguise. A disaster is coming. You must get through the airport — FAST.\n\nDo you choose to accept this mission?"
+  ));
+  const row = mk("div","confirm-row");
+  const yes = mk("button","btn-primary","⚡ Accept Mission");
+  yes.style.background = "var(--gold)";
+  yes.addEventListener("click", startGoldTrack);
+  const no  = mk("button","btn-ghost","Submit & Finish");
+  no.addEventListener("click", declineGold);
+  row.appendChild(no);
+  row.appendChild(yes);
+  card.appendChild(row);
+  f.appendChild(card);
+  return f;
+}
+
+/* Gold Track complete */
+function mkGoldDone() {
+  const f = frag();
+  const w = mk("div","complete-wrap");
+  w.appendChild(mk("div","big-stamp","🌍", "background:var(--gold)"));
+  w.appendChild(mk("div","comp-title","You Escaped!"));
+  w.appendChild(mk("div","comp-sub","Incredible work, "+S.nickname+"! 🔥\n\nYou completed The Great Escape.\n\nYour teacher will review your full mission report and leave personal feedback."));
+  f.appendChild(w);
+
+  const cta = mk("div","bottom-cta");
+  const restart = mk("button","btn-primary","↩ Try Again");
+  restart.addEventListener("click", confirmHome);
+  cta.appendChild(restart);
+  const home = mk("button","btn-ghost","🏠 Back to Home");
+  home.style.marginTop = "8px";
+  home.addEventListener("click", confirmHome);
+  cta.appendChild(home);
+  f.appendChild(cta);
+  return f;
+}
+
 /* Feedback panel */
 function mkFeedback() {
   const { ok, msg } = S.feedback;
@@ -1257,11 +1656,13 @@ function shuffle(arr) {
   return arr;
 }
 
-/* Shuffle lesson content on load — image match options only */
+/* Shuffle lesson content on load — image match options + sequencing items */
 function shuffleLesson() {
   LESSON.stages.forEach(st => {
     st.exercises.forEach(ex => {
       if (ex.type === "image-match") shuffle(ex.options);
+      if (ex.type === "sequencing")  shuffle(ex.items);
+      if (ex.type === "spot-mistake") shuffle(ex.options);
     });
   });
 }
@@ -1281,7 +1682,7 @@ function confirmHome() {
   Object.assign(S, {
     screen:"briefing", nickname:"", level:"bronze",
     stageIdx:0, exIdx:0, done:[], lastStage:null,
-    feedback:null, sel:null, gaps:{},
+    feedback:null, sel:null, gaps:{}, seq:{}, spotSel:null,
     blobs:{}, urls:{}, recording:false, hasAudio:{},
     showConfirm:false,
   });
