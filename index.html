@@ -996,7 +996,7 @@ function declineGold() {
 }
 
 /* Audio */
-const BYPASS_AUDIO = false; // ← set true to bypass audio for local testing
+const BYPASS_AUDIO = true; // ← set false when deploying for real use
 
 function canRecord() {
   return !BYPASS_AUDIO &&
