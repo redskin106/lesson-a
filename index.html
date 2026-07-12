@@ -1534,7 +1534,21 @@ const MODULE_REGISTRY = {
         catch(e) { playing = false; unlockOptions(); return; }
         u.rate  = isBronze ? 0.8 : 0.85;
         u.lang  = 'en-US';
+
+        // Fallback: unlock options after estimated audio duration + 2s buffer,
+        // in case onend never fires (silent TTS failure on some mobile browsers)
+        const estMs = Math.max(1500, (data.audio.length / u.rate) * 65);
+        const fallback = setTimeout(() => {
+          if (_audioRID !== myRID) return;
+          playing = false; hasPlayed = true;
+          listenIcon.textContent = '🔊';
+          listenLbl.textContent  = 'Listen again';
+          listenBtn.classList.remove('playing');
+          if (isSilver || isGold) unlockOptions();
+        }, estMs + 2000);
+
         u.onend = () => {
+          clearTimeout(fallback);
           if (_audioRID !== myRID) return;
           playing = false;
           hasPlayed = true;
@@ -1726,9 +1740,13 @@ const MODULE_REGISTRY = {
       const scoreLabel = container.querySelector('#match-score');
       const nextBtn    = container.querySelector('#next-btn');
 
-      // Shuffle both columns independently, preserving pair index
-      const leftItems  = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
-      const rightItems = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
+      // Shuffle both columns independently, ensuring no pair lines up by position
+      const withIdx    = pairs.map((p, i) => ({ ...p, pairIdx: i }));
+      const leftItems  = safeShuffle(withIdx, () => false);
+      const rightItems = safeShuffle(
+        withIdx,
+        r => r.some((item, pos) => item.pairIdx === leftItems[pos].pairIdx)
+      );
 
       leftItems.forEach(pair => {
         const btn = document.createElement('button');
@@ -2284,7 +2302,8 @@ const MODULE_REGISTRY = {
   'memory-pairs': {
     render(container, data, tier, onComplete) {
       const { items } = data;
-      const PAIRS = 4;
+      const PAIRS      = tier === 'bronze' ? 3 : 4;
+      const FLIPBACK   = tier === 'gold' ? 700 : tier === 'silver' ? 900 : 1200; // ms before non-match flips back
       const picked = safeShuffle(items, ()=>false).slice(0, PAIRS);
       const deckSrc = [
         ...picked.map((it,i)=>({...it, kind:'image', pid:i})),
@@ -2352,7 +2371,7 @@ const MODULE_REGISTRY = {
         if (!cw || cw.dataset.done || cw.dataset.flipped) return;
         cw.dataset.flipped = '1';
         ci.style.transform = 'rotateY(180deg)';
-        speak(deck[i].word, 'neutral');
+        if (deck[i].kind === 'image') speak(deck[i].word, 'neutral'); // word card is readable; only speak on image flip
         flips++;
         document.getElementById('mp-flips').textContent = flips;
         flipped.push(i);
@@ -2388,15 +2407,13 @@ const MODULE_REGISTRY = {
           const ciB=document.getElementById(`mp-ci-${b}`);
           if(ciA){ciA.style.borderRadius='10px';ciA.style.boxShadow='0 0 0 2px var(--fail)';}
           if(ciB){ciB.style.borderRadius='10px';ciB.style.boxShadow='0 0 0 2px var(--fail)';}
-          speak(ca.word,'wrong');
-          speak(cb.word,'wrong',700);
           setTimeout(()=>{
             if(ciA){ciA.style.transform='';ciA.style.boxShadow='';}
             if(ciB){ciB.style.transform='';ciB.style.boxShadow='';}
             delete document.getElementById(`mp-cw-${a}`).dataset.flipped;
             delete document.getElementById(`mp-cw-${b}`).dataset.flipped;
             flipped=[]; cardLocked=false;
-          },1100);
+          }, FLIPBACK);
         }
       }
     }
