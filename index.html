@@ -710,17 +710,30 @@ const LESSON = [
       bronze: {
         sentence: 'I ___ water every day.',
         options: ['drink', 'eat', 'sleep', 'run'],
-        answer: 'drink'
+        answer: 'drink',
+        tokens: [
+          {text:'I',       role:'subject'}, {text:'drink', role:'verb'},
+          {text:'water',   role:'object'},  {text:'every day', role:'time'}
+        ]
       },
       silver: {
         sentence: 'She ___ her homework before dinner.',
         options: ['does', 'eats', 'reads', 'plays', 'sleeps'],
-        answer: 'does'
+        answer: 'does',
+        tokens: [
+          {text:'She',          role:'subject'}, {text:'does',          role:'verb'},
+          {text:'her homework', role:'object'},  {text:'before dinner', role:'time'}
+        ]
       },
       gold: {
         sentence: 'My uncle works at the hospital and ___ sick people.',
         options: ['helps', 'calls', 'reads', 'drives', 'meets', 'teaches'],
-        answer: 'helps'
+        answer: 'helps',
+        tokens: [
+          {text:'My uncle',       role:'subject'}, {text:'works', role:'verb'},
+          {text:'at the hospital',role:'place'},   {text:'and',   role:'connector'},
+          {text:'helps',          role:'verb'},    {text:'sick people', role:'object'}
+        ]
       }
     }
   },
@@ -733,15 +746,26 @@ const LESSON = [
     data: {
       bronze: {
         statement: 'A dog is an animal.',
-        answer: true
+        answer: true,
+        tokens: [
+          {text:'A dog', role:'subject'}, {text:'is', role:'verb'}, {text:'an animal', role:'object'}
+        ]
       },
       silver: {
         statement: 'We eat breakfast at night.',
-        answer: false
+        answer: false,
+        tokens: [
+          {text:'We', role:'subject'}, {text:'eat', role:'verb'},
+          {text:'breakfast', role:'object'}, {text:'at night', role:'time'}
+        ]
       },
       gold: {
         statement: 'She goes to the library after class to study quietly.',
-        answer: true
+        answer: true,
+        tokens: [
+          {text:'She', role:'subject'}, {text:'goes', role:'verb'},
+          {text:'to the library', role:'place'}, {text:'after class', role:'time'}
+        ]
       }
     }
   },
@@ -1610,7 +1634,7 @@ const MODULE_REGISTRY = {
   // ─────────────────────────────────────────────
   'gap-fill': {
     render(container, data, tier, onComplete) {
-      const { sentence, options, answer } = data;
+      const { sentence, options, answer, tokens } = data;
       let filled   = null;
       let answered = false;
 
@@ -1623,17 +1647,19 @@ const MODULE_REGISTRY = {
         <p class="module-question">Choose the missing word.</p>
         <div class="sentence-display">${sentenceHTML}</div>
         <div class="word-bank" id="word-bank"></div>
+        <div id="gf-grammar" style="min-height:0;margin-top:12px;text-align:center;
+          line-height:2;transition:opacity .3s;opacity:0;"></div>
         <button class="next-ex-btn" id="check-btn" style="display:none;margin-top:16px">Check ✓</button>
         <button class="next-ex-btn" id="next-btn"  style="display:none">Next →</button>
       `;
 
-      const blankSlot = container.querySelector('#blank-slot');
-      const wordBank  = container.querySelector('#word-bank');
-      const checkBtn  = container.querySelector('#check-btn');
-      const nextBtn   = container.querySelector('#next-btn');
+      const blankSlot  = container.querySelector('#blank-slot');
+      const wordBank   = container.querySelector('#word-bank');
+      const checkBtn   = container.querySelector('#check-btn');
+      const nextBtn    = container.querySelector('#next-btn');
+      const grammarDiv = container.querySelector('#gf-grammar');
 
-      // Shuffle options
-      [...options].sort(() => Math.random() - 0.5).forEach(word => {
+      safeShuffle([...options], () => false).forEach(word => {
         const btn = document.createElement('button');
         btn.className    = 'word-btn';
         btn.textContent  = word;
@@ -1641,7 +1667,6 @@ const MODULE_REGISTRY = {
 
         btn.addEventListener('click', () => {
           if (answered) return;
-          // Toggle: tap same word to deselect
           if (filled === word) {
             filled = null;
             btn.classList.remove('selected');
@@ -1649,7 +1674,6 @@ const MODULE_REGISTRY = {
             blankSlot.style.color  = '';
             checkBtn.style.display = 'none';
           } else {
-            // Deselect previous
             wordBank.querySelectorAll('.word-btn').forEach(b => b.classList.remove('selected'));
             filled = word;
             btn.classList.add('selected');
@@ -1665,24 +1689,28 @@ const MODULE_REGISTRY = {
       checkBtn.addEventListener('click', () => {
         if (!filled || answered) return;
         answered = true;
-
         const correct = (filled === answer);
 
-        // Style the blank
         blankSlot.style.color       = correct ? 'var(--pass)' : 'var(--fail)';
         blankSlot.style.borderColor = correct ? 'var(--pass)' : 'var(--fail)';
 
-        // Style word bank buttons
         wordBank.querySelectorAll('.word-btn').forEach(b => {
           b.disabled = true;
-          if (b.dataset.word === answer)  b.classList.add('correct');
-          if (b.dataset.word === filled && !correct) b.classList.add('wrong');
+          if (b.dataset.word === answer)               b.classList.add('correct');
+          if (b.dataset.word === filled && !correct)   b.classList.add('wrong');
           b.classList.remove('selected');
         });
 
-        // If wrong, show correct answer in blank too
+        // Show correct word in blank if wrong
         if (!correct) {
-          setTimeout(() => { blankSlot.innerHTML = pill(answer, 'verb'); }, 400);
+          blankSlot.textContent   = answer;
+          blankSlot.style.color   = 'var(--pass)';
+        }
+
+        // Grammar pill reveal
+        if (tokens) {
+          grammarDiv.innerHTML = grammarSentence(tokens);
+          grammarDiv.style.opacity = '1';
         }
 
         checkBtn.style.display = 'none';
@@ -1699,7 +1727,7 @@ const MODULE_REGISTRY = {
   // ─────────────────────────────────────────────
   'true-false': {
     render(container, data, tier, onComplete) {
-      const { statement, answer } = data;
+      const { statement, answer, tokens } = data;
 
       container.innerHTML = `
         <p class="module-question">Is this true or false?</p>
@@ -1708,28 +1736,33 @@ const MODULE_REGISTRY = {
           <button class="tf-btn true-btn"  id="true-btn">✓ True</button>
           <button class="tf-btn false-btn" id="false-btn">✗ False</button>
         </div>
+        <div id="tf-grammar" style="min-height:0;margin-top:14px;text-align:center;
+          line-height:2;opacity:0;transition:opacity .3s;"></div>
         <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
       `;
 
       const trueBtn  = container.querySelector('#true-btn');
       const falseBtn = container.querySelector('#false-btn');
       const nextBtn  = container.querySelector('#next-btn');
+      const grammarDiv = container.querySelector('#tf-grammar');
 
       function handleAnswer(chosen) {
         const correct = (chosen === answer);
-
-        // Mark chosen button
         const chosenBtn = chosen ? trueBtn : falseBtn;
         chosenBtn.classList.add(correct ? 'highlight-correct' : 'highlight-wrong');
-
-        // Always show which was correct
         if (!correct) {
           const correctBtn = answer ? trueBtn : falseBtn;
           correctBtn.classList.add('highlight-correct');
         }
-
         trueBtn.disabled  = true;
         falseBtn.disabled = true;
+
+        // Grammar pill reveal
+        if (tokens) {
+          grammarDiv.innerHTML = grammarSentence(tokens);
+          grammarDiv.style.opacity = '1';
+        }
+
         nextBtn.style.display = 'block';
         nextBtn.onclick = () => onComplete(correct ? 1 : 0);
       }
@@ -2493,7 +2526,7 @@ const MODULE_REGISTRY = {
         const wordUp=item.word.toUpperCase();
         bankData=safeShuffle(letters,r=>r.join('')===wordUp).map((l,i)=>({letter:l,id:i,used:false}));
         drawWS();
-        speak(item.word,'neutral',300);
+        // No auto-play on load — student uses 🔊 button when ready
       }
 
       function drawWS() {
@@ -2502,7 +2535,7 @@ const MODULE_REGISTRY = {
           <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
           <div style="text-align:center;margin-bottom:1rem;position:relative;display:inline-block;width:100%;">
             ${visual(item)}
-            <button onclick="speak(session&&'${item.word}','neutral')" style="
+            <button id="ws-play-btn" style="
               position:absolute;right:8px;top:0;
               background:var(--surface2);border:1px solid var(--surface2);
               border-radius:50%;width:36px;height:36px;font-size:16px;
@@ -2527,6 +2560,8 @@ const MODULE_REGISTRY = {
             ">${t.letter}</button>`).join('')}
           </div>
           <div id="ws-fb" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);margin-bottom:.5rem;"></div>`;
+        const playBtn = container.querySelector('#ws-play-btn');
+        if (playBtn) playBtn.addEventListener('click', () => speak(item.word, 'neutral'));
       }
 
       function refreshSlots() {
@@ -2554,7 +2589,7 @@ const MODULE_REGISTRY = {
         if(si===-1)return;
         tile.used=true;
         slotData[si]={letter:tile.letter,bankId:bi};
-        speak(session[idx].word,'neutral');
+        // No audio per tap — student uses 🔊 button
         refreshSlots();refreshBank();
         if(slotData.indexOf(null)===-1)setTimeout(wsCheck,200);
       };
@@ -2588,14 +2623,12 @@ const MODULE_REGISTRY = {
           setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
         } else {
           if(fb){fb.textContent=`✗ The word is: ${item.word}`;fb.style.color='var(--fail)';}
-          speak(item.word,'wrong');
           setTimeout(()=>{
             slotData=slotData.map(()=>null);
             bankData.forEach(t=>t.used=false);
             wsLocked=false;
             refreshSlots();refreshBank();
             if(fb){fb.textContent='Try again!';fb.style.color='var(--text-dim)';}
-            speak(item.word,'neutral',300);
           },1500);
         }
       }
