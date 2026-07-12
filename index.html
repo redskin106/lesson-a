@@ -1412,8 +1412,37 @@ function safeShuffle(arr, badFn, maxAttempts=20) {
 const MIN_READ_MS   = 3500;
 const READ_PAUSE_MS = 1800;
 
+// ── Grammar pill renderer ─────────────────────────────────────────────────
+// Sentence tokens: array of {text, role} where role is one of:
+//   subject | verb | object | place | time | connector | detail | (omit = plain)
+// Usage: grammarSentence([{text:'I',role:'subject'},{text:'eat',role:'verb'},…])
+const GRAMMAR_COLORS = {
+  subject:   { bg: 'rgba(0,188,212,0.18)',   border: '#00BCD4', color: '#00BCD4' },
+  verb:      { bg: 'rgba(139,195,74,0.18)',  border: '#8BC34A', color: '#8BC34A' },
+  object:    { bg: 'rgba(255,152,0,0.18)',   border: '#FF9800', color: '#FFB74D' },
+  place:     { bg: 'rgba(171,71,188,0.18)',  border: '#AB47BC', color: '#CE93D8' },
+  time:      { bg: 'rgba(233,30,99,0.18)',   border: '#E91E63', color: '#F48FB1' },
+};
+function grammarSentence(tokens) {
+  return tokens.map(t => {
+    const c = GRAMMAR_COLORS[t.role];
+    if (!c) return `<span style="color:var(--text);">${t.text}</span>`;
+    return `<span style="
+      display:inline-block;
+      background:${c.bg};
+      border:1.5px solid ${c.border};
+      color:${c.color};
+      border-radius:6px;
+      padding:1px 7px;
+      margin:1px 2px;
+      font-weight:600;
+      font-size:.95em;
+    ">${t.text}</span>`;
+  }).join(' ');
+}
+
 function showReinforcePanel(item, onClose) {
-  const plain = item.sentence.replace(/<[^>]+>/g, '');
+  const plain = (item.sentence || '').replace(/<[^>]+>/g, '');
   const panel = document.getElementById('reinforce-panel');
   const bar   = document.getElementById('rp-bar');
 
@@ -1421,7 +1450,9 @@ function showReinforcePanel(item, onClose) {
     ? `<img src="${item.image}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;" alt="${item.word}">`
     : item.emoji;
   document.getElementById('rp-word').textContent = item.word;
-  document.getElementById('rp-sent').innerHTML   = verbify(item.sentence);
+  document.getElementById('rp-sent').innerHTML   = item.tokens
+    ? grammarSentence(item.tokens)
+    : (item.sentence || '');
 
   panel.style.transform = 'translateY(0)';
 
@@ -1448,56 +1479,69 @@ const MODULE_REGISTRY = {
 
   // ─────────────────────────────────────────────
   //  AUDIO UNDERSTANDING
-  //  Bronze: word → options unlock after 400ms safety window
-  //          (prevents ghost-click / tap-through from previous screen)
-  //  Silver: sentence → options appear after first listen
-  //  Gold:   sentence → options appear when audio ends,
-  //                     hidden again on replay
+  //  All tiers: options always fully visible.
+  //  Bronze:  tap freely — no listen requirement.
+  //  Silver:  must listen once before answering; tapping early shows nudge.
+  //  Gold:    must listen; options grey-out on replay until audio ends again.
   // ─────────────────────────────────────────────
   'audio-understanding': {
     render(container, data, tier, onComplete) {
 
-      const myRID    = ++_audioRID;   // snapshot this render's ID
-
+      const myRID    = ++_audioRID;
       const isBronze = tier === 'bronze';
-      const isSilver = tier === 'silver';
       const isGold   = tier === 'gold';
 
       let hasPlayed = false;
       let playing   = false;
       let answered  = false;
+      let optionsLive = isBronze; // bronze: live immediately; silver/gold: after first listen
 
       container.innerHTML = `
         <p class="module-question">${data.question}</p>
-        <button class="listen-btn" id="listen-btn">
-          <span id="listen-icon">🔊</span>
-          <span id="listen-label">Listen</span>
+        <button class="listen-btn" id="au-listen">
+          <span id="au-icon">🔊</span>
+          <span id="au-lbl">${isBronze ? 'Listen' : 'Listen first'}</span>
         </button>
-        <div class="options-grid" id="options-grid"></div>
-        <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
+        <p id="au-hint" style="text-align:center;font-size:13px;color:var(--accent);
+           min-height:18px;margin:.25rem 0 .5rem;opacity:0;transition:opacity .2s;"></p>
+        <div class="options-grid" id="au-grid"></div>
+        <button class="next-ex-btn" id="au-next" style="display:none">Next →</button>
       `;
 
-      const listenBtn  = container.querySelector('#listen-btn');
-      const listenIcon = container.querySelector('#listen-icon');
-      const listenLbl  = container.querySelector('#listen-label');
-      const grid       = container.querySelector('#options-grid');
-      const nextBtn    = container.querySelector('#next-btn');
+      const listenBtn = container.querySelector('#au-listen');
+      const listenIcon= container.querySelector('#au-icon');
+      const listenLbl = container.querySelector('#au-lbl');
+      const hint      = container.querySelector('#au-hint');
+      const grid      = container.querySelector('#au-grid');
+      const nextBtn   = container.querySelector('#au-next');
 
-      // ── Build options ──────────────────────────────────────
-      // ALL options start disabled + locked, regardless of tier.
-      // Bronze unlocks via setTimeout below.
-      // Silver / Gold unlock after audio plays.
+      function showHint(msg) {
+        hint.textContent = msg;
+        hint.style.opacity = '1';
+        setTimeout(() => { hint.style.opacity = '0'; }, 1800);
+      }
+
+      function setGridLive(live) {
+        optionsLive = live;
+        grid.querySelectorAll('.option-btn').forEach(b => {
+          if (answered) return;
+          b.style.opacity = live ? '1' : '0.35';
+          b.style.pointerEvents = live ? '' : 'none';
+        });
+      }
+
+      // Build options — always visible, interaction gated by optionsLive
       data.options.forEach(opt => {
         const btn = document.createElement('button');
-        btn.className   = 'option-btn locked';
+        btn.className   = 'option-btn';
         btn.textContent = opt;
-        btn.disabled    = true;
+        if (!isBronze) { btn.style.opacity = '0.35'; btn.style.pointerEvents = 'none'; }
 
         btn.addEventListener('click', () => {
-          if (answered || btn.disabled) return;
+          if (answered) return;
+          if (!optionsLive) { showHint('🔊 Listen first!'); return; }
           answered = true;
           TTS && TTS.cancel();
-
           const correct = (opt === data.answer);
           btn.classList.add(correct ? 'correct' : 'wrong');
           if (!correct) {
@@ -1509,80 +1553,46 @@ const MODULE_REGISTRY = {
           nextBtn.style.display = 'block';
           nextBtn.onclick = () => onComplete(correct ? 1 : 0);
         });
-
         grid.appendChild(btn);
       });
 
-      // ── Unlock / lock helpers ──────────────────────────────
-      function unlockOptions() {
-        if (answered) return;
-        grid.querySelectorAll('.option-btn').forEach(b => {
-          b.classList.remove('locked');
-          b.disabled = false;
-        });
-      }
-      function lockOptions() {
-        if (answered) return;
-        grid.querySelectorAll('.option-btn').forEach(b => {
-          b.classList.add('locked');
-          b.disabled = true;
-        });
-      }
+      // Bronze ghost-click guard (400ms)
+      if (isBronze) setTimeout(() => { if (_audioRID !== myRID) return; setGridLive(true); }, 400);
 
-      // Bronze: unlock after 400ms — prevents ghost clicks / tap-through
-      // events from the previous screen landing on newly rendered buttons.
-      if (isBronze) {
-        setTimeout(() => {
-          if (_audioRID !== myRID || answered) return; // stale or already done
-          unlockOptions();
-        }, 400);
-      }
-
-      // ── TTS ───────────────────────────────────────────────
-      function speak() {
+      // ── TTS ─────────────────────────────────────────────────
+      function doSpeak() {
         if (playing) return;
         playing = true;
         listenIcon.textContent = '⏸';
         listenLbl.textContent  = 'Playing…';
         listenBtn.classList.add('playing');
+        if (isGold && hasPlayed) setGridLive(false); // gold: re-hide on replay
 
-        // Gold: hide options on replay
-        if (isGold && hasPlayed) lockOptions();
-
-        if (!TTS) { playing = false; unlockOptions(); return; }
+        if (!TTS) { playing = false; setGridLive(true); return; }
         TTS.cancel();
         let u;
         try { u = new SpeechSynthesisUtterance(data.audio); }
-        catch(e) { playing = false; unlockOptions(); return; }
-        u.rate  = isBronze ? 0.8 : 0.85;
-        u.lang  = 'en-US';
+        catch(e) { playing = false; setGridLive(true); return; }
+        u.rate = isBronze ? 0.8 : 0.85;
+        u.lang = 'en-US';
 
-        // Fallback: unlock options after estimated audio duration + 2s buffer,
-        // in case onend never fires (silent TTS failure on some mobile browsers)
         const estMs = Math.max(1500, (data.audio.length / u.rate) * 65);
-        const fallback = setTimeout(() => {
+        const fbTimer = setTimeout(() => onAudioEnd(), estMs + 2000);
+
+        function onAudioEnd() {
+          clearTimeout(fbTimer);
           if (_audioRID !== myRID) return;
           playing = false; hasPlayed = true;
           listenIcon.textContent = '🔊';
           listenLbl.textContent  = 'Listen again';
           listenBtn.classList.remove('playing');
-          if (isSilver || isGold) unlockOptions();
-        }, estMs + 2000);
-
-        u.onend = () => {
-          clearTimeout(fallback);
-          if (_audioRID !== myRID) return;
-          playing = false;
-          hasPlayed = true;
-          listenIcon.textContent = '🔊';
-          listenLbl.textContent  = 'Listen again';
-          listenBtn.classList.remove('playing');
-          if (isSilver || isGold) unlockOptions();
-        };
+          setGridLive(true);
+        }
+        u.onend = onAudioEnd;
         TTS.speak(u);
       }
 
-      listenBtn.addEventListener('click', speak);
+      listenBtn.addEventListener('click', doSpeak);
     }
   },
 
@@ -2796,11 +2806,10 @@ const MODULE_REGISTRY = {
 
   // ─────────────────────────────────────────────
   //  AUDIO MATCH
-  //  Left col: tap to hear (unlimited replay, never disabled).
-  //  Right col: tap the matching text.
-  //  Same match/reveal mechanic as word-match — reuses its CSS.
-  //  Tiers differ only via data: bronze = single words,
-  //  silver/gold = sentences with deliberately similar distractors.
+  //  Left col: colour-coded audio buttons (tap to hear, unlimited).
+  //  Right col: plain text; reveals the pair's colour on match.
+  //  Each pair has a pre-assigned PALETTE colour that stays consistent
+  //  through selection, wrong-flash, and matched states.
   // ─────────────────────────────────────────────
   'audio-match': {
     render(container, data, tier, onComplete) {
@@ -2811,15 +2820,18 @@ const MODULE_REGISTRY = {
       const total      = pairs.length;
 
       const PALETTE = [
-        { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' },
-        { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' },
-        { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' },
-        { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' },
-        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' },
+        { border: '#00BCD4', bg: 'rgba(0,188,212,0.18)',  color: '#00BCD4' },
+        { border: '#AB47BC', bg: 'rgba(171,71,188,0.18)', color: '#CE93D8' },
+        { border: '#FF9800', bg: 'rgba(255,152,0,0.18)',  color: '#FFB74D' },
+        { border: '#E91E63', bg: 'rgba(233,30,99,0.18)',  color: '#F48FB1' },
+        { border: '#8BC34A', bg: 'rgba(139,195,74,0.18)', color: '#AED581' },
       ];
 
+      // Assign each pair a permanent palette slot
+      const pairColor = pairs.map((_, i) => PALETTE[i % PALETTE.length]);
+
       container.innerHTML = `
-        <p class="module-question">Listen, then tap the matching sentence.</p>
+        <p class="module-question">Tap 🔊 to listen, then tap the matching text.</p>
         <p class="match-score" id="am-score">${total} to match</p>
         <div class="match-grid">
           <div class="match-col" id="am-left-col"></div>
@@ -2833,21 +2845,25 @@ const MODULE_REGISTRY = {
       const scoreLabel = container.querySelector('#am-score');
       const nextBtn    = container.querySelector('#am-next-btn');
 
-      const leftItems  = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
-      const rightItems = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
+      // Shuffle independently, prevent left[i]/right[i] from being the same pair
+      const withIdx    = pairs.map((p, i) => ({ ...p, pairIdx: i }));
+      const leftItems  = safeShuffle(withIdx, () => false);
+      const rightItems = safeShuffle(withIdx,
+        r => r.some((item, pos) => item.pairIdx === leftItems[pos].pairIdx));
 
-      leftItems.forEach((pair, li) => {
+      leftItems.forEach(pair => {
+        const c   = pairColor[pair.pairIdx];
         const btn = document.createElement('button');
-        const c   = PALETTE[pair.pairIdx % PALETTE.length];
-        btn.className       = 'match-btn';
-        btn.innerHTML       = `🔊<br><span style="opacity:.7;font-size:11px;">Track ${li + 1}</span>`;
-        btn.dataset.key     = pair.text;
-        btn.dataset.side    = 'left';
-        btn.dataset.pairIdx = pair.pairIdx;
-        btn.dataset.audio   = pair.audio;
-        // Pre-colour each track distinctly so students can track which is which
-        btn.style.borderColor = c.border;
-        btn.style.color       = c.color;
+        btn.className           = 'match-btn';
+        btn.innerHTML           = `🔊`;
+        btn.dataset.side        = 'left';
+        btn.dataset.pairIdx     = pair.pairIdx;
+        btn.dataset.audio       = pair.audio;
+        btn.dataset.key         = pair.text;
+        // Stable colour — border + tint, persists through all states
+        btn.style.borderColor   = c.border;
+        btn.style.color         = c.color;
+        btn.style.background    = c.bg;
         leftCol.appendChild(btn);
       });
 
@@ -2855,14 +2871,14 @@ const MODULE_REGISTRY = {
         const btn = document.createElement('button');
         btn.className       = 'match-btn';
         btn.textContent     = pair.text;
-        btn.dataset.key     = pair.text;
         btn.dataset.side    = 'right';
         btn.dataset.pairIdx = pair.pairIdx;
+        btn.dataset.key     = pair.text;
         rightCol.appendChild(btn);
       });
 
       function applyMatchColor(btn) {
-        const c = PALETTE[parseInt(btn.dataset.pairIdx) % PALETTE.length];
+        const c = pairColor[parseInt(btn.dataset.pairIdx)];
         btn.style.borderColor = c.border;
         btn.style.background  = c.bg;
         btn.style.color       = c.color;
@@ -2870,50 +2886,58 @@ const MODULE_REGISTRY = {
         btn.disabled = true;
       }
 
+      function restoreLeftColor(btn) {
+        const c = pairColor[parseInt(btn.dataset.pairIdx)];
+        btn.style.borderColor = c.border;
+        btn.style.color       = c.color;
+        btn.style.background  = c.bg;
+      }
+
       container.querySelectorAll('.match-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           if (btn.classList.contains('matched')) return;
 
           if (btn.dataset.side === 'left') {
-            speak(btn.dataset.audio, 'neutral'); // unlimited replay, every tap plays
-            if (selectedLeft !== btn) {
-              container.querySelectorAll('.match-btn[data-side="left"]')
-                .forEach(b => b.classList.remove('selected'));
-              selectedLeft = btn;
-              btn.classList.add('selected');
-            }
+            speak(btn.dataset.audio, 'neutral');
+            // Deselect previous left, select this one
+            container.querySelectorAll('.match-btn[data-side="left"]').forEach(b => {
+              b.classList.remove('selected');
+              restoreLeftColor(b);
+            });
+            selectedLeft = btn;
+            btn.classList.add('selected');
+            btn.style.boxShadow = `0 0 0 3px ${pairColor[parseInt(btn.dataset.pairIdx)].border}`;
             return;
           }
 
           if (!selectedLeft) return;
-
-          const isMatch = (selectedLeft.dataset.key === btn.dataset.key);
+          const isMatch = selectedLeft.dataset.key === btn.dataset.key;
 
           if (isMatch) {
-            const leftBtn = selectedLeft;
-            selectedLeft  = null;
-            applyMatchColor(leftBtn);
+            selectedLeft.style.boxShadow = '';
+            selectedLeft.classList.remove('selected');
+            applyMatchColor(selectedLeft);
             applyMatchColor(btn);
+            selectedLeft = null;
             matchedCount++;
-
             const remaining = total - matchedCount;
             scoreLabel.textContent = remaining > 0 ? `${remaining} left` : 'All matched! ✓';
-
             if (matchedCount === total) {
-              const score = Math.max(0.6, 1 - (wrongCount * 0.1));
               nextBtn.style.display = 'block';
-              nextBtn.onclick = () => onComplete(score);
+              nextBtn.onclick = () => onComplete(Math.max(0.6, 1 - wrongCount * 0.1));
             }
           } else {
             wrongCount++;
-            selectedLeft.classList.add('wrong-flash');
-            btn.classList.add('wrong-flash');
             const prevLeft = selectedLeft;
-            selectedLeft   = null;
+            selectedLeft = null;
+            prevLeft.style.boxShadow = '';
+            prevLeft.classList.remove('selected');
+            prevLeft.style.borderColor = 'var(--fail)';
+            btn.style.borderColor      = 'var(--fail)';
             setTimeout(() => {
-              prevLeft.classList.remove('wrong-flash', 'selected');
-              btn.classList.remove('wrong-flash');
-            }, 500);
+              restoreLeftColor(prevLeft);
+              btn.style.borderColor = '';
+            }, 600);
           }
         });
       });
