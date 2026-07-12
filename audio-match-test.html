@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Audio Match — Test</title>
+<style>
+  :root {
+    --bg:       #0D1B2A;
+    --surface:  #1A2D42;
+    --surface2: #243B55;
+    --text:     #E0F0FF;
+    --text-dim: #7A9BB5;
+    --accent:   #4FC3F7;
+    --pass:     #4CAF50;
+    --fail:     #EF5350;
+    --gold:     #FFD700;
+    --radius:   12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 15px;
+    color: var(--text-dim);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* Tier picker */
+  .tier-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .tier-btn {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 8px;
+    border: 2px solid var(--surface2);
+    background: var(--surface);
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .tier-btn.active { border-color: var(--accent); color: var(--accent); }
+
+  /* Retry */
+  .retry-btn {
+    margin-bottom: 20px;
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 1.5px solid var(--text-dim);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .retry-btn:active { opacity: .7; }
+
+  /* Module container */
+  #module-area {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  /* ── Shared module styles (copied from shell) ── */
+  .module-question {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .match-score {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .match-col { display: flex; flex-direction: column; gap: 8px; }
+  .match-btn {
+    width: 100%;
+    padding: 16px 10px;
+    border-radius: var(--radius);
+    border: 2px solid var(--surface2);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .15s, background .15s, color .15s, box-shadow .15s;
+    line-height: 1.35;
+    min-height: 56px;
+  }
+  .match-btn:disabled { cursor: default; }
+  .match-btn.matched  { opacity: 1; }
+  .next-ex-btn {
+    display: block; width: 100%;
+    background: var(--accent); color: #0D1B2A;
+    border: none; border-radius: var(--radius);
+    font-size: 18px; font-weight: 700;
+    padding: 18px; cursor: pointer; margin-top: 4px;
+  }
+
+  /* Score panel at end */
+  #done-msg {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--pass);
+    margin-top: 16px;
+    min-height: 28px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Audio Match — Test</h1>
+
+<div class="tier-row">
+  <button class="tier-btn active" onclick="setTier('bronze')">🥉 Bronze</button>
+  <button class="tier-btn"        onclick="setTier('silver')">🥈 Silver</button>
+  <button class="tier-btn"        onclick="setTier('gold')">🥇 Gold</button>
+</div>
+
+<button class="retry-btn" onclick="render()">↺ Retry</button>
+
+<div id="module-area"></div>
+<div id="done-msg"></div>
+
+<script>
+// ── TTS ─────────────────────────────────────────────────────────
+const TTS = window.speechSynthesis || null;
+const SPEAK_MOODS = {
+  neutral:   { rate: 1.0,  pitch: 1.0,  volume: 1.0 },
+  celebrate: { rate: 1.15, pitch: 1.55, volume: 1.0 },
+};
+function speak(text, mood='neutral', delay=0) {
+  if (!TTS) return;
+  setTimeout(() => {
+    TTS.cancel();
+    let u;
+    try { u = new SpeechSynthesisUtterance(text); } catch(e) { return; }
+    const m = SPEAK_MOODS[mood];
+    u.rate = m.rate; u.pitch = m.pitch; u.volume = m.volume;
+    TTS.speak(u);
+  }, delay);
+}
+
+// ── safeShuffle ──────────────────────────────────────────────────
+function safeShuffle(arr, badFn, maxAttempts=20) {
+  const sh = a => [...a].sort(() => Math.random() - .5);
+  let r = sh(arr);
+  for (let i=0; i<maxAttempts; i++) { if (!badFn(r)) return r; r = sh(arr); }
+  return r;
+}
+
+// ── Data ─────────────────────────────────────────────────────────
+const DATA = {
+  bronze: {
+    pairs: [
+      { audio: 'dog',  text: 'dog'  },
+      { audio: 'cat',  text: 'cat'  },
+      { audio: 'bus',  text: 'bus'  },
+      { audio: 'book', text: 'book' },
+    ]
+  },
+  silver: {
+    pairs: [
+      { audio: 'I eat breakfast before school.', text: 'I eat breakfast before school.' },
+      { audio: 'I eat breakfast after school.',  text: 'I eat breakfast after school.'  },
+      { audio: 'I eat lunch before school.',     text: 'I eat lunch before school.'     },
+    ]
+  },
+  gold: {
+    pairs: [
+      { audio: 'He walks to school every morning.',  text: 'He walks to school every morning.'  },
+      { audio: 'She walks to school every morning.', text: 'She walks to school every morning.' },
+      { audio: 'He walks to school every evening.',  text: 'He walks to school every evening.'  },
+      { audio: 'He runs to school every morning.',   text: 'He runs to school every morning.'   },
+    ]
+  }
+};
+
+// ── State ────────────────────────────────────────────────────────
+let currentTier = 'bronze';
+
+function setTier(tier) {
+  currentTier = tier;
+  document.querySelectorAll('.tier-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['bronze','silver','gold'][i] === tier);
+  });
+  render();
+}
+
+// ── Renderer ─────────────────────────────────────────────────────
+function render() {
+  const container = document.getElementById('module-area');
+  const doneMsg   = document.getElementById('done-msg');
+  doneMsg.textContent = '';
+  TTS && TTS.cancel();
+
+  const { pairs } = DATA[currentTier];
+  let selectedLeft = null;
+  let matchedCount = 0;
+  let wrongCount   = 0;
+  const total      = pairs.length;
+
+  const PALETTE = [
+    { border: '#00BCD4', bg: 'rgba(0,188,212,0.18)',  color: '#00BCD4' },
+    { border: '#AB47BC', bg: 'rgba(171,71,188,0.18)', color: '#CE93D8' },
+    { border: '#FF9800', bg: 'rgba(255,152,0,0.18)',  color: '#FFB74D' },
+    { border: '#E91E63', bg: 'rgba(233,30,99,0.18)',  color: '#F48FB1' },
+    { border: '#8BC34A', bg: 'rgba(139,195,74,0.18)', color: '#AED581' },
+  ];
+  const pairColor = pairs.map((_, i) => PALETTE[i % PALETTE.length]);
+
+  container.innerHTML = `
+    <p class="module-question">Tap 🔊 to listen, then tap the matching text.</p>
+    <p class="match-score" id="am-score">${total} to match</p>
+    <div class="match-grid">
+      <div class="match-col" id="am-left"></div>
+      <div class="match-col" id="am-right"></div>
+    </div>
+  `;
+
+  const leftCol    = container.querySelector('#am-left');
+  const rightCol   = container.querySelector('#am-right');
+  const scoreLabel = container.querySelector('#am-score');
+
+  const withIdx    = pairs.map((p, i) => ({ ...p, pairIdx: i }));
+  const leftItems  = safeShuffle(withIdx, () => false);
+  const rightItems = safeShuffle(withIdx,
+    r => r.some((item, pos) => item.pairIdx === leftItems[pos].pairIdx));
+
+  leftItems.forEach(pair => {
+    const c   = pairColor[pair.pairIdx];
+    const btn = document.createElement('button');
+    btn.className         = 'match-btn';
+    btn.innerHTML         = '🔊';
+    btn.dataset.side      = 'left';
+    btn.dataset.pairIdx   = pair.pairIdx;
+    btn.dataset.audio     = pair.audio;
+    btn.dataset.key       = pair.text;
+    btn.style.borderColor = c.border;
+    btn.style.color       = c.color;
+    btn.style.background  = c.bg;
+    leftCol.appendChild(btn);
+  });
+
+  rightItems.forEach(pair => {
+    const btn = document.createElement('button');
+    btn.className       = 'match-btn';
+    btn.textContent     = pair.text;
+    btn.dataset.side    = 'right';
+    btn.dataset.pairIdx = pair.pairIdx;
+    btn.dataset.key     = pair.text;
+    rightCol.appendChild(btn);
+  });
+
+  function applyMatchColor(btn) {
+    const c = pairColor[parseInt(btn.dataset.pairIdx)];
+    btn.style.borderColor = c.border;
+    btn.style.background  = c.bg;
+    btn.style.color       = c.color;
+    btn.classList.add('matched');
+    btn.disabled = true;
+  }
+
+  function restoreLeftColor(btn) {
+    const c = pairColor[parseInt(btn.dataset.pairIdx)];
+    btn.style.borderColor = c.border;
+    btn.style.color       = c.color;
+    btn.style.background  = c.bg;
+    btn.style.boxShadow   = '';
+  }
+
+  container.querySelectorAll('.match-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('matched')) return;
+
+      if (btn.dataset.side === 'left') {
+        speak(btn.dataset.audio, 'neutral');
+        container.querySelectorAll('.match-btn[data-side="left"]').forEach(b => {
+          if (b.classList.contains('matched')) return;
+          b.classList.remove('selected');
+          restoreLeftColor(b);
+        });
+        selectedLeft = btn;
+        btn.classList.add('selected');
+        btn.style.boxShadow = `0 0 0 3px ${pairColor[parseInt(btn.dataset.pairIdx)].border}`;
+        return;
+      }
+
+      if (!selectedLeft) return;
+      const isMatch = selectedLeft.dataset.key === btn.dataset.key;
+
+      if (isMatch) {
+        selectedLeft.style.boxShadow = '';
+        selectedLeft.classList.remove('selected');
+        applyMatchColor(selectedLeft);
+        applyMatchColor(btn);
+        selectedLeft = null;
+        matchedCount++;
+        const remaining = total - matchedCount;
+        scoreLabel.textContent = remaining > 0 ? `${remaining} left` : 'All matched! ✓';
+        if (matchedCount === total) {
+          const score = Math.max(0.6, 1 - wrongCount * 0.1);
+          doneMsg.textContent = `Score: ${Math.round(score * 100)}%  ${wrongCount === 0 ? '⭐⭐⭐' : wrongCount <= 2 ? '⭐⭐' : '⭐'}`;
+        }
+      } else {
+        wrongCount++;
+        const prevLeft = selectedLeft;
+        selectedLeft = null;
+        prevLeft.style.boxShadow = '';
+        prevLeft.classList.remove('selected');
+        prevLeft.style.borderColor = 'var(--fail)';
+        btn.style.borderColor      = 'var(--fail)';
+        setTimeout(() => {
+          restoreLeftColor(prevLeft);
+          btn.style.borderColor = '';
+        }, 600);
+      }
+    });
+  });
+}
+
+render();
+</script>
+</body>
+</html>
