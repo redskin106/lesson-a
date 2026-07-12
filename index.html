@@ -1441,7 +1441,7 @@ function grammarSentence(tokens) {
   }).join(' ');
 }
 
-function showReinforcePanel(item, onClose) {
+function showReinforcePanel(item, onClose, opts={}) {
   const plain = (item.sentence || '').replace(/<[^>]+>/g, '');
   const panel = document.getElementById('reinforce-panel');
   const bar   = document.getElementById('rp-bar');
@@ -1458,7 +1458,9 @@ function showReinforcePanel(item, onClose) {
 
   const wordMs  = Math.max(800,  (item.word.length / SPEAK_MOODS.celebrate.rate) * 120);
   const sentMs  = Math.max(1500, (plain.length      / SPEAK_MOODS.neutral.rate)  * 60);
-  const panelMs = Math.max(MIN_READ_MS, wordMs + 400 + sentMs + READ_PAUSE_MS);
+  const panelMs = opts.sentenceOnly
+    ? Math.max(MIN_READ_MS, sentMs + READ_PAUSE_MS)
+    : Math.max(MIN_READ_MS, wordMs + 400 + sentMs + READ_PAUSE_MS);
 
   bar.style.transition = 'none'; bar.style.width = '0%';
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1466,7 +1468,11 @@ function showReinforcePanel(item, onClose) {
     bar.style.width = '100%';
   }));
 
-  speakThenSentence(item.word, plain, 'celebrate');
+  if (opts.sentenceOnly) {
+    speak(plain, 'neutral', 200);
+  } else {
+    speakThenSentence(item.word, plain, 'celebrate');
+  }
 
   setTimeout(() => {
     panel.style.transform = 'translateY(100%)';
@@ -2407,7 +2413,7 @@ const MODULE_REGISTRY = {
         if (!cw || cw.dataset.done || cw.dataset.flipped) return;
         cw.dataset.flipped = '1';
         ci.style.transform = 'rotateY(180deg)';
-        if (deck[i].kind === 'image') speak(deck[i].word, 'neutral'); // word card is readable; only speak on image flip
+        if (deck[i].kind === 'word') speak(deck[i].word, 'neutral'); // reinforce reading→audio on word reveal
         flips++;
         document.getElementById('mp-flips').textContent = flips;
         flipped.push(i);
@@ -2429,6 +2435,7 @@ const MODULE_REGISTRY = {
           const pip=document.getElementById(`mp-pip-${ca.pid}`);
           if(pip){pip.classList.add('done');}
           flipped=[];
+          TTS && TTS.cancel(); // stop any flip audio before panel plays sentence
           showReinforcePanel(ca, () => {
             cardLocked = false;
             if (matched === PAIRS) {
@@ -2437,7 +2444,7 @@ const MODULE_REGISTRY = {
               document.getElementById('mp-msg').textContent = starStr;
               setTimeout(()=>onComplete(matched/PAIRS), 800);
             }
-          });
+          }, { sentenceOnly: true });
         } else {
           const ciA=document.getElementById(`mp-ci-${a}`);
           const ciB=document.getElementById(`mp-ci-${b}`);
@@ -2899,9 +2906,11 @@ const MODULE_REGISTRY = {
 
           if (btn.dataset.side === 'left') {
             speak(btn.dataset.audio, 'neutral');
-            // Deselect previous left, select this one
+            // Deselect previous left, select this one — skip already-matched buttons
             container.querySelectorAll('.match-btn[data-side="left"]').forEach(b => {
+              if (b.classList.contains('matched')) return;
               b.classList.remove('selected');
+              b.style.boxShadow = '';
               restoreLeftColor(b);
             });
             selectedLeft = btn;
