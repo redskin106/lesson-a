@@ -285,7 +285,7 @@ html, body {
 .option-btn.correct { border-color: var(--pass); background: rgba(76,175,80,0.12); color: var(--pass); }
 .option-btn.wrong   { border-color: var(--fail); background: rgba(239,83,80,0.1);  color: var(--fail); }
 .option-btn:disabled { cursor: default; }
-.option-btn.locked  { opacity: 0; pointer-events: none; }
+.option-btn.locked  { opacity: 0.3; pointer-events: none; }
 
 .next-ex-btn {
   display: block; width: 100%;
@@ -1341,6 +1341,28 @@ const SPEAK_MOODS = {
   celebrate: { rate:1.15, pitch:1.55, volume:1.0 },
 };
 
+// ── Grammar pills ─────────────────────────────────────────────────────────
+// Colours match the sentence-building tile reveal palette.
+const GP = {
+  subject:   { bg:'rgba(0,188,212,0.15)',   color:'#00BCD4', label:'S' },
+  verb:      { bg:'rgba(139,195,74,0.15)',  color:'#8BC34A', label:'V' },
+  object:    { bg:'rgba(255,152,0,0.15)',   color:'#FFB74D', label:'O' },
+  place:     { bg:'rgba(171,71,188,0.15)',  color:'#CE93D8', label:'P' },
+  time:      { bg:'rgba(233,30,99,0.15)',   color:'#F48FB1', label:'T' },
+};
+function pill(text, role) {
+  const s = GP[role];
+  if (!s) return text;
+  return `<span style="display:inline-block;padding:1px 7px 2px;border-radius:5px;` +
+    `background:${s.bg};color:${s.color};font-weight:600;` +
+    `border:1px solid ${s.color}44;white-space:nowrap;">${text}</span>`;
+}
+// Converts <strong>word</strong> in sentence HTML → verb pill.
+// Extend as needed when data carries explicit role tags.
+function verbify(html) {
+  return html.replace(/<strong>(.*?)<\/strong>/g, (_, w) => pill(w, 'verb'));
+}
+
 function speak(text, mood='neutral', delay=0) {
   if (!TTS) return;
   setTimeout(() => {
@@ -1399,7 +1421,7 @@ function showReinforcePanel(item, onClose) {
     ? `<img src="${item.image}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;" alt="${item.word}">`
     : item.emoji;
   document.getElementById('rp-word').textContent = item.word;
-  document.getElementById('rp-sent').innerHTML   = item.sentence;
+  document.getElementById('rp-sent').innerHTML   = verbify(item.sentence);
 
   panel.style.transform = 'translateY(0)';
 
@@ -1644,7 +1666,7 @@ const MODULE_REGISTRY = {
 
         // If wrong, show correct answer in blank too
         if (!correct) {
-          setTimeout(() => { blankSlot.textContent = answer; }, 400);
+          setTimeout(() => { blankSlot.innerHTML = pill(answer, 'verb'); }, 400);
         }
 
         checkBtn.style.display = 'none';
@@ -2248,6 +2270,10 @@ const MODULE_REGISTRY = {
         }
         // speak prompt word
         speak(item.word, 'neutral', 300);
+        // Options start with 'locked' class (opacity 0.3) — remove it immediately.
+        // The local `locked` variable handles post-answer tap prevention separately.
+        setTimeout(() => container.querySelectorAll('.option-btn')
+          .forEach(b => b.classList.remove('locked')), 150);
       }
 
       // Expose handlers on window so inline onclick works
@@ -2812,12 +2838,16 @@ const MODULE_REGISTRY = {
 
       leftItems.forEach((pair, li) => {
         const btn = document.createElement('button');
+        const c   = PALETTE[pair.pairIdx % PALETTE.length];
         btn.className       = 'match-btn';
-        btn.innerHTML       = `🔊<br><span style="opacity:.55;font-size:11px;">Track ${li + 1}</span>`;
+        btn.innerHTML       = `🔊<br><span style="opacity:.7;font-size:11px;">Track ${li + 1}</span>`;
         btn.dataset.key     = pair.text;
         btn.dataset.side    = 'left';
         btn.dataset.pairIdx = pair.pairIdx;
         btn.dataset.audio   = pair.audio;
+        // Pre-colour each track distinctly so students can track which is which
+        btn.style.borderColor = c.border;
+        btn.style.color       = c.color;
         leftCol.appendChild(btn);
       });
 
