@@ -551,9 +551,9 @@ html, body {
 <option value="mod-4">Fill the Gap</option>
 <option value="mod-5">True or False</option>
 <option value="mod-6">Word Match</option>
-<option value="mod-7" selected>Put in Order</option>
+<option value="mod-7">Put in Order</option>
 <option value="mod-8">Say It</option>
-<option value="mod-game-1">Memory Pairs</option>
+<option value="mod-game-1" selected>Memory Pairs</option>
 <option value="mod-image-vocab">Picture &amp; Word</option>
 <option value="mod-game-2">Word Scramble</option>
 <option value="mod-spelling">Spelling</option>
@@ -2180,6 +2180,14 @@ const MODULE_REGISTRY = {
         </div>
         <div id="mp-msg" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);"></div>`;
 
+      const MP_PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)'  },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)'  },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)'  },
+        { border:'#8BC34A', bg:'rgba(139,195,74,.15)' },
+      ];
+
       window.mpFlip = function(i) {
         if (cardLocked) return;
         const cw = document.getElementById(`mp-cw-${i}`);
@@ -2200,14 +2208,15 @@ const MODULE_REGISTRY = {
         const isMatch = ca.pid === cb.pid && ca.kind !== cb.kind;
         if (isMatch) {
           matched++;
+          const mc = MP_PALETTE[ca.pid % MP_PALETTE.length];
           ['mp-cf-'+a,'mp-cf-'+b].forEach(id=>{
             const el=document.getElementById(id);
-            if(el){el.style.background='rgba(255,215,0,.1)';el.style.borderColor='var(--gold)';}
+            if(el){el.style.background=mc.bg; el.style.borderColor=mc.border;}
           });
           document.getElementById(`mp-cw-${a}`).dataset.done='1';
           document.getElementById(`mp-cw-${b}`).dataset.done='1';
           const pip=document.getElementById(`mp-pip-${ca.pid}`);
-          if(pip){pip.classList.add('done');}
+          if(pip){pip.classList.add('done'); pip.style.background=mc.border;}
           flipped=[];
           TTS && TTS.cancel(); // stop any flip audio before panel plays sentence
           showReinforcePanel(ca, () => {
@@ -2988,7 +2997,7 @@ const MODULE_REGISTRY = {
 };
 </script>
 <script>
-let currentModId='mod-7', currentTier='bronze';
+let currentModId='mod-game-1', currentTier='bronze';
 function pickModule(){currentModId=document.getElementById('mod-select').value;clearResult();render();}
 function setTier(t){currentTier=t;['bronze','silver','gold'].forEach(function(x){document.getElementById('tb-'+x).classList.toggle('active',x===t);});clearResult();render();}
 function clearResult(){document.getElementById('result-area').innerHTML='';}
@@ -3013,7 +3022,7 @@ function showResult(score){
   if(passed){area.innerHTML='<div style="text-align:center;padding:24px 16px;"><div style="font-size:36px;margin-bottom:8px;">'+stars+'</div><div style="font-size:20px;font-weight:700;color:var(--pass);margin-bottom:16px;">'+pct+'% — Passed!</div><button onclick="render()" style="padding:12px 28px;border-radius:10px;border:1.5px solid var(--text-dim);background:transparent;color:var(--text-dim);font-size:14px;cursor:pointer;">↺ Try again</button></div>';}
   else{area.innerHTML='<div style="text-align:center;padding:24px 16px;"><div style="font-size:36px;margin-bottom:8px;">⭐</div><div style="font-size:18px;font-weight:700;color:var(--fail);margin-bottom:6px;">'+pct+'% — not quite</div><div style="font-size:14px;color:var(--text-dim);margin-bottom:20px;">You need 60% to pass. Give it another go!</div><div style="display:flex;gap:10px;justify-content:center;"><button onclick="render()" style="flex:1;max-width:160px;padding:14px;border-radius:10px;background:var(--accent);border:none;color:#0D1B2A;font-size:16px;font-weight:700;cursor:pointer;">⟳ Try again</button><button onclick="skipModule()" style="flex:1;max-width:160px;padding:14px;border-radius:10px;background:transparent;border:1.5px solid var(--text-dim);color:var(--text-dim);font-size:16px;cursor:pointer;">Skip →</button></div></div>';}
 }
-function skipModule(){clearResult();document.getElementById('module-area').innerHTML='<p style="color:var(--text-dim);padding:32px;text-align:center;">Skipped — pick another module or retry.</p>';}
+function skipModule(){clearResult();document.getElementById('module-area').innerHTML='<p style="color:var(--text-dim);padding:32px;text-align:center;">Skipped.</p>';}
 render();
 </script>
 </body>
