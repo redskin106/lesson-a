@@ -2456,6 +2456,14 @@ const MODULE_REGISTRY = {
 
       let flipped=[], matched=0, flips=0, cardLocked=false;
 
+      const MP_PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)'  },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)'  },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)'  },
+        { border:'#8BC34A', bg:'rgba(139,195,74,.15)' },
+      ];
+
       function visual(item, size=32) {
         if (item.image) return `<img src="${item.image}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:6px;" alt="${item.word}">`;
         return `<span style="font-size:${size}px;line-height:1;">${item.emoji}</span>`;
@@ -2506,14 +2514,6 @@ const MODULE_REGISTRY = {
             </div>`).join('')}
         </div>
         <div id="mp-msg" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);"></div>`;
-
-      const MP_PALETTE = [
-        { border:'#00BCD4', bg:'rgba(0,188,212,.15)'  },
-        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
-        { border:'#FF9800', bg:'rgba(255,152,0,.15)'  },
-        { border:'#E91E63', bg:'rgba(233,30,99,.15)'  },
-        { border:'#8BC34A', bg:'rgba(139,195,74,.15)' },
-      ];
 
       window.mpFlip = function(i) {
         if (cardLocked) return;
