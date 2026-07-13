@@ -3038,11 +3038,17 @@ const MODULE_REGISTRY = {
             pairings.delete(leftIdx);
           }
 
-          // Create new pairing
+          // Create new pairing — play left audio then right text
+          const capturedLeft = selectedLeftBtn;
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
           selectedLeftBtn = null;
           refreshAll();
+
+          // Hear both sides: left audio → right text
+          speak(capturedLeft.dataset.audio, 'neutral');
+          const rightDelay = Math.max(600, capturedLeft.dataset.audio.length * 55);
+          speak(btn.textContent.trim(), 'neutral', rightDelay);
         });
       });
 
@@ -3054,11 +3060,13 @@ const MODULE_REGISTRY = {
         selectedLeftBtn = null;
 
         let correct = 0;
+
+        // First pass — colour all buttons by correctness
         container.querySelectorAll('.match-btn[data-side="left"]').forEach(btn => {
           const leftIdx  = parseInt(btn.dataset.pairIdx);
           const rightIdx = pairings.get(leftIdx);
           const isCorrect = rightIdx === leftIdx;
-          const paired = rightIdx !== undefined;
+          const paired    = rightIdx !== undefined;
           if (isCorrect) correct++;
           const c = isCorrect ? { border:'var(--pass)', bg:'rgba(76,175,80,.15)', color:'var(--pass)' }
                   : paired    ? { border:'var(--fail)', bg:'rgba(239,83,80,.1)',  color:'var(--fail)' }
@@ -3070,9 +3078,9 @@ const MODULE_REGISTRY = {
         });
 
         container.querySelectorAll('.match-btn[data-side="right"]').forEach(btn => {
-          const rightIdx = parseInt(btn.dataset.pairIdx);
-          const leftIdx  = rightUsed.get(rightIdx);
-          const paired   = leftIdx !== undefined;
+          const rightIdx  = parseInt(btn.dataset.pairIdx);
+          const leftIdx   = rightUsed.get(rightIdx);
+          const paired    = leftIdx !== undefined;
           const isCorrect = paired && leftIdx === rightIdx;
           const c = isCorrect ? { border:'var(--pass)', bg:'rgba(76,175,80,.15)', color:'var(--pass)' }
                   : paired    ? { border:'var(--fail)', bg:'rgba(239,83,80,.1)',  color:'var(--fail)' }
@@ -3082,7 +3090,25 @@ const MODULE_REGISTRY = {
           btn.style.color       = c.color;
         });
 
-        statusLbl.textContent = `${correct} of ${total} correct`;
+        // Second pass — gold hint: for each wrong left, highlight its correct right
+        container.querySelectorAll('.match-btn[data-side="left"]').forEach(btn => {
+          const leftIdx  = parseInt(btn.dataset.pairIdx);
+          const rightIdx = pairings.get(leftIdx);
+          const isCorrect = rightIdx === leftIdx;
+          if (!isCorrect) {
+            // The correct right button has the same pairIdx as this left
+            const correctRight = container.querySelector(
+              `.match-btn[data-side="right"][data-pair-idx="${leftIdx}"]`
+            );
+            if (correctRight) {
+              correctRight.style.borderColor = 'var(--gold)';
+              correctRight.style.background  = 'rgba(255,215,0,.12)';
+              correctRight.style.color       = 'var(--gold)';
+            }
+          }
+        });
+
+        statusLbl.textContent    = `${correct} of ${total} correct`;
         confirmBtn.style.display = 'none';
         nextBtn.style.display    = 'block';
         nextBtn.onclick = () => onComplete(correct / total);
