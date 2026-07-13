@@ -1255,11 +1255,24 @@ function handleTierResult(moduleIndex, tier, score) {
     }
 
   } else {
-    // Failed
+    // Failed — show score, offer retry or skip
     document.getElementById('result-msg').innerHTML =
-      `You need <strong>${Math.round(PASS_THRESHOLD * 100)}%</strong> to unlock the next level. You can do it!`;
-    ctaBtn.textContent = `↩ Try ${tierName} again`;
+      `You got <strong>${pct}%</strong> — you need <strong>${Math.round(PASS_THRESHOLD * 100)}%</strong> to pass. Give it another go!`;
+    ctaBtn.textContent = `\u27F3 Try ${tierName} again`;
     ctaBtn.onclick = () => startModule(moduleIndex, tier);
+
+    secBtn.style.display = 'block';
+    secBtn.textContent   = 'Skip \u2192';
+    secBtn.onclick = () => {
+      if (next) {
+        startModule(moduleIndex, next);
+      } else {
+        state.results[moduleIndex].complete = true;
+        const nextMod = moduleIndex + 1;
+        if (nextMod < LESSON.length) startModule(nextMod, 'bronze');
+        else showEndScreen();
+      }
+    };
   }
 
   showScreen('screen-tier-result');
@@ -1524,7 +1537,8 @@ const MODULE_REGISTRY = {
       let hasPlayed = false;
       let playing   = false;
       let answered  = false;
-      let optionsLive = isBronze; // bronze: live immediately; silver/gold: after first listen
+      let optionsLive = isBronze;
+      let selected    = null;
 
       container.innerHTML = `
         <p class="module-question">${data.question}</p>
@@ -1535,7 +1549,8 @@ const MODULE_REGISTRY = {
         <p id="au-hint" style="text-align:center;font-size:13px;color:var(--accent);
            min-height:18px;margin:.25rem 0 .5rem;opacity:0;transition:opacity .2s;"></p>
         <div class="options-grid" id="au-grid"></div>
-        <button class="next-ex-btn" id="au-next" style="display:none">Next →</button>
+        <button class="next-ex-btn" id="au-check" style="display:none;margin-bottom:8px;">Check \u2713</button>
+        <button class="next-ex-btn" id="au-next"  style="display:none;">Next \u2192</button>
       `;
 
       const listenBtn = container.querySelector('#au-listen');
@@ -1543,6 +1558,7 @@ const MODULE_REGISTRY = {
       const listenLbl = container.querySelector('#au-lbl');
       const hint      = container.querySelector('#au-hint');
       const grid      = container.querySelector('#au-grid');
+      const checkBtn  = container.querySelector('#au-check');
       const nextBtn   = container.querySelector('#au-next');
 
       function showHint(msg) {
@@ -1554,13 +1570,13 @@ const MODULE_REGISTRY = {
       function setGridLive(live) {
         optionsLive = live;
         grid.querySelectorAll('.option-btn').forEach(b => {
-          if (answered) return;
+          if (b.classList.contains('correct') || b.classList.contains('wrong')) return;
           b.style.opacity = live ? '1' : '0.35';
           b.style.pointerEvents = live ? '' : 'none';
         });
       }
 
-      // Build options — always visible, interaction gated by optionsLive
+      // Build options — tap to select/deselect, Check button locks in
       data.options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className   = 'option-btn';
@@ -1569,25 +1585,41 @@ const MODULE_REGISTRY = {
 
         btn.addEventListener('click', () => {
           if (answered) return;
-          if (!optionsLive) { showHint('🔊 Listen first!'); return; }
-          answered = true;
-          TTS && TTS.cancel();
-          const correct = (opt === data.answer);
-          btn.classList.add(correct ? 'correct' : 'wrong');
-          if (!correct) {
-            grid.querySelectorAll('.option-btn').forEach(b => {
-              if (b.textContent === data.answer) b.classList.add('correct');
-            });
+          if (!optionsLive) { showHint('\uD83D\uDD0A Listen first!'); return; }
+
+          if (selected === btn) {
+            btn.classList.remove('selected');
+            selected = null;
+            checkBtn.style.display = 'none';
+          } else {
+            if (selected) selected.classList.remove('selected');
+            selected = btn;
+            btn.classList.add('selected');
+            checkBtn.style.display = 'block';
           }
-          grid.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-          nextBtn.style.display = 'block';
-          nextBtn.onclick = () => onComplete(correct ? 1 : 0);
         });
         grid.appendChild(btn);
       });
 
-      // Bronze ghost-click guard (400ms)
       if (isBronze) setTimeout(() => { if (_audioRID !== myRID) return; setGridLive(true); }, 400);
+
+      checkBtn.addEventListener('click', () => {
+        if (!selected || answered) return;
+        answered = true;
+        TTS && TTS.cancel();
+        const correct = (selected.textContent === data.answer);
+        selected.classList.remove('selected');
+        selected.classList.add(correct ? 'correct' : 'wrong');
+        if (!correct) {
+          grid.querySelectorAll('.option-btn').forEach(b => {
+            if (b.textContent === data.answer) b.classList.add('correct');
+          });
+        }
+        grid.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+        checkBtn.style.display = 'none';
+        nextBtn.style.display  = 'block';
+        nextBtn.onclick = () => onComplete(correct ? 1 : 0);
+      });
 
       // ── TTS ─────────────────────────────────────────────────
       function doSpeak() {
