@@ -2467,7 +2467,10 @@ const MODULE_REGISTRY = {
           <div style="font-size:13px;color:var(--text-dim);">Flips: <span id="mp-flips" style="color:var(--text);">0</span></div>
         </div>
         <div id="mp-pips" style="display:flex;gap:6px;margin-bottom:1rem;">
-          ${picked.map((_,i)=>`<div class="pip" id="mp-pip-${i}" style="flex:1;"></div>`).join('')}
+          ${picked.map((_,i)=>{
+            const c=MP_PALETTE[i%MP_PALETTE.length];
+            return `<div class="pip" id="mp-pip-${i}" style="flex:1;background:${c.bg};border:1px solid ${c.border};opacity:.5;"></div>`;
+          }).join('')}
         </div>
         <div id="mp-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;">
           ${deck.map((card,i)=>`
@@ -2540,7 +2543,12 @@ const MODULE_REGISTRY = {
           document.getElementById(`mp-cw-${a}`).dataset.done='1';
           document.getElementById(`mp-cw-${b}`).dataset.done='1';
           const pip=document.getElementById(`mp-pip-${ca.pid}`);
-          if(pip){pip.classList.add('done'); pip.style.background=mc.border;}
+          if(pip){
+            pip.classList.add('done');
+            pip.style.background=mc.border;
+            pip.style.border='none';
+            pip.style.opacity='1';
+          }
           flipped=[];
           TTS && TTS.cancel(); // stop any flip audio before panel plays sentence
           showReinforcePanel(ca, () => {
