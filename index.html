@@ -1478,6 +1478,18 @@ function grammarSentence(tokens) {
   }).join(' ');
 }
 
+// Compact legend row — shown whenever grammar pills appear so students always
+// know what each colour means. Generates from GRAMMAR_COLORS so it stays in sync.
+function grammarLegend() {
+  const pills = Object.entries(GRAMMAR_COLORS).map(([role, c]) =>
+    `<span style="display:inline-block;background:${c.bg};border:1.5px solid ${c.border};
+      color:${c.color};border-radius:6px;padding:1px 9px;font-size:11px;font-weight:700;
+      letter-spacing:.03em;">${role.charAt(0).toUpperCase()+role.slice(1)}</span>`
+  ).join('');
+  return `<div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;
+    margin-bottom:10px;opacity:.85;">${pills}</div>`;
+}
+
 function showReinforcePanel(item, onClose, opts={}) {
   const plain = (item.sentence || '').replace(/<[^>]+>/g, '');
   const panel = document.getElementById('reinforce-panel');
@@ -1487,8 +1499,8 @@ function showReinforcePanel(item, onClose, opts={}) {
     ? `<img src="${item.image}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;" alt="${item.word}">`
     : item.emoji;
   document.getElementById('rp-word').textContent = item.word;
-  document.getElementById('rp-sent').innerHTML   = item.tokens
-    ? grammarSentence(item.tokens)
+  document.getElementById('rp-sent').innerHTML = item.tokens
+    ? grammarLegend() + grammarSentence(item.tokens)
     : (item.sentence || '');
 
   panel.style.transform = 'translateY(0)';
@@ -1739,9 +1751,9 @@ const MODULE_REGISTRY = {
           blankSlot.style.color   = 'var(--pass)';
         }
 
-        // Grammar pill reveal
+        // Grammar pill reveal — legend first so students know what each colour means
         if (tokens) {
-          grammarDiv.innerHTML = grammarSentence(tokens);
+          grammarDiv.innerHTML = grammarLegend() + grammarSentence(tokens);
           grammarDiv.style.opacity = '1';
         }
 
@@ -1789,9 +1801,9 @@ const MODULE_REGISTRY = {
         trueBtn.disabled  = true;
         falseBtn.disabled = true;
 
-        // Grammar pill reveal
+        // Grammar pill reveal — legend first so students know what each colour means
         if (tokens) {
-          grammarDiv.innerHTML = grammarSentence(tokens);
+          grammarDiv.innerHTML = grammarLegend() + grammarSentence(tokens);
           grammarDiv.style.opacity = '1';
         }
 
