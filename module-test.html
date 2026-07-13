@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Module Test Harness</title>
 <style>
 
@@ -528,19 +528,14 @@ html, body {
   margin-bottom: 8px;
 }
 
-.harness-header{position:sticky;top:0;z-index:100;background:var(--bg);
-  border-bottom:1px solid var(--surface2);padding:10px 16px 8px;}
+.harness-header{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--surface2);padding:10px 16px 8px;}
 .harness-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
 .harness-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;min-width:42px;}
-.mod-select{flex:1;min-width:0;background:var(--surface2);color:var(--text);
-  border:1.5px solid var(--surface2);border-radius:8px;padding:8px 10px;font-size:14px;font-weight:600;}
+.mod-select{flex:1;min-width:0;background:var(--surface2);color:var(--text);border:1.5px solid var(--surface2);border-radius:8px;padding:8px 10px;font-size:14px;font-weight:600;}
 .tier-row{display:flex;gap:6px;}
-.tier-btn{flex:1;padding:8px 0;border-radius:8px;border:2px solid var(--surface2);
-  background:var(--surface);color:var(--text-dim);font-size:13px;font-weight:700;cursor:pointer;
-  transition:border-color .15s,color .15s;}
+.tier-btn{flex:1;padding:8px 0;border-radius:8px;border:2px solid var(--surface2);background:var(--surface);color:var(--text-dim);font-size:13px;font-weight:700;cursor:pointer;transition:border-color .15s,color .15s;}
 .tier-btn.active{border-color:var(--accent);color:var(--accent);}
-.retry-btn{padding:8px 14px;border-radius:8px;border:1.5px solid var(--text-dim);
-  background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;white-space:nowrap;}
+.retry-btn{padding:8px 14px;border-radius:8px;border:1.5px solid var(--text-dim);background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;white-space:nowrap;}
 #module-area{padding:16px;max-width:460px;margin:0 auto;}
 #result-bar{text-align:center;font-size:17px;font-weight:700;padding:12px;min-height:48px;color:var(--pass);}
 </style>
@@ -565,12 +560,12 @@ html, body {
       <option value="mod-audio-match" selected>Listen &amp; Match</option>
       <option value="mod-sentence-building">Build a Sentence</option>
     </select>
-    <button class="retry-btn" onclick="render()">&#8635; Retry</button>
+    <button class="retry-btn" onclick="render()">↺ Retry</button>
   </div>
   <div class="tier-row">
-    <button class="tier-btn active" id="tb-bronze" onclick="setTier('bronze')">&#129353; Bronze</button>
-    <button class="tier-btn"        id="tb-silver" onclick="setTier('silver')">&#129352; Silver</button>
-    <button class="tier-btn"        id="tb-gold"   onclick="setTier('gold')"  >&#129351; Gold</button>
+    <button class="tier-btn active" id="tb-bronze" onclick="setTier('bronze')">🥉 Bronze</button>
+    <button class="tier-btn"        id="tb-silver" onclick="setTier('silver')">🥈 Silver</button>
+    <button class="tier-btn"        id="tb-gold"   onclick="setTier('gold')"  >🥇 Gold</button>
   </div>
 </div>
 <div id="module-area"></div>
@@ -2670,14 +2665,16 @@ const MODULE_REGISTRY = {
           } else {
             wrongCount++;
             const prevLeft = selectedLeft;
-            selectedLeft = null;
-            prevLeft.style.boxShadow = '';
-            prevLeft.classList.remove('selected');
+            selectedLeft = null;          // block further taps during flash
             prevLeft.style.borderColor = 'var(--fail)';
             btn.style.borderColor      = 'var(--fail)';
             setTimeout(() => {
               restoreLeftColor(prevLeft);
               btn.style.borderColor = '';
+              // Re-instate the left selection so student can try a different right button
+              selectedLeft = prevLeft;
+              prevLeft.classList.add('selected');
+              prevLeft.style.boxShadow = `0 0 0 3px ${pairColor[parseInt(prevLeft.dataset.pairIdx)].border}`;
             }, 600);
           }
         });
@@ -2858,8 +2855,8 @@ function render(){
   container.innerHTML='';
   renderer.render(container,data,currentTier,function(score){
     var pct=Math.round(score*100);
-    var stars=score>=0.9?'&#11088;&#11088;&#11088;':score>=0.7?'&#11088;&#11088;':'&#11088;';
-    document.getElementById('result-bar').textContent=stars+'  '+pct+'%  — tap Retry';
+    var stars=score>=0.9?'⭐⭐⭐':score>=0.7?'⭐⭐':'⭐';
+    document.getElementById('result-bar').textContent=stars+'  '+pct+'%  — tap ↺ to retry';
   });
 }
 render();
