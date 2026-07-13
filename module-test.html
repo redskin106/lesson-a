@@ -551,10 +551,10 @@ html, body {
 <option value="mod-4">Fill the Gap</option>
 <option value="mod-5">True or False</option>
 <option value="mod-6">Word Match</option>
-<option value="mod-7">Put in Order</option>
+<option value="mod-7" selected>Put in Order</option>
 <option value="mod-8">Say It</option>
 <option value="mod-game-1">Memory Pairs</option>
-<option value="mod-image-vocab" selected>Picture &amp; Word</option>
+<option value="mod-image-vocab">Picture &amp; Word</option>
 <option value="mod-game-2">Word Scramble</option>
 <option value="mod-spelling">Spelling</option>
 <option value="mod-audio-match">Listen &amp; Match</option>
@@ -1641,6 +1641,14 @@ const MODULE_REGISTRY = {
       const slots    = new Array(correct.length).fill(null);
       let checked    = false;
 
+      const SEQ_PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,0.15)',  text:'#00BCD4' },
+        { border:'#AB47BC', bg:'rgba(171,71,188,0.15)', text:'#CE93D8' },
+        { border:'#FF9800', bg:'rgba(255,152,0,0.15)',  text:'#FFB74D' },
+        { border:'#E91E63', bg:'rgba(233,30,99,0.15)',  text:'#F48FB1' },
+        { border:'#8BC34A', bg:'rgba(139,195,74,0.15)', text:'#AED581' },
+      ];
+
       // Shuffle pool
       const shuffled = [...items].sort(() => Math.random() - 0.5);
 
@@ -1662,13 +1670,21 @@ const MODULE_REGISTRY = {
       function renderSlots() {
         slotsEl.innerHTML = '';
         slots.forEach((val, i) => {
+          const c    = SEQ_PALETTE[i % SEQ_PALETTE.length];
           const slot = document.createElement('div');
           slot.className = 'seq-slot' + (val ? ' filled' : '');
-          slot.innerHTML = `<div class="slot-num">${i + 1}</div><div class="slot-text">${val || ''}</div>`;
+
+          // Colour the number always; fill slot background when occupied
+          slot.innerHTML = `
+            <div class="slot-num" style="color:${c.border};">${i + 1}</div>
+            <div class="slot-text">${val || ''}</div>`;
 
           if (val && !checked) {
+            slot.style.borderColor = c.border;
+            slot.style.background  = c.bg;
+            slot.querySelector('.slot-text').style.color = c.text;
+
             slot.addEventListener('click', () => {
-              // Return item to pool
               const word = slots[i];
               slots[i] = null;
               poolEl.querySelectorAll('.seq-item').forEach(b => {
@@ -1713,14 +1729,12 @@ const MODULE_REGISTRY = {
         checked = true;
         checkBtn.style.display = 'none';
 
-        // Disable pool items
         poolEl.querySelectorAll('.seq-item').forEach(b => b.style.pointerEvents = 'none');
 
         let correctCount = 0;
         slotsEl.querySelectorAll('.seq-slot').forEach((slot, i) => {
           const isCorrect = (slots[i] === correct[i]);
           slot.classList.add(isCorrect ? 'correct' : 'wrong');
-          // Show correct label if wrong
           if (!isCorrect) {
             slot.querySelector('.slot-text').innerHTML =
               `<span style="text-decoration:line-through;opacity:0.5">${slots[i]}</span>
@@ -2974,7 +2988,7 @@ const MODULE_REGISTRY = {
 };
 </script>
 <script>
-let currentModId='mod-image-vocab', currentTier='bronze';
+let currentModId='mod-7', currentTier='bronze';
 function pickModule(){currentModId=document.getElementById('mod-select').value;clearResult();render();}
 function setTier(t){currentTier=t;['bronze','silver','gold'].forEach(function(x){document.getElementById('tb-'+x).classList.toggle('active',x===t);});clearResult();render();}
 function clearResult(){document.getElementById('result-area').innerHTML='';}
