@@ -1,4 +1,11 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Module Test Harness</title><style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Module Test Harness</title>
+<style>
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -520,6 +527,7 @@ html, body {
   text-align: center;
   margin-bottom: 8px;
 }
+
 .harness-header{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--surface2);padding:10px 16px 8px;}
 .harness-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
 .harness-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;min-width:42px;}
@@ -529,7 +537,14 @@ html, body {
 .tier-btn.active{border-color:var(--accent);color:var(--accent);}
 #module-area{padding:16px;max-width:460px;margin:0 auto;}
 #result-area{max-width:460px;margin:0 auto;}
-</style></head><body><div class="harness-header"><div class="harness-row"><span class="harness-label">Module</span><select class="mod-select" id="mod-select" onchange="pickModule()"><option value="">-- pick a module --</option>
+</style>
+</head>
+<body>
+<div class="harness-header">
+  <div class="harness-row">
+    <span class="harness-label">Module</span>
+    <select class="mod-select" id="mod-select" onchange="pickModule()">
+      <option value="">-- pick a module --</option>
 <option value="mod-1">Listen &amp; Choose 1</option>
 <option value="mod-2">Listen &amp; Choose 2</option>
 <option value="mod-3">Listen &amp; Choose 3</option>
@@ -543,7 +558,24 @@ html, body {
 <option value="mod-game-2">Word Scramble</option>
 <option value="mod-spelling">Spelling</option>
 <option value="mod-audio-match" selected>Listen &amp; Match</option>
-<option value="mod-sentence-building">Build a Sentence</option></select></div><div class="tier-row"><button class="tier-btn active" id="tb-bronze" onclick="setTier('bronze')">🥉 Bronze</button><button class="tier-btn" id="tb-silver" onclick="setTier('silver')">🥈 Silver</button><button class="tier-btn" id="tb-gold" onclick="setTier('gold')">🥇 Gold</button></div></div><div id="module-area"></div><div id="result-area"></div><div id="reinforce-panel" style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--gold);padding:20px 20px 28px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);z-index:200;text-align:center;"><div id="rp-bar" style="position:absolute;top:0;left:0;height:3px;background:var(--gold);width:0%;"></div><div id="rp-em" style="font-size:52px;margin-bottom:8px;"></div><div id="rp-word" style="font-size:22px;font-weight:700;margin-bottom:6px;"></div><div id="rp-sent" style="font-size:15px;color:var(--text-dim);line-height:1.6;"></div></div><script>
+<option value="mod-sentence-building">Build a Sentence</option>
+    </select>
+  </div>
+  <div class="tier-row">
+    <button class="tier-btn active" id="tb-bronze" onclick="setTier('bronze')">🥉 Bronze</button>
+    <button class="tier-btn" id="tb-silver" onclick="setTier('silver')">🥈 Silver</button>
+    <button class="tier-btn" id="tb-gold" onclick="setTier('gold')">🥇 Gold</button>
+  </div>
+</div>
+<div id="module-area"></div>
+<div id="result-area"></div>
+<div id="reinforce-panel" style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--gold);padding:20px 20px 28px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);z-index:200;text-align:center;">
+  <div id="rp-bar" style="position:absolute;top:0;left:0;height:3px;background:var(--gold);width:0%;"></div>
+  <div id="rp-em" style="font-size:52px;margin-bottom:8px;"></div>
+  <div id="rp-word" style="font-size:22px;font-weight:700;margin-bottom:6px;"></div>
+  <div id="rp-sent" style="font-size:15px;color:var(--text-dim);line-height:1.6;"></div>
+</div>
+<script>
 const LESSON = [
   {
     id: 'mod-1',
@@ -1007,6 +1039,8 @@ const LESSON = [
   },
 ];
 
+</script>
+<script>
 let _audioRID = 0;
 
 // ══════════════════════════════════════════════════
@@ -2937,6 +2971,9 @@ const MODULE_REGISTRY = {
 
 };
 
+</script>
+<script>
+
 let currentModId='mod-audio-match', currentTier='bronze';
 function pickModule(){currentModId=document.getElementById('mod-select').value;clearResult();render();}
 function setTier(t){
@@ -2991,4 +3028,7 @@ function skipModule(){
   document.getElementById('module-area').innerHTML='<p style="color:var(--text-dim);padding:32px;text-align:center;">Skipped — pick another module or retry.</p>';
 }
 render();
-</script></body></html>
+
+</script>
+</body>
+</html>
