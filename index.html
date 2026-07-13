@@ -1478,16 +1478,23 @@ function grammarSentence(tokens) {
   }).join(' ');
 }
 
-// Compact legend row — shown whenever grammar pills appear so students always
-// know what each colour means. Generates from GRAMMAR_COLORS so it stays in sync.
+// Compact single-line legend — faded so it reads as a key, not content
 function grammarLegend() {
-  const pills = Object.entries(GRAMMAR_COLORS).map(([role, c]) =>
-    `<span style="display:inline-block;background:${c.bg};border:1.5px solid ${c.border};
-      color:${c.color};border-radius:6px;padding:1px 9px;font-size:11px;font-weight:700;
-      letter-spacing:.03em;">${role.charAt(0).toUpperCase()+role.slice(1)}</span>`
+  const FADED = {
+    subject: { dot: '#1A6070', text: '#3A7A8A' },
+    verb:    { dot: '#3A5C22', text: '#4A7030' },
+    object:  { dot: '#6A4008', text: '#7A5010' },
+    place:   { dot: '#4A2058', text: '#5A3068' },
+    time:    { dot: '#6A1030', text: '#7A2040' },
+  };
+  const pills = Object.entries(FADED).map(([role, c]) =>
+    `<span style="display:inline-flex;align-items:center;gap:4px;color:${c.text};font-size:11px;font-weight:600;white-space:nowrap;">
+      <span style="width:7px;height:7px;border-radius:50%;background:${c.dot};flex-shrink:0;"></span>${role.charAt(0).toUpperCase()+role.slice(1)}
+    </span>`
   ).join('');
-  return `<div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;
-    margin-bottom:10px;opacity:.85;">${pills}</div>`;
+  return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;overflow-x:auto;">
+    <span style="color:#4A6080;font-size:11px;white-space:nowrap;flex-shrink:0;">Key:</span>${pills}
+  </div>`;
 }
 
 function showReinforcePanel(item, onClose, opts={}) {
