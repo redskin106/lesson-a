@@ -553,12 +553,12 @@ html, body {
 <option value="mod-6">Word Match</option>
 <option value="mod-7">Put in Order</option>
 <option value="mod-8">Say It</option>
-<option value="mod-game-1" selected>Memory Pairs</option>
+<option value="mod-game-1">Memory Pairs</option>
 <option value="mod-image-vocab">Picture &amp; Word</option>
 <option value="mod-game-2">Word Scramble</option>
 <option value="mod-spelling">Spelling</option>
 <option value="mod-audio-match">Listen &amp; Match</option>
-<option value="mod-sentence-building">Build a Sentence</option>
+<option value="mod-sentence-building" selected>Build a Sentence</option>
     </select>
   </div>
   <div class="tier-row">
@@ -1017,12 +1017,12 @@ html, body {
       },
       silver: {
         items: [
-          { tokens: [ {text:'I',   role:'subject'}, {text:'like',   role:'verb'}, {text:'it',     role:'object'}, {text:'because', role:'connector'}, {text:'hot',   role:'detail'} ] },
-          { tokens: [ {text:'She', role:'subject'}, {text:'needs',  role:'verb'}, {text:'help',   role:'object'}, {text:'because', role:'connector'}, {text:'tired', role:'detail'} ] },
-          { tokens: [ {text:'We',  role:'subject'}, {text:'eat',    role:'verb'}, {text:'lunch',  role:'object'}, {text:'before',  role:'connector'}, {text:'school',role:'place'}  ] },
-          { tokens: [ {text:'He',  role:'subject'}, {text:'likes',  role:'verb'}, {text:'it',     role:'object'}, {text:'because', role:'connector'}, {text:'sweet', role:'detail'} ] },
-          { tokens: [ {text:'I',   role:'subject'}, {text:'go',     role:'verb'}, {text:'home',   role:'place'},  {text:'after',   role:'connector'}, {text:'school',role:'place'}  ] },
-          { tokens: [ {text:'She', role:'subject'}, {text:'drinks', role:'verb'}, {text:'water',  role:'object'}, {text:'before',  role:'connector'}, {text:'bed',   role:'place'}  ] },
+          { tokens: [ {text:'I',   role:'subject'}, {text:'like',   role:'verb'}, {text:'it',     role:'object'}, {text:'because', role:'connector'}, {text:'it is hot',     role:'detail'} ] },
+          { tokens: [ {text:'She', role:'subject'}, {text:'needs',  role:'verb'}, {text:'help',   role:'object'}, {text:'because', role:'connector'}, {text:'she is tired',  role:'detail'} ] },
+          { tokens: [ {text:'We',  role:'subject'}, {text:'eat',    role:'verb'}, {text:'lunch',  role:'object'}, {text:'before',  role:'connector'}, {text:'school',        role:'place'}  ] },
+          { tokens: [ {text:'He',  role:'subject'}, {text:'likes',  role:'verb'}, {text:'it',     role:'object'}, {text:'because', role:'connector'}, {text:'it is sweet',   role:'detail'} ] },
+          { tokens: [ {text:'I',   role:'subject'}, {text:'go',     role:'verb'}, {text:'home',   role:'place'},  {text:'after',   role:'connector'}, {text:'school',        role:'place'}  ] },
+          { tokens: [ {text:'She', role:'subject'}, {text:'drinks', role:'verb'}, {text:'water',  role:'object'}, {text:'before',  role:'connector'}, {text:'bed',           role:'place'}  ] },
         ]
       },
       gold: {
@@ -3005,7 +3005,7 @@ const MODULE_REGISTRY = {
 };
 </script>
 <script>
-let currentModId='mod-game-1', currentTier='bronze';
+let currentModId='mod-sentence-building', currentTier='bronze';
 function pickModule(){currentModId=document.getElementById('mod-select').value;clearResult();render();}
 function setTier(t){currentTier=t;['bronze','silver','gold'].forEach(function(x){document.getElementById('tb-'+x).classList.toggle('active',x===t);});clearResult();render();}
 function clearResult(){document.getElementById('result-area').innerHTML='';}
