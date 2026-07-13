@@ -2780,7 +2780,7 @@ const MODULE_REGISTRY = {
           </div>`}
           <div id="sp-fb" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);margin-bottom:.5rem;"></div>`;
 
-        speak(item.word,'neutral',350);
+        // No auto-play — student uses 🔊 button
         if(tier==='gold') setTimeout(()=>{const inp=document.getElementById('sp-input');if(inp)inp.focus();},200);
       }
 
@@ -2793,7 +2793,6 @@ const MODULE_REGISTRY = {
         if(si===-1)return;
         tile.used=true;
         slotData[si]={letter:tile.letter,bankId:bi};
-        speak(session[idx].word,'neutral');
         spRefreshSlots();spRefreshBank();
         if(slotData.indexOf(null)===-1)setTimeout(spCheckTiles,200);
       };
@@ -2839,17 +2838,15 @@ const MODULE_REGISTRY = {
           score++;
           if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
           speak(item.word,'celebrate');
-          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();},{sentenceOnly:true}),500);
         } else {
           if(fb){fb.textContent=`✗ The word is: ${item.word}`;fb.style.color='var(--fail)';}
-          speak(item.word,'wrong');
           setTimeout(()=>{
             slotData=slotData.map(()=>null);
             bankData.forEach(t=>t.used=false);
             spLocked=false;
             spRefreshSlots();spRefreshBank();
             if(fb){fb.textContent='Try again!';fb.style.color='var(--text-dim)';}
-            speak(item.word,'neutral',300);
           },1500);
         }
       }
@@ -2879,10 +2876,9 @@ const MODULE_REGISTRY = {
           if(!retypeMode)score++;
           if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
           speak(item.word,'celebrate');
-          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();},{sentenceOnly:true}),500);
         } else {
           if(fb){fb.textContent=`✗ The word is: ${item.word} — now type it correctly`;fb.style.color='var(--fail)';}
-          speak(item.word,'wrong');
           setTimeout(()=>{
             retypeMode=true; spLocked=false;
             if(inp){
@@ -2892,7 +2888,6 @@ const MODULE_REGISTRY = {
             }
             if(chk){chk.style.display='block';chk.disabled=true;chk.style.opacity='.4';}
             if(fb){fb.textContent=`Type: ${item.word}`;fb.style.color='var(--accent)';}
-            speak(item.word,'neutral',300);
           },1600);
         }
       };
