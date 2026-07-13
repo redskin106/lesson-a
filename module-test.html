@@ -2678,17 +2678,11 @@ const MODULE_REGISTRY = {
           const rightIdx = parseInt(btn.dataset.pairIdx);
 
           if (!selectedLeftBtn) {
-            // No left selected: if this right is paired, tap re-selects its left partner
+            // No left selected: if this right is paired, one tap unlinks it (no audio)
             if (rightUsed.has(rightIdx)) {
-              const leftIdx = rightUsed.get(rightIdx);
-              const partnerBtn = container.querySelector(
-                `.match-btn[data-side="left"][data-pair-idx="${leftIdx}"]`
-              );
-              if (partnerBtn) {
-                speak(partnerBtn.dataset.audio, 'neutral');
-                selectedLeftBtn = partnerBtn;
-                refreshAll();
-              }
+              pairings.delete(rightUsed.get(rightIdx));
+              rightUsed.delete(rightIdx);
+              refreshAll();
             }
             return;
           }
@@ -2940,6 +2934,12 @@ const MODULE_REGISTRY = {
   },
 
 };
+
+
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
 
 let currentModId='mod-audio-match', currentTier='bronze';
 function pickModule(){currentModId=document.getElementById('mod-select').value;clearResult();render();}
