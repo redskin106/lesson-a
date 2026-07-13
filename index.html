@@ -3070,10 +3070,9 @@ const MODULE_REGISTRY = {
             pairings.delete(leftIdx);
           }
 
-          // Step 4: create new pairing, play right text
+          // Step 4: create new pairing — silent, visual only
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
-          speak(btn.textContent.trim(), 'neutral');
           selectedLeftBtn = null;
           refreshAll();
         });
