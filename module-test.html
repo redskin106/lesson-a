@@ -2674,49 +2674,39 @@ const MODULE_REGISTRY = {
             return;
           }
 
-          // Right button
+
+          // Right button — always unlink existing pairing first, then optionally re-pair
           const rightIdx = parseInt(btn.dataset.pairIdx);
+          const leftIdx  = selectedLeftBtn ? parseInt(selectedLeftBtn.dataset.pairIdx) : null;
 
-          if (!selectedLeftBtn) {
-            // No left selected: if this right is paired, one tap unlinks it (no audio)
-            if (rightUsed.has(rightIdx)) {
-              pairings.delete(rightUsed.get(rightIdx));
-              rightUsed.delete(rightIdx);
-              refreshAll();
-            }
-            return;
-          }
-
-          const leftIdx = parseInt(selectedLeftBtn.dataset.pairIdx);
-
-          // Tap the right that's already paired with selected left → unlink
-          if (pairings.get(leftIdx) === rightIdx) {
-            pairings.delete(leftIdx);
-            rightUsed.delete(rightIdx);
-            selectedLeftBtn = null;
-            refreshAll();
-            return;
-          }
-
-          // Break any existing pairing on this right button
+          // Step 1: always break any existing pairing on this right button
           if (rightUsed.has(rightIdx)) {
-            pairings.delete(rightUsed.get(rightIdx));
+            const prevLeftIdx = rightUsed.get(rightIdx);
+            pairings.delete(prevLeftIdx);
             rightUsed.delete(rightIdx);
+            // If no left selected, or the same left as what was paired here → just unlink
+            if (leftIdx === null || leftIdx === prevLeftIdx) {
+              selectedLeftBtn = null;
+              refreshAll();
+              return;
+            }
           }
-          // Break any existing pairing on selected left
+
+          // Step 2: nothing more to do if no left is selected
+          if (leftIdx === null) { refreshAll(); return; }
+
+          // Step 3: break any existing pairing on the selected left
           if (pairings.has(leftIdx)) {
             rightUsed.delete(pairings.get(leftIdx));
             pairings.delete(leftIdx);
           }
 
-          // Create new pairing — play right text only (left was already heard on tap)
-          const capturedLeft = selectedLeftBtn;
+          // Step 4: create new pairing, play right text
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
+          speak(btn.textContent.trim(), 'neutral');
           selectedLeftBtn = null;
           refreshAll();
-
-          speak(btn.textContent.trim(), 'neutral');
         });
       });
 
@@ -2940,6 +2930,11 @@ const MODULE_REGISTRY = {
 // ══════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════
+
+showScreen('screen-name');
+</script>
+</body>
+</html>
 
 let currentModId='mod-audio-match', currentTier='bronze';
 function pickModule(){currentModId=document.getElementById('mod-select').value;clearResult();render();}
