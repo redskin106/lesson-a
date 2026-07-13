@@ -2696,17 +2696,14 @@ const MODULE_REGISTRY = {
             pairings.delete(leftIdx);
           }
 
-          // Create new pairing — play left audio then right text
+          // Create new pairing — play right text only (left was already heard on tap)
           const capturedLeft = selectedLeftBtn;
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
           selectedLeftBtn = null;
           refreshAll();
 
-          // Hear both sides: left audio → right text
-          speak(capturedLeft.dataset.audio, 'neutral');
-          const rightDelay = Math.max(600, capturedLeft.dataset.audio.length * 55);
-          speak(btn.textContent.trim(), 'neutral', rightDelay);
+          speak(btn.textContent.trim(), 'neutral');
         });
       });
 
@@ -2931,11 +2928,11 @@ function render(){
   TTS&&TTS.cancel();
   document.getElementById("result-bar").textContent="";
   var rp=document.getElementById("reinforce-panel");if(rp)rp.style.transform="translateY(100%)";
-  if(!currentModId){return;}
+  if(!currentModId)return;
   var mod=LESSON.find(function(m){return m.id===currentModId;});
   if(!mod){document.getElementById("module-area").innerHTML="<p style='color:var(--fail);padding:16px'>Not found</p>";return;}
   var data=mod.data[currentTier];
-  if(!data){document.getElementById("module-area").innerHTML="<p style='color:var(--fail);padding:16px'>No data for tier</p>";return;}
+  if(!data){document.getElementById("module-area").innerHTML="<p style='color:var(--fail);padding:16px'>No data</p>";return;}
   var renderer=MODULE_REGISTRY[mod.type];
   if(!renderer){document.getElementById("module-area").innerHTML="<p style='color:var(--fail);padding:16px'>No renderer</p>";return;}
   document.getElementById("module-area").innerHTML="";
