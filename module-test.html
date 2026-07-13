@@ -554,10 +554,10 @@ html, body {
 <option value="mod-7">Put in Order</option>
 <option value="mod-8">Say It</option>
 <option value="mod-game-1">Memory Pairs</option>
-<option value="mod-image-vocab">Picture &amp; Word</option>
+<option value="mod-image-vocab" selected>Picture &amp; Word</option>
 <option value="mod-game-2">Word Scramble</option>
 <option value="mod-spelling">Spelling</option>
-<option value="mod-audio-match" selected>Listen &amp; Match</option>
+<option value="mod-audio-match">Listen &amp; Match</option>
 <option value="mod-sentence-building">Build a Sentence</option>
     </select>
   </div>
@@ -849,7 +849,7 @@ html, body {
     label: 'Picture & Word',
     data: {
       bronze: {
-        mode: 'image-to-word',
+        mode: 'word-to-image',
         items: [
           { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
           { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
@@ -860,7 +860,7 @@ html, body {
         ]
       },
       silver: {
-        mode: 'word-to-image',
+        mode: 'image-to-word',
         items: [
           { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
           { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
@@ -2974,7 +2974,7 @@ const MODULE_REGISTRY = {
 };
 </script>
 <script>
-let currentModId='mod-audio-match', currentTier='bronze';
+let currentModId='mod-image-vocab', currentTier='bronze';
 function pickModule(){currentModId=document.getElementById('mod-select').value;clearResult();render();}
 function setTier(t){currentTier=t;['bronze','silver','gold'].forEach(function(x){document.getElementById('tb-'+x).classList.toggle('active',x===t);});clearResult();render();}
 function clearResult(){document.getElementById('result-area').innerHTML='';}
