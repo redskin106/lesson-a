@@ -575,8 +575,7 @@ html, body {
   <div id="rp-word" style="font-size:22px;font-weight:700;margin-bottom:6px;"></div>
   <div id="rp-sent" style="font-size:15px;color:var(--text-dim);line-height:1.6;"></div>
 </div>
-<script>
-const LESSON = [
+<script>const LESSON = [
   {
     id: 'mod-1',
     type: 'audio-understanding',
@@ -1038,10 +1037,8 @@ const LESSON = [
     }
   },
 ];
-
 </script>
-<script>
-let _audioRID = 0;
+<script>let _audioRID = 0;
 
 // ══════════════════════════════════════════════════
 //  SHARED UTILITIES
@@ -2749,10 +2746,9 @@ const MODULE_REGISTRY = {
             pairings.delete(leftIdx);
           }
 
-          // Step 4: create new pairing, play right text
+          // Step 4: create new pairing — silent, visual only
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
-          speak(btn.textContent.trim(), 'neutral');
           selectedLeftBtn = null;
           refreshAll();
         });
@@ -2976,23 +2972,15 @@ const MODULE_REGISTRY = {
   },
 
 };
-
 </script>
 <script>
-
 let currentModId='mod-audio-match', currentTier='bronze';
 function pickModule(){currentModId=document.getElementById('mod-select').value;clearResult();render();}
-function setTier(t){
-  currentTier=t;
-  ['bronze','silver','gold'].forEach(function(x){document.getElementById('tb-'+x).classList.toggle('active',x===t);});
-  clearResult();render();
-}
+function setTier(t){currentTier=t;['bronze','silver','gold'].forEach(function(x){document.getElementById('tb-'+x).classList.toggle('active',x===t);});clearResult();render();}
 function clearResult(){document.getElementById('result-area').innerHTML='';}
 function render(){
-  TTS&&TTS.cancel();
-  clearResult();
-  var rp=document.getElementById('reinforce-panel');
-  if(rp)rp.style.transform='translateY(100%)';
+  TTS&&TTS.cancel();clearResult();
+  var rp=document.getElementById('reinforce-panel');if(rp)rp.style.transform='translateY(100%)';
   if(!currentModId)return;
   var mod=LESSON.find(function(m){return m.id===currentModId;});
   if(!mod){document.getElementById('module-area').innerHTML='<p style="color:var(--fail);padding:16px">Not found</p>';return;}
@@ -3001,40 +2989,18 @@ function render(){
   var renderer=MODULE_REGISTRY[mod.type];
   if(!renderer){document.getElementById('module-area').innerHTML='<p style="color:var(--fail);padding:16px">No renderer</p>';return;}
   document.getElementById('module-area').innerHTML='';
-  renderer.render(document.getElementById('module-area'),data,currentTier,function(score){
-    showResult(score);
-  });
+  renderer.render(document.getElementById('module-area'),data,currentTier,function(score){showResult(score);});
 }
 function showResult(score){
-  TTS&&TTS.cancel();
-  document.getElementById('module-area').innerHTML='';
-  var pct=Math.round(score*100);
-  var passed=score>=0.6;
+  TTS&&TTS.cancel();document.getElementById('module-area').innerHTML='';
+  var pct=Math.round(score*100),passed=score>=0.6;
   var stars=score>=0.9?'⭐⭐⭐':score>=0.7?'⭐⭐':'⭐';
   var area=document.getElementById('result-area');
-  if(passed){
-    area.innerHTML='<div style="text-align:center;padding:24px 16px;">'
-      +'<div style="font-size:36px;margin-bottom:8px;">'+stars+'</div>'
-      +'<div style="font-size:20px;font-weight:700;color:var(--pass);margin-bottom:16px;">'+pct+'% — Passed!</div>'
-      +'<button onclick="render()" style="padding:12px 28px;border-radius:10px;border:1.5px solid var(--text-dim);background:transparent;color:var(--text-dim);font-size:14px;cursor:pointer;">↺ Try again</button>'
-      +'</div>';
-  } else {
-    area.innerHTML='<div style="text-align:center;padding:24px 16px;">'
-      +'<div style="font-size:36px;margin-bottom:8px;">⭐</div>'
-      +'<div style="font-size:18px;font-weight:700;color:var(--fail);margin-bottom:6px;">'+pct+'% — not quite</div>'
-      +'<div style="font-size:14px;color:var(--text-dim);margin-bottom:20px;">You need 60% to pass. Give it another go!</div>'
-      +'<div style="display:flex;gap:10px;justify-content:center;">'
-      +'<button onclick="render()" style="flex:1;max-width:160px;padding:14px;border-radius:10px;background:var(--accent);border:none;color:#0D1B2A;font-size:16px;font-weight:700;cursor:pointer;">⟳ Try again</button>'
-      +'<button onclick="skipModule()" style="flex:1;max-width:160px;padding:14px;border-radius:10px;background:transparent;border:1.5px solid var(--text-dim);color:var(--text-dim);font-size:16px;cursor:pointer;">Skip →</button>'
-      +'</div></div>';
-  }
+  if(passed){area.innerHTML='<div style="text-align:center;padding:24px 16px;"><div style="font-size:36px;margin-bottom:8px;">'+stars+'</div><div style="font-size:20px;font-weight:700;color:var(--pass);margin-bottom:16px;">'+pct+'% — Passed!</div><button onclick="render()" style="padding:12px 28px;border-radius:10px;border:1.5px solid var(--text-dim);background:transparent;color:var(--text-dim);font-size:14px;cursor:pointer;">↺ Try again</button></div>';}
+  else{area.innerHTML='<div style="text-align:center;padding:24px 16px;"><div style="font-size:36px;margin-bottom:8px;">⭐</div><div style="font-size:18px;font-weight:700;color:var(--fail);margin-bottom:6px;">'+pct+'% — not quite</div><div style="font-size:14px;color:var(--text-dim);margin-bottom:20px;">You need 60% to pass. Give it another go!</div><div style="display:flex;gap:10px;justify-content:center;"><button onclick="render()" style="flex:1;max-width:160px;padding:14px;border-radius:10px;background:var(--accent);border:none;color:#0D1B2A;font-size:16px;font-weight:700;cursor:pointer;">⟳ Try again</button><button onclick="skipModule()" style="flex:1;max-width:160px;padding:14px;border-radius:10px;background:transparent;border:1.5px solid var(--text-dim);color:var(--text-dim);font-size:16px;cursor:pointer;">Skip →</button></div></div>';}
 }
-function skipModule(){
-  clearResult();
-  document.getElementById('module-area').innerHTML='<p style="color:var(--text-dim);padding:32px;text-align:center;">Skipped — pick another module or retry.</p>';
-}
+function skipModule(){clearResult();document.getElementById('module-area').innerHTML='<p style="color:var(--text-dim);padding:32px;text-align:center;">Skipped — pick another module or retry.</p>';}
 render();
-
 </script>
 </body>
 </html>
