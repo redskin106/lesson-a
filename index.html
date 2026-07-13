@@ -2504,6 +2504,14 @@ const MODULE_REGISTRY = {
         </div>
         <div id="mp-msg" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);"></div>`;
 
+      const MP_PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)'  },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)'  },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)'  },
+        { border:'#8BC34A', bg:'rgba(139,195,74,.15)' },
+      ];
+
       window.mpFlip = function(i) {
         if (cardLocked) return;
         const cw = document.getElementById(`mp-cw-${i}`);
@@ -2524,14 +2532,15 @@ const MODULE_REGISTRY = {
         const isMatch = ca.pid === cb.pid && ca.kind !== cb.kind;
         if (isMatch) {
           matched++;
+          const mc = MP_PALETTE[ca.pid % MP_PALETTE.length];
           ['mp-cf-'+a,'mp-cf-'+b].forEach(id=>{
             const el=document.getElementById(id);
-            if(el){el.style.background='rgba(255,215,0,.1)';el.style.borderColor='var(--gold)';}
+            if(el){el.style.background=mc.bg; el.style.borderColor=mc.border;}
           });
           document.getElementById(`mp-cw-${a}`).dataset.done='1';
           document.getElementById(`mp-cw-${b}`).dataset.done='1';
           const pip=document.getElementById(`mp-pip-${ca.pid}`);
-          if(pip){pip.classList.add('done');}
+          if(pip){pip.classList.add('done'); pip.style.background=mc.border;}
           flipped=[];
           TTS && TTS.cancel(); // stop any flip audio before panel plays sentence
           showReinforcePanel(ca, () => {
