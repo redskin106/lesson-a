@@ -3038,17 +3038,14 @@ const MODULE_REGISTRY = {
             pairings.delete(leftIdx);
           }
 
-          // Create new pairing — play left audio then right text
+          // Create new pairing — play right text only (left was already heard on tap)
           const capturedLeft = selectedLeftBtn;
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
           selectedLeftBtn = null;
           refreshAll();
 
-          // Hear both sides: left audio → right text
-          speak(capturedLeft.dataset.audio, 'neutral');
-          const rightDelay = Math.max(600, capturedLeft.dataset.audio.length * 55);
-          speak(btn.textContent.trim(), 'neutral', rightDelay);
+          speak(btn.textContent.trim(), 'neutral');
         });
       });
 
