@@ -2852,18 +2852,16 @@ const MODULE_REGISTRY = {
 
   // ─────────────────────────────────────────────
   //  AUDIO MATCH
-  //  Left col: colour-coded audio buttons (tap to hear, unlimited).
-  //  Right col: plain text; reveals the pair's colour on match.
-  //  Each pair has a pre-assigned PALETTE colour that stays consistent
-  //  through selection, wrong-flash, and matched states.
+  //  Tentative pairing model:
+  //  - Tap left 🔊 → plays audio, selects it (tap again = deselect)
+  //  - Tap right (left selected) → creates colour-coded tentative pair
+  //  - Tap already-paired button → re-selects left so you can change right
+  //  - Confirm → checks all pairings, shows correct/wrong, then Next →
   // ─────────────────────────────────────────────
   'audio-match': {
     render(container, data, tier, onComplete) {
       const { pairs } = data;
-      let selectedLeft = null;
-      let matchedCount = 0;
-      let wrongCount   = 0;
-      const total      = pairs.length;
+      const total = pairs.length;
 
       const PALETTE = [
         { border: '#00BCD4', bg: 'rgba(0,188,212,0.18)',  color: '#00BCD4' },
@@ -2872,127 +2870,226 @@ const MODULE_REGISTRY = {
         { border: '#E91E63', bg: 'rgba(233,30,99,0.18)',  color: '#F48FB1' },
         { border: '#8BC34A', bg: 'rgba(139,195,74,0.18)', color: '#AED581' },
       ];
-
-      // Assign each pair a permanent palette slot
       const pairColor = pairs.map((_, i) => PALETTE[i % PALETTE.length]);
 
+      // pairings: Map<leftPairIdx, rightPairIdx>
+      // rightUsed: Map<rightPairIdx, leftPairIdx>  (reverse lookup)
+      const pairings = new Map();
+      const rightUsed = new Map();
+      let selectedLeftBtn = null;
+      let confirmed = false;
+
       container.innerHTML = `
-        <p class="module-question">Tap 🔊 to listen, then tap the matching text.</p>
-        <p class="match-score" id="am-score">${total} to match</p>
+        <p class="module-question">Tap \uD83D\uDD0A to listen, then match each sound to a text.</p>
+        <p id="am-status" style="text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:12px;">
+          0 of ${total} paired
+        </p>
         <div class="match-grid">
-          <div class="match-col" id="am-left-col"></div>
-          <div class="match-col" id="am-right-col"></div>
+          <div class="match-col" id="am-left"></div>
+          <div class="match-col" id="am-right"></div>
         </div>
-        <button class="next-ex-btn" id="am-next-btn" style="display:none">Next →</button>
+        <button class="next-ex-btn" id="am-confirm" style="display:none;margin-bottom:8px;">Check \u2713</button>
+        <button class="next-ex-btn" id="am-next"    style="display:none;">Next \u2192</button>
       `;
 
-      const leftCol    = container.querySelector('#am-left-col');
-      const rightCol   = container.querySelector('#am-right-col');
-      const scoreLabel = container.querySelector('#am-score');
-      const nextBtn    = container.querySelector('#am-next-btn');
+      const leftCol    = container.querySelector('#am-left');
+      const rightCol   = container.querySelector('#am-right');
+      const statusLbl  = container.querySelector('#am-status');
+      const confirmBtn = container.querySelector('#am-confirm');
+      const nextBtn    = container.querySelector('#am-next');
 
-      // Shuffle independently, prevent left[i]/right[i] from being the same pair
+      // Shuffle independently, no aligned pairs
       const withIdx    = pairs.map((p, i) => ({ ...p, pairIdx: i }));
       const leftItems  = safeShuffle(withIdx, () => false);
       const rightItems = safeShuffle(withIdx,
         r => r.some((item, pos) => item.pairIdx === leftItems[pos].pairIdx));
 
+      // Build left column
       leftItems.forEach(pair => {
-        const c   = pairColor[pair.pairIdx];
         const btn = document.createElement('button');
-        btn.className           = 'match-btn';
-        btn.innerHTML           = `🔊`;
-        btn.dataset.side        = 'left';
-        btn.dataset.pairIdx     = pair.pairIdx;
-        btn.dataset.audio       = pair.audio;
-        btn.dataset.key         = pair.text;
-        // Stable colour — border + tint, persists through all states
-        btn.style.borderColor   = c.border;
-        btn.style.color         = c.color;
-        btn.style.background    = c.bg;
+        btn.className             = 'match-btn';
+        btn.innerHTML             = '\uD83D\uDD0A';
+        btn.dataset.side          = 'left';
+        btn.dataset.pairIdx       = pair.pairIdx;
+        btn.dataset.audio         = pair.audio;
         leftCol.appendChild(btn);
       });
 
+      // Build right column
       rightItems.forEach(pair => {
         const btn = document.createElement('button');
         btn.className       = 'match-btn';
         btn.textContent     = pair.text;
         btn.dataset.side    = 'right';
         btn.dataset.pairIdx = pair.pairIdx;
-        btn.dataset.key     = pair.text;
         rightCol.appendChild(btn);
       });
 
-      function applyMatchColor(btn) {
-        const c = pairColor[parseInt(btn.dataset.pairIdx)];
-        btn.style.borderColor = c.border;
-        btn.style.background  = c.bg;
-        btn.style.color       = c.color;
-        btn.classList.add('matched');
-        btn.disabled = true;
+      // ── Style helpers ──────────────────────────────────
+      function styleLeft(btn) {
+        if (confirmed) return;
+        const idx = parseInt(btn.dataset.pairIdx);
+        const c   = pairColor[idx];
+        const isSelected = (btn === selectedLeftBtn);
+        const isPaired   = pairings.has(idx);
+
+        if (isSelected) {
+          btn.style.borderColor = c.border;
+          btn.style.background  = c.bg;
+          btn.style.color       = c.color;
+          btn.style.boxShadow   = `0 0 0 3px ${c.border}`;
+        } else if (isPaired) {
+          btn.style.borderColor = c.border;
+          btn.style.background  = c.bg;
+          btn.style.color       = c.color;
+          btn.style.boxShadow   = '';
+        } else {
+          btn.style.borderColor = 'var(--surface2)';
+          btn.style.background  = 'var(--surface)';
+          btn.style.color       = 'var(--text-dim)';
+          btn.style.boxShadow   = '';
+        }
       }
 
-      function restoreLeftColor(btn) {
-        const c = pairColor[parseInt(btn.dataset.pairIdx)];
-        btn.style.borderColor = c.border;
-        btn.style.color       = c.color;
-        btn.style.background  = c.bg;
+      function styleRight(btn) {
+        if (confirmed) return;
+        const rightIdx = parseInt(btn.dataset.pairIdx);
+        if (rightUsed.has(rightIdx)) {
+          const leftIdx = rightUsed.get(rightIdx);
+          const c = pairColor[leftIdx];
+          btn.style.borderColor = c.border;
+          btn.style.background  = c.bg;
+          btn.style.color       = c.color;
+        } else {
+          btn.style.borderColor = 'var(--surface2)';
+          btn.style.background  = 'var(--surface)';
+          btn.style.color       = 'var(--text)';
+        }
       }
 
+      function refreshAll() {
+        container.querySelectorAll('.match-btn[data-side="left"]')
+          .forEach(b => styleLeft(b));
+        container.querySelectorAll('.match-btn[data-side="right"]')
+          .forEach(b => styleRight(b));
+        statusLbl.textContent = `${pairings.size} of ${total} paired`;
+        confirmBtn.style.display = pairings.size > 0 ? 'block' : 'none';
+        confirmBtn.textContent   = pairings.size === total
+          ? 'Check \u2713'
+          : `Check ${pairings.size}\u2044${total} \u2713`;
+      }
+
+      // ── Interactions ───────────────────────────────────
       container.querySelectorAll('.match-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          if (btn.classList.contains('matched')) return;
+          if (confirmed) return;
 
           if (btn.dataset.side === 'left') {
             speak(btn.dataset.audio, 'neutral');
-            // Deselect previous left, select this one — skip already-matched buttons
-            container.querySelectorAll('.match-btn[data-side="left"]').forEach(b => {
-              if (b.classList.contains('matched')) return;
-              b.classList.remove('selected');
-              b.style.boxShadow = '';
-              restoreLeftColor(b);
-            });
-            selectedLeft = btn;
-            btn.classList.add('selected');
-            btn.style.boxShadow = `0 0 0 3px ${pairColor[parseInt(btn.dataset.pairIdx)].border}`;
+
+            if (btn === selectedLeftBtn) {
+              // Tap selected left again → deselect
+              selectedLeftBtn = null;
+            } else {
+              selectedLeftBtn = btn;
+            }
+            refreshAll();
             return;
           }
 
-          if (!selectedLeft) return;
-          const isMatch = selectedLeft.dataset.key === btn.dataset.key;
+          // Right button
+          const rightIdx = parseInt(btn.dataset.pairIdx);
 
-          if (isMatch) {
-            selectedLeft.style.boxShadow = '';
-            selectedLeft.classList.remove('selected');
-            applyMatchColor(selectedLeft);
-            applyMatchColor(btn);
-            selectedLeft = null;
-            matchedCount++;
-            const remaining = total - matchedCount;
-            scoreLabel.textContent = remaining > 0 ? `${remaining} left` : 'All matched! ✓';
-            if (matchedCount === total) {
-              nextBtn.style.display = 'block';
-              nextBtn.onclick = () => onComplete(Math.max(0.6, 1 - wrongCount * 0.1));
+          if (!selectedLeftBtn) {
+            // No left selected: if this right is paired, tap re-selects its left partner
+            if (rightUsed.has(rightIdx)) {
+              const leftIdx = rightUsed.get(rightIdx);
+              const partnerBtn = container.querySelector(
+                `.match-btn[data-side="left"][data-pair-idx="${leftIdx}"]`
+              );
+              if (partnerBtn) {
+                speak(partnerBtn.dataset.audio, 'neutral');
+                selectedLeftBtn = partnerBtn;
+                refreshAll();
+              }
             }
-          } else {
-            wrongCount++;
-            const prevLeft = selectedLeft;
-            selectedLeft = null;          // block further taps during flash
-            prevLeft.style.borderColor = 'var(--fail)';
-            btn.style.borderColor      = 'var(--fail)';
-            setTimeout(() => {
-              restoreLeftColor(prevLeft);
-              btn.style.borderColor = '';
-              // Re-instate the left selection so student can try a different right button
-              selectedLeft = prevLeft;
-              prevLeft.classList.add('selected');
-              prevLeft.style.boxShadow = `0 0 0 3px ${pairColor[parseInt(prevLeft.dataset.pairIdx)].border}`;
-            }, 600);
+            return;
           }
+
+          const leftIdx = parseInt(selectedLeftBtn.dataset.pairIdx);
+
+          // Tap the right that's already paired with selected left → unlink
+          if (pairings.get(leftIdx) === rightIdx) {
+            pairings.delete(leftIdx);
+            rightUsed.delete(rightIdx);
+            selectedLeftBtn = null;
+            refreshAll();
+            return;
+          }
+
+          // Break any existing pairing on this right button
+          if (rightUsed.has(rightIdx)) {
+            pairings.delete(rightUsed.get(rightIdx));
+            rightUsed.delete(rightIdx);
+          }
+          // Break any existing pairing on selected left
+          if (pairings.has(leftIdx)) {
+            rightUsed.delete(pairings.get(leftIdx));
+            pairings.delete(leftIdx);
+          }
+
+          // Create new pairing
+          pairings.set(leftIdx, rightIdx);
+          rightUsed.set(rightIdx, leftIdx);
+          selectedLeftBtn = null;
+          refreshAll();
         });
+      });
+
+      // ── Confirm ────────────────────────────────────────
+      confirmBtn.addEventListener('click', () => {
+        if (confirmed) return;
+        confirmed = true;
+        TTS && TTS.cancel();
+        selectedLeftBtn = null;
+
+        let correct = 0;
+        container.querySelectorAll('.match-btn[data-side="left"]').forEach(btn => {
+          const leftIdx  = parseInt(btn.dataset.pairIdx);
+          const rightIdx = pairings.get(leftIdx);
+          const isCorrect = rightIdx === leftIdx;
+          const paired = rightIdx !== undefined;
+          if (isCorrect) correct++;
+          const c = isCorrect ? { border:'var(--pass)', bg:'rgba(76,175,80,.15)', color:'var(--pass)' }
+                  : paired    ? { border:'var(--fail)', bg:'rgba(239,83,80,.1)',  color:'var(--fail)' }
+                              : { border:'var(--surface2)', bg:'var(--surface)', color:'var(--text-dim)' };
+          btn.style.borderColor = c.border;
+          btn.style.background  = c.bg;
+          btn.style.color       = c.color;
+          btn.style.boxShadow   = '';
+        });
+
+        container.querySelectorAll('.match-btn[data-side="right"]').forEach(btn => {
+          const rightIdx = parseInt(btn.dataset.pairIdx);
+          const leftIdx  = rightUsed.get(rightIdx);
+          const paired   = leftIdx !== undefined;
+          const isCorrect = paired && leftIdx === rightIdx;
+          const c = isCorrect ? { border:'var(--pass)', bg:'rgba(76,175,80,.15)', color:'var(--pass)' }
+                  : paired    ? { border:'var(--fail)', bg:'rgba(239,83,80,.1)',  color:'var(--fail)' }
+                              : { border:'var(--surface2)', bg:'var(--surface)', color:'var(--text)' };
+          btn.style.borderColor = c.border;
+          btn.style.background  = c.bg;
+          btn.style.color       = c.color;
+        });
+
+        statusLbl.textContent = `${correct} of ${total} correct`;
+        confirmBtn.style.display = 'none';
+        nextBtn.style.display    = 'block';
+        nextBtn.onclick = () => onComplete(correct / total);
       });
     }
   },
+
 
   // ─────────────────────────────────────────────
   //  SENTENCE BUILDING
