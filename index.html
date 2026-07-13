@@ -2971,14 +2971,16 @@ const MODULE_REGISTRY = {
           } else {
             wrongCount++;
             const prevLeft = selectedLeft;
-            selectedLeft = null;
-            prevLeft.style.boxShadow = '';
-            prevLeft.classList.remove('selected');
+            selectedLeft = null;          // block further taps during flash
             prevLeft.style.borderColor = 'var(--fail)';
             btn.style.borderColor      = 'var(--fail)';
             setTimeout(() => {
               restoreLeftColor(prevLeft);
               btn.style.borderColor = '';
+              // Re-instate the left selection so student can try a different right button
+              selectedLeft = prevLeft;
+              prevLeft.classList.add('selected');
+              prevLeft.style.boxShadow = `0 0 0 3px ${pairColor[parseInt(prevLeft.dataset.pairIdx)].border}`;
             }, 600);
           }
         });
