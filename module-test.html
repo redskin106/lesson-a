@@ -1007,19 +1007,6 @@ const LESSON = [
   },
 ];
 
-  document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
-  startBtn.classList.remove('ready');
-}
-
-// ══════════════════════════════════════════════════
-//  MODULE REGISTRY
-//  Contract: render(container, data, tier, onComplete)
-//  onComplete(score)  score = 0–1
-// ══════════════════════════════════════════════════
-
-// Render ID — incremented on every render call.
-// All async callbacks (onend, setTimeout) check this before acting
-// so stale callbacks from a previous render can never fire into a new one.
 let _audioRID = 0;
 
 // ══════════════════════════════════════════════════
@@ -2961,9 +2948,7 @@ function setTier(t){
   ['bronze','silver','gold'].forEach(function(x){document.getElementById('tb-'+x).classList.toggle('active',x===t);});
   clearResult();render();
 }
-function clearResult(){
-  document.getElementById('result-area').innerHTML='';
-}
+function clearResult(){document.getElementById('result-area').innerHTML='';}
 function render(){
   TTS&&TTS.cancel();
   clearResult();
@@ -3002,8 +2987,7 @@ function showResult(score){
       +'<div style="display:flex;gap:10px;justify-content:center;">'
       +'<button onclick="render()" style="flex:1;max-width:160px;padding:14px;border-radius:10px;background:var(--accent);border:none;color:#0D1B2A;font-size:16px;font-weight:700;cursor:pointer;">⟳ Try again</button>'
       +'<button onclick="skipModule()" style="flex:1;max-width:160px;padding:14px;border-radius:10px;background:transparent;border:1.5px solid var(--text-dim);color:var(--text-dim);font-size:16px;cursor:pointer;">Skip →</button>'
-      +'</div>'
-      +'</div>';
+      +'</div></div>';
   }
 }
 function skipModule(){
