@@ -520,7 +520,6 @@ html, body {
   text-align: center;
   margin-bottom: 8px;
 }
-
 .harness-header{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--surface2);padding:10px 16px 8px;}
 .harness-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
 .harness-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;min-width:42px;}
@@ -531,11 +530,7 @@ html, body {
 .retry-btn{padding:8px 14px;border-radius:8px;border:1.5px solid var(--text-dim);background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;white-space:nowrap;}
 #module-area{padding:16px;max-width:460px;margin:0 auto;}
 #result-bar{text-align:center;font-size:17px;font-weight:700;padding:12px;min-height:48px;color:var(--pass);}
-</style></head><body><div class="harness-header">
-  <div class="harness-row">
-    <span class="harness-label">Module</span>
-    <select class="mod-select" id="mod-select" onchange="pickModule()">
-      <option value="mod-1">Listen &amp; Choose 1</option>
+</style></head><body><div class="harness-header"><div class="harness-row"><span class="harness-label">Module</span><select class="mod-select" id="mod-select" onchange="pickModule()"><option value="">-- pick --</option><option value="mod-1">Listen &amp; Choose 1</option>
 <option value="mod-2">Listen &amp; Choose 2</option>
 <option value="mod-3">Listen &amp; Choose 3</option>
 <option value="mod-4">Fill the Gap</option>
@@ -548,24 +543,8 @@ html, body {
 <option value="mod-game-2">Word Scramble</option>
 <option value="mod-spelling">Spelling</option>
 <option value="mod-audio-match" selected>Listen &amp; Match</option>
-<option value="mod-sentence-building">Build a Sentence</option>
-    </select>
-    <button class="retry-btn" onclick="render()">↺ Retry</button>
-  </div>
-  <div class="tier-row">
-    <button class="tier-btn active" id="tb-bronze" onclick="setTier('bronze')">🥉 Bronze</button>
-    <button class="tier-btn"        id="tb-silver" onclick="setTier('silver')">🥈 Silver</button>
-    <button class="tier-btn"        id="tb-gold"   onclick="setTier('gold')"  >🥇 Gold</button>
-  </div>
-</div><div id="module-area"></div>
-<div id="result-bar"></div>
-<div id="reinforce-panel" style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--gold);padding:20px 20px 28px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);z-index:200;text-align:center;">
-  <div id="rp-bar" style="position:absolute;top:0;left:0;height:3px;background:var(--gold);width:0%;"></div>
-  <div id="rp-em"   style="font-size:52px;margin-bottom:8px;"></div>
-  <div id="rp-word" style="font-size:22px;font-weight:700;margin-bottom:6px;"></div>
-  <div id="rp-sent" style="font-size:15px;color:var(--text-dim);line-height:1.6;"></div>
-</div>
-<script>const LESSON = [
+<option value="mod-sentence-building">Build a Sentence</option></select><button class="retry-btn" onclick="render()">↺ Retry</button></div><div class="tier-row"><button class="tier-btn active" id="tb-bronze" onclick="setTier('bronze')">🥉 Bronze</button><button class="tier-btn" id="tb-silver" onclick="setTier('silver')">🥈 Silver</button><button class="tier-btn" id="tb-gold" onclick="setTier('gold')">🥇 Gold</button></div></div><div id="module-area"></div><div id="result-bar"></div><div id="reinforce-panel" style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--gold);padding:20px 20px 28px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);z-index:200;text-align:center;"><div id="rp-bar" style="position:absolute;top:0;left:0;height:3px;background:var(--gold);width:0%;"></div><div id="rp-em" style="font-size:52px;margin-bottom:8px;"></div><div id="rp-word" style="font-size:22px;font-weight:700;margin-bottom:6px;"></div><div id="rp-sent" style="font-size:15px;color:var(--text-dim);line-height:1.6;"></div></div><script>
+const LESSON = [
   {
     id: 'mod-1',
     type: 'audio-understanding',
@@ -2717,11 +2696,17 @@ const MODULE_REGISTRY = {
             pairings.delete(leftIdx);
           }
 
-          // Create new pairing
+          // Create new pairing — play left audio then right text
+          const capturedLeft = selectedLeftBtn;
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
           selectedLeftBtn = null;
           refreshAll();
+
+          // Hear both sides: left audio → right text
+          speak(capturedLeft.dataset.audio, 'neutral');
+          const rightDelay = Math.max(600, capturedLeft.dataset.audio.length * 55);
+          speak(btn.textContent.trim(), 'neutral', rightDelay);
         });
       });
 
@@ -2733,11 +2718,13 @@ const MODULE_REGISTRY = {
         selectedLeftBtn = null;
 
         let correct = 0;
+
+        // First pass — colour all buttons by correctness
         container.querySelectorAll('.match-btn[data-side="left"]').forEach(btn => {
           const leftIdx  = parseInt(btn.dataset.pairIdx);
           const rightIdx = pairings.get(leftIdx);
           const isCorrect = rightIdx === leftIdx;
-          const paired = rightIdx !== undefined;
+          const paired    = rightIdx !== undefined;
           if (isCorrect) correct++;
           const c = isCorrect ? { border:'var(--pass)', bg:'rgba(76,175,80,.15)', color:'var(--pass)' }
                   : paired    ? { border:'var(--fail)', bg:'rgba(239,83,80,.1)',  color:'var(--fail)' }
@@ -2749,9 +2736,9 @@ const MODULE_REGISTRY = {
         });
 
         container.querySelectorAll('.match-btn[data-side="right"]').forEach(btn => {
-          const rightIdx = parseInt(btn.dataset.pairIdx);
-          const leftIdx  = rightUsed.get(rightIdx);
-          const paired   = leftIdx !== undefined;
+          const rightIdx  = parseInt(btn.dataset.pairIdx);
+          const leftIdx   = rightUsed.get(rightIdx);
+          const paired    = leftIdx !== undefined;
           const isCorrect = paired && leftIdx === rightIdx;
           const c = isCorrect ? { border:'var(--pass)', bg:'rgba(76,175,80,.15)', color:'var(--pass)' }
                   : paired    ? { border:'var(--fail)', bg:'rgba(239,83,80,.1)',  color:'var(--fail)' }
@@ -2761,7 +2748,25 @@ const MODULE_REGISTRY = {
           btn.style.color       = c.color;
         });
 
-        statusLbl.textContent = `${correct} of ${total} correct`;
+        // Second pass — gold hint: for each wrong left, highlight its correct right
+        container.querySelectorAll('.match-btn[data-side="left"]').forEach(btn => {
+          const leftIdx  = parseInt(btn.dataset.pairIdx);
+          const rightIdx = pairings.get(leftIdx);
+          const isCorrect = rightIdx === leftIdx;
+          if (!isCorrect) {
+            // The correct right button has the same pairIdx as this left
+            const correctRight = container.querySelector(
+              `.match-btn[data-side="right"][data-pair-idx="${leftIdx}"]`
+            );
+            if (correctRight) {
+              correctRight.style.borderColor = 'var(--gold)';
+              correctRight.style.background  = 'rgba(255,215,0,.12)';
+              correctRight.style.color       = 'var(--gold)';
+            }
+          }
+        });
+
+        statusLbl.textContent    = `${correct} of ${total} correct`;
         confirmBtn.style.display = 'none';
         nextBtn.style.display    = 'block';
         nextBtn.onclick = () => onComplete(correct / total);
@@ -2919,26 +2924,25 @@ const MODULE_REGISTRY = {
   },
 
 };
-
-let currentModId='mod-audio-match', currentTier='bronze';
-function pickModule(){currentModId=document.getElementById('mod-select').value;render();}
-function setTier(t){currentTier=t;['bronze','silver','gold'].forEach(function(x){document.getElementById('tb-'+x).classList.toggle('active',x===t);});render();}
+let currentModId="mod-audio-match",currentTier="bronze";
+function pickModule(){currentModId=document.getElementById("mod-select").value;render();}
+function setTier(t){currentTier=t;["bronze","silver","gold"].forEach(function(x){document.getElementById("tb-"+x).classList.toggle("active",x===t);});render();}
 function render(){
   TTS&&TTS.cancel();
-  document.getElementById('result-bar').textContent='';
-  var rp=document.getElementById('reinforce-panel');
-  if(rp)rp.style.transform='translateY(100%)';
+  document.getElementById("result-bar").textContent="";
+  var rp=document.getElementById("reinforce-panel");if(rp)rp.style.transform="translateY(100%)";
+  if(!currentModId){return;}
   var mod=LESSON.find(function(m){return m.id===currentModId;});
-  if(!mod){document.getElementById('module-area').innerHTML='<p style="color:var(--fail);padding:16px">Not found</p>';return;}
+  if(!mod){document.getElementById("module-area").innerHTML="<p style='color:var(--fail);padding:16px'>Not found</p>";return;}
   var data=mod.data[currentTier];
-  if(!data){document.getElementById('module-area').innerHTML='<p style="color:var(--fail);padding:16px">No data for tier</p>';return;}
+  if(!data){document.getElementById("module-area").innerHTML="<p style='color:var(--fail);padding:16px'>No data for tier</p>";return;}
   var renderer=MODULE_REGISTRY[mod.type];
-  if(!renderer){document.getElementById('module-area').innerHTML='<p style="color:var(--fail);padding:16px">No renderer</p>';return;}
-  document.getElementById('module-area').innerHTML='';
-  renderer.render(document.getElementById('module-area'),data,currentTier,function(score){
+  if(!renderer){document.getElementById("module-area").innerHTML="<p style='color:var(--fail);padding:16px'>No renderer</p>";return;}
+  document.getElementById("module-area").innerHTML="";
+  renderer.render(document.getElementById("module-area"),data,currentTier,function(score){
     var pct=Math.round(score*100);
-    var s=score>=0.9?'⭐⭐⭐':score>=0.7?'⭐⭐':'⭐';
-    document.getElementById('result-bar').textContent=s+'  '+pct+'%  — tap ↺ to retry';
+    var s=score>=0.9?"⭐⭐⭐":score>=0.7?"⭐⭐":"⭐";
+    document.getElementById("result-bar").textContent=s+"  "+pct+"%  — tap ↺ to retry";
   });
 }
 render();
