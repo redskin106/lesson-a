@@ -2495,18 +2495,20 @@ const MODULE_REGISTRY = {
     }
   },
 
-  // ─────────────────────────────────────────────
-  //  WORD SCRAMBLE
-  //  Image + audio shown. Tap scrambled letter
-  //  tiles to spell the word. Wrong = reset bank.
-  //  Reinforcement panel on correct.
-  // ─────────────────────────────────────────────
   'word-scramble': {
     render(container, data, tier, onComplete) {
       const { items } = data;
       const PICK = Math.min(items.length, 4);
       const session = safeShuffle(items, ()=>false).slice(0, PICK);
       let idx=0, score=0, slotData=[], bankData=[], wsLocked=false;
+
+      // One distinct colour per session item — cycles through palette
+      const WS_PALETTE = ['#00BCD4','#AB47BC','#FF9800','#E91E63'];
+      const itemColor = () => WS_PALETTE[idx % WS_PALETTE.length];
+      const itemBg    = () => itemColor().replace('#','') === '00BCD4' ? 'rgba(0,188,212,.12)'
+                            : itemColor() === '#AB47BC' ? 'rgba(171,71,188,.12)'
+                            : itemColor() === '#FF9800' ? 'rgba(255,152,0,.12)'
+                            : 'rgba(233,30,99,.12)';
 
       function visual(item) {
         if (item.image) return `<img src="${item.image}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;" alt="${item.word}">`;
@@ -2526,11 +2528,11 @@ const MODULE_REGISTRY = {
         const wordUp=item.word.toUpperCase();
         bankData=safeShuffle(letters,r=>r.join('')===wordUp).map((l,i)=>({letter:l,id:i,used:false}));
         drawWS();
-        // No auto-play on load — student uses 🔊 button when ready
       }
 
       function drawWS() {
         const item=session[idx];
+        const col=itemColor();
         container.innerHTML=`
           <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
           <div style="text-align:center;margin-bottom:1rem;position:relative;display:inline-block;width:100%;">
@@ -2553,7 +2555,7 @@ const MODULE_REGISTRY = {
           <div id="ws-bank" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:56px;margin-bottom:1rem;">
             ${bankData.map((t,bi)=>`<button id="ws-t-${bi}" onclick="wsTap(${bi})" style="
               width:44px;height:52px;border-radius:8px;
-              border:1.5px solid #4A6080;background:var(--surface);
+              border:1.5px solid ${col};background:var(--surface);
               font-size:20px;font-weight:700;color:var(--text);
               cursor:pointer;box-shadow:0 2px 0 #1E3248;
               transition:opacity .2s;
@@ -2568,9 +2570,11 @@ const MODULE_REGISTRY = {
         slotData.forEach((entry,si)=>{
           const el=document.getElementById(`ws-s-${si}`);
           if(!el)return;
+          const col=itemColor();
           el.textContent=entry?entry.letter:'';
-          el.style.borderColor=entry?'var(--accent)':'var(--surface2)';
-          el.style.background=entry?'rgba(79,195,247,.08)':'var(--surface)';
+          el.style.borderColor=entry?col:'var(--surface2)';
+          el.style.background=entry?itemBg():'var(--surface)';
+          el.style.color=entry?col:'var(--text)';
         });
       }
 
@@ -2589,7 +2593,6 @@ const MODULE_REGISTRY = {
         if(si===-1)return;
         tile.used=true;
         slotData[si]={letter:tile.letter,bankId:bi};
-        // No audio per tap — student uses 🔊 button
         refreshSlots();refreshBank();
         if(slotData.indexOf(null)===-1)setTimeout(wsCheck,200);
       };
@@ -2609,18 +2612,21 @@ const MODULE_REGISTRY = {
         const ok=attempt===item.word.toLowerCase();
         wsLocked=true;
         const fb=document.getElementById('ws-fb');
+        const col=itemColor();
         slotData.forEach((_,si)=>{
           const el=document.getElementById(`ws-s-${si}`);
           if(el){
-            el.style.borderColor=ok?'var(--gold)':'var(--fail)';
-            el.style.background=ok?'rgba(255,215,0,.1)':'rgba(239,83,80,.1)';
+            el.style.borderColor=ok?col:'var(--fail)';
+            el.style.background=ok?itemBg():'rgba(239,83,80,.1)';
+            el.style.color=ok?col:'var(--fail)';
           }
         });
         if(ok){
           score++;
           if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
-          speak(item.word,'celebrate');
-          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+          speak(item.word,'celebrate'); // word spoken once here
+          // sentenceOnly:true → panel plays sentence only (no word repeat)
+          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();},{sentenceOnly:true}),500);
         } else {
           if(fb){fb.textContent=`✗ The word is: ${item.word}`;fb.style.color='var(--fail)';}
           setTimeout(()=>{
