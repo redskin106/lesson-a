@@ -859,32 +859,32 @@ const LESSON = [
     data: {
       bronze: {
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] },
         ]
       },
       silver: {
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] },
         ]
       },
       gold: {
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] },
         ]
       }
     }
@@ -899,34 +899,34 @@ const LESSON = [
       bronze: {
         mode: 'image-to-word',
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] },
         ]
       },
       silver: {
         mode: 'word-to-image',
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] },
         ]
       },
       gold: {
         mode: 'cloze-image',
         items: [
-          { word:'runs',   emoji:'🐕', image:null, sentence:'The dog ___ in the park.' },
-          { word:'drink',  emoji:'💧', image:null, sentence:'I ___ water every day.' },
-          { word:'starts', emoji:'🏫', image:null, sentence:'School ___ at eight o\'clock.' },
-          { word:'reads',  emoji:'📚', image:null, sentence:'She ___ a book every night.' },
-          { word:'takes',  emoji:'🚌', image:null, sentence:'She ___ the bus to school.' },
-          { word:'sleeps', emoji:'🐈', image:null, sentence:'The cat ___ on the chair.' },
+          { word:'runs',   emoji:'🐕', image:null, sentence:'The dog ___ in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'drink',  emoji:'💧', image:null, sentence:'I ___ water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'starts', emoji:'🏫', image:null, sentence:'School ___ at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'reads',  emoji:'📚', image:null, sentence:'She ___ a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'takes',  emoji:'🚌', image:null, sentence:'She ___ the bus to school.', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+          { word:'sleeps', emoji:'🐈', image:null, sentence:'The cat ___ on the chair.', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] },
         ]
       }
     }
@@ -940,32 +940,32 @@ const LESSON = [
     data: {
       bronze: {
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] },
         ]
       },
       silver: {
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.' },
-          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.' },
+          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.', tokens:[{text:'It',role:'subject'},{text:'rains',role:'verb'},{text:'every morning',role:'time'}] },
+          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.', tokens:[{text:'She',role:'subject'},{text:'calls',role:'verb'},{text:'her friend',role:'object'},{text:'on the phone',role:'place'}] },
         ]
       },
       gold: {
         items: [
-          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.' },
-          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.' },
-          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.' },
-          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
+          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.', tokens:[{text:'My friend',role:'subject'},{text:'lives',role:'verb'},{text:'near me',role:'place'}] },
+          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.', tokens:[{text:'He',role:'subject'},{text:'saves',role:'verb'},{text:'his money',role:'object'},{text:'every month',role:'time'}] },
+          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.', tokens:[{text:'It',role:'subject'},{text:'rains',role:'verb'},{text:'every morning',role:'time'}] },
+          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.', tokens:[{text:'She',role:'subject'},{text:'calls',role:'verb'},{text:'her friend',role:'object'},{text:'on the phone',role:'place'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
         ]
       }
     }
@@ -979,30 +979,30 @@ const LESSON = [
     data: {
       bronze: {
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
+          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] },
+          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.', tokens:[{text:'It',role:'subject'},{text:'rains',role:'verb'},{text:'every morning',role:'time'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
         ]
       },
       silver: {
         items: [
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.' },
-          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.' },
-          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.' },
-          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.', tokens:[{text:'She',role:'subject'},{text:'calls',role:'verb'},{text:'her friend',role:'object'},{text:'on the phone',role:'place'}] },
+          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.', tokens:[{text:'He',role:'subject'},{text:'saves',role:'verb'},{text:'his money',role:'object'},{text:'every month',role:'time'}] },
+          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.', tokens:[{text:'My friend',role:'subject'},{text:'lives',role:'verb'},{text:'near me',role:'place'}] },
+          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.', tokens:[{text:'It',role:'subject'},{text:'rains',role:'verb'},{text:'every morning',role:'time'}] },
+          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
         ]
       },
       gold: {
         items: [
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.' },
-          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.' },
-          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.' },
+          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:'at eight o\'clock',role:'time'}] },
+          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.', tokens:[{text:'She',role:'subject'},{text:'calls',role:'verb'},{text:'her friend',role:'object'},{text:'on the phone',role:'place'}] },
+          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.', tokens:[{text:'He',role:'subject'},{text:'saves',role:'verb'},{text:'his money',role:'object'},{text:'every month',role:'time'}] },
+          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.', tokens:[{text:'My friend',role:'subject'},{text:'lives',role:'verb'},{text:'near me',role:'place'}] },
           { word:'library',emoji:'📖', image:null, sentence:'She <strong>goes</strong> to the library after class.' },
           { word:'hospital',emoji:'🏥',image:null, sentence:'My uncle <strong>works</strong> at the hospital.' },
         ]
@@ -3270,7 +3270,11 @@ const MODULE_REGISTRY = {
             el.style.background=c?c+'26':'rgba(255,255,255,.06)';
             el.style.color=c||'var(--text-dim)';
           });
-          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
+          // Show legend above the coloured tiles
+          if(fb){
+            fb.innerHTML=grammarLegend();
+            fb.style.color='';
+          }
           speak(sentenceText(item.tokens),'celebrate');
           if(nextBtn){
             nextBtn.style.display='block';
