@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gap Fill — Live Asset Test</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a12;
+  }
+  @media (min-width: 500px) {
+    body { display: grid; place-items: center; min-height: 100vh; }
+    .app-frame {
+      width: 400px; height: min(860px, 94vh);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+  }
+  @media (max-width: 499px) {
+    .app-frame { width: 100%; height: 100dvh; }
+  }
+  .app-frame {
+    position: relative;
+    border-radius: 44px;
+    overflow: hidden;
+    background: #0a0a12;
+  }
+  .layer-bg {
+    position: absolute; inset: 0;
+    background-image: url('assets/bg_and_border.png');
+    background-size: cover;
+    background-position: center top;
+    z-index: 0;
+  }
+  .layer-scene {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 38%;
+    background-image: url('assets/school_scene.png');
+    background-size: cover;
+    background-position: center bottom;
+    z-index: 1;
+  }
+  .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 20px;
+  }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .badge {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(90deg,#753A70,#A54D75);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 500; color: #fff;
+  }
+  .module-title { font-size: 15px; color: #fff; font-weight: 500; }
+  .mute-btn { background: none; border: none; cursor: pointer; font-size: 20px; }
+  .q-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+  .prog-track { width: 100%; height: 6px; background: #202336; border-radius: 99px; margin-bottom: 24px; overflow: hidden; }
+  .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
+  .sentence { font-size: 18px; color: #fff; line-height: 1.5; margin: 0 0 26px; white-space: nowrap; }
+  .blank { border-bottom: 2px solid rgba(255,255,255,0.5); padding: 0 6px; display: inline-block; width: 70px; }
+  .pill-row { display: flex; gap: 6px; margin-bottom: 22px; }
+  .pill {
+    flex: 1; padding: 10px 4px; border-radius: 99px;
+    background: linear-gradient(180deg,#883D5E,#6B2D56 55%,#562952);
+    border: 1px solid #1A213A;
+    font-size: 14px; color: rgba(255,255,255,0.85);
+    transition: transform .12s; cursor: pointer; font-family: inherit;
+  }
+  .pill.selected {
+    background: linear-gradient(180deg,#F0AE63,#C15445);
+    border: 1.5px solid #BE4FA8;
+    color: #fff; font-weight: 500;
+  }
+  .check-row { display: flex; justify-content: center; }
+  .check-btn {
+    padding: 11px 56px; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 19px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .check-btn:disabled { opacity: 0.5; pointer-events: none; }
+  .status { font-size: 13px; color: rgba(255,255,255,0.5); text-align: center; margin-top: 14px; min-height: 18px; }
+  .legend { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: auto; padding-top: 14px; }
+  .legend span { font-size: 11px; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 4px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .overlay {
+    display: none; position: absolute; inset: 0;
+    background: rgba(10,8,20,0.9);
+    text-align: center; align-items: center; justify-content: center;
+    flex-direction: column; padding: 20px; z-index: 3;
+  }
+  .continue-btn, .next-btn {
+    padding: 11px 48px; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 17px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .stars-row { font-size: 44px; margin-bottom: 18px; letter-spacing: 6px; min-height: 56px; }
+</style>
+</head>
+<body>
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="layer-scene"></div>
+  <div class="content">
+    <div id="qView">
+      <div class="header">
+        <div class="header-left">
+          <div class="badge">4</div>
+          <span class="module-title">Fill the gap</span>
+        </div>
+        <button id="muteBtn" class="mute-btn" aria-label="toggle sound">&#128266;</button>
+      </div>
+      <div class="q-label" id="qLabel">Question 1 of 3</div>
+      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      <p class="sentence" id="sentence">&nbsp;</p>
+      <div class="pill-row" id="pillRow"></div>
+      <div class="check-row"><button id="checkBtn" class="check-btn">Check</button></div>
+      <p class="status" id="status">&nbsp;</p>
+      <div class="legend">
+        <span><span class="dot" style="background:#00BCD4"></span>Subject</span>
+        <span><span class="dot" style="background:#8BC34A"></span>Verb</span>
+        <span><span class="dot" style="background:#FF9800"></span>Object</span>
+        <span><span class="dot" style="background:#AB47BC"></span>Place</span>
+        <span><span class="dot" style="background:#E91E63"></span>Time</span>
+      </div>
+    </div>
+    <div id="overlay" class="overlay">
+      <div id="reinforceContent" style="display:none;">
+        <div style="font-size:15px;color:rgba(255,255,255,0.5);margin-bottom:10px;">correct!</div>
+        <div style="font-size:28px;color:#fff;font-weight:500;margin-bottom:8px;" id="reinforceWord">goes</div>
+        <div style="font-size:15px;color:rgba(255,255,255,0.7);margin-bottom:32px;" id="reinforceSentence"></div>
+        <button id="continueBtn" class="continue-btn">Continue</button>
+      </div>
+      <div id="completeContent" style="display:none;">
+        <div class="stars-row" id="starsRow"></div>
+        <div style="font-size:20px;color:#fff;font-weight:500;margin-bottom:6px;">Module complete</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:28px;" id="scoreLabel"></div>
+        <button id="nextModuleBtn" class="next-btn">Next module</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var questions = [
+    {sentence:['She ',' to school every day.'], word:'goes', options:['go','goes','going','gone']},
+    {sentence:['They ',' football on Saturdays.'], word:'play', options:['play','plays','playing','played']},
+    {sentence:['I ',' my homework last night.'], word:'finished', options:['finish','finishing','finished','finishes']}
+  ];
+  var qi=0, correctFirstTry=0, attemptedWrongOnCurrent=false, locked=false;
+  var ctx=null, muted=false;
+  function unlock(){ if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); } }
+  document.getElementById('muteBtn').addEventListener('click', function(e){
+    muted=!muted; e.target.innerHTML = muted ? '&#128263;' : '&#128266;';
+  });
+  function tone(freq,dur){
+    if(muted) return; unlock();
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.frequency.value=freq; g.gain.setValueAtTime(0.15,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+  }
+  function sfx(name){
+    if(name==='tap') tone(600,0.06);
+    if(name==='correct'){ tone(880,0.12); setTimeout(function(){tone(1180,0.14);},90); }
+    if(name==='wrong') tone(180,0.22);
+    if(name==='star') tone(1000,0.1);
+    if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
+  }
+  var pillRow = document.getElementById('pillRow');
+  var checkBtn = document.getElementById('checkBtn');
+  var selected = null;
+  function setCheckEnabled(on){
+    locked = !on;
+    checkBtn.disabled = !on;
+  }
+  function renderQuestion(){
+    var q = questions[qi];
+    document.getElementById('qLabel').textContent = 'Question '+(qi+1)+' of '+questions.length;
+    document.getElementById('progFill').style.width = Math.round((qi/questions.length)*100)+'%';
+    document.getElementById('sentence').innerHTML = q.sentence[0]+'<span class="blank">&nbsp;</span>'+q.sentence[1];
+    document.getElementById('status').textContent = '\u00A0';
+    selected = null;
+    attemptedWrongOnCurrent = false;
+    setCheckEnabled(true);
+    pillRow.innerHTML = '';
+    q.options.forEach(function(opt){
+      var b = document.createElement('button');
+      b.textContent = opt;
+      b.className = 'pill';
+      b.dataset.word = opt;
+      b.addEventListener('click', function(){
+        if(locked) return;
+        unlock();
+        Array.from(pillRow.children).forEach(function(x){ x.classList.remove('selected'); });
+        b.classList.add('selected');
+        b.style.transform = 'scale(0.95)';
+        setTimeout(function(){ b.style.transform='scale(1)'; },120);
+        selected = opt;
+        sfx('tap');
+      });
+      pillRow.appendChild(b);
+    });
+  }
+  var overlay = document.getElementById('overlay');
+  function showReinforce(){
+    var q = questions[qi];
+    document.getElementById('reinforceWord').textContent = q.word;
+    document.getElementById('reinforceSentence').textContent = q.sentence[0].trim()+' '+q.word+' '+q.sentence[1].trim();
+    document.getElementById('completeContent').style.display = 'none';
+    document.getElementById('reinforceContent').style.display = 'block';
+    overlay.style.display = 'flex';
+  }
+  checkBtn.addEventListener('click', function(){
+    if(locked) return;
+    unlock();
+    if(!selected){
+      document.getElementById('status').textContent = 'pick an option first';
+      return;
+    }
+    var q = questions[qi];
+    if(selected === q.word){
+      setCheckEnabled(false);
+      sfx('correct');
+      if(!attemptedWrongOnCurrent){ correctFirstTry++; }
+      document.getElementById('status').textContent = attemptedWrongOnCurrent ? 'correct, nice recovery' : 'correct, first try';
+      setTimeout(showReinforce, 550);
+    } else {
+      attemptedWrongOnCurrent = true;
+      sfx('wrong');
+      var sel = pillRow.querySelector('[data-word="'+selected+'"]');
+      sel.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}],{duration:350});
+      document.getElementById('status').textContent = 'not quite, try again';
+    }
+  });
+  document.getElementById('continueBtn').addEventListener('click', function(){
+    overlay.style.display = 'none';
+    qi++;
+    if(qi < questions.length){
+      renderQuestion();
+    } else {
+      document.getElementById('progFill').style.width = '100%';
+      var pct = correctFirstTry/questions.length;
+      var starCount = pct === 1 ? 3 : pct >= 0.6 ? 2 : 1;
+      document.getElementById('scoreLabel').textContent = correctFirstTry+' of '+questions.length+' correct on first try';
+      document.getElementById('reinforceContent').style.display = 'none';
+      document.getElementById('completeContent').style.display = 'block';
+      var starsEl = document.getElementById('starsRow');
+      starsEl.innerHTML = '';
+      overlay.style.display = 'flex';
+      var i=0;
+      function dropStar(){
+        if(i>=starCount){ sfx('complete'); return; }
+        var span = document.createElement('span');
+        span.textContent = '\u2605';
+        span.style.color = '#F0AE63';
+        span.style.display='inline-block';
+        starsEl.appendChild(span);
+        span.animate([{transform:'translateY(-20px) scale(0.5)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
+        sfx('star');
+        i++;
+        setTimeout(dropStar, 220);
+      }
+      dropStar();
+    }
+  });
+  document.getElementById('nextModuleBtn').addEventListener('click', function(){
+    overlay.style.display='none';
+    qi=0; correctFirstTry=0;
+    renderQuestion();
+  });
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
