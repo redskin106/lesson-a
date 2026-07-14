@@ -180,7 +180,7 @@
       return '<span style="display:inline-block;background:'+c.bg+';border:1.5px solid '+c.border+';color:'+c.color+';border-radius:6px;padding:1px 7px;margin:1px 2px;font-weight:600;font-size:.95em;">'+t.text+'</span>';
     }).join(' ');
   }
-  function grammarLegend(){
+  function grammarLegend(tokens){
     var FADED = {
       subject: { dot: '#1A6070', text: '#3A7A8A' },
       verb:    { dot: '#3A5C22', text: '#4A7030' },
@@ -188,11 +188,16 @@
       place:   { dot: '#4A2058', text: '#5A3068' },
       time:    { dot: '#6A1030', text: '#7A2040' }
     };
-    var pills = Object.keys(FADED).map(function(role){
+    var ORDER = ['subject', 'verb', 'object', 'place', 'time'];
+    var present = {};
+    (tokens || []).forEach(function(t){ present[t.role] = true; });
+    var roles = ORDER.filter(function(r){ return present[r] && FADED[r]; });
+    if(roles.length === 0) return '';
+    var pills = roles.map(function(role){
       var c = FADED[role];
       return '<span style="display:inline-flex;align-items:center;gap:4px;color:'+c.text+';font-size:11px;font-weight:600;white-space:nowrap;"><span style="width:7px;height:7px;border-radius:50%;background:'+c.dot+';flex-shrink:0;"></span>'+role.charAt(0).toUpperCase()+role.slice(1)+'</span>';
     }).join('');
-    return '<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;"><span style="color:#4A6080;font-size:11px;">Key:</span>'+pills+'</div>';
+    return '<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">'+pills+'</div>';
   }
 
   var questions = [
@@ -286,7 +291,7 @@
     var q = questions[qi];
     document.getElementById('reinforceWord').textContent = q.answer;
     document.getElementById('reinforceSentence').innerHTML = grammarSentence(q.tokens);
-    document.getElementById('reinforceLegend').innerHTML = grammarLegend();
+    document.getElementById('reinforceLegend').innerHTML = grammarLegend(q.tokens);
     document.getElementById('completeContent').style.display = 'none';
     document.getElementById('reinforceContent').style.display = 'block';
     overlay.style.display = 'flex';
