@@ -60,9 +60,11 @@
     flex-shrink: 0;
   }
   .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
-  .header-left { display: flex; align-items: center; gap: 3%; min-width: 0; }
+  .header-left { display: flex; align-items: center; gap: 5%; min-width: 0; }
   .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; }
-  .mute-btn { background: none; border: none; cursor: pointer; font-size: 4.5cqw; flex-shrink: 0; }
+  .mute-btn { background: none; border: none; cursor: pointer; flex-shrink: 0; padding: 0; }
+  .mute-btn img { width: 6.5cqw; height: 6.5cqw; display: block; transition: filter .15s, opacity .15s; }
+  .mute-btn.muted img { filter: grayscale(1); opacity: 0.4; }
 
   .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; }
   .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
@@ -124,7 +126,7 @@
         <div class="badge">4</div>
         <span class="module-title">Fill the gap</span>
       </div>
-      <button id="muteBtn" class="mute-btn" aria-label="toggle sound">&#128266;</button>
+      <button id="muteBtn" class="mute-btn" aria-label="toggle sound"><img src="assets/star.png" alt=""></button>
     </div>
   </div>
 
@@ -178,8 +180,9 @@
   var qi=0, correctFirstTry=0, attemptedWrongOnCurrent=false, locked=false;
   var ctx=null, muted=false;
   function unlock(){ if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); } }
-  document.getElementById('muteBtn').addEventListener('click', function(e){
-    muted=!muted; e.target.innerHTML = muted ? '&#128263;' : '&#128266;';
+  var muteBtnEl = document.getElementById('muteBtn');
+  muteBtnEl.addEventListener('click', function(){
+    muted=!muted; muteBtnEl.classList.toggle('muted', muted);
   });
   function tone(freq,dur){
     if(muted) return; unlock();
