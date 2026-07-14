@@ -146,20 +146,13 @@
 
   <p class="pos block-status status" id="status">&nbsp;</p>
 
-  <div class="pos block-legend"><div class="legend">
-    <span><span class="dot" style="background:#00BCD4"></span>Subject</span>
-    <span><span class="dot" style="background:#8BC34A"></span>Verb</span>
-    <span><span class="dot" style="background:#FF9800"></span>Object</span>
-    <span><span class="dot" style="background:#AB47BC"></span>Place</span>
-    <span><span class="dot" style="background:#E91E63"></span>Time</span>
-  </div></div>
-
   <div id="overlay" class="overlay">
     <div id="reinforceContent" style="display:none;">
       <div style="font-size:3.5cqw;color:rgba(255,255,255,0.5);margin-bottom:3%;">correct!</div>
-      <div style="font-size:6.5cqw;color:#fff;font-weight:500;margin-bottom:2%;" id="reinforceWord">goes</div>
-      <div style="font-size:3.5cqw;color:rgba(255,255,255,0.7);margin-bottom:8%;" id="reinforceSentence"></div>
-      <button id="continueBtn" class="continue-btn">Continue</button>
+      <div style="font-size:6.5cqw;color:#fff;font-weight:500;margin-bottom:4%;" id="reinforceWord">goes</div>
+      <div style="font-size:4cqw;line-height:2;margin-bottom:5%;" id="reinforceSentence"></div>
+      <div id="reinforceLegend"></div>
+      <button id="continueBtn" class="continue-btn" style="margin-top:4%;">Continue</button>
     </div>
     <div id="completeContent" style="display:none;">
       <div class="stars-row" id="starsRow"></div>
@@ -172,10 +165,65 @@
 </div>
 <script>
 (function(){
+  // Real data, copied verbatim from LESSON['mod-4'] in index.html
+  var GRAMMAR_COLORS = {
+    subject: { bg: 'rgba(0,188,212,0.18)',  border: '#00BCD4', color: '#00BCD4' },
+    verb:    { bg: 'rgba(139,195,74,0.18)', border: '#8BC34A', color: '#8BC34A' },
+    object:  { bg: 'rgba(255,152,0,0.18)',  border: '#FF9800', color: '#FFB74D' },
+    place:   { bg: 'rgba(171,71,188,0.18)', border: '#AB47BC', color: '#CE93D8' },
+    time:    { bg: 'rgba(233,30,99,0.18)',  border: '#E91E63', color: '#F48FB1' }
+  };
+  function grammarSentence(tokens){
+    return tokens.map(function(t){
+      var c = GRAMMAR_COLORS[t.role];
+      if(!c) return '<span style="color:#fff;">'+t.text+'</span>';
+      return '<span style="display:inline-block;background:'+c.bg+';border:1.5px solid '+c.border+';color:'+c.color+';border-radius:6px;padding:1px 7px;margin:1px 2px;font-weight:600;font-size:.95em;">'+t.text+'</span>';
+    }).join(' ');
+  }
+  function grammarLegend(){
+    var FADED = {
+      subject: { dot: '#1A6070', text: '#3A7A8A' },
+      verb:    { dot: '#3A5C22', text: '#4A7030' },
+      object:  { dot: '#6A4008', text: '#7A5010' },
+      place:   { dot: '#4A2058', text: '#5A3068' },
+      time:    { dot: '#6A1030', text: '#7A2040' }
+    };
+    var pills = Object.keys(FADED).map(function(role){
+      var c = FADED[role];
+      return '<span style="display:inline-flex;align-items:center;gap:4px;color:'+c.text+';font-size:11px;font-weight:600;white-space:nowrap;"><span style="width:7px;height:7px;border-radius:50%;background:'+c.dot+';flex-shrink:0;"></span>'+role.charAt(0).toUpperCase()+role.slice(1)+'</span>';
+    }).join('');
+    return '<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;"><span style="color:#4A6080;font-size:11px;">Key:</span>'+pills+'</div>';
+  }
+
   var questions = [
-    {sentence:['She ',' to school every day.'], word:'goes', options:['go','goes','going','gone']},
-    {sentence:['They ',' football on Saturdays.'], word:'play', options:['play','plays','playing','played']},
-    {sentence:['I ',' my homework last night.'], word:'finished', options:['finish','finishing','finished','finishes']}
+    {
+      sentence: 'I ___ water every day.',
+      answer: 'drink',
+      options: ['drink', 'eat', 'sleep', 'run'],
+      tokens: [
+        {text:'I', role:'subject'}, {text:'drink', role:'verb'},
+        {text:'water', role:'object'}, {text:'every day', role:'time'}
+      ]
+    },
+    {
+      sentence: 'She ___ her homework before dinner.',
+      answer: 'does',
+      options: ['does', 'eats', 'reads', 'plays', 'sleeps'],
+      tokens: [
+        {text:'She', role:'subject'}, {text:'does', role:'verb'},
+        {text:'her homework', role:'object'}, {text:'before dinner', role:'time'}
+      ]
+    },
+    {
+      sentence: 'My uncle works at the hospital and ___ sick people.',
+      answer: 'helps',
+      options: ['helps', 'calls', 'reads', 'drives', 'meets', 'teaches'],
+      tokens: [
+        {text:'My uncle', role:'subject'}, {text:'works', role:'verb'},
+        {text:'at the hospital', role:'place'}, {text:'and', role:'connector'},
+        {text:'helps', role:'verb'}, {text:'sick people', role:'object'}
+      ]
+    }
   ];
   var qi=0, correctFirstTry=0, attemptedWrongOnCurrent=false, locked=false;
   var ctx=null, muted=false;
@@ -209,7 +257,7 @@
     var q = questions[qi];
     document.getElementById('qLabel').textContent = 'Question '+(qi+1)+' of '+questions.length;
     document.getElementById('progFill').style.width = Math.round((qi/questions.length)*100)+'%';
-    document.getElementById('sentence').innerHTML = q.sentence[0]+'<span class="blank">&nbsp;</span>'+q.sentence[1];
+    document.getElementById('sentence').innerHTML = q.sentence.replace('___', '<span class="blank">&nbsp;</span>');
     document.getElementById('status').textContent = '\u00A0';
     selected = null;
     attemptedWrongOnCurrent = false;
@@ -236,8 +284,9 @@
   var overlay = document.getElementById('overlay');
   function showReinforce(){
     var q = questions[qi];
-    document.getElementById('reinforceWord').textContent = q.word;
-    document.getElementById('reinforceSentence').textContent = q.sentence[0].trim()+' '+q.word+' '+q.sentence[1].trim();
+    document.getElementById('reinforceWord').textContent = q.answer;
+    document.getElementById('reinforceSentence').innerHTML = grammarSentence(q.tokens);
+    document.getElementById('reinforceLegend').innerHTML = grammarLegend();
     document.getElementById('completeContent').style.display = 'none';
     document.getElementById('reinforceContent').style.display = 'block';
     overlay.style.display = 'flex';
@@ -250,7 +299,7 @@
       return;
     }
     var q = questions[qi];
-    if(selected === q.word){
+    if(selected === q.answer){
       setCheckEnabled(false);
       sfx('correct');
       if(!attemptedWrongOnCurrent){ correctFirstTry++; }
