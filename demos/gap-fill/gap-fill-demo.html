@@ -52,16 +52,17 @@
   .block-status   { left: 13.08%; top: 47.5%;  width: 72.83%; height: 1.5%; }
 
   .badge {
-    width: 8.2%; aspect-ratio: 1/1; border-radius: 50%;
+    width: 9cqw; aspect-ratio: 1/1; border-radius: 50%;
     background: linear-gradient(90deg,#753A70,#A54D75);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-weight: 500;
     font-size: 3.6cqw;
+    flex-shrink: 0;
   }
   .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
-  .header-left { display: flex; align-items: center; gap: 3%; }
-  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; }
-  .mute-btn { background: none; border: none; cursor: pointer; font-size: 4.5cqw; }
+  .header-left { display: flex; align-items: center; gap: 3%; min-width: 0; }
+  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; }
+  .mute-btn { background: none; border: none; cursor: pointer; font-size: 4.5cqw; flex-shrink: 0; }
 
   .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; }
   .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
@@ -95,7 +96,7 @@
 
   .legend { display: flex; justify-content: center; gap: 3%; flex-wrap: nowrap; height: 100%; align-items: center; }
   .legend span { font-size: 2.7cqw; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 3px; white-space: nowrap; }
-  .dot { width: 2.2%; aspect-ratio: 1/1; border-radius: 50%; display: inline-block; }
+  .dot { width: 1.8cqw; height: 1.8cqw; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 
   .overlay {
     display: none; position: absolute; inset: 0; z-index: 3;
