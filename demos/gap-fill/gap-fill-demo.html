@@ -45,11 +45,8 @@
   .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
   .block-qlabel   { left: 13.08%; top: 15.85%; width: 40%;    height: 1.28%; }
   .block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
-  .block-sentence { left: 13.08%; top: 25.89%; width: 72.83%; height: 1.98%; }
-  .block-pillrow  { left: 13.00%; top: 32.87%; width: 75.08%; height: 4.03%; }
-  .block-check    { left: 30.92%; top: 42.09%; width: 38.00%; height: 4.11%; }
+  .block-flowzone { left: 13.00%; top: 25.89%; width: 75.08%; }
   .block-legend   { left: 16.33%; top: 52.67%; width: 65.00%; height: 1.28%; }
-  .block-status   { left: 13.08%; top: 47.5%;  width: 72.83%; height: 1.5%; }
 
   .badge {
     width: 9cqw; aspect-ratio: 1/1; border-radius: 50%;
@@ -70,16 +67,17 @@
   .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
   .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
 
-  .sentence { color: #fff; font-size: 4.7cqw; line-height: 1.3; white-space: nowrap; }
+  .sentence { color: #fff; font-size: 4.4cqw; line-height: 1.4; margin: 0 0 6%; }
   .blank { border-bottom: 2px solid rgba(255,255,255,0.5); padding: 0 1.5%; display: inline-block; width: 17%; }
 
-  .pill-row { display: flex; gap: 1.5%; height: 100%; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 1.5% 1.5%; margin-bottom: 6%; }
   .pill {
-    flex: 1; border-radius: 99px;
+    flex: 1; min-width: 22%; border-radius: 99px;
     background: linear-gradient(180deg,#883D5E,#6B2D56 55%,#562952);
     border: 1px solid #1A213A;
     font-size: 3.5cqw; color: rgba(255,255,255,0.85);
     cursor: pointer; font-family: inherit; transition: transform .12s;
+    padding: 2.5% 2%;
   }
   .pill.selected {
     background: linear-gradient(180deg,#F0AE63,#C15445);
@@ -88,9 +86,10 @@
   }
 
   .check-btn {
-    width: 100%; height: 100%; border-radius: 999px; border: none;
+    display: block; margin: 0 auto 6%;
+    padding: 3% 12%; border-radius: 999px; border: none;
     background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
-    color: #fff; font-size: 4.7cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+    color: #fff; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
   }
   .check-btn:disabled { opacity: 0.5; pointer-events: none; }
 
@@ -136,15 +135,12 @@
     <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
   </div>
 
-  <p class="pos block-sentence sentence" id="sentence">&nbsp;</p>
-
-  <div class="pos block-pillrow"><div class="pill-row" id="pillRow"></div></div>
-
-  <div class="pos block-check">
+  <div class="pos block-flowzone">
+    <p class="sentence" id="sentence">&nbsp;</p>
+    <div class="pill-row" id="pillRow"></div>
     <button id="checkBtn" class="check-btn">Check</button>
+    <p class="status" id="status">&nbsp;</p>
   </div>
-
-  <p class="pos block-status status" id="status">&nbsp;</p>
 
   <div id="overlay" class="overlay">
     <div id="reinforceContent" style="display:none;">
