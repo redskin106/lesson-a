@@ -1479,7 +1479,7 @@ function grammarSentence(tokens) {
 }
 
 // Compact single-line legend — faded so it reads as a key, not content
-function grammarLegend() {
+function grammarLegend(tokens) {
   const FADED = {
     subject: { dot: '#1A6070', text: '#3A7A8A' },
     verb:    { dot: '#3A5C22', text: '#4A7030' },
@@ -1487,14 +1487,17 @@ function grammarLegend() {
     place:   { dot: '#4A2058', text: '#5A3068' },
     time:    { dot: '#6A1030', text: '#7A2040' },
   };
-  const pills = Object.entries(FADED).map(([role, c]) =>
-    `<span style="display:inline-flex;align-items:center;gap:4px;color:${c.text};font-size:11px;font-weight:600;white-space:nowrap;">
+  const ORDER = ['subject', 'verb', 'object', 'place', 'time'];
+  const present = new Set((tokens || []).map(t => t.role));
+  const roles = ORDER.filter(r => present.has(r) && FADED[r]);
+  if (roles.length === 0) return '';
+  const pills = roles.map(role => {
+    const c = FADED[role];
+    return `<span style="display:inline-flex;align-items:center;gap:4px;color:${c.text};font-size:11px;font-weight:600;white-space:nowrap;">
       <span style="width:7px;height:7px;border-radius:50%;background:${c.dot};flex-shrink:0;"></span>${role.charAt(0).toUpperCase()+role.slice(1)}
-    </span>`
-  ).join('');
-  return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;overflow-x:auto;">
-    <span style="color:#4A6080;font-size:11px;white-space:nowrap;flex-shrink:0;">Key:</span>${pills}
-  </div>`;
+    </span>`;
+  }).join('');
+  return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;overflow-x:auto;">${pills}</div>`;
 }
 
 function showReinforcePanel(item, onClose, opts={}) {
@@ -1507,7 +1510,7 @@ function showReinforcePanel(item, onClose, opts={}) {
     : item.emoji;
   document.getElementById('rp-word').textContent = item.word;
   document.getElementById('rp-sent').innerHTML = item.tokens
-    ? grammarLegend() + grammarSentence(item.tokens)
+    ? grammarLegend(item.tokens) + grammarSentence(item.tokens)
     : (item.sentence || '');
 
   panel.style.transform = 'translateY(0)';
@@ -1760,7 +1763,7 @@ const MODULE_REGISTRY = {
 
         // Grammar pill reveal — legend first so students know what each colour means
         if (tokens) {
-          grammarDiv.innerHTML = grammarLegend() + grammarSentence(tokens);
+          grammarDiv.innerHTML = grammarLegend(tokens) + grammarSentence(tokens);
           grammarDiv.style.opacity = '1';
         }
 
@@ -1810,7 +1813,7 @@ const MODULE_REGISTRY = {
 
         // Grammar pill reveal — legend first so students know what each colour means
         if (tokens) {
-          grammarDiv.innerHTML = grammarLegend() + grammarSentence(tokens);
+          grammarDiv.innerHTML = grammarLegend(tokens) + grammarSentence(tokens);
           grammarDiv.style.opacity = '1';
         }
 
@@ -3297,7 +3300,7 @@ const MODULE_REGISTRY = {
           });
           // Show legend above the coloured tiles
           if(fb){
-            fb.innerHTML=grammarLegend();
+            fb.innerHTML=grammarLegend(item.tokens);
             fb.style.color='';
           }
           speak(sentenceText(item.tokens),'celebrate');
