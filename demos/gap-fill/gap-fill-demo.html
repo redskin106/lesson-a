@@ -70,14 +70,14 @@
   .sentence { color: #fff; font-size: 4.4cqw; line-height: 1.4; margin: 0 0 6%; }
   .blank { border-bottom: 2px solid rgba(255,255,255,0.5); padding: 0 1.5%; display: inline-block; width: 17%; }
 
-  .pill-row { display: flex; flex-wrap: wrap; gap: 1.5% 1.5%; margin-bottom: 6%; }
+  .pill-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5%; margin-bottom: 6%; }
   .pill {
-    flex: 1; min-width: 22%; border-radius: 99px;
+    border-radius: 99px;
     background: linear-gradient(180deg,#883D5E,#6B2D56 55%,#562952);
     border: 1px solid #1A213A;
     font-size: 3.5cqw; color: rgba(255,255,255,0.85);
     cursor: pointer; font-family: inherit; transition: transform .12s;
-    padding: 2.5% 2%;
+    padding: 2.5% 2%; min-width: 0;
   }
   .pill.selected {
     background: linear-gradient(180deg,#F0AE63,#C15445);
