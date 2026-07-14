@@ -13,11 +13,15 @@
     place-items: center;
     min-height: 100vh;
   }
-  .app-frame {
-    position: relative;
+  .frame-wrap {
     width: min(400px, 100vw);
-    aspect-ratio: 1200 / 2580;
     max-height: 94vh;
+    position: relative;
+    container-type: inline-size;
+  }
+  .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
+  .app-frame {
+    position: absolute; inset: 0;
     overflow: hidden;
   }
   .layer-bg {
@@ -52,18 +56,18 @@
     background: linear-gradient(90deg,#753A70,#A54D75);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-weight: 500;
-    font-size: 3.6vw;
+    font-size: 3.6cqw;
   }
   .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
   .header-left { display: flex; align-items: center; gap: 3%; }
-  .module-title { color: #fff; font-weight: 500; font-size: 3.9vw; }
-  .mute-btn { background: none; border: none; cursor: pointer; font-size: 4.5vw; }
+  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; }
+  .mute-btn { background: none; border: none; cursor: pointer; font-size: 4.5cqw; }
 
-  .q-label { color: rgba(255,255,255,0.4); font-size: 3vw; }
+  .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; }
   .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
   .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
 
-  .sentence { color: #fff; font-size: 4.7vw; line-height: 1.3; white-space: nowrap; }
+  .sentence { color: #fff; font-size: 4.7cqw; line-height: 1.3; white-space: nowrap; }
   .blank { border-bottom: 2px solid rgba(255,255,255,0.5); padding: 0 1.5%; display: inline-block; width: 17%; }
 
   .pill-row { display: flex; gap: 1.5%; height: 100%; }
@@ -71,7 +75,7 @@
     flex: 1; border-radius: 99px;
     background: linear-gradient(180deg,#883D5E,#6B2D56 55%,#562952);
     border: 1px solid #1A213A;
-    font-size: 3.5vw; color: rgba(255,255,255,0.85);
+    font-size: 3.5cqw; color: rgba(255,255,255,0.85);
     cursor: pointer; font-family: inherit; transition: transform .12s;
   }
   .pill.selected {
@@ -83,14 +87,14 @@
   .check-btn {
     width: 100%; height: 100%; border-radius: 999px; border: none;
     background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
-    color: #fff; font-size: 4.7vw; font-weight: 500; cursor: pointer; font-family: inherit;
+    color: #fff; font-size: 4.7cqw; font-weight: 500; cursor: pointer; font-family: inherit;
   }
   .check-btn:disabled { opacity: 0.5; pointer-events: none; }
 
-  .status { font-size: 3.2vw; color: rgba(255,255,255,0.5); text-align: center; }
+  .status { font-size: 3.2cqw; color: rgba(255,255,255,0.5); text-align: center; }
 
   .legend { display: flex; justify-content: center; gap: 3%; flex-wrap: nowrap; height: 100%; align-items: center; }
-  .legend span { font-size: 2.7vw; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+  .legend span { font-size: 2.7cqw; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 3px; white-space: nowrap; }
   .dot { width: 2.2%; aspect-ratio: 1/1; border-radius: 50%; display: inline-block; }
 
   .overlay {
@@ -102,12 +106,13 @@
   .continue-btn, .next-btn {
     padding: 3% 12%; border-radius: 999px; border: none;
     background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
-    color: #fff; font-size: 4vw; font-weight: 500; cursor: pointer; font-family: inherit;
+    color: #fff; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
   }
-  .stars-row { font-size: 10vw; margin-bottom: 4%; letter-spacing: 6px; min-height: 12vw; }
+  .stars-row { font-size: 10cqw; margin-bottom: 4%; letter-spacing: 6px; min-height: 12cqw; }
 </style>
 </head>
 <body>
+<div class="frame-wrap">
 <div class="app-frame">
   <div class="layer-bg"></div>
   <div class="layer-scene"></div>
@@ -148,18 +153,19 @@
 
   <div id="overlay" class="overlay">
     <div id="reinforceContent" style="display:none;">
-      <div style="font-size:3.5vw;color:rgba(255,255,255,0.5);margin-bottom:3%;">correct!</div>
-      <div style="font-size:6.5vw;color:#fff;font-weight:500;margin-bottom:2%;" id="reinforceWord">goes</div>
-      <div style="font-size:3.5vw;color:rgba(255,255,255,0.7);margin-bottom:8%;" id="reinforceSentence"></div>
+      <div style="font-size:3.5cqw;color:rgba(255,255,255,0.5);margin-bottom:3%;">correct!</div>
+      <div style="font-size:6.5cqw;color:#fff;font-weight:500;margin-bottom:2%;" id="reinforceWord">goes</div>
+      <div style="font-size:3.5cqw;color:rgba(255,255,255,0.7);margin-bottom:8%;" id="reinforceSentence"></div>
       <button id="continueBtn" class="continue-btn">Continue</button>
     </div>
     <div id="completeContent" style="display:none;">
       <div class="stars-row" id="starsRow"></div>
-      <div style="font-size:5vw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
-      <div style="font-size:3.3vw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
+      <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
+      <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
       <button id="nextModuleBtn" class="next-btn">Next module</button>
     </div>
   </div>
+</div>
 </div>
 <script>
 (function(){
