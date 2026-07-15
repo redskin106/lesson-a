@@ -126,7 +126,6 @@
       <div class="match-col" id="leftCol"></div>
       <div class="match-col" id="rightCol"></div>
     </div>
-    <button id="confirmBtn" class="next-btn" style="display:none;margin-bottom:3%;">Check ✓</button>
     <button id="nextBtn" class="next-btn">Next →</button>
   </div>
 
@@ -200,7 +199,6 @@
   var leftCol = document.getElementById('leftCol');
   var rightCol = document.getElementById('rightCol');
   var scoreLabel = document.getElementById('matchScore');
-  var confirmBtn = document.getElementById('confirmBtn');
   var nextBtn = document.getElementById('nextBtn');
 
   var pairings, rightUsed, selectedLeftBtn, confirmed, pairColor, total;
@@ -234,12 +232,23 @@
       btn.style.color = 'rgba(255,255,255,0.85)';
     }
   }
+  function checkAllCorrect(){
+    if(pairings.size !== total) return false;
+    for(var leftIdx of pairings.keys()){
+      if(pairings.get(leftIdx) !== leftIdx) return false;
+    }
+    return true;
+  }
   function refreshAll(){
     document.querySelectorAll('.match-btn[data-side="left"]').forEach(styleLeft);
     document.querySelectorAll('.match-btn[data-side="right"]').forEach(styleRight);
     scoreLabel.textContent = pairings.size+' of '+total+' paired';
-    confirmBtn.style.display = pairings.size > 0 ? 'flex' : 'none';
-    confirmBtn.textContent = pairings.size === total ? 'Check \u2713' : 'Check '+pairings.size+'/'+total+' \u2713';
+    if(checkAllCorrect()){
+      confirmed = true;
+      sfx('correct');
+      scoreLabel.textContent = 'All matched! \u2713';
+      nextBtn.style.display = 'flex';
+    }
   }
 
   function renderTier(){
@@ -253,7 +262,6 @@
 
     document.getElementById('progFill').style.width = Math.round((ti/tiers.length)*100)+'%';
     scoreLabel.textContent = '0 of '+total+' paired';
-    confirmBtn.style.display = 'none';
     nextBtn.style.display = 'none';
     leftCol.innerHTML = '';
     rightCol.innerHTML = '';
@@ -322,54 +330,6 @@
       });
     });
   }
-
-  confirmBtn.addEventListener('click', function(){
-    if(confirmed) return;
-    confirmed = true;
-    selectedLeftBtn = null;
-    var correct = 0;
-
-    document.querySelectorAll('.match-btn[data-side="left"]').forEach(function(btn){
-      var leftIdx = parseInt(btn.dataset.pairIdx);
-      var rightIdx = pairings.get(leftIdx);
-      var isCorrect = rightIdx === leftIdx;
-      var paired = rightIdx !== undefined;
-      if(isCorrect) correct++;
-      var c = isCorrect ? {border:'#8BC34A', bg:'rgba(139,195,74,0.15)', color:'#AED581'}
-            : paired    ? {border:'#E91E63', bg:'rgba(233,30,99,0.12)', color:'#F48FB1'}
-                        : {border:'rgba(255,255,255,0.08)', bg:'rgba(255,255,255,0.05)', color:'rgba(255,255,255,0.4)'};
-      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color; btn.style.boxShadow = '';
-    });
-    document.querySelectorAll('.match-btn[data-side="right"]').forEach(function(btn){
-      var rightIdx = parseInt(btn.dataset.pairIdx);
-      var leftIdx = rightUsed.get(rightIdx);
-      var paired = leftIdx !== undefined;
-      var isCorrect = paired && leftIdx === rightIdx;
-      var c = isCorrect ? {border:'#8BC34A', bg:'rgba(139,195,74,0.15)', color:'#AED581'}
-            : paired    ? {border:'#E91E63', bg:'rgba(233,30,99,0.12)', color:'#F48FB1'}
-                        : {border:'rgba(255,255,255,0.08)', bg:'rgba(255,255,255,0.05)', color:'rgba(255,255,255,0.85)'};
-      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
-    });
-    // Gold hint: for each wrong/unpaired left, highlight its correct right
-    document.querySelectorAll('.match-btn[data-side="left"]').forEach(function(btn){
-      var leftIdx = parseInt(btn.dataset.pairIdx);
-      var rightIdx = pairings.get(leftIdx);
-      var isCorrect = rightIdx === leftIdx;
-      if(!isCorrect){
-        var correctRight = document.querySelector('.match-btn[data-side="right"][data-pair-idx="'+leftIdx+'"]');
-        if(correctRight){
-          correctRight.style.borderColor = '#E8B44A';
-          correctRight.style.background = 'rgba(232,180,74,0.14)';
-          correctRight.style.color = '#E8B44A';
-        }
-      }
-    });
-
-    if(correct === total) sfx('correct'); else sfx('wrong');
-    scoreLabel.textContent = correct+' of '+total+' correct';
-    confirmBtn.style.display = 'none';
-    nextBtn.style.display = 'flex';
-  });
 
   var overlay = document.getElementById('overlay');
   nextBtn.addEventListener('click', function(){
