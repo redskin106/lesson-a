@@ -82,7 +82,6 @@
     display: flex; align-items: center; justify-content: center;
     transition: opacity .25s, transform .12s, border-color .15s, background .15s;
   }
-  .option-btn.selected { border-color: #7052B4; background: rgba(112,82,180,0.18); color: #C9B8EA; }
   .option-btn.locked { opacity: 0.35; pointer-events: none; }
 
   .check-btn {
@@ -232,22 +231,34 @@
     listenBtn.classList.remove('playing');
 
     optionsGrid.innerHTML = '';
-    q.options.forEach(function(opt){
+    var PALETTE = [
+      { border:'#00BCD4', bg:'rgba(0,188,212,.18)',  color:'#4DD0E1' },
+      { border:'#AB47BC', bg:'rgba(171,71,188,.18)', color:'#CE93D8' },
+      { border:'#FF9800', bg:'rgba(255,152,0,.18)',  color:'#FFB74D' },
+      { border:'#E91E63', bg:'rgba(233,30,99,.18)',  color:'#F48FB1' }
+    ];
+    q.options.forEach(function(opt, idx){
       var btn = document.createElement('button');
       btn.className = 'option-btn';
       btn.textContent = opt;
       if(!isBronze) btn.classList.add('locked');
+      var c = PALETTE[idx % PALETTE.length];
       btn.addEventListener('click', function(){
         if(answered) return;
         if(!optionsLive){ showHint('🔊 Listen first!'); return; }
         if(selected === btn){
           btn.classList.remove('selected');
+          btn.style.borderColor = ''; btn.style.background = ''; btn.style.color = '';
           selected = null;
           checkBtn.style.display = 'none';
         } else {
-          if(selected) selected.classList.remove('selected');
+          if(selected){
+            selected.classList.remove('selected');
+            selected.style.borderColor = ''; selected.style.background = ''; selected.style.color = '';
+          }
           selected = btn;
           btn.classList.add('selected');
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
           checkBtn.style.display = 'block';
         }
       });
