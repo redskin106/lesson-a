@@ -278,6 +278,7 @@
         scoreLabel.style.color = '#AED581';
         notQuiteBtn.style.display = 'none';
         nudgeEl.style.opacity = '0';
+        encourageEl.style.opacity = '0';
         nextBtn.style.display = 'flex';
       } else {
         sfx('wrong');
@@ -286,6 +287,7 @@
         nextBtn.style.display = 'none';
         notQuiteBtn.style.display = 'flex';
         nudgeEl.style.opacity = '0';
+        encourageEl.style.opacity = '0';
       }
     } else {
       scoreLabel.textContent = pairings.size+' of '+total+' paired';
