@@ -57,33 +57,30 @@
   .pip.done { opacity: 1; border: none; }
 
   .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; margin-bottom: 4%; }
-  .card-wrap { aspect-ratio: 1/1; -webkit-perspective: 600px; perspective: 600px; cursor: pointer; }
+  .card-wrap { aspect-ratio: 1/1; cursor: pointer; }
   .card-inner {
     width: 100%; height: 100%; position: relative;
-    -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-    transition: transform .35s cubic-bezier(.4,0,.2,1);
     border-radius: 10px;
   }
-  .card-inner.flipped { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); }
   .card-face {
     position: absolute; inset: 0; border-radius: 10px;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
     display: flex; align-items: center; justify-content: center;
+    transition: opacity .25s ease, transform .25s ease;
   }
   .card-back {
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
     color: rgba(255,255,255,0.2); font-size: 6.5cqw;
+    opacity: 1; transform: scaleX(1);
   }
   .card-front {
     background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1);
-    -webkit-transform: rotateY(180deg);
-    transform: rotateY(180deg);
     flex-direction: column; gap: 3%;
     font-size: 4cqw; font-weight: 600; color: rgba(255,255,255,0.85);
     padding: 4%; text-align: center;
+    opacity: 0; transform: scaleX(0); pointer-events: none;
   }
+  .card-inner.flipped .card-back { opacity: 0; transform: scaleX(0); }
+  .card-inner.flipped .card-front { opacity: 1; transform: scaleX(1); pointer-events: auto; }
   .card-front .emoji { font-size: 10.5cqw; line-height: 1; }
 
   .status-line { min-height: 5cqw; text-align: center; font-size: 3.4cqw; color: rgba(255,255,255,0.5); margin-bottom: 2%; }
@@ -330,6 +327,7 @@
     unlock();
     wrap.dataset.flipped = '1';
     inner.classList.add('flipped');
+    if(deck[i].kind === 'word') speak(deck[i].word, 'neutral'); // real behavior: speak immediately on flip, word cards only
     flips++;
     flipCountEl.textContent = 'Flips: '+flips;
     flipped.push(i);
@@ -354,7 +352,7 @@
       if(pip){ pip.classList.add('done'); pip.style.background = mc.border; }
       flipped = [];
 
-      speak(ca.word, 'neutral'); // one audio on a correct match
+      if(window.speechSynthesis) window.speechSynthesis.cancel();
       showReinforce(ca, function(){
         cardLocked = false;
         if(matched === PAIRS){
@@ -367,9 +365,6 @@
       var ciB = document.getElementById('ci-'+b);
       if(ciA) ciA.style.boxShadow = '0 0 0 2px #E91E63';
       if(ciB) ciB.style.boxShadow = '0 0 0 2px #E91E63';
-
-      speak(ca.word, 'neutral');          // both audios on a wrong guess
-      speak(cb.word, 'neutral', 700);     // staggered so they don't overlap
 
       setTimeout(function(){
         if(ciA){ ciA.classList.remove('flipped'); ciA.style.boxShadow = ''; }
