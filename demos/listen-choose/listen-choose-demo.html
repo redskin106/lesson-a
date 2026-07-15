@@ -241,7 +241,7 @@
       var btn = document.createElement('button');
       btn.className = 'option-btn';
       btn.textContent = opt;
-      if(!isBronze) btn.classList.add('locked');
+      btn.classList.add('locked');
       var c = PALETTE[idx % PALETTE.length];
       btn.addEventListener('click', function(){
         if(answered) return;
@@ -265,7 +265,7 @@
       optionsGrid.appendChild(btn);
     });
 
-    if(isBronze) setGridLive(true); else setGridLive(false);
+    setGridLive(false);
 
     listenBtn.onclick = function(){
       if(playing) return;
