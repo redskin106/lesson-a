@@ -82,15 +82,6 @@
 
   .speak-hint { text-align: center; font-size: 3.2cqw; color: rgba(255,255,255,0.5); margin-bottom: 4%; min-height: 4cqw; }
 
-  .assess-btn {
-    display: block; margin: 0 auto;
-    padding: 3% 12%; border-radius: 999px;
-    background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
-    color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; font-family: inherit;
-    cursor: pointer;
-  }
-  .assess-btn:disabled { pointer-events: none; opacity: 0.5; }
-
   .no-mic-msg { text-align: center; font-size: 3.2cqw; color: rgba(255,255,255,0.5); margin: 3% 0; line-height: 1.5; }
 
   .proceed-btn {
@@ -154,9 +145,6 @@
       </button>
     </div>
     <p class="speak-hint" id="speakHint">Hear the model, then record yourself.</p>
-    <div id="assessWrap" style="display:none;">
-      <button id="assessYes" class="assess-btn">Continue</button>
-    </div>
     <button id="nextBtn" class="proceed-btn">Next →</button>
   </div>
 
@@ -202,8 +190,6 @@
   var recIcon = document.getElementById('recIcon');
   var recLabel = document.getElementById('recLabel');
   var hint = document.getElementById('speakHint');
-  var assessWrap = document.getElementById('assessWrap');
-  var yesBtn = document.getElementById('assessYes');
   var nextBtn = document.getElementById('nextBtn');
   var overlay = document.getElementById('overlay');
 
@@ -243,9 +229,6 @@
     playBtn.style.display = '';
     hint.textContent = 'Hear the model, then record yourself.';
     hint.style.display = '';
-    assessWrap.style.display = 'none';
-    yesBtn.disabled = false;
-    yesBtn.classList.remove('selected');
     nextBtn.style.display = 'none';
     var stale = document.querySelector('.no-mic-msg');
     if(stale) stale.remove();
@@ -317,8 +300,8 @@
           recBtn.classList.remove('recording');
           recordingBlob = new Blob(chunks, { type: mimeType });
           playBtn.disabled = false;
-          assessWrap.style.display = 'block';
-          hint.textContent = 'Listen to both, then continue when ready.';
+          hint.textContent = 'Listen to both, then tap Next when ready.';
+          nextBtn.style.display = 'block';
           adjustScenePosition();
         };
         mediaRecorder.start();
@@ -331,33 +314,23 @@
       });
     };
 
-    function lockAssess(){
-      done = true;
-      yesBtn.disabled = true;
-      if(stream) stream.getTracks().forEach(function(t){ t.stop(); });
-    }
-    yesBtn.onclick = function(){
-      if(done) return;
-      lockAssess();
-      totalScore += 1;
-      assessWrap.style.display = 'none';
-      nextBtn.style.display = 'block';
-    };
-
     function showNoMicFallback(){
       recBtn.style.display = 'none';
       playBtn.style.display = 'none';
       var msg = document.createElement('div');
       msg.className = 'no-mic-msg';
-      msg.textContent = 'Microphone not available. Listen to the model, say it aloud, then tap how it went.';
+      msg.textContent = 'Microphone not available. Listen to the model, then say it aloud and tap Next.';
       document.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
-      assessWrap.style.display = 'block';
       hint.style.display = 'none';
+      nextBtn.style.display = 'block';
       adjustScenePosition();
     }
   }
 
   nextBtn.addEventListener('click', function(){
+    nextBtn.style.display = 'none';
+    totalScore += 1;
+    if(stream) stream.getTracks().forEach(function(t){ t.stop(); });
     qi++;
     if(qi < questions.length){
       renderQuestion();
