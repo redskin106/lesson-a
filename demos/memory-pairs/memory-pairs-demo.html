@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Pairs — Live Asset Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a12;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+  .frame-wrap {
+    width: min(400px, 100vw);
+    max-height: 94vh;
+    position: relative;
+    container-type: inline-size;
+  }
+  .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
+  .app-frame {
+    position: absolute; inset: 0;
+    overflow: hidden;
+  }
+  .layer-bg {
+    position: absolute; inset: 0;
+    background-image: url('assets/bg_and_border.png');
+    background-size: 100% 100%;
+    z-index: 0;
+  }
+  .pos { position: absolute; z-index: 2; }
+  .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
+  .block-qlabel   { left: 13.08%; top: 15.85%; width: 75%;    height: 1.28%; }
+  .block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
+  .block-flowzone { left: 8.00%; top: 25.89%; width: 84%; }
+
+  .badge {
+    width: 9cqw; aspect-ratio: 1/1; border-radius: 50%;
+    background: linear-gradient(90deg,#753A70,#A54D75);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 500; font-size: 3.6cqw; flex-shrink: 0;
+  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+  .header-left { display: flex; align-items: center; gap: 5%; min-width: 0; }
+  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; }
+  .medal-icon { flex-shrink: 0; }
+  .medal-icon img { width: 6.5cqw; height: 6.5cqw; display: block; }
+
+  .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; display: flex; justify-content: space-between; }
+  .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
+  .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
+
+  .pips-row { display: flex; gap: 1.5%; margin-bottom: 4%; }
+  .pip { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); opacity: 0.5; transition: all .25s; }
+  .pip.done { opacity: 1; border: none; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5%; margin-bottom: 4%; }
+  .card-wrap { aspect-ratio: 1/1; perspective: 600px; cursor: pointer; }
+  .card-inner {
+    width: 100%; height: 100%; position: relative;
+    transform-style: preserve-3d;
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    border-radius: 10px;
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute; inset: 0; border-radius: 10px;
+    backface-visibility: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card-back {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.2); font-size: 5cqw;
+  }
+  .card-front {
+    background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1);
+    transform: rotateY(180deg);
+    flex-direction: column; gap: 3%;
+    font-size: 3cqw; font-weight: 600; color: rgba(255,255,255,0.85);
+    padding: 4%; text-align: center;
+  }
+  .card-front .emoji { font-size: 8cqw; line-height: 1; }
+
+  .status-line { min-height: 5cqw; text-align: center; font-size: 3.4cqw; color: rgba(255,255,255,0.5); margin-bottom: 2%; }
+
+  .overlay {
+    display: none; position: absolute; inset: 0; z-index: 3;
+    background: rgba(10,8,20,0.9);
+    text-align: center; align-items: center; justify-content: center;
+    flex-direction: column; padding: 5%;
+  }
+  .continue-btn {
+    padding: 3% 12%; border-radius: 999px;
+    background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+    color: #C9B8EA; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .next-module-btn {
+    padding: 3% 12%; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .stars-row { font-size: 10cqw; margin-bottom: 4%; letter-spacing: 6px; min-height: 12cqw; }
+</style>
+</head>
+<body>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+
+  <div class="pos block-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="badge">7</div>
+        <span class="module-title">Memory Pairs</span>
+      </div>
+      <div class="medal-icon"><img src="assets/silver.png?v=2" alt="Silver tier"></div>
+    </div>
+  </div>
+
+  <div class="pos block-qlabel q-label">
+    <span>Find the pairs</span>
+    <span id="flipCount">Flips: 0</span>
+  </div>
+
+  <div class="pos block-progress">
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="pos block-flowzone">
+    <div class="pips-row" id="pipsRow"></div>
+    <div class="card-grid" id="cardGrid"></div>
+    <p class="status-line" id="statusLine">&nbsp;</p>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div id="reinforceContent" style="display:none;">
+      <div style="font-size:3.5cqw;font-weight:600;color:#AED581;margin-bottom:4%;">match!</div>
+      <div style="font-size:4cqw;line-height:2;margin-bottom:5%;" id="reinforceSentence"></div>
+      <div id="reinforceLegend"></div>
+      <button id="continueBtn" class="continue-btn" style="margin-top:4%;">Continue</button>
+    </div>
+    <div id="completeContent" style="display:none;">
+      <div class="stars-row" id="starsRow"></div>
+      <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
+      <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
+      <button id="nextModuleBtn" class="next-module-btn">Next module</button>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+  // Real GRAMMAR_COLORS / grammarSentence / grammarLegend, copied verbatim from index.html
+  var GRAMMAR_COLORS = {
+    subject: { bg: 'rgba(0,188,212,0.18)',  border: '#00BCD4', color: '#00BCD4' },
+    verb:    { bg: 'rgba(139,195,74,0.18)', border: '#8BC34A', color: '#8BC34A' },
+    object:  { bg: 'rgba(255,152,0,0.18)',  border: '#FF9800', color: '#FFB74D' },
+    place:   { bg: 'rgba(171,71,188,0.18)', border: '#AB47BC', color: '#CE93D8' },
+    time:    { bg: 'rgba(233,30,99,0.18)',  border: '#E91E63', color: '#F48FB1' }
+  };
+  function grammarSentence(tokens){
+    return tokens.map(function(t){
+      var c = GRAMMAR_COLORS[t.role];
+      if(!c) return '<span style="color:#fff;">'+t.text+'</span>';
+      return '<span style="display:inline-block;background:'+c.bg+';border:1.5px solid '+c.border+';color:'+c.color+';border-radius:6px;padding:1px 7px;margin:1px 2px;font-weight:600;font-size:.95em;">'+t.text+'</span>';
+    }).join(' ');
+  }
+  function grammarLegend(tokens){
+    var FADED = {
+      subject: { dot: '#1A6070', text: '#3A7A8A' },
+      verb:    { dot: '#3A5C22', text: '#4A7030' },
+      object:  { dot: '#6A4008', text: '#7A5010' },
+      place:   { dot: '#4A2058', text: '#5A3068' },
+      time:    { dot: '#6A1030', text: '#7A2040' }
+    };
+    var ORDER = ['subject', 'verb', 'object', 'place', 'time'];
+    var present = {};
+    (tokens || []).forEach(function(t){ present[t.role] = true; });
+    var roles = ORDER.filter(function(r){ return present[r] && FADED[r]; });
+    if(roles.length === 0) return '';
+    var pills = roles.map(function(role){
+      var c = FADED[role];
+      return '<span style="display:inline-flex;align-items:center;gap:4px;color:'+c.text+';font-size:.5em;font-weight:600;white-space:nowrap;"><span style="width:7px;height:7px;border-radius:50%;background:'+c.dot+';flex-shrink:0;"></span>'+role.charAt(0).toUpperCase()+role.slice(1)+'</span>';
+    }).join('');
+    return '<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">'+pills+'</div>';
+  }
+
+  function safeShuffle(arr, badFn, maxAttempts){
+    maxAttempts = maxAttempts || 20;
+    function sh(a){ return a.slice().sort(function(){ return Math.random() - 0.5; }); }
+    var result = sh(arr), attempts = 0;
+    while(badFn(result) && attempts++ < maxAttempts) result = sh(arr);
+    return result;
+  }
+
+  var MP_PALETTE = [
+    { border:'#00BCD4', bg:'rgba(0,188,212,.15)' },
+    { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+    { border:'#FF9800', bg:'rgba(255,152,0,.15)' },
+    { border:'#E91E63', bg:'rgba(233,30,99,.15)' },
+    { border:'#8BC34A', bg:'rgba(139,195,74,.15)' }
+  ];
+
+  // Real data, copied verbatim from LESSON['mod-game-1']
+  var allItems = [
+    { word:'dog',    emoji:'\uD83D\uDC15', sentence:'The dog runs in the park.',
+      tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+    { word:'water',  emoji:'\uD83D\uDCA7', sentence:'I drink water every day.',
+      tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+    { word:'school', emoji:'\uD83C\uDFEB', sentence:"School starts at eight o'clock.",
+      tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:"at eight o'clock",role:'time'}] },
+    { word:'book',   emoji:'\uD83D\uDCDA', sentence:'She reads a book every night.',
+      tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+    { word:'bus',    emoji:'\uD83D\uDE8C', sentence:'She takes the bus to school.',
+      tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+    { word:'cat',    emoji:'\uD83D\uDC08', sentence:'The cat sleeps on the chair.',
+      tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] }
+  ];
+
+  var tiers = [
+    { name:'bronze', pairs:3, flipback:1200 },
+    { name:'silver', pairs:4, flipback:900 },
+    { name:'gold',   pairs:4, flipback:700 }
+  ];
+  var ti = 0;
+
+  var ctx = null;
+  function unlock(){ if(!ctx){ ctx = new (window.AudioContext||window.webkitAudioContext)(); } }
+  function tone(freq, dur){
+    unlock();
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = freq; g.gain.setValueAtTime(0.15, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+  }
+  function sfx(name){
+    if(name==='star') tone(1000,0.1);
+    if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
+  }
+  function speakWord(word){
+    if(!window.speechSynthesis) return;
+    var u = new SpeechSynthesisUtterance(word);
+    u.rate = 0.9;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  }
+
+  var cardGrid = document.getElementById('cardGrid');
+  var pipsRow = document.getElementById('pipsRow');
+  var statusLine = document.getElementById('statusLine');
+  var flipCountEl = document.getElementById('flipCount');
+  var overlay = document.getElementById('overlay');
+
+  var picked, deck, PAIRS, FLIPBACK, flipped, matched, flips, cardLocked;
+
+  function renderTier(){
+    var t = tiers[ti];
+    PAIRS = t.pairs;
+    FLIPBACK = t.flipback;
+    picked = safeShuffle(allItems, function(){ return false; }).slice(0, PAIRS);
+
+    var deckSrc = [];
+    picked.forEach(function(it, i){ deckSrc.push(Object.assign({}, it, {kind:'image', pid:i})); });
+    picked.forEach(function(it, i){ deckSrc.push(Object.assign({}, it, {kind:'word', pid:i})); });
+    deck = safeShuffle(deckSrc, function(r){
+      for(var i=0;i<r.length-1;i++) if(r[i].pid===r[i+1].pid) return true;
+      return false;
+    });
+
+    flipped = []; matched = 0; flips = 0; cardLocked = false;
+    document.getElementById('progFill').style.width = Math.round((ti/tiers.length)*100)+'%';
+    flipCountEl.textContent = 'Flips: 0';
+    statusLine.textContent = '\u00A0';
+
+    pipsRow.innerHTML = '';
+    picked.forEach(function(_, i){
+      var c = MP_PALETTE[i % MP_PALETTE.length];
+      var pip = document.createElement('div');
+      pip.className = 'pip';
+      pip.id = 'pip-'+i;
+      pip.style.background = c.bg;
+      pip.style.borderColor = c.border;
+      pipsRow.appendChild(pip);
+    });
+
+    cardGrid.innerHTML = '';
+    deck.forEach(function(card, i){
+      var wrap = document.createElement('div');
+      wrap.className = 'card-wrap';
+      wrap.id = 'cw-'+i;
+      var inner = document.createElement('div');
+      inner.className = 'card-inner';
+      inner.id = 'ci-'+i;
+      var back = document.createElement('div');
+      back.className = 'card-face card-back';
+      back.textContent = '?';
+      var front = document.createElement('div');
+      front.className = 'card-face card-front';
+      front.id = 'cf-'+i;
+      if(card.kind === 'image'){
+        front.innerHTML = '<span class="emoji">'+card.emoji+'</span>';
+      } else {
+        front.innerHTML = '<span>'+card.word+'</span>';
+      }
+      inner.appendChild(back);
+      inner.appendChild(front);
+      wrap.appendChild(inner);
+      wrap.addEventListener('click', function(){ flipCard(i); });
+      cardGrid.appendChild(wrap);
+    });
+  }
+
+  function flipCard(i){
+    if(cardLocked) return;
+    var wrap = document.getElementById('cw-'+i);
+    var inner = document.getElementById('ci-'+i);
+    if(!wrap || wrap.dataset.done || wrap.dataset.flipped) return;
+    unlock();
+    wrap.dataset.flipped = '1';
+    inner.classList.add('flipped');
+    if(deck[i].kind === 'word') speakWord(deck[i].word);
+    flips++;
+    flipCountEl.textContent = 'Flips: '+flips;
+    flipped.push(i);
+    if(flipped.length === 2){ cardLocked = true; setTimeout(checkMatch, 500); }
+  }
+
+  function checkMatch(){
+    var a = flipped[0], b = flipped[1];
+    var ca = deck[a], cb = deck[b];
+    var isMatch = ca.pid === cb.pid && ca.kind !== cb.kind;
+
+    if(isMatch){
+      matched++;
+      var mc = MP_PALETTE[ca.pid % MP_PALETTE.length];
+      ['cf-'+a, 'cf-'+b].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el){ el.style.background = mc.bg; el.style.borderColor = mc.border; }
+      });
+      document.getElementById('cw-'+a).dataset.done = '1';
+      document.getElementById('cw-'+b).dataset.done = '1';
+      var pip = document.getElementById('pip-'+ca.pid);
+      if(pip){ pip.classList.add('done'); pip.style.background = mc.border; }
+      flipped = [];
+
+      if(window.speechSynthesis) window.speechSynthesis.cancel();
+      showReinforce(ca, function(){
+        cardLocked = false;
+        if(matched === PAIRS){
+          var stars = flips<=10 ? 3 : flips<=14 ? 2 : 1;
+          finishTier(stars);
+        }
+      });
+    } else {
+      var ciA = document.getElementById('ci-'+a);
+      var ciB = document.getElementById('ci-'+b);
+      if(ciA) ciA.style.boxShadow = '0 0 0 2px #E91E63';
+      if(ciB) ciB.style.boxShadow = '0 0 0 2px #E91E63';
+      setTimeout(function(){
+        if(ciA){ ciA.classList.remove('flipped'); ciA.style.boxShadow = ''; }
+        if(ciB){ ciB.classList.remove('flipped'); ciB.style.boxShadow = ''; }
+        delete document.getElementById('cw-'+a).dataset.flipped;
+        delete document.getElementById('cw-'+b).dataset.flipped;
+        flipped = []; cardLocked = false;
+      }, FLIPBACK);
+    }
+  }
+
+  function showReinforce(item, onClose){
+    document.getElementById('reinforceSentence').innerHTML = grammarSentence(item.tokens);
+    document.getElementById('reinforceLegend').innerHTML = grammarLegend(item.tokens);
+    document.getElementById('completeContent').style.display = 'none';
+    document.getElementById('reinforceContent').style.display = 'block';
+    overlay.style.display = 'flex';
+    document.getElementById('continueBtn').onclick = function(){
+      overlay.style.display = 'none';
+      onClose();
+    };
+  }
+
+  function finishTier(stars){
+    document.getElementById('progFill').style.width = '100%';
+    var starsEl = document.getElementById('starsRow');
+    starsEl.innerHTML = '';
+    document.getElementById('scoreLabel').textContent = tiers[ti].name.charAt(0).toUpperCase()+tiers[ti].name.slice(1)+' complete — '+flips+' flips';
+    document.getElementById('reinforceContent').style.display = 'none';
+    document.getElementById('completeContent').style.display = 'block';
+    overlay.style.display = 'flex';
+    var i = 0;
+    function dropStar(){
+      if(i >= stars){ sfx('complete'); return; }
+      var span = document.createElement('span');
+      span.textContent = '\u2605';
+      span.style.color = '#F0AE63';
+      span.style.display = 'inline-block';
+      starsEl.appendChild(span);
+      span.animate([{transform:'translateY(-20px) scale(0.5)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
+      sfx('star');
+      i++;
+      setTimeout(dropStar, 220);
+    }
+    dropStar();
+  }
+
+  document.getElementById('nextModuleBtn').addEventListener('click', function(){
+    overlay.style.display = 'none';
+    ti++;
+    if(ti >= tiers.length) ti = 0;
+    renderTier();
+  });
+
+  renderTier();
+})();
+</script>
+</body>
+</html>
