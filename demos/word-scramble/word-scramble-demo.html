@@ -94,6 +94,12 @@
 
   .ws-feedback { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
 
+  .frame-mask {
+    position: absolute; inset: 0; z-index: 4;
+    background-image: url('assets/frame_mask.png');
+    background-size: 100% 100%;
+    pointer-events: none;
+  }
   .overlay {
     display: none; position: absolute; inset: 0; z-index: 3;
     background: rgba(10,8,20,0.9);
@@ -112,6 +118,7 @@
 <div class="frame-wrap">
 <div class="app-frame">
   <div class="layer-bg"></div>
+  <div class="frame-mask"></div>
   <div class="layer-scene"></div>
 
   <div class="pos block-header">
