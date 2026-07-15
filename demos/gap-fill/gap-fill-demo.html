@@ -148,8 +148,7 @@
 
   <div id="overlay" class="overlay">
     <div id="reinforceContent" style="display:none;">
-      <div style="font-size:3.5cqw;color:rgba(255,255,255,0.5);margin-bottom:3%;">correct!</div>
-      <div style="font-size:6.5cqw;color:#fff;font-weight:500;margin-bottom:4%;" id="reinforceWord">goes</div>
+      <div style="font-size:3.5cqw;font-weight:600;color:#AED581;margin-bottom:4%;">correct!</div>
       <div style="font-size:4cqw;line-height:2;margin-bottom:5%;" id="reinforceSentence"></div>
       <div id="reinforceLegend"></div>
       <button id="continueBtn" class="continue-btn" style="margin-top:4%;">Continue</button>
@@ -285,7 +284,6 @@
   var overlay = document.getElementById('overlay');
   function showReinforce(){
     var q = questions[qi];
-    document.getElementById('reinforceWord').textContent = q.answer;
     document.getElementById('reinforceSentence').innerHTML = grammarSentence(q.tokens);
     document.getElementById('reinforceLegend').innerHTML = grammarLegend(q.tokens);
     document.getElementById('completeContent').style.display = 'none';
