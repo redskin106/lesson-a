@@ -91,6 +91,12 @@
   .tf-btn.false-btn { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); border: 1.5px solid rgba(255,255,255,0.08); }
   .tf-btn:disabled { cursor: default; opacity: 0.95; }
 
+  .frame-mask {
+    position: absolute; inset: 0; z-index: 4;
+    background-image: url('assets/frame_mask.png');
+    background-size: 100% 100%;
+    pointer-events: none;
+  }
   .overlay {
     display: none; position: absolute; inset: 0; z-index: 3;
     background: rgba(10,8,20,0.9);
@@ -109,6 +115,7 @@
 <div class="frame-wrap">
 <div class="app-frame">
   <div class="layer-bg"></div>
+  <div class="frame-mask"></div>
   <div class="layer-scene"></div>
 
   <div class="pos block-header">
