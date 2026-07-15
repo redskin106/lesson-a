@@ -81,6 +81,18 @@
     color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
     align-items: center; justify-content: center;
   }
+  .encourage-msg {
+    text-align: center; font-size: 3.2cqw; color: #AED581; font-weight: 500;
+    opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0;
+  }
+  .not-quite-btn {
+    display: none; margin: 0 auto;
+    padding: 3% 12%; border-radius: 999px;
+    background: rgba(233,30,99,0.14); border: 1.5px solid rgba(233,30,99,0.4);
+    color: #F48FB1; font-size: 4.4cqw; font-weight: 500; font-family: inherit;
+    cursor: default; pointer-events: none;
+    align-items: center; justify-content: center;
+  }
 
   .overlay {
     display: none; position: absolute; inset: 0; z-index: 3;
@@ -126,6 +138,8 @@
       <div class="match-col" id="leftCol"></div>
       <div class="match-col" id="rightCol"></div>
     </div>
+    <p class="encourage-msg" id="encourageMsg"></p>
+    <button id="notQuiteBtn" class="not-quite-btn" disabled style="display:none;">Not quite yet</button>
     <button id="nextBtn" class="next-btn">Next →</button>
   </div>
 
@@ -199,7 +213,9 @@
   var leftCol = document.getElementById('leftCol');
   var rightCol = document.getElementById('rightCol');
   var scoreLabel = document.getElementById('matchScore');
+  var notQuiteBtn = document.getElementById('notQuiteBtn');
   var nextBtn = document.getElementById('nextBtn');
+  var encourageEl = document.getElementById('encourageMsg');
 
   var pairings, rightUsed, selectedLeftBtn, confirmed, pairColor, total;
 
@@ -242,21 +258,40 @@
   function refreshAll(){
     document.querySelectorAll('.match-btn[data-side="left"]').forEach(styleLeft);
     document.querySelectorAll('.match-btn[data-side="right"]').forEach(styleRight);
+
+    var correctSoFar = 0;
+    pairings.forEach(function(rightIdx, leftIdx){ if(rightIdx === leftIdx) correctSoFar++; });
+
     if(pairings.size === total){
       if(checkAllCorrect()){
         confirmed = true;
         sfx('correct');
         scoreLabel.textContent = 'All matched! \u2713';
         scoreLabel.style.color = '#AED581';
+        notQuiteBtn.style.display = 'none';
         nextBtn.style.display = 'flex';
       } else {
         sfx('wrong');
-        scoreLabel.textContent = 'not quite yet — check your pairs';
-        scoreLabel.style.color = '#F48FB1';
+        scoreLabel.textContent = Math.min(pairings.size, total)+' of '+total+' paired';
+        scoreLabel.style.color = '';
+        nextBtn.style.display = 'none';
+        notQuiteBtn.style.display = 'flex';
       }
     } else {
       scoreLabel.textContent = pairings.size+' of '+total+' paired';
       scoreLabel.style.color = '';
+      nextBtn.style.display = 'none';
+      notQuiteBtn.style.display = 'none';
+
+      if(correctSoFar > 0){
+        var ratio = correctSoFar / total;
+        encourageEl.textContent = ratio >= 0.66 ? 'Almost there!'
+                                 : ratio >= 0.34 ? 'Getting there!'
+                                 : 'Nice, keep going!';
+        encourageEl.style.opacity = '1';
+      } else {
+        encourageEl.style.opacity = '0';
+      }
     }
   }
 
@@ -271,7 +306,10 @@
 
     document.getElementById('progFill').style.width = Math.round((ti/tiers.length)*100)+'%';
     scoreLabel.textContent = '0 of '+total+' paired';
+    scoreLabel.style.color = '';
     nextBtn.style.display = 'none';
+    notQuiteBtn.style.display = 'none';
+    encourageEl.style.opacity = '0';
     leftCol.innerHTML = '';
     rightCol.innerHTML = '';
 
