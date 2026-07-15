@@ -66,7 +66,12 @@
   .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
   .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
 
-  .sentence { color: #fff; font-size: 4.4cqw; line-height: 1.4; margin: 0 0 6%; }
+  .sentence {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 5% 6%;
+    color: #fff; font-size: 4.4cqw; line-height: 1.5; text-align: center;
+    margin: 0 0 6%;
+  }
   .blank { border-bottom: 2px solid rgba(255,255,255,0.5); padding: 0 1.5%; display: inline-block; width: 17%; }
 
   .pill-row { display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 7%; column-gap: 1.5%; margin-bottom: 6%; }
