@@ -87,19 +87,6 @@
   }
   .tf-btn:disabled { cursor: default; opacity: 0.95; }
 
-  .grammar-reveal {
-    opacity: 0; transition: opacity .3s; min-height: 0;
-    font-size: 4cqw; line-height: 2; margin-bottom: 4%;
-  }
-  .grammar-reveal .legend-row { margin-bottom: 3%; }
-
-  .next-btn {
-    display: none; width: 100%;
-    padding: 4% 0; border-radius: 999px; border: none;
-    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
-    color: #fff; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
-  }
-
   .overlay {
     display: none; position: absolute; inset: 0; z-index: 3;
     background: rgba(10,8,20,0.9);
@@ -143,15 +130,21 @@
       <button id="trueBtn" class="tf-btn true-btn">✓ True</button>
       <button id="falseBtn" class="tf-btn false-btn">✗ False</button>
     </div>
-    <div class="grammar-reveal" id="grammarReveal"></div>
-    <button id="nextBtn" class="next-btn">Next →</button>
   </div>
 
   <div id="overlay" class="overlay">
-    <div class="stars-row" id="starsRow"></div>
-    <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
-    <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
-    <button id="nextModuleBtn" class="next-module-btn">Next module</button>
+    <div id="reinforceContent" style="display:none;">
+      <div style="font-size:3.5cqw;font-weight:600;margin-bottom:3%;" id="resultLabel">correct!</div>
+      <div style="font-size:4cqw;line-height:2;margin-bottom:5%;" id="reinforceStatement"></div>
+      <div id="reinforceLegend"></div>
+      <button id="continueBtn" class="next-module-btn" style="margin-top:4%;">Continue</button>
+    </div>
+    <div id="completeContent" style="display:none;">
+      <div class="stars-row" id="starsRow"></div>
+      <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
+      <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
+      <button id="nextModuleBtn" class="next-module-btn">Next module</button>
+    </div>
   </div>
 </div>
 </div>
@@ -238,9 +231,8 @@
 
   var trueBtn = document.getElementById('trueBtn');
   var falseBtn = document.getElementById('falseBtn');
-  var nextBtn = document.getElementById('nextBtn');
   var statementEl = document.getElementById('statement');
-  var grammarEl = document.getElementById('grammarReveal');
+  var overlay = document.getElementById('overlay');
 
   function renderQuestion(){
     var q = questions[qi];
@@ -251,9 +243,18 @@
     falseBtn.disabled = false;
     trueBtn.classList.remove('highlight-correct','highlight-wrong');
     falseBtn.classList.remove('highlight-correct','highlight-wrong');
-    grammarEl.style.opacity = '0';
-    grammarEl.innerHTML = '';
-    nextBtn.style.display = 'none';
+  }
+
+  function showReinforce(correct){
+    var q = questions[qi];
+    var label = document.getElementById('resultLabel');
+    label.textContent = correct ? 'correct!' : 'not quite';
+    label.style.color = correct ? '#AED581' : '#F48FB1';
+    document.getElementById('reinforceStatement').innerHTML = q.tokens ? grammarSentence(q.tokens) : q.statement;
+    document.getElementById('reinforceLegend').innerHTML = q.tokens ? grammarLegend(q.tokens) : '';
+    document.getElementById('completeContent').style.display = 'none';
+    document.getElementById('reinforceContent').style.display = 'block';
+    overlay.style.display = 'flex';
   }
 
   function handleAnswer(chosen){
@@ -271,18 +272,13 @@
     falseBtn.disabled = true;
     if(correct) correctCount++;
     sfx(correct ? 'correct' : 'wrong');
-
-    if(q.tokens){
-      grammarEl.innerHTML = grammarLegend(q.tokens) + grammarSentence(q.tokens);
-      grammarEl.style.opacity = '1';
-    }
-    nextBtn.style.display = 'block';
+    setTimeout(function(){ showReinforce(correct); }, 550);
   }
   trueBtn.addEventListener('click', function(){ handleAnswer(true); });
   falseBtn.addEventListener('click', function(){ handleAnswer(false); });
 
-  var overlay = document.getElementById('overlay');
-  nextBtn.addEventListener('click', function(){
+  document.getElementById('continueBtn').addEventListener('click', function(){
+    overlay.style.display = 'none';
     qi++;
     if(qi < questions.length){
       renderQuestion();
@@ -293,6 +289,8 @@
       document.getElementById('scoreLabel').textContent = correctCount+' of '+questions.length+' correct';
       var starsEl = document.getElementById('starsRow');
       starsEl.innerHTML = '';
+      document.getElementById('reinforceContent').style.display = 'none';
+      document.getElementById('completeContent').style.display = 'block';
       overlay.style.display = 'flex';
       var i = 0;
       function dropStar(){
@@ -305,6 +303,7 @@
         span.animate([{transform:'translateY(-20px) scale(0.5)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
         sfx('star');
         i++;
+
         setTimeout(dropStar, 220);
       }
       dropStar();
