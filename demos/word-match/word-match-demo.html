@@ -85,6 +85,10 @@
     text-align: center; font-size: 3.2cqw; color: #AED581; font-weight: 500;
     opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0;
   }
+  .nudge-msg {
+    text-align: center; font-size: 3.2cqw; color: #E8B44A; font-weight: 500;
+    opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0;
+  }
   .not-quite-btn {
     display: none; margin: 0 auto;
     padding: 3% 12%; border-radius: 999px;
@@ -139,6 +143,7 @@
       <div class="match-col" id="rightCol"></div>
     </div>
     <p class="encourage-msg" id="encourageMsg"></p>
+    <p class="nudge-msg" id="nudgeMsg"></p>
     <button id="notQuiteBtn" class="not-quite-btn" disabled style="display:none;">Not quite yet</button>
     <button id="nextBtn" class="next-btn">Next →</button>
   </div>
@@ -216,6 +221,7 @@
   var notQuiteBtn = document.getElementById('notQuiteBtn');
   var nextBtn = document.getElementById('nextBtn');
   var encourageEl = document.getElementById('encourageMsg');
+  var nudgeEl = document.getElementById('nudgeMsg');
 
   var pairings, rightUsed, selectedLeftBtn, confirmed, pairColor, total;
 
@@ -259,8 +265,10 @@
     document.querySelectorAll('.match-btn[data-side="left"]').forEach(styleLeft);
     document.querySelectorAll('.match-btn[data-side="right"]').forEach(styleRight);
 
-    var correctSoFar = 0;
-    pairings.forEach(function(rightIdx, leftIdx){ if(rightIdx === leftIdx) correctSoFar++; });
+    var correctSoFar = 0, wrongSoFar = 0;
+    pairings.forEach(function(rightIdx, leftIdx){
+      if(rightIdx === leftIdx) correctSoFar++; else wrongSoFar++;
+    });
 
     if(pairings.size === total){
       if(checkAllCorrect()){
@@ -269,6 +277,7 @@
         scoreLabel.textContent = 'All matched! \u2713';
         scoreLabel.style.color = '#AED581';
         notQuiteBtn.style.display = 'none';
+        nudgeEl.style.opacity = '0';
         nextBtn.style.display = 'flex';
       } else {
         sfx('wrong');
@@ -276,6 +285,7 @@
         scoreLabel.style.color = '';
         nextBtn.style.display = 'none';
         notQuiteBtn.style.display = 'flex';
+        nudgeEl.style.opacity = '0';
       }
     } else {
       scoreLabel.textContent = pairings.size+' of '+total+' paired';
@@ -283,14 +293,22 @@
       nextBtn.style.display = 'none';
       notQuiteBtn.style.display = 'none';
 
-      if(correctSoFar > 0){
-        var ratio = correctSoFar / total;
-        encourageEl.textContent = ratio >= 0.66 ? 'Almost there!'
-                                 : ratio >= 0.34 ? 'Getting there!'
-                                 : 'Nice, keep going!';
-        encourageEl.style.opacity = '1';
-      } else {
+      // Bronze only: nudge the moment a wrong pairing exists, takes priority over encouragement
+      if(ti === 0 && wrongSoFar > 0){
+        nudgeEl.textContent = 'Are you sure about that one?';
+        nudgeEl.style.opacity = '1';
         encourageEl.style.opacity = '0';
+      } else {
+        nudgeEl.style.opacity = '0';
+        if(correctSoFar > 0){
+          var ratio = correctSoFar / total;
+          encourageEl.textContent = ratio >= 0.66 ? 'Almost there!'
+                                   : ratio >= 0.34 ? 'Getting there!'
+                                   : 'Nice, keep going!';
+          encourageEl.style.opacity = '1';
+        } else {
+          encourageEl.style.opacity = '0';
+        }
       }
     }
   }
@@ -310,6 +328,7 @@
     nextBtn.style.display = 'none';
     notQuiteBtn.style.display = 'none';
     encourageEl.style.opacity = '0';
+    nudgeEl.style.opacity = '0';
     leftCol.innerHTML = '';
     rightCol.innerHTML = '';
 
