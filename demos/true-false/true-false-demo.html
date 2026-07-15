@@ -77,14 +77,6 @@
   }
   .tf-btn.true-btn  { background: rgba(139,195,74,0.14);  color: #AED581; border: 1.5px solid rgba(139,195,74,0.4); }
   .tf-btn.false-btn { background: rgba(233,30,99,0.14);   color: #F48FB1; border: 1.5px solid rgba(233,30,99,0.4); }
-  .tf-btn.highlight-correct {
-    background: linear-gradient(180deg,#1B5E20 0%,#4C8C3A 45%,#8BC34A 100%);
-    color: #fff; border-color: transparent;
-  }
-  .tf-btn.highlight-wrong {
-    background: linear-gradient(180deg,#7A0B2E 0%,#C2295A 45%,#E91E63 100%);
-    color: #fff; border-color: transparent;
-  }
   .tf-btn:disabled { cursor: default; opacity: 0.95; }
 
   .overlay {
@@ -241,8 +233,6 @@
     statementEl.textContent = q.statement;
     trueBtn.disabled = false;
     falseBtn.disabled = false;
-    trueBtn.classList.remove('highlight-correct','highlight-wrong');
-    falseBtn.classList.remove('highlight-correct','highlight-wrong');
   }
 
   function showReinforce(correct){
@@ -262,12 +252,6 @@
     unlock();
     var q = questions[qi];
     var correct = (chosen === q.answer);
-    var chosenBtn = chosen ? trueBtn : falseBtn;
-    chosenBtn.classList.add(correct ? 'highlight-correct' : 'highlight-wrong');
-    if(!correct){
-      var correctBtn = q.answer ? trueBtn : falseBtn;
-      correctBtn.classList.add('highlight-correct');
-    }
     trueBtn.disabled = true;
     falseBtn.disabled = true;
     if(correct) correctCount++;
