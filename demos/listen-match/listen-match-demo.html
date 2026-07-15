@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listen & Match — Live Asset Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a12;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+  .frame-wrap {
+    width: min(400px, 100vw);
+    max-height: 94vh;
+    position: relative;
+    container-type: inline-size;
+  }
+  .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
+  .app-frame {
+    position: absolute; inset: 0;
+    overflow: hidden;
+    border-radius: 12.7cqw;
+  }
+  .layer-bg {
+    position: absolute; inset: 0;
+    background-image: url('assets/bg_and_border.png');
+    background-size: 100% 100%;
+    z-index: 0;
+  }
+  .layer-scene {
+    position: absolute;
+    left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%;
+    background-image: url('assets/school_scene.png');
+    background-size: 100% 100%;
+    z-index: 1;
+  }
+  .pos { position: absolute; z-index: 2; }
+  .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
+  .block-qlabel   { left: 13.08%; top: 15.85%; width: 75%;    height: 1.28%; }
+  .block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
+  .block-flowzone { left: 13.00%; top: 25.89%; width: 75.08%; }
+
+  .badge {
+    width: 9cqw; aspect-ratio: 1/1; border-radius: 50%;
+    background: linear-gradient(90deg,#753A70,#A54D75);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 500;
+    font-size: 3.6cqw;
+    flex-shrink: 0;
+  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+  .header-left { display: flex; align-items: center; gap: 2.5cqw; min-width: 0; }
+  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; }
+  .medal-icon { flex-shrink: 0; }
+  .medal-icon img { width: 6.5cqw; height: 6.5cqw; display: block; }
+
+  .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; display: flex; justify-content: space-between; }
+  .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
+  .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
+
+  .prompt { color: rgba(255,255,255,0.5); font-size: 3.4cqw; margin-bottom: 4%; text-align: center; }
+
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4%; margin-bottom: 5%; }
+  .match-col { display: flex; flex-direction: column; gap: 4%; }
+  .match-btn {
+    background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 4% 3%;
+    color: rgba(255,255,255,0.85); font-size: 3.4cqw; font-family: inherit;
+    cursor: pointer; transition: transform .12s, background .15s, border-color .15s, color .15s;
+    min-height: 0; line-height: 1.3;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+  }
+
+  .next-btn {
+    display: none; margin: 0 auto;
+    padding: 3% 12%; border-radius: 999px;
+    background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+    color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+    align-items: center; justify-content: center;
+  }
+  .encourage-msg {
+    text-align: center; font-size: 3.2cqw; color: #AED581; font-weight: 500;
+    opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0;
+  }
+  .nudge-msg {
+    text-align: center; font-size: 3.2cqw; color: #E8B44A; font-weight: 500;
+    opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0;
+  }
+  .not-quite-btn {
+    display: none; margin: 0 auto;
+    padding: 3% 12%; border-radius: 999px;
+    background: rgba(233,30,99,0.14); border: 1.5px solid rgba(233,30,99,0.4);
+    color: #F48FB1; font-size: 4.4cqw; font-weight: 500; font-family: inherit;
+    cursor: default; pointer-events: none;
+    align-items: center; justify-content: center;
+  }
+
+  .overlay {
+    display: none; position: absolute; inset: 0; z-index: 3;
+    background: rgba(10,8,20,0.9);
+    text-align: center; align-items: center; justify-content: center;
+    flex-direction: column; padding: 5%;
+  }
+  .next-module-btn {
+    padding: 3% 12%; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .stars-row { font-size: 10cqw; margin-bottom: 4%; letter-spacing: 6px; min-height: 12cqw; }
+</style>
+</head>
+<body>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="layer-scene"></div>
+
+  <div class="pos block-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="badge">12</div>
+        <span class="module-title">Listen &amp; Match</span>
+      </div>
+      <div class="medal-icon"><img src="assets/silver.png?v=2" alt="Silver tier"></div>
+    </div>
+  </div>
+
+  <div class="pos block-qlabel q-label">
+    <span>Tap 🔊 to listen, then match.</span>
+    <span id="matchScore">3 pairs to match</span>
+  </div>
+
+  <div class="pos block-progress">
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="pos block-flowzone">
+    <div class="match-grid">
+      <div class="match-col" id="leftCol"></div>
+      <div class="match-col" id="rightCol"></div>
+    </div>
+    <p class="encourage-msg" id="encourageMsg"></p>
+    <p class="nudge-msg" id="nudgeMsg"></p>
+    <button id="notQuiteBtn" class="not-quite-btn" disabled style="display:none;">Not quite yet</button>
+    <button id="nextBtn" class="next-btn">Next →</button>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="stars-row" id="starsRow"></div>
+    <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
+    <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
+    <button id="nextModuleBtn" class="next-module-btn">Next module</button>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+  // Real safeShuffle, copied verbatim from index.html
+  function safeShuffle(arr, badFn, maxAttempts){
+    maxAttempts = maxAttempts || 20;
+    function sh(a){ return a.slice().sort(function(){ return Math.random() - 0.5; }); }
+    var result = sh(arr), attempts = 0;
+    while(badFn(result) && attempts++ < maxAttempts) result = sh(arr);
+    return result;
+  }
+
+  // Real PALETTE, copied verbatim from the word-match renderer
+  var PALETTE = [
+    { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' },
+    { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' },
+    { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' },
+    { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' },
+    { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' }
+  ];
+
+  // Real data, copied verbatim from LESSON['mod-6'] silver tier (4 pairs — good middle test)
+  // Real data, copied verbatim from LESSON['mod-audio-match'] in index.html
+  var tiers = [
+    { pairs: [
+        { left: 'dog',  right: 'dog'  },
+        { left: 'cat',  right: 'cat'  },
+        { left: 'bus',  right: 'bus'  },
+        { left: 'book', right: 'book' }
+    ]},
+    { pairs: [
+        { left: 'I eat breakfast before school.', right: 'I eat breakfast before school.' },
+        { left: 'I eat breakfast after school.',  right: 'I eat breakfast after school.'  },
+        { left: 'I eat lunch before school.',     right: 'I eat lunch before school.'     }
+    ]},
+    { pairs: [
+        { left: 'He walks to school every morning.',  right: 'He walks to school every morning.'  },
+        { left: 'She walks to school every morning.', right: 'She walks to school every morning.' },
+        { left: 'He walks to school every evening.',  right: 'He walks to school every evening.'  },
+        { left: 'He runs to school every morning.',   right: 'He runs to school every morning.'   }
+    ]}
+  ];
+
+  var ti = 0;
+  var ctx = null;
+  function unlock(){ if(!ctx){ ctx = new (window.AudioContext||window.webkitAudioContext)(); } }
+  function tone(freq, dur){
+    unlock();
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = freq; g.gain.setValueAtTime(0.15, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+  }
+  function sfx(name){
+    if(name==='tap') tone(600,0.06);
+    if(name==='wrong') tone(350,0.18);
+    if(name==='star') tone(1000,0.1);
+    if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
+  }
+  var SPEAK_MOODS = { neutral: { rate:0.85, pitch:1.0, volume:0.9 } };
+  function speak(text, mood){
+    if(!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    var m = SPEAK_MOODS[mood || 'neutral'];
+    u.rate = m.rate; u.pitch = m.pitch; u.volume = m.volume;
+    window.speechSynthesis.speak(u);
+  }
+
+  var leftCol = document.getElementById('leftCol');
+  var rightCol = document.getElementById('rightCol');
+  var scoreLabel = document.getElementById('matchScore');
+  var notQuiteBtn = document.getElementById('notQuiteBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var encourageEl = document.getElementById('encourageMsg');
+  var nudgeEl = document.getElementById('nudgeMsg');
+
+  var pairings, rightUsed, selectedLeftBtn, confirmed, pairColor, total;
+
+  function styleLeft(btn){
+    if(confirmed) return;
+    var idx = parseInt(btn.dataset.pairIdx);
+    var c = pairColor[idx];
+    var isSelected = (btn === selectedLeftBtn);
+    var isPaired = pairings.has(idx);
+    if(isSelected){
+      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+      btn.style.boxShadow = '0 0 0 3px '+c.border;
+    } else if(isPaired){
+      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+      btn.style.boxShadow = '';
+    } else {
+      btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.color = 'rgba(255,255,255,0.85)'; btn.style.boxShadow = '';
+    }
+  }
+  function styleRight(btn){
+    if(confirmed) return;
+    var rightIdx = parseInt(btn.dataset.pairIdx);
+    if(rightUsed.has(rightIdx)){
+      var leftIdx = rightUsed.get(rightIdx);
+      var c = pairColor[leftIdx];
+      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+    } else {
+      btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.color = 'rgba(255,255,255,0.85)';
+    }
+  }
+  function checkAllCorrect(){
+    if(pairings.size !== total) return false;
+    for(var leftIdx of pairings.keys()){
+      if(pairings.get(leftIdx) !== leftIdx) return false;
+    }
+    return true;
+  }
+  function refreshAll(){
+    document.querySelectorAll('.match-btn[data-side="left"]').forEach(styleLeft);
+    document.querySelectorAll('.match-btn[data-side="right"]').forEach(styleRight);
+
+    var correctSoFar = 0, wrongSoFar = 0;
+    pairings.forEach(function(rightIdx, leftIdx){
+      if(rightIdx === leftIdx) correctSoFar++; else wrongSoFar++;
+    });
+
+    if(pairings.size === total){
+      if(checkAllCorrect()){
+        confirmed = true;
+        sfx('correct');
+        scoreLabel.textContent = 'Good job!';
+        scoreLabel.style.color = '#AED581';
+        notQuiteBtn.style.display = 'none';
+        nudgeEl.style.opacity = '0';
+        encourageEl.style.opacity = '0';
+        nextBtn.style.display = 'flex';
+      } else {
+        sfx('wrong');
+        scoreLabel.textContent = Math.min(pairings.size, total)+' of '+total+' paired';
+        scoreLabel.style.color = '';
+        nextBtn.style.display = 'none';
+        notQuiteBtn.style.display = 'flex';
+        nudgeEl.style.opacity = '0';
+        encourageEl.style.opacity = '0';
+      }
+    } else {
+      scoreLabel.textContent = pairings.size+' of '+total+' paired';
+      scoreLabel.style.color = '';
+      nextBtn.style.display = 'none';
+      notQuiteBtn.style.display = 'none';
+
+      // Bronze only: nudge the moment a wrong pairing exists, takes priority over encouragement
+      if(ti === 0 && wrongSoFar > 0){
+        nudgeEl.textContent = 'Are you sure about that one?';
+        nudgeEl.style.opacity = '1';
+        encourageEl.style.opacity = '0';
+      } else {
+        nudgeEl.style.opacity = '0';
+        if(correctSoFar > 0){
+          var ratio = correctSoFar / total;
+          encourageEl.textContent = ratio >= 0.66 ? 'Almost there!'
+                                   : ratio >= 0.34 ? 'Getting there!'
+                                   : 'Nice, keep going!';
+          encourageEl.style.opacity = '1';
+        } else {
+          encourageEl.style.opacity = '0';
+        }
+      }
+    }
+  }
+
+  function renderTier(){
+    var pairs = tiers[ti].pairs;
+    total = pairs.length;
+    pairings = new Map();
+    rightUsed = new Map();
+    selectedLeftBtn = null;
+    confirmed = false;
+    pairColor = pairs.map(function(_, i){ return PALETTE[i % PALETTE.length]; });
+
+    document.getElementById('progFill').style.width = Math.round((ti/tiers.length)*100)+'%';
+    scoreLabel.textContent = '0 of '+total+' paired';
+    scoreLabel.style.color = '';
+    nextBtn.style.display = 'none';
+    notQuiteBtn.style.display = 'none';
+    encourageEl.style.opacity = '0';
+    nudgeEl.style.opacity = '0';
+    leftCol.innerHTML = '';
+    rightCol.innerHTML = '';
+
+    var withIdx = pairs.map(function(p, i){ return {left:p.left, right:p.right, pairIdx:i}; });
+    var leftItems = safeShuffle(withIdx, function(){ return false; });
+    var rightItems = safeShuffle(withIdx, function(r){
+      return r.some(function(item, pos){ return item.pairIdx === leftItems[pos].pairIdx; });
+    });
+
+    leftItems.forEach(function(pair){
+      var btn = document.createElement('button');
+      btn.className = 'match-btn';
+      btn.innerHTML = '🔊';
+      btn.style.fontSize = '5cqw';
+      btn.dataset.side = 'left';
+      btn.dataset.pairIdx = pair.pairIdx;
+      btn.dataset.audio = pair.left;
+      leftCol.appendChild(btn);
+    });
+    rightItems.forEach(function(pair){
+      var btn = document.createElement('button');
+      btn.className = 'match-btn';
+      btn.textContent = pair.right;
+      btn.dataset.side = 'right';
+      btn.dataset.pairIdx = pair.pairIdx;
+      rightCol.appendChild(btn);
+    });
+
+    document.querySelectorAll('.match-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(confirmed) return;
+        unlock();
+
+        if(btn.dataset.side === 'left'){
+          speak(btn.dataset.audio, 'neutral');
+          selectedLeftBtn = (btn === selectedLeftBtn) ? null : btn;
+          refreshAll();
+          return;
+        }
+
+        // Right button — always unlink any existing pairing first, then optionally re-pair
+        var rightIdx = parseInt(btn.dataset.pairIdx);
+        var leftIdx = selectedLeftBtn ? parseInt(selectedLeftBtn.dataset.pairIdx) : null;
+
+        if(rightUsed.has(rightIdx)){
+          var prevLeftIdx = rightUsed.get(rightIdx);
+          pairings.delete(prevLeftIdx);
+          rightUsed.delete(rightIdx);
+          if(leftIdx === null || leftIdx === prevLeftIdx){
+            selectedLeftBtn = null;
+            sfx('tap');
+            refreshAll();
+            return;
+          }
+        }
+        if(leftIdx === null){ refreshAll(); return; }
+
+        if(pairings.has(leftIdx)){
+          rightUsed.delete(pairings.get(leftIdx));
+          pairings.delete(leftIdx);
+        }
+        pairings.set(leftIdx, rightIdx);
+        rightUsed.set(rightIdx, leftIdx);
+        selectedLeftBtn = null;
+        sfx('tap');
+        refreshAll();
+      });
+    });
+  }
+
+  var overlay = document.getElementById('overlay');
+  nextBtn.addEventListener('click', function(){
+
+    ti++;
+    if(ti < tiers.length){
+      renderTier();
+    } else {
+      document.getElementById('progFill').style.width = '100%';
+      document.getElementById('scoreLabel').textContent = tiers.length+' of '+tiers.length+' tiers complete';
+      var starsEl = document.getElementById('starsRow');
+      starsEl.innerHTML = '';
+      overlay.style.display = 'flex';
+      var i = 0, starCount = 3;
+      function dropStar(){
+        if(i >= starCount){ sfx('complete'); return; }
+        var span = document.createElement('span');
+        span.textContent = '\u2605';
+        span.style.color = '#F0AE63';
+        span.style.display = 'inline-block';
+        starsEl.appendChild(span);
+        span.animate([{transform:'translateY(-20px) scale(0.5)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
+        sfx('star');
+        i++;
+        setTimeout(dropStar, 220);
+      }
+      dropStar();
+    }
+  });
+  document.getElementById('nextModuleBtn').addEventListener('click', function(){
+    overlay.style.display = 'none';
+    ti = 0;
+    renderTier();
+  });
+
+  renderTier();
+})();
+</script>
+</body>
+</html>
