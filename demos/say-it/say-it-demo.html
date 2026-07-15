@@ -215,6 +215,22 @@
 
   var modelPlaying, selfPlaying, isRecording, done, recordingBlob, selfAudio, mediaRecorder, stream;
 
+  var SCENE_DEFAULT_TOP = 51.47; // matches the original fixed position
+  var SCENE_GAP = 1.5; // breathing room below content, in % of frame height
+  function adjustScenePosition(){
+    var frame = document.querySelector('.app-frame');
+    var flowzone = document.querySelector('.block-flowzone');
+    var scene = document.querySelector('.layer-scene');
+    if(!frame || !flowzone || !scene) return;
+    var frameRect = frame.getBoundingClientRect();
+    var flowRect = flowzone.getBoundingClientRect();
+    if(frameRect.height === 0) return;
+    var contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
+    var newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + SCENE_GAP);
+    scene.style.top = newTop + '%';
+  }
+  window.addEventListener('resize', adjustScenePosition);
+
   function renderQuestion(){
     var q = questions[qi];
     var isBronze = q.tier === 'bronze';
@@ -239,6 +255,7 @@
     nextBtn.style.display = 'none';
     var stale = document.querySelector('.no-mic-msg');
     if(stale) stale.remove();
+    adjustScenePosition();
 
     function playModel(){
       if(modelPlaying || !window.speechSynthesis) return;
@@ -308,6 +325,7 @@
           playBtn.disabled = false;
           assessWrap.style.display = 'block';
           hint.textContent = 'Listen to both, then tap how it went.';
+          adjustScenePosition();
         };
         mediaRecorder.start();
         isRecording = true;
@@ -348,6 +366,7 @@
       document.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
       assessWrap.style.display = 'block';
       hint.style.display = 'none';
+      adjustScenePosition();
     }
   }
 
