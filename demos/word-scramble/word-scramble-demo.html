@@ -386,6 +386,8 @@
     document.getElementById('completeContent').style.display = 'none';
     document.getElementById('reinforceContent').style.display = 'block';
     overlay.style.display = 'flex';
+    var plainSentence = item.tokens.map(function(t){ return t.text; }).join(' ');
+    speak(plainSentence, 'neutral', 200); // matches real showReinforcePanel(sentenceOnly:true)
     document.getElementById('continueBtn').onclick = function(){
       overlay.style.display = 'none';
       onClose();
