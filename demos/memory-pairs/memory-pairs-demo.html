@@ -205,17 +205,17 @@
 
   // Real data, copied verbatim from LESSON['mod-game-1']
   var allItems = [
-    { word:'dog',    emoji:'\uD83D\uDC15', sentence:'The dog runs in the park.',
+    { word:'dog',    emoji:'\uD83D\uDC15', image:null, sentence:'The dog runs in the park.',
       tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
-    { word:'water',  emoji:'\uD83D\uDCA7', sentence:'I drink water every day.',
+    { word:'water',  emoji:'\uD83D\uDCA7', image:null, sentence:'I drink water every day.',
       tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
-    { word:'school', emoji:'\uD83C\uDFEB', sentence:"School starts at eight o'clock.",
+    { word:'school', emoji:'\uD83C\uDFEB', image:null, sentence:"School starts at eight o'clock.",
       tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:"at eight o'clock",role:'time'}] },
-    { word:'book',   emoji:'\uD83D\uDCDA', sentence:'She reads a book every night.',
+    { word:'book',   emoji:'\uD83D\uDCDA', image:null, sentence:'She reads a book every night.',
       tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
-    { word:'bus',    emoji:'\uD83D\uDE8C', sentence:'She takes the bus to school.',
+    { word:'bus',    emoji:'\uD83D\uDE8C', image:null, sentence:'She takes the bus to school.',
       tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
-    { word:'cat',    emoji:'\uD83D\uDC08', sentence:'The cat sleeps on the chair.',
+    { word:'cat',    emoji:'\uD83D\uDC08', image:null, sentence:'The cat sleeps on the chair.',
       tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] }
   ];
 
@@ -307,7 +307,9 @@
       front.className = 'card-face card-front';
       front.id = 'cf-'+i;
       if(card.kind === 'image'){
-        front.innerHTML = '<span class="emoji">'+card.emoji+'</span>';
+        front.innerHTML = card.image
+          ? '<img src="'+card.image+'" alt="'+card.word+'" style="width:70%;height:70%;object-fit:cover;border-radius:8px;">'
+          : '<span class="emoji">'+card.emoji+'</span>';
       } else {
         front.innerHTML = '<span>'+card.word+'</span>';
       }
