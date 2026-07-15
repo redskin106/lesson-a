@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>True or False — Live Asset Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a12;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+  .frame-wrap {
+    width: min(400px, 100vw);
+    max-height: 94vh;
+    position: relative;
+    container-type: inline-size;
+  }
+  .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
+  .app-frame {
+    position: absolute; inset: 0;
+    overflow: hidden;
+  }
+  .layer-bg {
+    position: absolute; inset: 0;
+    background-image: url('assets/bg_and_border.png');
+    background-size: 100% 100%;
+    z-index: 0;
+  }
+  .layer-scene {
+    position: absolute;
+    left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%;
+    background-image: url('assets/school_scene.png');
+    background-size: 100% 100%;
+    z-index: 1;
+  }
+  .pos { position: absolute; z-index: 2; }
+  .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
+  .block-qlabel   { left: 13.08%; top: 15.85%; width: 40%;    height: 1.28%; }
+  .block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
+  .block-flowzone { left: 13.00%; top: 25.89%; width: 75.08%; }
+
+  .badge {
+    width: 9cqw; aspect-ratio: 1/1; border-radius: 50%;
+    background: linear-gradient(90deg,#753A70,#A54D75);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 500;
+    font-size: 3.6cqw;
+    flex-shrink: 0;
+  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+  .header-left { display: flex; align-items: center; gap: 5%; min-width: 0; }
+  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; }
+  .medal-icon { flex-shrink: 0; }
+  .medal-icon img { width: 6.5cqw; height: 6.5cqw; display: block; }
+
+  .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; }
+  .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
+  .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
+
+  .prompt { color: rgba(255,255,255,0.5); font-size: 3.4cqw; margin-bottom: 4%; }
+  .statement {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 5% 6%;
+    color: #fff; font-size: 4.4cqw; line-height: 1.5; text-align: center;
+    margin-bottom: 6%;
+  }
+
+  .tf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 3%; margin-bottom: 5%; }
+  .tf-btn {
+    border-radius: 14px; padding: 7% 3%;
+    font-size: 4.2cqw; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: transform .12s, background .15s, border-color .15s, color .15s;
+  }
+  .tf-btn.true-btn  { background: rgba(139,195,74,0.12); border: 2px solid #8BC34A; color: #AED581; }
+  .tf-btn.false-btn { background: rgba(233,30,99,0.12);  border: 2px solid #E91E63; color: #F48FB1; }
+  .tf-btn.highlight-correct { background: #8BC34A; border-color: #8BC34A; color: #16250A; }
+  .tf-btn.highlight-wrong   { background: #E91E63; border-color: #E91E63; color: #fff; }
+  .tf-btn:disabled { cursor: default; opacity: 0.9; }
+
+  .grammar-reveal {
+    opacity: 0; transition: opacity .3s; min-height: 0;
+    font-size: 4cqw; line-height: 2; margin-bottom: 4%;
+  }
+  .grammar-reveal .legend-row { margin-bottom: 3%; }
+
+  .next-btn {
+    display: none; width: 100%;
+    padding: 4% 0; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+
+  .overlay {
+    display: none; position: absolute; inset: 0; z-index: 3;
+    background: rgba(10,8,20,0.9);
+    text-align: center; align-items: center; justify-content: center;
+    flex-direction: column; padding: 5%;
+  }
+  .next-module-btn {
+    padding: 3% 12%; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .stars-row { font-size: 10cqw; margin-bottom: 4%; letter-spacing: 6px; min-height: 12cqw; }
+</style>
+</head>
+<body>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="layer-scene"></div>
+
+  <div class="pos block-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="badge">5</div>
+        <span class="module-title">True or False</span>
+      </div>
+      <div class="medal-icon"><img src="assets/silver.png?v=2" alt="Silver tier"></div>
+    </div>
+  </div>
+
+  <div class="pos block-qlabel q-label" id="qLabel">Question 1 of 3</div>
+
+  <div class="pos block-progress">
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="pos block-flowzone">
+    <p class="prompt">Is this true or false?</p>
+    <div class="statement" id="statement"></div>
+    <div class="tf-row">
+      <button id="trueBtn" class="tf-btn true-btn">✓ True</button>
+      <button id="falseBtn" class="tf-btn false-btn">✗ False</button>
+    </div>
+    <div class="grammar-reveal" id="grammarReveal"></div>
+    <button id="nextBtn" class="next-btn">Next →</button>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="stars-row" id="starsRow"></div>
+    <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
+    <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
+    <button id="nextModuleBtn" class="next-module-btn">Next module</button>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+  // Real GRAMMAR_COLORS / grammarSentence / grammarLegend, copied verbatim from index.html
+  var GRAMMAR_COLORS = {
+    subject: { bg: 'rgba(0,188,212,0.18)',  border: '#00BCD4', color: '#00BCD4' },
+    verb:    { bg: 'rgba(139,195,74,0.18)', border: '#8BC34A', color: '#8BC34A' },
+    object:  { bg: 'rgba(255,152,0,0.18)',  border: '#FF9800', color: '#FFB74D' },
+    place:   { bg: 'rgba(171,71,188,0.18)', border: '#AB47BC', color: '#CE93D8' },
+    time:    { bg: 'rgba(233,30,99,0.18)',  border: '#E91E63', color: '#F48FB1' }
+  };
+  function grammarSentence(tokens){
+    return tokens.map(function(t){
+      var c = GRAMMAR_COLORS[t.role];
+      if(!c) return '<span style="color:#fff;">'+t.text+'</span>';
+      return '<span style="display:inline-block;background:'+c.bg+';border:1.5px solid '+c.border+';color:'+c.color+';border-radius:6px;padding:1px 7px;margin:1px 2px;font-weight:600;font-size:.95em;">'+t.text+'</span>';
+    }).join(' ');
+  }
+  function grammarLegend(tokens){
+    var FADED = {
+      subject: { dot: '#1A6070', text: '#3A7A8A' },
+      verb:    { dot: '#3A5C22', text: '#4A7030' },
+      object:  { dot: '#6A4008', text: '#7A5010' },
+      place:   { dot: '#4A2058', text: '#5A3068' },
+      time:    { dot: '#6A1030', text: '#7A2040' }
+    };
+    var ORDER = ['subject', 'verb', 'object', 'place', 'time'];
+    var present = {};
+    (tokens || []).forEach(function(t){ present[t.role] = true; });
+    var roles = ORDER.filter(function(r){ return present[r] && FADED[r]; });
+    if(roles.length === 0) return '';
+    var pills = roles.map(function(role){
+      var c = FADED[role];
+      return '<span style="display:inline-flex;align-items:center;gap:4px;color:'+c.text+';font-size:.5em;font-weight:600;white-space:nowrap;"><span style="width:7px;height:7px;border-radius:50%;background:'+c.dot+';flex-shrink:0;"></span>'+role.charAt(0).toUpperCase()+role.slice(1)+'</span>';
+    }).join('');
+    return '<div class="legend-row" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">'+pills+'</div>';
+  }
+
+  // Real data, copied verbatim from LESSON['mod-5'] in index.html
+  var questions = [
+    {
+      statement: 'A dog is an animal.',
+      answer: true,
+      tokens: [
+        {text:'A dog', role:'subject'}, {text:'is', role:'verb'}, {text:'an animal', role:'object'}
+      ]
+    },
+    {
+      statement: 'We eat breakfast at night.',
+      answer: false,
+      tokens: [
+        {text:'We', role:'subject'}, {text:'eat', role:'verb'},
+        {text:'breakfast', role:'object'}, {text:'at night', role:'time'}
+      ]
+    },
+    {
+      statement: 'She goes to the library after class to study quietly.',
+      answer: true,
+      tokens: [
+        {text:'She', role:'subject'}, {text:'goes', role:'verb'},
+        {text:'to the library', role:'place'}, {text:'after class', role:'time'}
+      ]
+    }
+  ];
+
+  var qi = 0, correctCount = 0;
+  var ctx = null;
+  function unlock(){ if(!ctx){ ctx = new (window.AudioContext||window.webkitAudioContext)(); } }
+  function tone(freq, dur){
+    unlock();
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = freq; g.gain.setValueAtTime(0.15, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+  }
+  function sfx(name){
+    if(name==='correct'){ tone(880,0.12); setTimeout(function(){tone(1180,0.14);},90); }
+    if(name==='wrong') tone(350,0.22);
+    if(name==='star') tone(1000,0.1);
+    if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
+  }
+
+  var trueBtn = document.getElementById('trueBtn');
+  var falseBtn = document.getElementById('falseBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var statementEl = document.getElementById('statement');
+  var grammarEl = document.getElementById('grammarReveal');
+
+  function renderQuestion(){
+    var q = questions[qi];
+    document.getElementById('qLabel').textContent = 'Question '+(qi+1)+' of '+questions.length;
+    document.getElementById('progFill').style.width = Math.round((qi/questions.length)*100)+'%';
+    statementEl.textContent = q.statement;
+    trueBtn.disabled = false;
+    falseBtn.disabled = false;
+    trueBtn.classList.remove('highlight-correct','highlight-wrong');
+    falseBtn.classList.remove('highlight-correct','highlight-wrong');
+    grammarEl.style.opacity = '0';
+    grammarEl.innerHTML = '';
+    nextBtn.style.display = 'none';
+  }
+
+  function handleAnswer(chosen){
+    if(trueBtn.disabled) return;
+    unlock();
+    var q = questions[qi];
+    var correct = (chosen === q.answer);
+    var chosenBtn = chosen ? trueBtn : falseBtn;
+    chosenBtn.classList.add(correct ? 'highlight-correct' : 'highlight-wrong');
+    if(!correct){
+      var correctBtn = q.answer ? trueBtn : falseBtn;
+      correctBtn.classList.add('highlight-correct');
+    }
+    trueBtn.disabled = true;
+    falseBtn.disabled = true;
+    if(correct) correctCount++;
+    sfx(correct ? 'correct' : 'wrong');
+
+    if(q.tokens){
+      grammarEl.innerHTML = grammarLegend(q.tokens) + grammarSentence(q.tokens);
+      grammarEl.style.opacity = '1';
+    }
+    nextBtn.style.display = 'block';
+  }
+  trueBtn.addEventListener('click', function(){ handleAnswer(true); });
+  falseBtn.addEventListener('click', function(){ handleAnswer(false); });
+
+  var overlay = document.getElementById('overlay');
+  nextBtn.addEventListener('click', function(){
+    qi++;
+    if(qi < questions.length){
+      renderQuestion();
+    } else {
+      document.getElementById('progFill').style.width = '100%';
+      var pct = correctCount/questions.length;
+      var starCount = pct === 1 ? 3 : pct >= 0.6 ? 2 : 1;
+      document.getElementById('scoreLabel').textContent = correctCount+' of '+questions.length+' correct';
+      var starsEl = document.getElementById('starsRow');
+      starsEl.innerHTML = '';
+      overlay.style.display = 'flex';
+      var i = 0;
+      function dropStar(){
+        if(i >= starCount){ sfx('complete'); return; }
+        var span = document.createElement('span');
+        span.textContent = '\u2605';
+        span.style.color = '#F0AE63';
+        span.style.display = 'inline-block';
+        starsEl.appendChild(span);
+        span.animate([{transform:'translateY(-20px) scale(0.5)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
+        sfx('star');
+        i++;
+        setTimeout(dropStar, 220);
+      }
+      dropStar();
+    }
+  });
+  document.getElementById('nextModuleBtn').addEventListener('click', function(){
+    overlay.style.display = 'none';
+    qi = 0; correctCount = 0;
+    renderQuestion();
+  });
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
