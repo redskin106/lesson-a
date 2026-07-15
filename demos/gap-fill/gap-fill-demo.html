@@ -76,17 +76,11 @@
 
   .pill-row { display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 7%; column-gap: 1.5%; margin-bottom: 5%; }
   .pill {
-    border-radius: 99px;
-    background: linear-gradient(180deg,#883D5E,#6B2D56 55%,#562952);
-    border: 1px solid #1A213A;
+    background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
     font-size: 3.5cqw; color: rgba(255,255,255,0.85);
-    cursor: pointer; font-family: inherit; transition: transform .12s;
+    cursor: pointer; font-family: inherit; transition: transform .12s, background .15s, border-color .15s, color .15s;
     padding: 2.5% 2%; min-width: 0;
-  }
-  .pill.selected {
-    background: linear-gradient(180deg,#F0AE63,#C15445);
-    border: 1.5px solid #BE4FA8;
-    color: #fff; font-weight: 500;
   }
 
   .check-btn {
@@ -263,16 +257,28 @@
     attemptedWrongOnCurrent = false;
     setCheckEnabled(true);
     pillRow.innerHTML = '';
-    q.options.forEach(function(opt){
+    var PALETTE = [
+      { border:'#00BCD4', bg:'rgba(0,188,212,.18)',  color:'#4DD0E1' },
+      { border:'#AB47BC', bg:'rgba(171,71,188,.18)', color:'#CE93D8' },
+      { border:'#FF9800', bg:'rgba(255,152,0,.18)',  color:'#FFB74D' },
+      { border:'#E91E63', bg:'rgba(233,30,99,.18)',  color:'#F48FB1' },
+      { border:'#8BC34A', bg:'rgba(139,195,74,.18)', color:'#AED581' }
+    ];
+    q.options.forEach(function(opt, idx){
       var b = document.createElement('button');
       b.textContent = opt;
       b.className = 'pill';
       b.dataset.word = opt;
+      var c = PALETTE[idx % PALETTE.length];
       b.addEventListener('click', function(){
         if(locked) return;
         unlock();
-        Array.from(pillRow.children).forEach(function(x){ x.classList.remove('selected'); });
+        Array.from(pillRow.children).forEach(function(x){
+          x.classList.remove('selected');
+          x.style.borderColor = ''; x.style.background = ''; x.style.color = '';
+        });
         b.classList.add('selected');
+        b.style.borderColor = c.border; b.style.background = c.bg; b.style.color = c.color;
         b.style.transform = 'scale(0.95)';
         setTimeout(function(){ b.style.transform='scale(1)'; },120);
         selected = opt;
