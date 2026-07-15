@@ -242,12 +242,19 @@
     if(name==='star') tone(1000,0.1);
     if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
   }
-  function speakWord(word){
+  var SPEAK_MOODS = {
+    neutral:   { rate:0.85, pitch:1.0,  volume:0.9 },
+    celebrate: { rate:1.15, pitch:1.55, volume:1.0 }
+  };
+  function speak(text, mood, delay){
     if(!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(word);
-    u.rate = 0.85; u.pitch = 1.0; u.volume = 0.9; // matches real SPEAK_MOODS.neutral exactly
-    window.speechSynthesis.speak(u);
+    setTimeout(function(){
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var m = SPEAK_MOODS[mood || 'neutral'];
+      u.rate = m.rate; u.pitch = m.pitch; u.volume = m.volume;
+      window.speechSynthesis.speak(u);
+    }, delay || 0);
   }
 
   var cardGrid = document.getElementById('cardGrid');
@@ -323,7 +330,6 @@
     unlock();
     wrap.dataset.flipped = '1';
     inner.classList.add('flipped');
-    if(deck[i].kind === 'word') speakWord(deck[i].word);
     flips++;
     flipCountEl.textContent = 'Flips: '+flips;
     flipped.push(i);
@@ -348,7 +354,7 @@
       if(pip){ pip.classList.add('done'); pip.style.background = mc.border; }
       flipped = [];
 
-      if(window.speechSynthesis) window.speechSynthesis.cancel();
+      speak(ca.word, 'neutral'); // one audio on a correct match
       showReinforce(ca, function(){
         cardLocked = false;
         if(matched === PAIRS){
@@ -361,6 +367,10 @@
       var ciB = document.getElementById('ci-'+b);
       if(ciA) ciA.style.boxShadow = '0 0 0 2px #E91E63';
       if(ciB) ciB.style.boxShadow = '0 0 0 2px #E91E63';
+
+      speak(ca.word, 'neutral');          // both audios on a wrong guess
+      speak(cb.word, 'neutral', 700);     // staggered so they don't overlap
+
       setTimeout(function(){
         if(ciA){ ciA.classList.remove('flipped'); ciA.style.boxShadow = ''; }
         if(ciB){ ciB.classList.remove('flipped'); ciB.style.boxShadow = ''; }
@@ -377,6 +387,7 @@
     document.getElementById('completeContent').style.display = 'none';
     document.getElementById('reinforceContent').style.display = 'block';
     overlay.style.display = 'flex';
+    speak(item.sentence, 'neutral', 900); // read the sentence, matching real showReinforcePanel(sentenceOnly:true)
     document.getElementById('continueBtn').onclick = function(){
       overlay.style.display = 'none';
       onClose();
