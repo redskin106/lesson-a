@@ -240,6 +240,17 @@
     if(name==='star') tone(1000,0.1);
     if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
   }
+  var SPEAK_MOODS = { neutral: { rate:0.85, pitch:1.0, volume:0.9 } };
+  function speak(text, mood, delay){
+    if(!window.speechSynthesis) return;
+    setTimeout(function(){
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var m = SPEAK_MOODS[mood || 'neutral'];
+      u.rate = m.rate; u.pitch = m.pitch; u.volume = m.volume;
+      window.speechSynthesis.speak(u);
+    }, delay || 0);
+  }
   var pillRow = document.getElementById('pillRow');
   var checkBtn = document.getElementById('checkBtn');
   var selected = null;
@@ -295,6 +306,8 @@
     document.getElementById('completeContent').style.display = 'none';
     document.getElementById('reinforceContent').style.display = 'block';
     overlay.style.display = 'flex';
+    var plainSentence = q.tokens.map(function(t){ return t.text; }).join(' ');
+    speak(plainSentence, 'neutral', 200); // matches real showReinforcePanel(sentenceOnly:true)
   }
   checkBtn.addEventListener('click', function(){
     if(locked) return;
