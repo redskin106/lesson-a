@@ -109,6 +109,12 @@
 
   .sp-feedback { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
 
+  .frame-mask {
+    position: absolute; inset: 0; z-index: 4;
+    background-image: url('assets/frame_mask.png');
+    background-size: 100% 100%;
+    pointer-events: none;
+  }
   .overlay {
     display: none; position: absolute; inset: 0; z-index: 3;
     background: rgba(10,8,20,0.9);
@@ -127,6 +133,7 @@
 <div class="frame-wrap">
 <div class="app-frame">
   <div class="layer-bg"></div>
+  <div class="frame-mask"></div>
   <div class="layer-scene"></div>
 
   <div class="pos block-header">
@@ -448,7 +455,6 @@
     if(ok){
       score++;
       spFeedback.textContent = '✓ Correct!'; spFeedback.style.color = '#AED581';
-      speak(item.word, 'celebrate');
       setTimeout(function(){ showReinforce(item, function(){ idx++; if(idx < session.length) load(); else finishTier(); }); }, 500);
     } else {
       spFeedback.textContent = '✗ The word is: '+item.word; spFeedback.style.color = '#F48FB1';
@@ -475,7 +481,6 @@
     if(ok){
       if(!retypeMode) score++; // retype after a wrong first attempt does NOT count
       spFeedback.textContent = '✓ Correct!'; spFeedback.style.color = '#AED581';
-      speak(item.word, 'celebrate');
       setTimeout(function(){ showReinforce(item, function(){ idx++; if(idx < session.length) load(); else finishTier(); }); }, 500);
     } else {
       spFeedback.textContent = '✗ The word is: '+item.word+' — now type it correctly';
