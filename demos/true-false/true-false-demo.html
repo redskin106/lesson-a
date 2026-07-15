@@ -70,6 +70,16 @@
   }
 
   .tf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 3%; margin-bottom: 5%; }
+  .tf-btn.true-btn.selected  { background: rgba(139,195,74,0.32); border-color: #8BC34A; }
+  .tf-btn.false-btn.selected { background: rgba(233,30,99,0.32); border-color: #E91E63; }
+  .check-btn {
+    display: block; margin: 0 auto;
+    padding: 3% 12%; border-radius: 999px;
+    background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+    color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .check-btn:disabled { opacity: 0.5; pointer-events: none; }
+  .status { font-size: 3.2cqw; color: rgba(255,255,255,0.5); text-align: center; margin-top: 4%; }
   .tf-btn {
     border-radius: 999px; padding: 2.5% 2%; border: none;
     font-size: 3.5cqw; font-weight: 600; cursor: pointer; font-family: inherit;
@@ -123,6 +133,8 @@
       <button id="trueBtn" class="tf-btn true-btn">✓ True</button>
       <button id="falseBtn" class="tf-btn false-btn">✗ False</button>
     </div>
+    <button id="checkBtn" class="check-btn">Check</button>
+    <p class="status" id="status">&nbsp;</p>
   </div>
 
   <div id="overlay" class="overlay">
@@ -216,6 +228,7 @@
     o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
   }
   function sfx(name){
+    if(name==='tap') tone(600,0.06);
     if(name==='correct'){ tone(880,0.12); setTimeout(function(){tone(1180,0.14);},90); }
     if(name==='wrong') tone(350,0.22);
     if(name==='star') tone(1000,0.1);
@@ -224,8 +237,11 @@
 
   var trueBtn = document.getElementById('trueBtn');
   var falseBtn = document.getElementById('falseBtn');
+  var checkBtn = document.getElementById('checkBtn');
+  var statusEl = document.getElementById('status');
   var statementEl = document.getElementById('statement');
   var overlay = document.getElementById('overlay');
+  var selectedChoice = null;
 
   function renderQuestion(){
     var q = questions[qi];
@@ -234,6 +250,11 @@
     statementEl.textContent = q.statement;
     trueBtn.disabled = false;
     falseBtn.disabled = false;
+    trueBtn.classList.remove('selected');
+    falseBtn.classList.remove('selected');
+    selectedChoice = null;
+    statusEl.textContent = '\u00A0';
+    checkBtn.disabled = false;
   }
 
   function showReinforce(correct){
@@ -248,19 +269,34 @@
     overlay.style.display = 'flex';
   }
 
-  function handleAnswer(chosen){
+  function selectChoice(choice){
     if(trueBtn.disabled) return;
     unlock();
+    sfx('tap');
+    selectedChoice = (selectedChoice === choice) ? null : choice;
+    trueBtn.classList.toggle('selected', selectedChoice === true);
+    falseBtn.classList.toggle('selected', selectedChoice === false);
+    statusEl.textContent = '\u00A0';
+  }
+  trueBtn.addEventListener('click', function(){ selectChoice(true); });
+  falseBtn.addEventListener('click', function(){ selectChoice(false); });
+
+  checkBtn.addEventListener('click', function(){
+    if(trueBtn.disabled) return;
+    unlock();
+    if(selectedChoice === null){
+      statusEl.textContent = 'pick True or False first';
+      return;
+    }
     var q = questions[qi];
-    var correct = (chosen === q.answer);
+    var correct = (selectedChoice === q.answer);
     trueBtn.disabled = true;
     falseBtn.disabled = true;
+    checkBtn.disabled = true;
     if(correct) correctCount++;
     sfx(correct ? 'correct' : 'wrong');
     setTimeout(function(){ showReinforce(correct); }, 550);
-  }
-  trueBtn.addEventListener('click', function(){ handleAnswer(true); });
-  falseBtn.addEventListener('click', function(){ handleAnswer(false); });
+  });
 
   document.getElementById('continueBtn').addEventListener('click', function(){
     overlay.style.display = 'none';
