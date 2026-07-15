@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Match — Live Asset Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a12;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+  .frame-wrap {
+    width: min(400px, 100vw);
+    max-height: 94vh;
+    position: relative;
+    container-type: inline-size;
+  }
+  .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
+  .app-frame {
+    position: absolute; inset: 0;
+    overflow: hidden;
+  }
+  .layer-bg {
+    position: absolute; inset: 0;
+    background-image: url('assets/bg_and_border.png');
+    background-size: 100% 100%;
+    z-index: 0;
+  }
+  .layer-scene {
+    position: absolute;
+    left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%;
+    background-image: url('assets/school_scene.png');
+    background-size: 100% 100%;
+    z-index: 1;
+  }
+  .pos { position: absolute; z-index: 2; }
+  .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
+  .block-qlabel   { left: 13.08%; top: 15.85%; width: 75%;    height: 1.28%; }
+  .block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
+  .block-flowzone { left: 13.00%; top: 25.89%; width: 75.08%; }
+
+  .badge {
+    width: 9cqw; aspect-ratio: 1/1; border-radius: 50%;
+    background: linear-gradient(90deg,#753A70,#A54D75);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 500;
+    font-size: 3.6cqw;
+    flex-shrink: 0;
+  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+  .header-left { display: flex; align-items: center; gap: 5%; min-width: 0; }
+  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; }
+  .medal-icon { flex-shrink: 0; }
+  .medal-icon img { width: 6.5cqw; height: 6.5cqw; display: block; }
+
+  .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; display: flex; justify-content: space-between; }
+  .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
+  .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
+
+  .prompt { color: rgba(255,255,255,0.5); font-size: 3.4cqw; margin-bottom: 4%; text-align: center; }
+
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4%; margin-bottom: 6%; }
+  .match-col { display: flex; flex-direction: column; gap: 4%; }
+  .match-btn {
+    background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 4% 3%;
+    color: rgba(255,255,255,0.85); font-size: 3.4cqw; font-family: inherit;
+    cursor: pointer; transition: transform .12s, background .15s, border-color .15s, color .15s;
+    min-height: 0; line-height: 1.3;
+  }
+  .match-btn.selected { border-color: #7052B4; background: rgba(112,82,180,0.18); color: #C9B8EA; }
+  .match-btn.matched { cursor: default; }
+  .match-btn.wrong-flash { border-color: #E91E63 !important; background: rgba(233,30,99,0.2) !important; color: #F48FB1 !important; }
+
+  .next-btn {
+    display: none; width: 100%;
+    padding: 4% 0; border-radius: 999px;
+    background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+    color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+
+  .overlay {
+    display: none; position: absolute; inset: 0; z-index: 3;
+    background: rgba(10,8,20,0.9);
+    text-align: center; align-items: center; justify-content: center;
+    flex-direction: column; padding: 5%;
+  }
+  .next-module-btn {
+    padding: 3% 12%; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .stars-row { font-size: 10cqw; margin-bottom: 4%; letter-spacing: 6px; min-height: 12cqw; }
+</style>
+</head>
+<body>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="layer-scene"></div>
+
+  <div class="pos block-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="badge">6</div>
+        <span class="module-title">Word Match</span>
+      </div>
+      <div class="medal-icon"><img src="assets/silver.png?v=2" alt="Silver tier"></div>
+    </div>
+  </div>
+
+  <div class="pos block-qlabel q-label">
+    <span>Match the words.</span>
+    <span id="matchScore">3 pairs to match</span>
+  </div>
+
+  <div class="pos block-progress">
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="pos block-flowzone">
+    <div class="match-grid">
+      <div class="match-col" id="leftCol"></div>
+      <div class="match-col" id="rightCol"></div>
+    </div>
+    <button id="nextBtn" class="next-btn">Next →</button>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="stars-row" id="starsRow"></div>
+    <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
+    <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
+    <button id="nextModuleBtn" class="next-module-btn">Next module</button>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+  // Real safeShuffle, copied verbatim from index.html
+  function safeShuffle(arr, badFn, maxAttempts){
+    maxAttempts = maxAttempts || 20;
+    function sh(a){ return a.slice().sort(function(){ return Math.random() - 0.5; }); }
+    var result = sh(arr), attempts = 0;
+    while(badFn(result) && attempts++ < maxAttempts) result = sh(arr);
+    return result;
+  }
+
+  // Real PALETTE, copied verbatim from the word-match renderer
+  var PALETTE = [
+    { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' },
+    { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' },
+    { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' },
+    { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' },
+    { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' }
+  ];
+
+  // Real data, copied verbatim from LESSON['mod-6'] silver tier (4 pairs — good middle test)
+  var tiers = [
+    { pairs: [
+        { left: 'dog',   right: 'an animal' },
+        { left: 'water', right: 'a drink'   },
+        { left: 'book',  right: 'you read it' }
+    ]},
+    { pairs: [
+        { left: 'hungry', right: 'want food'  },
+        { left: 'tired',  right: 'need sleep' },
+        { left: 'happy',  right: 'feel good'  },
+        { left: 'cold',   right: 'not warm'   }
+    ]},
+    { pairs: [
+        { left: 'library',   right: 'place to study'    },
+        { left: 'homework',  right: 'work after school' },
+        { left: 'breakfast', right: 'morning meal'      },
+        { left: 'neighbor',  right: 'person nearby'     },
+        { left: 'weekend',   right: 'Saturday & Sunday' }
+    ]}
+  ];
+
+  var ti = 0;
+  var ctx = null;
+  function unlock(){ if(!ctx){ ctx = new (window.AudioContext||window.webkitAudioContext)(); } }
+  function tone(freq, dur){
+    unlock();
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = freq; g.gain.setValueAtTime(0.15, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+  }
+  function sfx(name){
+    if(name==='tap') tone(600,0.06);
+    if(name==='wrong') tone(350,0.18);
+    if(name==='star') tone(1000,0.1);
+    if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
+  }
+
+  var leftCol = document.getElementById('leftCol');
+  var rightCol = document.getElementById('rightCol');
+  var scoreLabel = document.getElementById('matchScore');
+  var nextBtn = document.getElementById('nextBtn');
+  var selectedLeft = null;
+
+  function renderTier(){
+    var pairs = tiers[ti].pairs;
+    var total = pairs.length;
+    var matchedCount = 0, wrongCount = 0;
+    selectedLeft = null;
+
+    document.getElementById('progFill').style.width = Math.round((ti/tiers.length)*100)+'%';
+    scoreLabel.textContent = total+' pairs to match';
+    nextBtn.style.display = 'none';
+    leftCol.innerHTML = '';
+    rightCol.innerHTML = '';
+
+    var withIdx = pairs.map(function(p, i){ return {left:p.left, right:p.right, pairIdx:i}; });
+    var leftItems = safeShuffle(withIdx, function(){ return false; });
+    var rightItems = safeShuffle(withIdx, function(r){
+      return r.some(function(item, pos){ return item.pairIdx === leftItems[pos].pairIdx; });
+    });
+
+    leftItems.forEach(function(pair){
+      var btn = document.createElement('button');
+      btn.className = 'match-btn';
+      btn.textContent = pair.left;
+      btn.dataset.key = pair.left;
+      btn.dataset.side = 'left';
+      btn.dataset.pairIdx = pair.pairIdx;
+      leftCol.appendChild(btn);
+    });
+    rightItems.forEach(function(pair){
+      var btn = document.createElement('button');
+      btn.className = 'match-btn';
+      btn.textContent = pair.right;
+      btn.dataset.key = pair.left;
+      btn.dataset.side = 'right';
+      btn.dataset.pairIdx = pair.pairIdx;
+      rightCol.appendChild(btn);
+    });
+
+    function applyMatchColor(btn){
+      var c = PALETTE[parseInt(btn.dataset.pairIdx) % PALETTE.length];
+      btn.style.borderColor = c.border;
+      btn.style.background = c.bg;
+      btn.style.color = c.color;
+      btn.classList.add('matched');
+      btn.disabled = true;
+    }
+
+    document.querySelectorAll('.match-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(btn.classList.contains('matched')) return;
+        unlock();
+
+        if(btn.dataset.side === 'left'){
+          document.querySelectorAll('.match-btn[data-side="left"]').forEach(function(b){ b.classList.remove('selected'); });
+          if(selectedLeft === btn){
+            selectedLeft = null;
+          } else {
+            selectedLeft = btn;
+            btn.classList.add('selected');
+            sfx('tap');
+          }
+          return;
+        }
+
+        if(!selectedLeft) return;
+        var isMatch = (selectedLeft.dataset.key === btn.dataset.key);
+
+        if(isMatch){
+          var leftBtn = selectedLeft;
+          selectedLeft = null;
+          applyMatchColor(leftBtn);
+          applyMatchColor(btn);
+          matchedCount++;
+          sfx('tap');
+
+          var remaining = total - matchedCount;
+          scoreLabel.textContent = remaining > 0
+            ? remaining+' pair'+(remaining>1?'s':'')+' left'
+            : 'All matched! \u2713';
+
+          if(matchedCount === total){
+            nextBtn.style.display = 'block';
+          }
+        } else {
+          wrongCount++;
+          sfx('wrong');
+          selectedLeft.classList.add('wrong-flash');
+          btn.classList.add('wrong-flash');
+          var prevLeft = selectedLeft;
+          selectedLeft = null;
+          setTimeout(function(){
+            prevLeft.classList.remove('wrong-flash','selected');
+            btn.classList.remove('wrong-flash');
+          }, 500);
+        }
+      });
+    });
+  }
+
+  var overlay = document.getElementById('overlay');
+  nextBtn.addEventListener('click', function(){
+    ti++;
+    if(ti < tiers.length){
+      renderTier();
+    } else {
+      document.getElementById('progFill').style.width = '100%';
+      document.getElementById('scoreLabel').textContent = tiers.length+' of '+tiers.length+' tiers complete';
+      var starsEl = document.getElementById('starsRow');
+      starsEl.innerHTML = '';
+      overlay.style.display = 'flex';
+      var i = 0, starCount = 3;
+      function dropStar(){
+        if(i >= starCount){ sfx('complete'); return; }
+        var span = document.createElement('span');
+        span.textContent = '\u2605';
+        span.style.color = '#F0AE63';
+        span.style.display = 'inline-block';
+        starsEl.appendChild(span);
+        span.animate([{transform:'translateY(-20px) scale(0.5)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
+        sfx('star');
+        i++;
+        setTimeout(dropStar, 220);
+      }
+      dropStar();
+    }
+  });
+  document.getElementById('nextModuleBtn').addEventListener('click', function(){
+    overlay.style.display = 'none';
+    ti = 0;
+    renderTier();
+  });
+
+  renderTier();
+})();
+</script>
+</body>
+</html>
