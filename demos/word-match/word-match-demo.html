@@ -242,12 +242,21 @@
   function refreshAll(){
     document.querySelectorAll('.match-btn[data-side="left"]').forEach(styleLeft);
     document.querySelectorAll('.match-btn[data-side="right"]').forEach(styleRight);
-    scoreLabel.textContent = pairings.size+' of '+total+' paired';
-    if(checkAllCorrect()){
-      confirmed = true;
-      sfx('correct');
-      scoreLabel.textContent = 'All matched! \u2713';
-      nextBtn.style.display = 'flex';
+    if(pairings.size === total){
+      if(checkAllCorrect()){
+        confirmed = true;
+        sfx('correct');
+        scoreLabel.textContent = 'All matched! \u2713';
+        scoreLabel.style.color = '#AED581';
+        nextBtn.style.display = 'flex';
+      } else {
+        sfx('wrong');
+        scoreLabel.textContent = 'not quite yet — check your pairs';
+        scoreLabel.style.color = '#F48FB1';
+      }
+    } else {
+      scoreLabel.textContent = pairings.size+' of '+total+' paired';
+      scoreLabel.style.color = '';
     }
   }
 
