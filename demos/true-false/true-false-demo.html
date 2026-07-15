@@ -75,15 +75,19 @@
     font-size: 4.2cqw; font-weight: 600; cursor: pointer; font-family: inherit;
     transition: transform .12s, background .15s, color .15s;
   }
-  .tf-btn.true-btn  { background: rgba(139,195,74,0.14);  color: #AED581; border: 1.5px solid rgba(139,195,74,0.4); }
-  .tf-btn.false-btn { background: rgba(233,30,99,0.14);   color: #F48FB1; border: 1.5px solid rgba(233,30,99,0.4); }
-  .tf-btn.highlight-correct {
+  .tf-btn.true-btn {
     background: linear-gradient(180deg,#1B5E20 0%,#4C8C3A 45%,#8BC34A 100%);
-    color: #fff; border-color: transparent;
+    color: #fff;
+  }
+  .tf-btn.false-btn {
+    background: linear-gradient(180deg,#7A0B2E 0%,#C2295A 45%,#E91E63 100%);
+    color: #fff;
+  }
+  .tf-btn.highlight-correct {
+    box-shadow: 0 0 0 3px #fff, 0 0 18px rgba(255,255,255,0.45);
   }
   .tf-btn.highlight-wrong {
-    background: linear-gradient(180deg,#7A0B2E 0%,#C2295A 45%,#E91E63 100%);
-    color: #fff; border-color: transparent;
+    opacity: 0.45;
   }
   .tf-btn:disabled { cursor: default; opacity: 0.95; }
 
