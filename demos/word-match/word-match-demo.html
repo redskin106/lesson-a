@@ -73,9 +73,6 @@
     min-height: 0; line-height: 1.3;
     display: flex; align-items: center; justify-content: center; text-align: center;
   }
-  .match-btn.selected { border-color: #7052B4; background: rgba(112,82,180,0.18); color: #C9B8EA; }
-  .match-btn.matched { cursor: default; }
-  .match-btn.wrong-flash { border-color: #E91E63 !important; background: rgba(233,30,99,0.2) !important; color: #F48FB1 !important; }
 
   .next-btn {
     display: none; margin: 0 auto;
@@ -129,6 +126,7 @@
       <div class="match-col" id="leftCol"></div>
       <div class="match-col" id="rightCol"></div>
     </div>
+    <button id="confirmBtn" class="next-btn" style="display:none;margin-bottom:3%;">Check ✓</button>
     <button id="nextBtn" class="next-btn">Next →</button>
   </div>
 
@@ -202,17 +200,60 @@
   var leftCol = document.getElementById('leftCol');
   var rightCol = document.getElementById('rightCol');
   var scoreLabel = document.getElementById('matchScore');
+  var confirmBtn = document.getElementById('confirmBtn');
   var nextBtn = document.getElementById('nextBtn');
-  var selectedLeft = null;
+
+  var pairings, rightUsed, selectedLeftBtn, confirmed, pairColor, total;
+
+  function styleLeft(btn){
+    if(confirmed) return;
+    var idx = parseInt(btn.dataset.pairIdx);
+    var c = pairColor[idx];
+    var isSelected = (btn === selectedLeftBtn);
+    var isPaired = pairings.has(idx);
+    if(isSelected){
+      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+      btn.style.boxShadow = '0 0 0 3px '+c.border;
+    } else if(isPaired){
+      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+      btn.style.boxShadow = '';
+    } else {
+      btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.color = 'rgba(255,255,255,0.85)'; btn.style.boxShadow = '';
+    }
+  }
+  function styleRight(btn){
+    if(confirmed) return;
+    var rightIdx = parseInt(btn.dataset.pairIdx);
+    if(rightUsed.has(rightIdx)){
+      var leftIdx = rightUsed.get(rightIdx);
+      var c = pairColor[leftIdx];
+      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+    } else {
+      btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.color = 'rgba(255,255,255,0.85)';
+    }
+  }
+  function refreshAll(){
+    document.querySelectorAll('.match-btn[data-side="left"]').forEach(styleLeft);
+    document.querySelectorAll('.match-btn[data-side="right"]').forEach(styleRight);
+    scoreLabel.textContent = pairings.size+' of '+total+' paired';
+    confirmBtn.style.display = pairings.size > 0 ? 'flex' : 'none';
+    confirmBtn.textContent = pairings.size === total ? 'Check \u2713' : 'Check '+pairings.size+'/'+total+' \u2713';
+  }
 
   function renderTier(){
     var pairs = tiers[ti].pairs;
-    var total = pairs.length;
-    var matchedCount = 0, wrongCount = 0;
-    selectedLeft = null;
+    total = pairs.length;
+    pairings = new Map();
+    rightUsed = new Map();
+    selectedLeftBtn = null;
+    confirmed = false;
+    pairColor = pairs.map(function(_, i){ return PALETTE[i % PALETTE.length]; });
 
     document.getElementById('progFill').style.width = Math.round((ti/tiers.length)*100)+'%';
-    scoreLabel.textContent = total+' pairs to match';
+    scoreLabel.textContent = '0 of '+total+' paired';
+    confirmBtn.style.display = 'none';
     nextBtn.style.display = 'none';
     leftCol.innerHTML = '';
     rightCol.innerHTML = '';
@@ -227,7 +268,6 @@
       var btn = document.createElement('button');
       btn.className = 'match-btn';
       btn.textContent = pair.left;
-      btn.dataset.key = pair.left;
       btn.dataset.side = 'left';
       btn.dataset.pairIdx = pair.pairIdx;
       leftCol.appendChild(btn);
@@ -236,75 +276,104 @@
       var btn = document.createElement('button');
       btn.className = 'match-btn';
       btn.textContent = pair.right;
-      btn.dataset.key = pair.left;
       btn.dataset.side = 'right';
       btn.dataset.pairIdx = pair.pairIdx;
       rightCol.appendChild(btn);
     });
 
-    function applyMatchColor(btn){
-      var c = PALETTE[parseInt(btn.dataset.pairIdx) % PALETTE.length];
-      btn.style.borderColor = c.border;
-      btn.style.background = c.bg;
-      btn.style.color = c.color;
-      btn.classList.add('matched');
-      btn.disabled = true;
-    }
-
     document.querySelectorAll('.match-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
-        if(btn.classList.contains('matched')) return;
+        if(confirmed) return;
         unlock();
 
         if(btn.dataset.side === 'left'){
-          document.querySelectorAll('.match-btn[data-side="left"]').forEach(function(b){ b.classList.remove('selected'); });
-          if(selectedLeft === btn){
-            selectedLeft = null;
-          } else {
-            selectedLeft = btn;
-            btn.classList.add('selected');
-            sfx('tap');
-          }
+          sfx('tap');
+          selectedLeftBtn = (btn === selectedLeftBtn) ? null : btn;
+          refreshAll();
           return;
         }
 
-        if(!selectedLeft) return;
-        var isMatch = (selectedLeft.dataset.key === btn.dataset.key);
+        // Right button — always unlink any existing pairing first, then optionally re-pair
+        var rightIdx = parseInt(btn.dataset.pairIdx);
+        var leftIdx = selectedLeftBtn ? parseInt(selectedLeftBtn.dataset.pairIdx) : null;
 
-        if(isMatch){
-          var leftBtn = selectedLeft;
-          selectedLeft = null;
-          applyMatchColor(leftBtn);
-          applyMatchColor(btn);
-          matchedCount++;
-          sfx('tap');
-
-          var remaining = total - matchedCount;
-          scoreLabel.textContent = remaining > 0
-            ? remaining+' pair'+(remaining>1?'s':'')+' left'
-            : 'All matched! \u2713';
-
-          if(matchedCount === total){
-            nextBtn.style.display = 'flex';
+        if(rightUsed.has(rightIdx)){
+          var prevLeftIdx = rightUsed.get(rightIdx);
+          pairings.delete(prevLeftIdx);
+          rightUsed.delete(rightIdx);
+          if(leftIdx === null || leftIdx === prevLeftIdx){
+            selectedLeftBtn = null;
+            sfx('tap');
+            refreshAll();
+            return;
           }
-        } else {
-          wrongCount++;
-          sfx('wrong');
-          selectedLeft.classList.add('wrong-flash');
-          btn.classList.add('wrong-flash');
-          var prevLeft = selectedLeft;
-          selectedLeft = null;
-          setTimeout(function(){
-            prevLeft.classList.remove('wrong-flash','selected');
-            btn.classList.remove('wrong-flash');
-          }, 500);
         }
+        if(leftIdx === null){ refreshAll(); return; }
+
+        if(pairings.has(leftIdx)){
+          rightUsed.delete(pairings.get(leftIdx));
+          pairings.delete(leftIdx);
+        }
+        pairings.set(leftIdx, rightIdx);
+        rightUsed.set(rightIdx, leftIdx);
+        selectedLeftBtn = null;
+        sfx('tap');
+        refreshAll();
       });
     });
   }
 
+  confirmBtn.addEventListener('click', function(){
+    if(confirmed) return;
+    confirmed = true;
+    selectedLeftBtn = null;
+    var correct = 0;
+
+    document.querySelectorAll('.match-btn[data-side="left"]').forEach(function(btn){
+      var leftIdx = parseInt(btn.dataset.pairIdx);
+      var rightIdx = pairings.get(leftIdx);
+      var isCorrect = rightIdx === leftIdx;
+      var paired = rightIdx !== undefined;
+      if(isCorrect) correct++;
+      var c = isCorrect ? {border:'#8BC34A', bg:'rgba(139,195,74,0.15)', color:'#AED581'}
+            : paired    ? {border:'#E91E63', bg:'rgba(233,30,99,0.12)', color:'#F48FB1'}
+                        : {border:'rgba(255,255,255,0.08)', bg:'rgba(255,255,255,0.05)', color:'rgba(255,255,255,0.4)'};
+      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color; btn.style.boxShadow = '';
+    });
+    document.querySelectorAll('.match-btn[data-side="right"]').forEach(function(btn){
+      var rightIdx = parseInt(btn.dataset.pairIdx);
+      var leftIdx = rightUsed.get(rightIdx);
+      var paired = leftIdx !== undefined;
+      var isCorrect = paired && leftIdx === rightIdx;
+      var c = isCorrect ? {border:'#8BC34A', bg:'rgba(139,195,74,0.15)', color:'#AED581'}
+            : paired    ? {border:'#E91E63', bg:'rgba(233,30,99,0.12)', color:'#F48FB1'}
+                        : {border:'rgba(255,255,255,0.08)', bg:'rgba(255,255,255,0.05)', color:'rgba(255,255,255,0.85)'};
+      btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+    });
+    // Gold hint: for each wrong/unpaired left, highlight its correct right
+    document.querySelectorAll('.match-btn[data-side="left"]').forEach(function(btn){
+      var leftIdx = parseInt(btn.dataset.pairIdx);
+      var rightIdx = pairings.get(leftIdx);
+      var isCorrect = rightIdx === leftIdx;
+      if(!isCorrect){
+        var correctRight = document.querySelector('.match-btn[data-side="right"][data-pair-idx="'+leftIdx+'"]');
+        if(correctRight){
+          correctRight.style.borderColor = '#E8B44A';
+          correctRight.style.background = 'rgba(232,180,74,0.14)';
+          correctRight.style.color = '#E8B44A';
+        }
+      }
+    });
+
+    if(correct === total) sfx('correct'); else sfx('wrong');
+    scoreLabel.textContent = correct+' of '+total+' correct';
+    confirmBtn.style.display = 'none';
+    nextBtn.style.display = 'flex';
+  });
+
   var overlay = document.getElementById('overlay');
   nextBtn.addEventListener('click', function(){
+
     ti++;
     if(ti < tiers.length){
       renderTier();
