@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Say It — Live Asset Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a12;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+  .frame-wrap {
+    width: min(400px, 100vw);
+    max-height: 94vh;
+    position: relative;
+    container-type: inline-size;
+  }
+  .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
+  .app-frame {
+    position: absolute; inset: 0;
+    overflow: hidden;
+  }
+  .layer-bg {
+    position: absolute; inset: 0;
+    background-image: url('assets/bg_and_border.png');
+    background-size: 100% 100%;
+    z-index: 0;
+  }
+  .layer-scene {
+    position: absolute;
+    left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%;
+    background-image: url('assets/school_scene.png');
+    background-size: 100% 100%;
+    z-index: 1;
+  }
+  .pos { position: absolute; z-index: 2; }
+  .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
+  .block-qlabel   { left: 13.08%; top: 15.85%; width: 75%;    height: 1.28%; }
+  .block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
+  .block-flowzone { left: 13.00%; top: 25.89%; width: 75.08%; }
+
+  .badge {
+    width: 9cqw; aspect-ratio: 1/1; border-radius: 50%;
+    background: linear-gradient(90deg,#753A70,#A54D75);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 500; font-size: 3.6cqw; flex-shrink: 0;
+  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+  .header-left { display: flex; align-items: center; gap: 5%; min-width: 0; }
+  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; }
+  .medal-icon { flex-shrink: 0; }
+  .medal-icon img { width: 6.5cqw; height: 6.5cqw; display: block; }
+
+  .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; }
+  .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
+  .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
+
+  .speak-prompt { color: rgba(255,255,255,0.5); font-size: 3.4cqw; text-align: center; margin-bottom: 3%; }
+  .speak-target {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 5% 6%;
+    color: #fff; font-size: 4.4cqw; line-height: 1.5; text-align: center;
+    margin-bottom: 5%;
+  }
+
+  .speak-trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; margin-bottom: 3%; }
+  .trio-btn {
+    background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+    border-radius: 12px; padding: 3.5cqw 2%;
+    color: #C9B8EA; font-size: 3cqw; font-weight: 500; font-family: inherit;
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 1.5cqw;
+    transition: background .15s, opacity .2s;
+  }
+  .trio-icon { font-size: 5cqw; }
+  .trio-btn.playing { background: rgba(112,82,180,0.3); }
+  .trio-btn.record.recording { background: rgba(233,30,99,0.2); border-color: rgba(233,30,99,0.5); color: #F48FB1; }
+  .trio-btn:disabled { opacity: 0.35; pointer-events: none; }
+
+  .speak-hint { text-align: center; font-size: 3.2cqw; color: rgba(255,255,255,0.5); margin-bottom: 4%; min-height: 4cqw; }
+
+  .assess-btns { display: flex; flex-direction: column; gap: 4cqw; margin-bottom: 3%; }
+  .assess-btn {
+    background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 999px; padding: 3.5% 5%;
+    color: rgba(255,255,255,0.85); font-size: 3.6cqw; font-family: inherit;
+    cursor: pointer; text-align: center;
+  }
+  .assess-btn.selected.yes { background: rgba(139,195,74,0.18); border-color: #8BC34A; color: #AED581; }
+  .assess-btn.selected.no  { background: rgba(233,30,99,0.14); border-color: #E91E63; color: #F48FB1; }
+  .assess-btn:disabled { pointer-events: none; }
+
+  .no-mic-msg { text-align: center; font-size: 3.2cqw; color: rgba(255,255,255,0.5); margin: 3% 0; line-height: 1.5; }
+
+  .proceed-btn {
+    display: none; margin: 0 auto;
+    padding: 3% 12%; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+
+  .overlay {
+    display: none; position: absolute; inset: 0; z-index: 3;
+    background: rgba(10,8,20,0.9);
+    text-align: center; align-items: center; justify-content: center;
+    flex-direction: column; padding: 5%;
+  }
+  .next-module-btn {
+    padding: 3% 12%; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .stars-row { font-size: 10cqw; margin-bottom: 4%; letter-spacing: 6px; min-height: 12cqw; }
+</style>
+</head>
+<body>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="layer-scene"></div>
+
+  <div class="pos block-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="badge">8</div>
+        <span class="module-title">Say It</span>
+      </div>
+      <div class="medal-icon"><img src="assets/silver.png?v=2" alt="Silver tier"></div>
+    </div>
+  </div>
+
+  <div class="pos block-qlabel q-label" id="qLabel">Question 1 of 3</div>
+
+  <div class="pos block-progress">
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="pos block-flowzone">
+    <p class="speak-prompt" id="speakPrompt"></p>
+    <div class="speak-target" id="speakTarget"></div>
+    <div class="speak-trio">
+      <button id="modelBtn" class="trio-btn model">
+        <span class="trio-icon" id="modelIcon">🔊</span>
+        <span>Model</span>
+      </button>
+      <button id="playBtn" class="trio-btn playback" disabled>
+        <span class="trio-icon" id="playIcon">▶</span>
+        <span>You</span>
+      </button>
+      <button id="recBtn" class="trio-btn record">
+        <span class="trio-icon" id="recIcon">🎤</span>
+        <span id="recLabel">Record</span>
+      </button>
+    </div>
+    <p class="speak-hint" id="speakHint">Hear the model, then record yourself.</p>
+    <div id="assessWrap" style="display:none;">
+      <div class="assess-btns">
+        <button id="assessYes" class="assess-btn">✓ That sounded right</button>
+        <button id="assessNo" class="assess-btn">↩ I need more practice</button>
+      </div>
+    </div>
+    <button id="nextBtn" class="proceed-btn">Next →</button>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="stars-row" id="starsRow"></div>
+    <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
+    <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
+    <button id="nextModuleBtn" class="next-module-btn">Next module</button>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+  // Real data, copied verbatim from LESSON['mod-8'] in index.html
+  var questions = [
+    { tier:'bronze', prompt:'Say this word:', target:'water' },
+    { tier:'silver', prompt:'Say this sentence:', target:'I eat breakfast before school.' },
+    { tier:'gold', prompt:'Say this sentence:', target:'We visit our grandparents on the weekend because we miss them.' }
+  ];
+  var qi = 0, totalScore = 0;
+
+  var ctx = null;
+  function unlock(){ if(!ctx){ ctx = new (window.AudioContext||window.webkitAudioContext)(); } }
+  function tone(freq, dur){
+    unlock();
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = freq; g.gain.setValueAtTime(0.15, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+  }
+  function sfx(name){
+    if(name==='star') tone(1000,0.1);
+    if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
+  }
+
+  var speakPrompt = document.getElementById('speakPrompt');
+  var speakTarget = document.getElementById('speakTarget');
+  var modelBtn = document.getElementById('modelBtn');
+  var modelIcon = document.getElementById('modelIcon');
+  var playBtn = document.getElementById('playBtn');
+  var playIcon = document.getElementById('playIcon');
+  var recBtn = document.getElementById('recBtn');
+  var recIcon = document.getElementById('recIcon');
+  var recLabel = document.getElementById('recLabel');
+  var hint = document.getElementById('speakHint');
+  var assessWrap = document.getElementById('assessWrap');
+  var yesBtn = document.getElementById('assessYes');
+  var noBtn = document.getElementById('assessNo');
+  var nextBtn = document.getElementById('nextBtn');
+  var overlay = document.getElementById('overlay');
+
+  var modelPlaying, selfPlaying, isRecording, done, recordingBlob, selfAudio, mediaRecorder, stream;
+
+  function renderQuestion(){
+    var q = questions[qi];
+    var isBronze = q.tier === 'bronze';
+
+    document.getElementById('qLabel').textContent = 'Question '+(qi+1)+' of '+questions.length;
+    document.getElementById('progFill').style.width = Math.round((qi/questions.length)*100)+'%';
+    speakPrompt.textContent = q.prompt;
+    speakTarget.textContent = q.target;
+
+    modelPlaying = false; selfPlaying = false; isRecording = false; done = false;
+    recordingBlob = null; selfAudio = null; mediaRecorder = null; stream = null;
+
+    modelIcon.textContent = '🔊'; modelBtn.classList.remove('playing');
+    playIcon.textContent = '▶'; playBtn.classList.remove('playing'); playBtn.disabled = true;
+    recIcon.textContent = '🎤'; recLabel.textContent = 'Record'; recBtn.classList.remove('recording'); recBtn.style.display = '';
+    playBtn.style.display = '';
+    hint.textContent = 'Hear the model, then record yourself.';
+    hint.style.display = '';
+    assessWrap.style.display = 'none';
+    yesBtn.disabled = false; noBtn.disabled = false;
+    yesBtn.classList.remove('selected','yes'); noBtn.classList.remove('selected','no');
+    nextBtn.style.display = 'none';
+    var stale = document.querySelector('.no-mic-msg');
+    if(stale) stale.remove();
+
+    function playModel(){
+      if(modelPlaying || !window.speechSynthesis) return;
+      stopSelf();
+      modelPlaying = true;
+      modelIcon.textContent = '⏸';
+      modelBtn.classList.add('playing');
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(q.target);
+      u.rate = isBronze ? 0.8 : 0.85; u.lang = 'en-US';
+      u.onend = function(){
+        modelPlaying = false;
+        modelIcon.textContent = '🔊';
+        modelBtn.classList.remove('playing');
+      };
+      window.speechSynthesis.speak(u);
+    }
+    modelBtn.onclick = function(){
+      unlock();
+      if(modelPlaying){
+        window.speechSynthesis && window.speechSynthesis.cancel();
+        modelPlaying = false; modelIcon.textContent = '🔊'; modelBtn.classList.remove('playing');
+      } else {
+        playModel();
+      }
+    };
+
+    function stopSelf(){
+      if(selfAudio){ selfAudio.pause(); selfAudio.currentTime = 0; }
+      selfPlaying = false;
+      playIcon.textContent = '▶';
+      playBtn.classList.remove('playing');
+    }
+    playBtn.onclick = function(){
+      if(!recordingBlob || isRecording || done) return;
+      if(selfPlaying){ stopSelf(); return; }
+      window.speechSynthesis && window.speechSynthesis.cancel();
+      modelPlaying = false; modelIcon.textContent = '🔊'; modelBtn.classList.remove('playing');
+      selfPlaying = true;
+      playIcon.textContent = '⏸';
+      playBtn.classList.add('playing');
+      var url = URL.createObjectURL(recordingBlob);
+      selfAudio = new Audio(url);
+      selfAudio.play();
+      selfAudio.onended = function(){ stopSelf(); URL.revokeObjectURL(url); };
+    };
+
+    recBtn.onclick = function(){
+      if(done) return;
+      if(isRecording){ mediaRecorder.stop(); return; }
+      stopSelf();
+      window.speechSynthesis && window.speechSynthesis.cancel();
+      modelPlaying = false; modelIcon.textContent = '🔊'; modelBtn.classList.remove('playing');
+
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function(s){
+        stream = s;
+        var mimeType = (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : 'audio/mp4';
+        var chunks = [];
+        mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+        mediaRecorder.ondataavailable = function(e){ if(e.data.size > 0) chunks.push(e.data); };
+        mediaRecorder.onstop = function(){
+          stream.getTracks().forEach(function(t){ t.stop(); });
+          isRecording = false;
+          recIcon.textContent = '🎤'; recLabel.textContent = 'Re-record';
+          recBtn.classList.remove('recording');
+          recordingBlob = new Blob(chunks, { type: mimeType });
+          playBtn.disabled = false;
+          assessWrap.style.display = 'block';
+          hint.textContent = 'Listen to both, then tap how it went.';
+        };
+        mediaRecorder.start();
+        isRecording = true;
+        recIcon.textContent = '⏹'; recLabel.textContent = 'Stop';
+        recBtn.classList.add('recording');
+        hint.textContent = 'Recording… tap ⏹ to stop.';
+      }).catch(function(){
+        showNoMicFallback();
+      });
+    };
+
+    function lockAssess(){
+      done = true;
+      yesBtn.disabled = true; noBtn.disabled = true;
+      if(stream) stream.getTracks().forEach(function(t){ t.stop(); });
+    }
+    yesBtn.onclick = function(){
+      if(done) return;
+      yesBtn.classList.add('selected','yes');
+      lockAssess();
+      var score = 1; totalScore += score;
+      nextBtn.style.display = 'block';
+    };
+    noBtn.onclick = function(){
+      if(done) return;
+      noBtn.classList.add('selected','no');
+      lockAssess();
+      var score = 0; totalScore += score;
+      nextBtn.style.display = 'block';
+    };
+
+    function showNoMicFallback(){
+      recBtn.style.display = 'none';
+      playBtn.style.display = 'none';
+      var msg = document.createElement('div');
+      msg.className = 'no-mic-msg';
+      msg.textContent = 'Microphone not available. Listen to the model, say it aloud, then tap how it went.';
+      document.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
+      assessWrap.style.display = 'block';
+      hint.style.display = 'none';
+    }
+  }
+
+  nextBtn.addEventListener('click', function(){
+    qi++;
+    if(qi < questions.length){
+      renderQuestion();
+    } else {
+      document.getElementById('progFill').style.width = '100%';
+      var avgScore = totalScore / questions.length;
+      var starCount = avgScore === 1 ? 3 : avgScore >= 0.6 ? 2 : 1;
+      document.getElementById('scoreLabel').textContent = totalScore+' of '+questions.length+' felt right';
+      var starsEl = document.getElementById('starsRow');
+      starsEl.innerHTML = '';
+      overlay.style.display = 'flex';
+      var i = 0;
+      function dropStar(){
+        if(i >= starCount){ sfx('complete'); return; }
+        var span = document.createElement('span');
+        span.textContent = '\u2605';
+        span.style.color = '#F0AE63';
+        span.style.display = 'inline-block';
+        starsEl.appendChild(span);
+        span.animate([{transform:'translateY(-20px) scale(0.5)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
+        sfx('star');
+        i++;
+        setTimeout(dropStar, 220);
+      }
+      dropStar();
+    }
+  });
+  document.getElementById('nextModuleBtn').addEventListener('click', function(){
+    overlay.style.display = 'none';
+    qi = 0; totalScore = 0;
+    renderQuestion();
+  });
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
