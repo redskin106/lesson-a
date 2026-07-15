@@ -52,11 +52,11 @@
   .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
   .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
 
-  .pips-row { display: flex; gap: 1.5%; margin-bottom: 4%; }
+  .pips-row { display: flex; gap: 1.5%; margin-bottom: 3%; }
   .pip { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); opacity: 0.5; transition: all .25s; }
   .pip.done { opacity: 1; border: none; }
 
-  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; margin-bottom: 4%; }
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; margin-bottom: 5%; }
   .card-wrap { aspect-ratio: 1/1; cursor: pointer; }
   .card-inner {
     width: 100%; height: 100%; position: relative;
@@ -83,7 +83,7 @@
   .card-inner.flipped .card-front { opacity: 1; transform: scaleX(1); pointer-events: auto; }
   .card-front .emoji { font-size: 10.5cqw; line-height: 1; }
 
-  .status-line { min-height: 5cqw; text-align: center; font-size: 3.4cqw; color: rgba(255,255,255,0.5); margin-bottom: 2%; }
+  .status-line { min-height: 5cqw; text-align: center; font-size: 3.4cqw; color: rgba(255,255,255,0.5); margin-bottom: 3%; }
 
   .overlay {
     display: none; position: absolute; inset: 0; z-index: 3;
