@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Scramble — Live Asset Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a12;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+  .frame-wrap {
+    width: min(400px, 100vw);
+    max-height: 94vh;
+    position: relative;
+    container-type: inline-size;
+  }
+  .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
+  .app-frame {
+    position: absolute; inset: 0;
+    overflow: hidden;
+  }
+  .layer-bg {
+    position: absolute; inset: 0;
+    background-image: url('assets/bg_and_border.png');
+    background-size: 100% 100%;
+    z-index: 0;
+  }
+  .layer-scene {
+    position: absolute;
+    left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%;
+    background-image: url('assets/school_scene.png');
+    background-size: 100% 100%;
+    z-index: 1;
+  }
+  .pos { position: absolute; z-index: 2; }
+  .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
+  .block-qlabel   { left: 13.08%; top: 15.85%; width: 75%;    height: 1.28%; }
+  .block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
+  .block-flowzone { left: 13.00%; top: 25.89%; width: 75.08%; }
+
+  .badge {
+    width: 9cqw; aspect-ratio: 1/1; border-radius: 50%;
+    background: linear-gradient(90deg,#753A70,#A54D75);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 500; font-size: 3.6cqw; flex-shrink: 0;
+  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+  .header-left { display: flex; align-items: center; gap: 2.5cqw; min-width: 0; }
+  .module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; }
+  .medal-icon { flex-shrink: 0; }
+  .medal-icon img { width: 6.5cqw; height: 6.5cqw; display: block; }
+
+  .q-label { color: rgba(255,255,255,0.4); font-size: 3cqw; }
+  .prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
+  .prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
+
+  .pips-row { display: flex; gap: 1.5%; margin-bottom: 5%; }
+  .pip { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); opacity: 0.5; transition: all .25s; }
+  .pip.current { opacity: 1; border-color: #7052B4; }
+  .pip.done { opacity: 1; border: none; background: #8BC34A; }
+
+  .ws-visual { text-align: center; margin-bottom: 5%; position: relative; }
+  .ws-emoji { font-size: 15cqw; line-height: 1; }
+  .ws-play-btn {
+    position: absolute; right: 0; top: 0;
+    background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+    border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
+    cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
+  }
+
+  .ws-slots { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 5%; }
+  .ws-slot {
+    width: 11cqw; height: 13cqw; border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5cqw; font-weight: 700; color: #fff; cursor: pointer;
+    transition: border-color .2s, background .2s, color .2s;
+  }
+
+  .ws-bank { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; margin-bottom: 4%; }
+  .ws-tile {
+    width: 11cqw; height: 13cqw; border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+    font-size: 5cqw; font-weight: 700; color: rgba(255,255,255,0.85);
+    cursor: pointer; font-family: inherit; transition: opacity .2s;
+  }
+  .ws-tile.used { opacity: 0; pointer-events: none; }
+
+  .ws-feedback { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
+
+  .overlay {
+    display: none; position: absolute; inset: 0; z-index: 3;
+    background: rgba(10,8,20,0.9);
+    text-align: center; align-items: center; justify-content: center;
+    flex-direction: column; padding: 5%;
+  }
+  .continue-btn, .next-module-btn {
+    padding: 3% 12%; border-radius: 999px; border: none;
+    background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+    color: #fff; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .stars-row { font-size: 10cqw; margin-bottom: 4%; letter-spacing: 6px; min-height: 12cqw; }
+</style>
+</head>
+<body>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="layer-scene"></div>
+
+  <div class="pos block-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="badge">10</div>
+        <span class="module-title">Word Scramble</span>
+      </div>
+      <div class="medal-icon"><img src="assets/silver.png?v=2" alt="Silver tier"></div>
+    </div>
+  </div>
+
+  <div class="pos block-qlabel q-label" id="qLabel">Tier 1 of 3</div>
+
+  <div class="pos block-progress">
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="pos block-flowzone">
+    <div class="pips-row" id="pipsRow"></div>
+    <div class="ws-visual">
+      <div class="ws-emoji" id="wsEmoji"></div>
+      <button class="ws-play-btn" id="wsPlayBtn">🔊</button>
+    </div>
+    <div class="ws-slots" id="wsSlots"></div>
+    <div class="ws-bank" id="wsBank"></div>
+    <p class="ws-feedback" id="wsFeedback">&nbsp;</p>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div id="reinforceContent" style="display:none;">
+      <div style="font-size:3.5cqw;font-weight:600;color:#AED581;margin-bottom:4%;">correct!</div>
+      <div style="font-size:4cqw;line-height:2;margin-bottom:5%;" id="reinforceSentence"></div>
+      <div id="reinforceLegend"></div>
+      <button id="continueBtn" class="continue-btn" style="margin-top:4%;">Continue</button>
+    </div>
+    <div id="completeContent" style="display:none;">
+      <div class="stars-row" id="starsRow"></div>
+      <div style="font-size:5cqw;color:#fff;font-weight:500;margin-bottom:2%;">Module complete</div>
+      <div style="font-size:3.3cqw;color:rgba(255,255,255,0.5);margin-bottom:7%;" id="scoreLabel"></div>
+      <button id="nextModuleBtn" class="next-module-btn">Next module</button>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+  function safeShuffle(arr, badFn, maxAttempts){
+    maxAttempts = maxAttempts || 20;
+    function sh(a){ return a.slice().sort(function(){ return Math.random() - 0.5; }); }
+    var result = sh(arr), attempts = 0;
+    while(badFn(result) && attempts++ < maxAttempts) result = sh(arr);
+    return result;
+  }
+  var SPEAK_MOODS = {
+    neutral:   { rate:0.85, pitch:1.0,  volume:0.9 },
+    celebrate: { rate:1.15, pitch:1.55, volume:1.0 }
+  };
+  function speak(text, mood, delay){
+    if(!window.speechSynthesis) return;
+    setTimeout(function(){
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var m = SPEAK_MOODS[mood || 'neutral'];
+      u.rate = m.rate; u.pitch = m.pitch; u.volume = m.volume;
+      window.speechSynthesis.speak(u);
+    }, delay || 0);
+  }
+  var GRAMMAR_COLORS = {
+    subject: { bg: 'rgba(0,188,212,0.18)',  border: '#00BCD4', color: '#00BCD4' },
+    verb:    { bg: 'rgba(139,195,74,0.18)', border: '#8BC34A', color: '#8BC34A' },
+    object:  { bg: 'rgba(255,152,0,0.18)',  border: '#FF9800', color: '#FFB74D' },
+    place:   { bg: 'rgba(171,71,188,0.18)', border: '#AB47BC', color: '#CE93D8' },
+    time:    { bg: 'rgba(233,30,99,0.18)',  border: '#E91E63', color: '#F48FB1' }
+  };
+  function grammarSentence(tokens){
+    return tokens.map(function(t){
+      var c = GRAMMAR_COLORS[t.role];
+      if(!c) return '<span style="color:#fff;">'+t.text+'</span>';
+      return '<span style="display:inline-block;background:'+c.bg+';border:1.5px solid '+c.border+';color:'+c.color+';border-radius:6px;padding:1px 7px;margin:1px 2px;font-weight:600;font-size:.95em;">'+t.text+'</span>';
+    }).join(' ');
+  }
+  function grammarLegend(tokens){
+    var FADED = {
+      subject: { dot: '#1A6070', text: '#3A7A8A' },
+      verb:    { dot: '#3A5C22', text: '#4A7030' },
+      object:  { dot: '#6A4008', text: '#7A5010' },
+      place:   { dot: '#4A2058', text: '#5A3068' },
+      time:    { dot: '#6A1030', text: '#7A2040' }
+    };
+    var ORDER = ['subject', 'verb', 'object', 'place', 'time'];
+    var present = {};
+    (tokens || []).forEach(function(t){ present[t.role] = true; });
+    var roles = ORDER.filter(function(r){ return present[r] && FADED[r]; });
+    if(roles.length === 0) return '';
+    var pills = roles.map(function(role){
+      var c = FADED[role];
+      return '<span style="display:inline-flex;align-items:center;gap:4px;color:'+c.text+';font-size:.5em;font-weight:600;white-space:nowrap;"><span style="width:7px;height:7px;border-radius:50%;background:'+c.dot+';flex-shrink:0;"></span>'+role.charAt(0).toUpperCase()+role.slice(1)+'</span>';
+    }).join('');
+    return '<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">'+pills+'</div>';
+  }
+
+  // Real 4-color palette, copied verbatim from the word-scramble renderer
+  var WS_PALETTE = [
+    { border:'#00BCD4', bg:'rgba(0,188,212,.15)' },
+    { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+    { border:'#FF9800', bg:'rgba(255,152,0,.15)' },
+    { border:'#E91E63', bg:'rgba(233,30,99,.15)' }
+  ];
+
+  // Real data, copied verbatim from LESSON['mod-game-2'] in index.html
+  var tiers = [
+    { items:[
+      { word:'dog', emoji:'🐕', sentence:'The dog ___ in the park.', clozeWord:'dog', tokens:[{text:'The',role:null},{text:'dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+      { word:'water', emoji:'💧', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+      { word:'school', emoji:'🏫', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:"at eight o'clock",role:'time'}] },
+      { word:'book', emoji:'📚', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+      { word:'bus', emoji:'🚌', tokens:[{text:'She',role:'subject'},{text:'takes',role:'verb'},{text:'the bus',role:'object'},{text:'to school',role:'place'}] },
+      { word:'cat', emoji:'🐈', tokens:[{text:'The cat',role:'subject'},{text:'sleeps',role:'verb'},{text:'on the chair',role:'place'}] }
+    ]},
+    { items:[
+      { word:'dog', emoji:'🐕', tokens:[{text:'The dog',role:'subject'},{text:'runs',role:'verb'},{text:'in the park',role:'place'}] },
+      { word:'water', emoji:'💧', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+      { word:'school', emoji:'🏫', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:"at eight o'clock",role:'time'}] },
+      { word:'book', emoji:'📚', tokens:[{text:'She',role:'subject'},{text:'reads',role:'verb'},{text:'a book',role:'object'},{text:'every night',role:'time'}] },
+      { word:'rain', emoji:'🌧️', tokens:[{text:'It',role:'subject'},{text:'rains',role:'verb'},{text:'every morning',role:'time'}] },
+      { word:'phone', emoji:'📱', tokens:[{text:'She',role:'subject'},{text:'calls',role:'verb'},{text:'her friend',role:'object'},{text:'on the phone',role:'place'}] }
+    ]},
+    { items:[
+      { word:'friend', emoji:'👫', tokens:[{text:'My friend',role:'subject'},{text:'lives',role:'verb'},{text:'near me',role:'place'}] },
+      { word:'money', emoji:'💰', tokens:[{text:'He',role:'subject'},{text:'saves',role:'verb'},{text:'his money',role:'object'},{text:'every month',role:'time'}] },
+      { word:'rain', emoji:'🌧️', tokens:[{text:'It',role:'subject'},{text:'rains',role:'verb'},{text:'every morning',role:'time'}] },
+      { word:'phone', emoji:'📱', tokens:[{text:'She',role:'subject'},{text:'calls',role:'verb'},{text:'her friend',role:'object'},{text:'on the phone',role:'place'}] },
+      { word:'water', emoji:'💧', tokens:[{text:'I',role:'subject'},{text:'drink',role:'verb'},{text:'water',role:'object'},{text:'every day',role:'time'}] },
+      { word:'school', emoji:'🏫', tokens:[{text:'School',role:'subject'},{text:'starts',role:'verb'},{text:"at eight o'clock",role:'time'}] }
+    ]}
+  ];
+  var ti = 0, idx = 0, score = 0, wsLocked = false;
+  var PICK = 4;
+  var session, slotData, bankData;
+  var overlay = document.getElementById('overlay');
+
+  var ctx = null;
+  function unlock(){ if(!ctx){ ctx = new (window.AudioContext||window.webkitAudioContext)(); } }
+  function tone(freq, dur){
+    unlock();
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = freq; g.gain.setValueAtTime(0.15, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+  }
+  function sfx(name){
+    if(name==='tap') tone(600,0.06);
+    if(name==='star') tone(1000,0.1);
+    if(name==='complete'){ tone(700,0.1); setTimeout(function(){tone(1050,0.16);},110); }
+  }
+
+  var pipsRow = document.getElementById('pipsRow');
+  var wsEmoji = document.getElementById('wsEmoji');
+  var wsPlayBtn = document.getElementById('wsPlayBtn');
+  var wsSlots = document.getElementById('wsSlots');
+  var wsBank = document.getElementById('wsBank');
+  var wsFeedback = document.getElementById('wsFeedback');
+
+  var SCENE_DEFAULT_TOP = 51.47;
+  var SCENE_GAP = 1.5;
+  function adjustScenePosition(){
+    var frame = document.querySelector('.app-frame');
+    var flowzone = document.querySelector('.block-flowzone');
+    var scene = document.querySelector('.layer-scene');
+    if(!frame || !flowzone || !scene) return;
+    var frameRect = frame.getBoundingClientRect();
+    var flowRect = flowzone.getBoundingClientRect();
+    if(frameRect.height === 0) return;
+    var contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
+    var newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + SCENE_GAP);
+    scene.style.top = newTop + '%';
+  }
+  window.addEventListener('resize', adjustScenePosition);
+
+  function itemColor(){ return WS_PALETTE[idx % WS_PALETTE.length]; }
+
+  function pipsHTML(){
+    return session.map(function(_, i){
+      var cls = i < idx ? 'done' : i === idx ? 'current' : '';
+      return '<div class="pip '+cls+'"></div>';
+    }).join('');
+  }
+
+  function refreshSlots(){
+    slotData.forEach(function(entry, si){
+      var el = document.getElementById('ws-s-'+si);
+      if(!el) return;
+      var c = itemColor();
+      el.textContent = entry ? entry.letter : '';
+      el.style.borderColor = entry ? c.border : 'rgba(255,255,255,0.08)';
+      el.style.background = entry ? c.bg : 'rgba(255,255,255,0.05)';
+      el.style.color = entry ? c.border : '#fff';
+    });
+  }
+  function refreshBank(){
+    bankData.forEach(function(t, bi){
+      var el = document.getElementById('ws-t-'+bi);
+      if(el) el.classList.toggle('used', t.used);
+    });
+  }
+
+  function wsTap(bi){
+    if(wsLocked) return;
+    var tile = bankData[bi];
+    if(tile.used) return;
+    var si = slotData.indexOf(null);
+    if(si === -1) return;
+    unlock(); sfx('tap');
+    tile.used = true;
+    slotData[si] = { letter: tile.letter, bankId: bi };
+    refreshSlots(); refreshBank();
+    if(slotData.indexOf(null) === -1) setTimeout(wsCheck, 200);
+  }
+  function wsRemove(si){
+    if(wsLocked) return;
+    var entry = slotData[si];
+    if(!entry) return;
+    unlock(); sfx('tap');
+    bankData[entry.bankId].used = false;
+    slotData[si] = null;
+    refreshSlots(); refreshBank();
+  }
+
+  function load(){
+    wsLocked = false;
+    var item = session[idx];
+    var letters = item.word.toUpperCase().split('');
+    slotData = letters.map(function(){ return null; });
+    var wordUp = item.word.toUpperCase();
+    bankData = safeShuffle(letters, function(r){ return r.join('') === wordUp; }).map(function(l, i){ return { letter:l, id:i, used:false }; });
+    draw();
+    adjustScenePosition();
+  }
+
+  function draw(){
+    var item = session[idx];
+    pipsRow.innerHTML = pipsHTML();
+    wsEmoji.textContent = item.emoji;
+    wsFeedback.textContent = '\u00A0';
+
+    wsSlots.innerHTML = '';
+    slotData.forEach(function(_, si){
+      var d = document.createElement('div');
+      d.className = 'ws-slot';
+      d.id = 'ws-s-'+si;
+      d.addEventListener('click', function(){ wsRemove(si); });
+      wsSlots.appendChild(d);
+    });
+
+    wsBank.innerHTML = '';
+    bankData.forEach(function(t, bi){
+      var b = document.createElement('button');
+      b.className = 'ws-tile';
+      b.id = 'ws-t-'+bi;
+      b.textContent = t.letter;
+      b.addEventListener('click', function(){ wsTap(bi); });
+      wsBank.appendChild(b);
+    });
+
+    refreshSlots(); refreshBank();
+  }
+  wsPlayBtn.onclick = function(){ unlock(); speak(session[idx].word, 'neutral'); };
+
+  function showReinforce(item, onClose){
+    document.getElementById('reinforceSentence').innerHTML = grammarSentence(item.tokens);
+    document.getElementById('reinforceLegend').innerHTML = grammarLegend(item.tokens);
+    document.getElementById('completeContent').style.display = 'none';
+    document.getElementById('reinforceContent').style.display = 'block';
+    overlay.style.display = 'flex';
+    document.getElementById('continueBtn').onclick = function(){
+      overlay.style.display = 'none';
+      onClose();
+    };
+  }
+
+  function wsCheck(){
+    var item = session[idx];
+    var attempt = slotData.map(function(e){ return e.letter; }).join('').toLowerCase();
+    var ok = attempt === item.word.toLowerCase();
+    wsLocked = true;
+    var c = itemColor();
+
+    slotData.forEach(function(_, si){
+      var el = document.getElementById('ws-s-'+si);
+      if(el){
+        el.style.borderColor = ok ? c.border : '#E91E63';
+        el.style.background = ok ? c.bg : 'rgba(233,30,99,0.12)';
+        el.style.color = ok ? c.border : '#F48FB1';
+      }
+    });
+
+    if(ok){
+      score++;
+      wsFeedback.textContent = '✓ Correct!';
+      wsFeedback.style.color = '#AED581';
+      speak(item.word, 'celebrate'); // word spoken once here
+      // sentenceOnly: panel plays sentence only (no word repeat), matching real behavior
+      setTimeout(function(){
+        showReinforce(item, function(){
+          idx++;
+          if(idx < session.length) load(); else finishTier();
+        });
+      }, 500);
+    } else {
+      wsFeedback.textContent = '✗ The word is: '+item.word;
+      wsFeedback.style.color = '#F48FB1';
+      setTimeout(function(){
+        slotData = slotData.map(function(){ return null; });
+        bankData.forEach(function(t){ t.used = false; });
+        wsLocked = false;
+        refreshSlots(); refreshBank();
+        wsFeedback.textContent = 'Try again!';
+        wsFeedback.style.color = 'rgba(255,255,255,0.4)';
+      }, 1500); // silent retry, no wrong sound — matches locked audio rules
+    }
+  }
+
+  function renderTier(){
+    document.getElementById('qLabel').textContent = 'Tier '+(ti+1)+' of '+tiers.length;
+    document.getElementById('progFill').style.width = Math.round((ti/tiers.length)*100)+'%';
+    session = safeShuffle(tiers[ti].items, function(){ return false; }).slice(0, PICK);
+    idx = 0; score = 0;
+    load();
+  }
+
+  function finishTier(){
+    document.getElementById('progFill').style.width = '100%';
+    var avgScore = score / PICK;
+    var starCount = avgScore === 1 ? 3 : avgScore >= 0.6 ? 2 : 1;
+    document.getElementById('scoreLabel').textContent = score+' of '+PICK+' correct';
+    var starsEl = document.getElementById('starsRow');
+    starsEl.innerHTML = '';
+    document.getElementById('reinforceContent').style.display = 'none';
+    document.getElementById('completeContent').style.display = 'block';
+    overlay.style.display = 'flex';
+    var i = 0;
+    function dropStar(){
+      if(i >= starCount){ sfx('complete'); return; }
+      var span = document.createElement('span');
+      span.textContent = '\u2605';
+      span.style.color = '#F0AE63';
+      span.style.display = 'inline-block';
+      starsEl.appendChild(span);
+      span.animate([{transform:'translateY(-20px) scale(0.5)',opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration:320,easing:'ease-out'});
+      sfx('star');
+      i++;
+      setTimeout(dropStar, 220);
+    }
+    dropStar();
+  }
+
+  document.getElementById('nextModuleBtn').addEventListener('click', function(){
+    overlay.style.display = 'none';
+    ti++;
+    if(ti >= tiers.length) ti = 0;
+    renderTier();
+  });
+
+  renderTier();
+})();
+</script>
+</body>
+</html>
