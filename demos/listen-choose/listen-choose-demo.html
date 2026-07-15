@@ -216,6 +216,22 @@
     });
   }
 
+  var SCENE_DEFAULT_TOP = 51.47; // matches the original fixed position
+  var SCENE_GAP = 3; // breathing room below content, in % of frame height
+  function adjustScenePosition(){
+    var frame = document.querySelector('.app-frame');
+    var flowzone = document.querySelector('.block-flowzone');
+    var scene = document.querySelector('.layer-scene');
+    if(!frame || !flowzone || !scene) return;
+    var frameRect = frame.getBoundingClientRect();
+    var flowRect = flowzone.getBoundingClientRect();
+    if(frameRect.height === 0) return; // not laid out yet
+    var contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
+    var newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + SCENE_GAP);
+    scene.style.top = newTop + '%';
+  }
+  window.addEventListener('resize', adjustScenePosition);
+
   function renderQuestion(){
     var q = questions[qi];
     var isBronze = q.tier === 'bronze';
@@ -261,11 +277,13 @@
           btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
           checkBtn.style.display = 'block';
         }
+        adjustScenePosition();
       });
       optionsGrid.appendChild(btn);
     });
 
     setGridLive(false);
+    adjustScenePosition();
 
     listenBtn.onclick = function(){
       if(playing) return;
