@@ -263,7 +263,7 @@
     var q = questions[qi];
     document.getElementById('qLabel').textContent = 'Question '+(qi+1)+' of '+questions.length;
     document.getElementById('progFill').style.width = Math.round((qi/questions.length)*100)+'%';
-    document.getElementById('sentence').innerHTML = q.sentence.replace('___', '<span class="blank">&nbsp;</span>');
+    document.getElementById('sentence').innerHTML = q.sentence.replace('___', '<span class="blank" id="blankSlot">&nbsp;</span>');
     document.getElementById('status').textContent = '\u00A0';
     selected = null;
     attemptedWrongOnCurrent = false;
@@ -294,6 +294,8 @@
         b.style.transform = 'scale(0.95)';
         setTimeout(function(){ b.style.transform='scale(1)'; },120);
         selected = opt;
+        var blank = document.getElementById('blankSlot');
+        if(blank){ blank.textContent = opt; blank.style.color = c.color; }
         sfx('tap');
       });
       pillRow.appendChild(b);
