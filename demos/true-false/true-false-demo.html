@@ -71,15 +71,21 @@
 
   .tf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 3%; margin-bottom: 5%; }
   .tf-btn {
-    border-radius: 14px; padding: 7% 3%;
+    border-radius: 999px; padding: 7% 3%; border: none;
     font-size: 4.2cqw; font-weight: 600; cursor: pointer; font-family: inherit;
-    transition: transform .12s, background .15s, border-color .15s, color .15s;
+    transition: transform .12s, background .15s, color .15s;
   }
-  .tf-btn.true-btn  { background: rgba(139,195,74,0.12); border: 2px solid #8BC34A; color: #AED581; }
-  .tf-btn.false-btn { background: rgba(233,30,99,0.12);  border: 2px solid #E91E63; color: #F48FB1; }
-  .tf-btn.highlight-correct { background: #8BC34A; border-color: #8BC34A; color: #16250A; }
-  .tf-btn.highlight-wrong   { background: #E91E63; border-color: #E91E63; color: #fff; }
-  .tf-btn:disabled { cursor: default; opacity: 0.9; }
+  .tf-btn.true-btn  { background: rgba(139,195,74,0.14);  color: #AED581; border: 1.5px solid rgba(139,195,74,0.4); }
+  .tf-btn.false-btn { background: rgba(233,30,99,0.14);   color: #F48FB1; border: 1.5px solid rgba(233,30,99,0.4); }
+  .tf-btn.highlight-correct {
+    background: linear-gradient(180deg,#1B5E20 0%,#4C8C3A 45%,#8BC34A 100%);
+    color: #fff; border-color: transparent;
+  }
+  .tf-btn.highlight-wrong {
+    background: linear-gradient(180deg,#7A0B2E 0%,#C2295A 45%,#E91E63 100%);
+    color: #fff; border-color: transparent;
+  }
+  .tf-btn:disabled { cursor: default; opacity: 0.95; }
 
   .grammar-reveal {
     opacity: 0; transition: opacity .3s; min-height: 0;
