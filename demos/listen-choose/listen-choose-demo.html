@@ -217,7 +217,7 @@
   }
 
   var SCENE_DEFAULT_TOP = 51.47; // matches the original fixed position
-  var SCENE_GAP = 3; // breathing room below content, in % of frame height
+  var SCENE_GAP = 1.5; // breathing room below content, in % of frame height
   function adjustScenePosition(){
     var frame = document.querySelector('.app-frame');
     var flowzone = document.querySelector('.block-flowzone');
@@ -277,7 +277,6 @@
           btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
           checkBtn.style.display = 'block';
         }
-        adjustScenePosition();
       });
       optionsGrid.appendChild(btn);
     });
