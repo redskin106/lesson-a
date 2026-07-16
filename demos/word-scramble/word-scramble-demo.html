@@ -198,7 +198,7 @@
     return tokens.map(function(t){
       var c = GRAMMAR_COLORS[t.role];
       if(!c) return '<span style="color:#fff;">'+t.text+'</span>';
-      return '<span style="display:inline-block;background:'+c.bg+';border:1.5px solid '+c.border+';color:'+c.color+';border-radius:6px;padding:1px 7px;margin:1px 2px;font-weight:600;font-size:.95em;">'+t.text+'</span>';
+      return '<span style="display:inline-block;background:'+c.bg+';border:1.5px solid '+c.border+';color:'+c.color+';border-radius:999px;padding:2px 9px;margin:1px 2px;font-weight:600;font-size:.95em;">'+t.text+'</span>';
     }).join(' ');
   }
   function grammarLegend(tokens){
