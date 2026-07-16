@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module Test Harness</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a12;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 12px 40px;
+  }
+  h1 { color: #fff; font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+  .controls {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 20px; width: 100%; max-width: 500px;
+  }
+  select {
+    flex: 1; min-width: 160px;
+    background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12);
+    color: #fff; font-size: 15px; padding: 10px 12px; border-radius: 10px;
+    font-family: inherit; cursor: pointer;
+  }
+  select:focus { outline: none; border-color: rgba(112,82,180,0.7); }
+  .frame-holder {
+    width: min(400px, 100vw);
+    aspect-ratio: 1200 / 2580;
+    position: relative;
+  }
+  iframe { width: 100%; height: 100%; border: none; border-radius: 12.7cqw; }
+  .direct-link {
+    color: rgba(255,255,255,0.4); font-size: 13px; margin-top: 14px; text-align: center;
+  }
+  .direct-link a { color: #C9B8EA; }
+</style>
+</head>
+<body>
+  <h1>Module Test Harness</h1>
+  <div class="controls">
+    <select id="moduleSelect"></select>
+    <select id="tierSelect">
+      <option value="bronze">Bronze</option>
+      <option value="silver">Silver</option>
+      <option value="gold">Gold</option>
+    </select>
+  </div>
+  <div class="frame-holder">
+    <iframe id="previewFrame"></iframe>
+  </div>
+  <p class="direct-link">Direct link: <a id="directLink" href="#" target="_blank">open in new tab</a></p>
+
+<script>
+  var MODULES = [
+    { label: "Gap-fill",         slug: "gap-fill",       file: "gap-fill-demo.html" },
+    { label: "True/False",       slug: "true-false",     file: "true-false-demo.html" },
+    { label: "Word Match",       slug: "word-match",     file: "word-match-demo.html" },
+    { label: "Memory Pairs",     slug: "memory-pairs",   file: "memory-pairs-demo.html" },
+    { label: "Listen & Choose",  slug: "listen-choose",  file: "listen-choose-demo.html" },
+    { label: "Put in Order",     slug: "put-in-order",   file: "put-in-order-demo.html" },
+    { label: "Say It",           slug: "say-it",         file: "say-it-demo.html" },
+    { label: "Picture & Word",   slug: "picture-word",   file: "picture-word-demo.html" },
+    { label: "Word Scramble",    slug: "word-scramble",  file: "word-scramble-demo.html" },
+    { label: "Spelling",         slug: "spelling",       file: "spelling-demo.html" },
+    { label: "Listen & Match",   slug: "listen-match",   file: "listen-match-demo.html" },
+    { label: "Build a Sentence", slug: "build-sentence", file: "build-sentence-demo.html" }
+  ];
+
+  var moduleSelect = document.getElementById('moduleSelect');
+  var tierSelect = document.getElementById('tierSelect');
+  var previewFrame = document.getElementById('previewFrame');
+  var directLink = document.getElementById('directLink');
+
+  MODULES.forEach(function(m, i){
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = m.label;
+    moduleSelect.appendChild(opt);
+  });
+
+  function buildUrl(){
+    var m = MODULES[moduleSelect.value];
+    var tier = tierSelect.value;
+    return '../' + m.slug + '/' + m.file + '?tier=' + tier + '&v=' + Date.now();
+  }
+
+  function update(){
+    var url = buildUrl();
+    previewFrame.src = url;
+    directLink.href = url.split('&v=')[0];
+  }
+
+  moduleSelect.addEventListener('change', update);
+  tierSelect.addEventListener('change', update);
+
+  // Read initial state from URL if provided (?module=slug&tier=bronze)
+  var params = new URLSearchParams(location.search);
+  var initialSlug = params.get('module');
+  var initialTier = params.get('tier');
+  if(initialSlug){
+    var idx = MODULES.findIndex(function(m){ return m.slug === initialSlug; });
+    if(idx !== -1) moduleSelect.value = idx;
+  }
+  if(initialTier) tierSelect.value = initialTier;
+
+  update();
+</script>
+</body>
+</html>
