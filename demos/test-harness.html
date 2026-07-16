@@ -1,4 +1,3 @@
-<!-- rebuild trigger -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,7 +85,7 @@
   function buildUrl(){
     var m = MODULES[moduleSelect.value];
     var tier = tierSelect.value;
-    return '../' + m.slug + '/' + m.file + '?tier=' + tier + '&v=' + Date.now();
+    return m.slug + '/' + m.file + '?tier=' + tier + '&v=' + Date.now();
   }
 
   function update(){
