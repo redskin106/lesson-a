@@ -1,0 +1,3641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Colors Around Us</title>
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #0D1B2A;
+  --surface:    #162436;
+  --surface2:   #1E3248;
+  --text:       #EEF2F7;
+  --text-dim:   #7A9BBF;
+  --accent:     #4FC3F7;
+  --bronze:     #CD7F32;
+  --bronze-bg:  rgba(205,127,50,0.15);
+  --silver:     #A0AEC0;
+  --silver-bg:  rgba(160,174,192,0.15);
+  --gold:       #FFD700;
+  --gold-bg:    rgba(255,215,0,0.12);
+  --pass:       #4CAF50;
+  --fail:       #EF5350;
+  --radius:     12px;
+  --radius-sm:  8px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  height: 100dvh;
+  overflow-y: auto;
+  padding: 28px 20px 32px;
+}
+.screen.active { display: flex; }
+
+/* ─── NAME PICKER ─────────────────────────── */
+
+.welcome-label {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.welcome-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.welcome-sub {
+  color: var(--text-dim);
+  font-size: 15px;
+  margin-bottom: 28px;
+}
+.name-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.name-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 18px 12px;
+  min-height: 60px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+.name-btn.selected {
+  border-color: var(--accent);
+  background: rgba(79,195,247,0.1);
+  color: var(--accent);
+}
+.start-btn {
+  background: var(--accent);
+  color: #0D1B2A;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 18px;
+  width: 100%;
+  cursor: pointer;
+  opacity: 0.25;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  margin-top: auto;
+}
+.start-btn.ready { opacity: 1; pointer-events: auto; }
+
+/* ─── MODULE SCREEN ──────────────────────── */
+
+.module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.student-name {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.tier-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.tier-badge.bronze { background: var(--bronze-bg); color: var(--bronze); }
+.tier-badge.silver { background: var(--silver-bg); color: var(--silver); }
+.tier-badge.gold   { background: var(--gold-bg);   color: var(--gold);   }
+
+.progress-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.pip {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface2);
+  transition: background 0.3s;
+}
+.pip.done    { background: var(--pass); }
+.pip.current { background: var(--accent); }
+
+.tier-track {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.tier-seg {
+  flex: 1;
+  padding: 9px 6px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.25;
+  transition: opacity 0.3s;
+}
+.tier-seg.bronze { background: var(--bronze-bg); color: var(--bronze); }
+.tier-seg.silver { background: var(--silver-bg); color: var(--silver); }
+.tier-seg.gold   { background: var(--gold-bg);   color: var(--gold);   }
+.tier-seg.active { opacity: 1; }
+.tier-seg.passed { opacity: 0.65; }
+.tier-seg.passed::after { content: ' ✓'; }
+
+#module-container { flex: 1; }
+
+/* ─── TIER RESULT SCREEN ─────────────────── */
+
+.result-icon  { font-size: 64px; text-align: center; margin: 28px 0 14px; }
+.result-title { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.result-score { font-size: 17px; color: var(--text-dim); text-align: center; margin-bottom: 28px; }
+.result-score span { color: var(--text); font-weight: 700; }
+.result-msg {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 15px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.result-msg strong { color: var(--text); }
+
+.cta-btn {
+  display: block; width: 100%;
+  background: var(--accent); color: #0D1B2A;
+  border: none; border-radius: var(--radius);
+  font-size: 18px; font-weight: 700;
+  padding: 18px; cursor: pointer;
+  text-align: center; margin-bottom: 12px;
+}
+.secondary-btn {
+  display: block; width: 100%;
+  background: var(--surface2); color: var(--text);
+  border: none; border-radius: var(--radius);
+  font-size: 16px; font-weight: 600;
+  padding: 16px; cursor: pointer; text-align: center;
+}
+
+/* ─── END SCREEN ─────────────────────────── */
+
+.end-header { text-align: center; padding: 16px 0 20px; }
+.end-trophy  { font-size: 56px; margin-bottom: 10px; }
+.end-name    { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+.end-total   { font-size: 15px; color: var(--text-dim); }
+.end-total span { color: var(--accent); font-weight: 700; }
+
+.summary-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+
+.summary-item {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.summary-item-label  { font-size: 15px; font-weight: 600; }
+.summary-item-detail { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+.summary-status {
+  font-size: 12px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+}
+.summary-status.complete   { background: rgba(76,175,80,0.15);  color: var(--pass); }
+.summary-status.incomplete { background: rgba(239,83,80,0.15);  color: var(--fail); }
+
+.retry-btn {
+  display: block; width: 100%;
+  background: transparent; color: var(--text);
+  border: 2px solid var(--fail); border-radius: var(--radius);
+  font-size: 16px; font-weight: 600;
+  padding: 16px; cursor: pointer; text-align: center; margin-bottom: 12px;
+}
+.done-btn {
+  display: block; width: 100%;
+  background: var(--pass); color: #fff;
+  border: none; border-radius: var(--radius);
+  font-size: 18px; font-weight: 700;
+  padding: 18px; cursor: pointer; text-align: center;
+}
+
+/* ─── MODULE: AUDIO UNDERSTANDING ──────────── */
+
+.module-title    { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.module-question { font-size: 15px; color: var(--text-dim); margin-bottom: 20px; }
+
+.listen-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%;
+  background: var(--surface2);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-size: 16px; font-weight: 700;
+  padding: 16px; cursor: pointer; margin-bottom: 20px;
+  transition: background 0.15s;
+}
+.listen-btn.playing { background: rgba(79,195,247,0.1); }
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.option-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 15px; font-weight: 500;
+  padding: 16px 12px; min-height: 64px;
+  cursor: pointer; text-align: center;
+  transition: border-color 0.15s, background 0.15s, opacity 0.25s;
+}
+.option-btn.correct { border-color: var(--pass); background: rgba(76,175,80,0.12); color: var(--pass); }
+.option-btn.wrong   { border-color: var(--fail); background: rgba(239,83,80,0.1);  color: var(--fail); }
+.option-btn:disabled { cursor: default; }
+.option-btn.locked  { opacity: 0; pointer-events: none; }
+
+.next-ex-btn {
+  display: block; width: 100%;
+  background: var(--accent); color: #0D1B2A;
+  border: none; border-radius: var(--radius);
+  font-size: 18px; font-weight: 700;
+  padding: 18px; cursor: pointer; margin-top: 20px;
+}
+
+/* ─── MODULE: GAP FILL ──────────────────────── */
+
+.sentence-display {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  font-size: 18px;
+  line-height: 2;
+  margin-bottom: 20px;
+}
+.blank-slot {
+  display: inline-block;
+  min-width: 80px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+  text-align: center;
+  padding: 0 6px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.word-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.word-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 15px; font-weight: 600;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.word-btn.selected { border-color: var(--accent); background: rgba(79,195,247,0.1); color: var(--accent); }
+.word-btn.correct  { border-color: var(--pass);   color: var(--pass); }
+.word-btn.wrong    { border-color: var(--fail);   color: var(--fail); }
+.word-btn:disabled { cursor: default; }
+
+/* ─── MODULE: TRUE / FALSE ──────────────────── */
+
+.tf-statement {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.tf-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.tf-btn {
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font-size: 19px; font-weight: 700;
+  padding: 24px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tf-btn.true-btn  { background: rgba(76,175,80,0.1);  color: var(--pass); border-color: var(--pass); }
+.tf-btn.false-btn { background: rgba(239,83,80,0.1);  color: var(--fail); border-color: var(--fail); }
+.tf-btn.highlight-correct { background: var(--pass);  color: #fff; border-color: var(--pass); }
+.tf-btn.highlight-wrong   { background: var(--fail);  color: #fff; border-color: var(--fail); }
+.tf-btn:disabled { cursor: default; opacity: 0.7; }
+
+/* ─── MODULE: WORD MATCH ────────────────────── */
+
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.match-col { display: flex; flex-direction: column; gap: 8px; }
+.match-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px; font-weight: 600;
+  padding: 12px 10px;
+  min-height: 54px;
+  cursor: pointer; text-align: center;
+  line-height: 1.3;
+  transition: all 0.15s;
+}
+.match-btn.selected   { border-color: var(--accent); background: rgba(79,195,247,0.1); color: var(--accent); }
+.match-btn.matched    { border-color: var(--pass);   background: rgba(76,175,80,0.12); color: var(--pass); pointer-events: none; }
+.match-btn.wrong-flash { border-color: var(--fail);  background: rgba(239,83,80,0.1); }
+.match-score {
+  font-size: 14px; color: var(--text-dim);
+  text-align: center; margin-bottom: 12px;
+}
+
+/* ─── MODULE: SEQUENCING ────────────────────── */
+
+.seq-prompt { font-size: 15px; color: var(--text-dim); margin-bottom: 14px; }
+.seq-slots  { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.seq-slot {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface2);
+  border: 2px dashed rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px; min-height: 50px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.seq-slot.filled  { border-style: solid; border-color: var(--accent); cursor: pointer; }
+.seq-slot.correct { border-color: var(--pass); background: rgba(76,175,80,0.1); }
+.seq-slot.wrong   { border-color: var(--fail); background: rgba(239,83,80,0.08); }
+.slot-num {
+  width: 24px; height: 24px; flex-shrink: 0;
+  background: var(--surface); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--text-dim);
+  transition: background 0.2s, color 0.2s;
+}
+.seq-slot.filled .slot-num { background: var(--accent); color: #0D1B2A; }
+.slot-text { font-size: 15px; font-weight: 600; }
+.seq-pool-label { font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.seq-pool  { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.seq-item {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px; font-weight: 600;
+  padding: 11px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.seq-item:active { background: var(--surface); }
+.seq-item.used   { opacity: 0.2; pointer-events: none; }
+
+/* ─── MODULE: AUDIO SPEAKING ────────────────── */
+
+.speak-target {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  font-size: 20px; font-weight: 700;
+  text-align: center; line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Three-button comparison row */
+.speak-trio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.trio-btn {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 16px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 80px;
+}
+.trio-btn .trio-icon  { font-size: 24px; line-height: 1; }
+.trio-btn .trio-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+
+/* Model button — accent blue */
+.trio-btn.model { border-color: var(--accent); color: var(--accent); }
+.trio-btn.model .trio-label { color: var(--accent); }
+.trio-btn.model.playing { background: rgba(79,195,247,0.1); }
+
+/* Playback button — purple, disabled until recorded */
+.trio-btn.playback { border-color: #AB47BC; color: #CE93D8; opacity: 0.3; pointer-events: none; }
+.trio-btn.playback .trio-label { color: #AB47BC; }
+.trio-btn.playback.ready { opacity: 1; pointer-events: auto; }
+.trio-btn.playback.playing { background: rgba(171,71,188,0.1); }
+
+/* Record button — red */
+.trio-btn.record { border-color: var(--fail); color: var(--fail); }
+.trio-btn.record .trio-label { color: var(--fail); }
+.trio-btn.record.recording {
+  background: rgba(239,83,80,0.1);
+  animation: pulse-record 1s ease-in-out infinite;
+}
+@keyframes pulse-record {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(239,83,80,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(239,83,80,0);   }
+}
+
+.speak-hint {
+  font-size: 13px; color: var(--text-dim);
+  text-align: center; margin-bottom: 20px;
+}
+
+/* Self-assess — appears after first recording */
+.assess-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.assess-btn {
+  border: 2px solid transparent; border-radius: var(--radius);
+  font-size: 16px; font-weight: 700; padding: 18px; cursor: pointer;
+  transition: all 0.15s;
+}
+.assess-yes { background: rgba(76,175,80,0.1); color: var(--pass); border-color: var(--pass); }
+.assess-no  { background: rgba(239,83,80,0.1); color: var(--fail); border-color: var(--fail); }
+.assess-btn.selected.assess-yes { background: var(--pass); color: #fff; }
+.assess-btn.selected.assess-no  { background: var(--fail); color: #fff; }
+.assess-btn:disabled { cursor: default; opacity: 0.5; }
+.no-mic-msg {
+  background: var(--surface2); border-radius: var(--radius-sm);
+  padding: 14px 16px; font-size: 14px; color: var(--text-dim);
+  text-align: center; margin-bottom: 14px; line-height: 1.6;
+}
+
+
+/* ─── NEW MODULE STYLES ──────────────────────── */
+.option-btn.selected {
+  border-color: var(--accent);
+  background: rgba(79,195,247,0.08);
+  color: var(--accent);
+}
+.module-game-label {
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     SCREEN 1 — NAME PICKER
+════════════════════════════════════ -->
+<div id="screen-name" class="screen active">
+  <p class="welcome-label">Colors Around Us</p>
+  <h1 class="welcome-title">Hello! 👋</h1>
+  <p class="welcome-sub">Tap your name to begin.</p>
+  <div class="name-grid" id="name-grid"></div>
+  <button class="start-btn" id="start-btn">Start →</button>
+</div>
+
+<!-- ═══════════════════════════════════
+     SCREEN 2 — MODULE
+════════════════════════════════════ -->
+<div id="screen-module" class="screen">
+  <div class="module-header">
+    <span class="student-name" id="header-name"></span>
+    <span class="tier-badge bronze" id="tier-badge">Bronze</span>
+  </div>
+  <div class="progress-row" id="progress-pips"></div>
+  <div class="tier-track">
+    <div class="tier-seg bronze" id="seg-bronze">Bronze</div>
+    <div class="tier-seg silver" id="seg-silver">Silver</div>
+    <div class="tier-seg gold"   id="seg-gold">Gold</div>
+  </div>
+  <div id="module-container"></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SCREEN 3 — TIER RESULT
+════════════════════════════════════ -->
+<div id="screen-tier-result" class="screen">
+  <div class="result-icon"  id="result-icon"></div>
+  <h2 class="result-title"  id="result-title"></h2>
+  <p  class="result-score"  id="result-score"></p>
+  <p  class="result-msg"    id="result-msg"></p>
+  <button class="cta-btn"       id="result-cta"></button>
+  <button class="secondary-btn" id="result-secondary" style="display:none"></button>
+</div>
+
+<!-- ═══════════════════════════════════
+     REINFORCEMENT PANEL
+     Shared by image-vocab, memory-pairs,
+     word-scramble, spelling modules
+════════════════════════════════════ -->
+<div id="reinforce-panel" style="
+  position:fixed;bottom:0;left:0;right:0;
+  background:#0D1B2A;
+  border-top:1px solid #1E3248;
+  border-radius:20px 20px 0 0;
+  padding:1.5rem 1.5rem 2.25rem;
+  display:flex;flex-direction:column;align-items:center;gap:.75rem;
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  z-index:200;
+">
+  <div id="rp-em"   style="font-size:64px;line-height:1;"></div>
+  <div id="rp-word" style="font-size:28px;font-weight:600;color:#FFD700;letter-spacing:.03em;"></div>
+  <div id="rp-sent" style="font-size:15px;color:#7A9BBF;text-align:center;line-height:1.7;"></div>
+  <div style="width:100%;height:3px;background:#1E3248;border-radius:99px;overflow:hidden;margin-top:.25rem;">
+    <div id="rp-bar" style="height:100%;background:#FFD700;width:0%;border-radius:99px;transition:width linear;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SCREEN 4 — END SCREEN
+════════════════════════════════════ -->
+<div id="screen-end" class="screen">
+  <div class="end-header">
+    <div class="end-trophy">🏆</div>
+    <div class="end-name"  id="end-name"></div>
+    <div class="end-total" id="end-total"></div>
+  </div>
+  <div class="summary-list" id="summary-list"></div>
+  <button class="retry-btn" id="retry-btn" style="display:none">↩ Retry incomplete modules</button>
+  <button class="done-btn"  id="done-btn">✓ Done</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════════
+
+const STUDENTS       = ['Sophy','Davit','Sam','Nu','Tue','Yee','Lee Ga','Felix','Tin','Ken','Thai'];
+const PASS_THRESHOLD = 0.6; // 60% to pass a tier
+
+// ══════════════════════════════════════════════════
+//  LESSON DATA
+//  Each module: { id, type, label, data: { bronze, silver, gold } }
+//  Add / replace entries here to build the full lesson.
+// ══════════════════════════════════════════════════
+
+const LESSON = [
+  {
+    "id": "gapfill",
+    "type": "gap-fill",
+    "label": "Gap-fill",
+    "data": {
+      "bronze": {
+        "sentence": "The apple is ___.",
+        "answer": "red",
+        "options": [
+          "red",
+          "blue",
+          "green",
+          "yellow"
+        ],
+        "tokens": [
+          {
+            "t": "The apple",
+            "r": "subject"
+          },
+          {
+            "t": "is",
+            "r": "verb"
+          },
+          {
+            "t": "red.",
+            "r": "object"
+          }
+        ]
+      },
+      "silver": {
+        "sentence": "I like yellow because it is ___.",
+        "answer": "bright",
+        "options": [
+          "bright",
+          "heavy",
+          "quiet",
+          "far"
+        ],
+        "tokens": [
+          {
+            "t": "I",
+            "r": "subject"
+          },
+          {
+            "t": "like",
+            "r": "verb"
+          },
+          {
+            "t": "yellow",
+            "r": "object"
+          },
+          {
+            "t": "because",
+            "r": "connector"
+          },
+          {
+            "t": "it is bright",
+            "r": null
+          }
+        ]
+      },
+      "gold": {
+        "sentence": "Although blue is calm, my favorite color is ___.",
+        "answer": "red",
+        "options": [
+          "red",
+          "blue",
+          "green",
+          "tired"
+        ],
+        "tokens": [
+          {
+            "t": "Although blue is calm",
+            "r": "connector"
+          },
+          {
+            "t": "my favorite color",
+            "r": "subject"
+          },
+          {
+            "t": "is",
+            "r": "verb"
+          },
+          {
+            "t": "red",
+            "r": "object"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "truefalse",
+    "type": "true-false",
+    "label": "True / False",
+    "data": {
+      "bronze": {
+        "statement": "The sky is blue.",
+        "answer": true,
+        "tokens": [
+          {
+            "t": "The sky",
+            "r": "subject"
+          },
+          {
+            "t": "is",
+            "r": "verb"
+          },
+          {
+            "t": "blue",
+            "r": "object"
+          }
+        ]
+      },
+      "silver": {
+        "statement": "Bananas are usually purple.",
+        "answer": false,
+        "tokens": [
+          {
+            "t": "Bananas",
+            "r": "subject"
+          },
+          {
+            "t": "are usually",
+            "r": "verb"
+          },
+          {
+            "t": "purple",
+            "r": "object"
+          }
+        ]
+      },
+      "gold": {
+        "statement": "Mixing red and yellow makes orange.",
+        "answer": true,
+        "tokens": [
+          {
+            "t": "Mixing red and yellow",
+            "r": "subject"
+          },
+          {
+            "t": "makes",
+            "r": "verb"
+          },
+          {
+            "t": "orange",
+            "r": "object"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "wordmatch",
+    "type": "word-match",
+    "label": "Word Match",
+    "data": {
+      "bronze": {
+        "pairs": [
+          {
+            "left": "red",
+            "right": "apple"
+          },
+          {
+            "left": "blue",
+            "right": "sky"
+          },
+          {
+            "left": "yellow",
+            "right": "banana"
+          }
+        ]
+      },
+      "silver": {
+        "pairs": [
+          {
+            "left": "red",
+            "right": "apple"
+          },
+          {
+            "left": "blue",
+            "right": "sky"
+          },
+          {
+            "left": "yellow",
+            "right": "banana"
+          },
+          {
+            "left": "green",
+            "right": "leaf"
+          }
+        ]
+      },
+      "gold": {
+        "pairs": [
+          {
+            "left": "red",
+            "right": "apple"
+          },
+          {
+            "left": "blue",
+            "right": "sky"
+          },
+          {
+            "left": "yellow",
+            "right": "banana"
+          },
+          {
+            "left": "green",
+            "right": "leaf"
+          },
+          {
+            "left": "purple",
+            "right": "grape"
+          },
+          {
+            "left": "black",
+            "right": "night"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "memorypairs",
+    "type": "memory-pairs",
+    "label": "Memory Pairs",
+    "data": {
+      "bronze": {
+        "items": [
+          {
+            "word": "red",
+            "emoji": "🔴",
+            "image": null,
+            "sentence": "The apple is red.",
+            "sentenceAudioFile": "audio/the-apple-is-red--memorypairs.shared.item0.sentence.mp3"
+          },
+          {
+            "word": "blue",
+            "emoji": "🔵",
+            "image": null,
+            "sentence": "The sky is blue."
+          },
+          {
+            "word": "green",
+            "emoji": "🟢",
+            "image": null,
+            "sentence": "The grass is green."
+          },
+          {
+            "word": "yellow",
+            "emoji": "🟡",
+            "image": null,
+            "sentence": "The sun is yellow."
+          },
+          {
+            "word": "orange",
+            "emoji": "🟠",
+            "image": null,
+            "sentence": "The pumpkin is orange.",
+            "sentenceAudioFile": "audio/the-pumpkin-is-orange--memorypairs.shared.item4.sentence.mp3"
+          },
+          {
+            "word": "purple",
+            "emoji": "🟣",
+            "image": null,
+            "sentence": "The grape is purple.",
+            "sentenceAudioFile": "audio/the-grape-is-purple--memorypairs.shared.item5.sentence.mp3"
+          },
+          {
+            "word": "black",
+            "emoji": "⚫",
+            "image": null,
+            "sentence": "The night is black."
+          },
+          {
+            "word": "white",
+            "emoji": "⚪",
+            "image": null,
+            "sentence": "The cloud is white."
+          }
+        ]
+      },
+      "silver": {
+        "items": [
+          {
+            "word": "red",
+            "emoji": "🔴",
+            "image": null,
+            "sentence": "The apple is red.",
+            "sentenceAudioFile": "audio/the-apple-is-red--memorypairs.shared.item0.sentence.mp3"
+          },
+          {
+            "word": "blue",
+            "emoji": "🔵",
+            "image": null,
+            "sentence": "The sky is blue."
+          },
+          {
+            "word": "green",
+            "emoji": "🟢",
+            "image": null,
+            "sentence": "The grass is green."
+          },
+          {
+            "word": "yellow",
+            "emoji": "🟡",
+            "image": null,
+            "sentence": "The sun is yellow."
+          },
+          {
+            "word": "orange",
+            "emoji": "🟠",
+            "image": null,
+            "sentence": "The pumpkin is orange.",
+            "sentenceAudioFile": "audio/the-pumpkin-is-orange--memorypairs.shared.item4.sentence.mp3"
+          },
+          {
+            "word": "purple",
+            "emoji": "🟣",
+            "image": null,
+            "sentence": "The grape is purple.",
+            "sentenceAudioFile": "audio/the-grape-is-purple--memorypairs.shared.item5.sentence.mp3"
+          },
+          {
+            "word": "black",
+            "emoji": "⚫",
+            "image": null,
+            "sentence": "The night is black."
+          },
+          {
+            "word": "white",
+            "emoji": "⚪",
+            "image": null,
+            "sentence": "The cloud is white."
+          }
+        ]
+      },
+      "gold": {
+        "items": [
+          {
+            "word": "red",
+            "emoji": "🔴",
+            "image": null,
+            "sentence": "The apple is red.",
+            "sentenceAudioFile": "audio/the-apple-is-red--memorypairs.shared.item0.sentence.mp3"
+          },
+          {
+            "word": "blue",
+            "emoji": "🔵",
+            "image": null,
+            "sentence": "The sky is blue."
+          },
+          {
+            "word": "green",
+            "emoji": "🟢",
+            "image": null,
+            "sentence": "The grass is green."
+          },
+          {
+            "word": "yellow",
+            "emoji": "🟡",
+            "image": null,
+            "sentence": "The sun is yellow."
+          },
+          {
+            "word": "orange",
+            "emoji": "🟠",
+            "image": null,
+            "sentence": "The pumpkin is orange.",
+            "sentenceAudioFile": "audio/the-pumpkin-is-orange--memorypairs.shared.item4.sentence.mp3"
+          },
+          {
+            "word": "purple",
+            "emoji": "🟣",
+            "image": null,
+            "sentence": "The grape is purple.",
+            "sentenceAudioFile": "audio/the-grape-is-purple--memorypairs.shared.item5.sentence.mp3"
+          },
+          {
+            "word": "black",
+            "emoji": "⚫",
+            "image": null,
+            "sentence": "The night is black."
+          },
+          {
+            "word": "white",
+            "emoji": "⚪",
+            "image": null,
+            "sentence": "The cloud is white."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "listenchoose",
+    "type": "audio-understanding",
+    "label": "Listen & Choose",
+    "data": {
+      "bronze": {
+        "audio": "What color is the sun?",
+        "question": "What color is the sun?",
+        "options": [
+          "yellow",
+          "blue",
+          "black",
+          "green"
+        ],
+        "answer": "yellow"
+      },
+      "silver": {
+        "audio": "Which color means stop on a traffic light?",
+        "question": "Which color means stop on a traffic light?",
+        "options": [
+          "red",
+          "green",
+          "yellow",
+          "blue"
+        ],
+        "answer": "red"
+      },
+      "gold": {
+        "audio": "Which color do you get by mixing blue and yellow?",
+        "question": "Which color do you get by mixing blue and yellow?",
+        "options": [
+          "green",
+          "purple",
+          "orange",
+          "black"
+        ],
+        "answer": "green"
+      }
+    }
+  },
+  {
+    "id": "putinorder",
+    "type": "sequencing",
+    "label": "Put in Order",
+    "data": {
+      "bronze": {
+        "prompt": "Put the traffic light colors in order (top to bottom).",
+        "items": [
+          "red",
+          "yellow",
+          "green"
+        ],
+        "correct": [
+          "red",
+          "yellow",
+          "green"
+        ]
+      },
+      "silver": {
+        "prompt": "Order the first three rainbow colors.",
+        "items": [
+          "red",
+          "orange",
+          "yellow"
+        ],
+        "correct": [
+          "red",
+          "orange",
+          "yellow"
+        ]
+      },
+      "gold": {
+        "prompt": "Order these from darkest to lightest.",
+        "items": [
+          "black",
+          "purple",
+          "pink",
+          "white"
+        ],
+        "correct": [
+          "black",
+          "purple",
+          "pink",
+          "white"
+        ]
+      }
+    }
+  },
+  {
+    "id": "sayit",
+    "type": "audio-speaking",
+    "label": "Say It",
+    "data": {
+      "bronze": {
+        "prompt": "Say the color of the sky.",
+        "target": "blue",
+        "keyWords": []
+      },
+      "silver": {
+        "prompt": "Say a sentence about your favorite color.",
+        "target": "My favorite color is green.",
+        "keyWords": []
+      },
+      "gold": {
+        "prompt": "Explain why you like this color.",
+        "target": "I like blue because it is calm.",
+        "keyWords": []
+      }
+    }
+  },
+  {
+    "id": "picword",
+    "type": "image-vocab",
+    "label": "Picture & Word",
+    "data": {
+      "bronze": {
+        "mode": "word-to-image",
+        "items": [
+          {
+            "word": "red",
+            "emoji": "🔴",
+            "image": null,
+            "sentence": "The apple is red."
+          },
+          {
+            "word": "blue",
+            "emoji": "🔵",
+            "image": null,
+            "sentence": "The sky is blue."
+          },
+          {
+            "word": "green",
+            "emoji": "🟢",
+            "image": null,
+            "sentence": "The grass is green."
+          },
+          {
+            "word": "yellow",
+            "emoji": "🟡",
+            "image": null,
+            "sentence": "The sun is yellow."
+          },
+          {
+            "word": "orange",
+            "emoji": "🟠",
+            "image": null,
+            "sentence": "The pumpkin is orange."
+          },
+          {
+            "word": "purple",
+            "emoji": "🟣",
+            "image": null,
+            "sentence": "The grape is purple."
+          }
+        ]
+      },
+      "silver": {
+        "mode": "image-to-word",
+        "items": [
+          {
+            "word": "red",
+            "emoji": "🔴",
+            "image": null,
+            "sentence": "The apple is red."
+          },
+          {
+            "word": "blue",
+            "emoji": "🔵",
+            "image": null,
+            "sentence": "The sky is blue."
+          },
+          {
+            "word": "green",
+            "emoji": "🟢",
+            "image": null,
+            "sentence": "The grass is green."
+          },
+          {
+            "word": "yellow",
+            "emoji": "🟡",
+            "image": null,
+            "sentence": "The sun is yellow."
+          },
+          {
+            "word": "orange",
+            "emoji": "🟠",
+            "image": null,
+            "sentence": "The pumpkin is orange."
+          },
+          {
+            "word": "purple",
+            "emoji": "🟣",
+            "image": null,
+            "sentence": "The grape is purple."
+          }
+        ]
+      },
+      "gold": {
+        "mode": "cloze-image",
+        "items": [
+          {
+            "word": "red",
+            "emoji": "🔴",
+            "image": null,
+            "sentence": "The apple is ___."
+          },
+          {
+            "word": "blue",
+            "emoji": "🔵",
+            "image": null,
+            "sentence": "The sky is ___."
+          },
+          {
+            "word": "green",
+            "emoji": "🟢",
+            "image": null,
+            "sentence": "The grass is ___."
+          },
+          {
+            "word": "yellow",
+            "emoji": "🟡",
+            "image": null,
+            "sentence": "The sun is ___."
+          },
+          {
+            "word": "orange",
+            "emoji": "🟠",
+            "image": null,
+            "sentence": "The pumpkin is ___."
+          },
+          {
+            "word": "purple",
+            "emoji": "🟣",
+            "image": null,
+            "sentence": "The grape is ___."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "wordscramble",
+    "type": "word-scramble",
+    "label": "Word Scramble",
+    "data": {
+      "bronze": {
+        "items": [
+          {
+            "word": "red",
+            "emoji": "🔴",
+            "sentence": ""
+          },
+          {
+            "word": "blue",
+            "emoji": "🔵",
+            "sentence": ""
+          },
+          {
+            "word": "green",
+            "emoji": "🟢",
+            "sentence": ""
+          },
+          {
+            "word": "pink",
+            "emoji": "🩷",
+            "sentence": ""
+          }
+        ]
+      },
+      "silver": {
+        "items": [
+          {
+            "word": "orange",
+            "emoji": "🟠",
+            "sentence": ""
+          },
+          {
+            "word": "purple",
+            "emoji": "🟣",
+            "sentence": ""
+          },
+          {
+            "word": "yellow",
+            "emoji": "🟡",
+            "sentence": ""
+          },
+          {
+            "word": "brown",
+            "emoji": "🟤",
+            "sentence": ""
+          }
+        ]
+      },
+      "gold": {
+        "items": [
+          {
+            "word": "violet",
+            "emoji": "🟣",
+            "sentence": ""
+          },
+          {
+            "word": "indigo",
+            "emoji": "🔵",
+            "sentence": ""
+          },
+          {
+            "word": "magenta",
+            "emoji": "🩷",
+            "sentence": ""
+          },
+          {
+            "word": "charcoal",
+            "emoji": "⚫",
+            "sentence": ""
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "spelling",
+    "type": "spelling",
+    "label": "Spelling",
+    "data": {
+      "bronze": {
+        "items": [
+          {
+            "word": "red",
+            "emoji": "🔴",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "blue",
+            "emoji": "🔵",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "green",
+            "emoji": "🟢",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "pink",
+            "emoji": "🩷",
+            "sentence": "",
+            "tokens": null
+          }
+        ]
+      },
+      "silver": {
+        "items": [
+          {
+            "word": "orange",
+            "emoji": "🟠",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "purple",
+            "emoji": "🟣",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "yellow",
+            "emoji": "🟡",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "brown",
+            "emoji": "🟤",
+            "sentence": "",
+            "tokens": null
+          }
+        ]
+      },
+      "gold": {
+        "items": [
+          {
+            "word": "turquoise",
+            "emoji": "🔵",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "maroon",
+            "emoji": "🔴",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "lavender",
+            "emoji": "🟣",
+            "sentence": "",
+            "tokens": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "listenmatch",
+    "type": "audio-match",
+    "label": "Listen & Match",
+    "data": {
+      "bronze": {
+        "pairs": [
+          {
+            "audio": "red",
+            "text": "red"
+          },
+          {
+            "audio": "blue",
+            "text": "blue"
+          },
+          {
+            "audio": "green",
+            "text": "green"
+          }
+        ]
+      },
+      "silver": {
+        "pairs": [
+          {
+            "audio": "red",
+            "text": "red"
+          },
+          {
+            "audio": "blue",
+            "text": "blue"
+          },
+          {
+            "audio": "green",
+            "text": "green"
+          },
+          {
+            "audio": "yellow",
+            "text": "yellow"
+          }
+        ]
+      },
+      "gold": {
+        "pairs": [
+          {
+            "audio": "red",
+            "text": "red"
+          },
+          {
+            "audio": "blue",
+            "text": "blue"
+          },
+          {
+            "audio": "green",
+            "text": "green"
+          },
+          {
+            "audio": "yellow",
+            "text": "yellow"
+          },
+          {
+            "audio": "purple",
+            "text": "purple"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "buildsentence",
+    "type": "sentence-building",
+    "label": "Build a Sentence",
+    "data": {
+      "bronze": {
+        "items": [
+          {
+            "tokens": [
+              {
+                "text": "The",
+                "role": null
+              },
+              {
+                "text": "sky",
+                "role": "subject"
+              },
+              {
+                "text": "is",
+                "role": "verb"
+              },
+              {
+                "text": "blue",
+                "role": "object"
+              }
+            ]
+          },
+          {
+            "tokens": [
+              {
+                "text": "The",
+                "role": null
+              },
+              {
+                "text": "grass",
+                "role": "subject"
+              },
+              {
+                "text": "is",
+                "role": "verb"
+              },
+              {
+                "text": "green",
+                "role": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "silver": {
+        "items": [
+          {
+            "tokens": [
+              {
+                "text": "I",
+                "role": "subject"
+              },
+              {
+                "text": "wear",
+                "role": "verb"
+              },
+              {
+                "text": "a",
+                "role": null
+              },
+              {
+                "text": "red",
+                "role": null
+              },
+              {
+                "text": "shirt",
+                "role": "object"
+              },
+              {
+                "text": "every day",
+                "role": "time"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "items": [
+          {
+            "tokens": [
+              {
+                "text": "I",
+                "role": "subject"
+              },
+              {
+                "text": "like",
+                "role": "verb"
+              },
+              {
+                "text": "blue",
+                "role": "object"
+              },
+              {
+                "text": "because",
+                "role": "connector"
+              },
+              {
+                "text": "it is calm",
+                "role": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+];
+
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+
+const state = {
+  student: null,
+  currentModuleIndex: 0,
+  currentTier: 'bronze',
+  results: buildResults()
+};
+
+function buildResults() {
+  return LESSON.map(() => ({
+    bronze:   { score: null, passed: false },
+    silver:   { score: null, passed: false },
+    gold:     { score: null, passed: false },
+    complete: false
+  }));
+}
+
+// ══════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════
+
+const TIERS = ['bronze','silver','gold'];
+const nextTier  = t => TIERS[TIERS.indexOf(t) + 1] || null;
+const cap       = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const el = document.getElementById(id);
+  el.style.display = 'flex';
+  el.classList.add('active');
+  el.scrollTop = 0;
+}
+
+// ══════════════════════════════════════════════════
+//  SCREEN 1 — NAME PICKER
+// ══════════════════════════════════════════════════
+
+const nameGrid = document.getElementById('name-grid');
+const startBtn = document.getElementById('start-btn');
+
+STUDENTS.forEach(name => {
+  const btn = document.createElement('button');
+  btn.className   = 'name-btn';
+  btn.textContent = name;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.student = name;
+    startBtn.classList.add('ready');
+  });
+  nameGrid.appendChild(btn);
+});
+
+startBtn.addEventListener('click', () => {
+  if (!state.student) return;
+  document.getElementById('header-name').textContent = state.student;
+  state.currentModuleIndex = 0;
+  state.currentTier = 'bronze';
+  state.results = buildResults();
+  startModule(0, 'bronze');
+});
+
+// ══════════════════════════════════════════════════
+//  SCREEN 2 — MODULE RUNNER
+// ══════════════════════════════════════════════════
+
+function startModule(moduleIndex, tier) {
+  state.currentModuleIndex = moduleIndex;
+  state.currentTier = tier;
+
+  const mod = LESSON[moduleIndex];
+
+  // Header
+  document.getElementById('header-name').textContent = state.student;
+
+  // Tier badge
+  const badge = document.getElementById('tier-badge');
+  badge.textContent = cap(tier);
+  badge.className = `tier-badge ${tier}`;
+
+  // Progress pips
+  const pipsEl = document.getElementById('progress-pips');
+  pipsEl.innerHTML = '';
+  LESSON.forEach((_, i) => {
+    const pip = document.createElement('div');
+    pip.className = 'pip'
+      + (state.results[i].complete ? ' done' : '')
+      + (i === moduleIndex && !state.results[i].complete ? ' current' : '');
+    pipsEl.appendChild(pip);
+  });
+
+  // Tier track
+  TIERS.forEach(t => {
+    const seg = document.getElementById(`seg-${t}`);
+    seg.className = `tier-seg ${t}`;
+    if (state.results[moduleIndex][t].passed) seg.classList.add('passed');
+    else if (t === tier) seg.classList.add('active');
+  });
+
+  showScreen('screen-module');
+
+  // Render module
+  const container = document.getElementById('module-container');
+  container.innerHTML = '';
+
+  const renderer = MODULE_REGISTRY[mod.type];
+  if (!renderer) {
+    container.innerHTML = `<p style="color:var(--text-dim);padding:32px 0;text-align:center">Module type "${mod.type}" not registered.</p>`;
+    return;
+  }
+
+  renderer.render(container, mod.data[tier], tier, score => {
+    handleTierResult(moduleIndex, tier, score);
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  TIER RESULT HANDLER
+// ══════════════════════════════════════════════════
+
+function handleTierResult(moduleIndex, tier, score) {
+  const passed = score >= PASS_THRESHOLD;
+  state.results[moduleIndex][tier] = { score, passed };
+
+  const pct      = Math.round(score * 100);
+  const tierName = cap(tier);
+  const next     = nextTier(tier);
+
+  const stars   = pct === 100 ? 3 : pct >= 60 ? 2 : pct > 0 ? 1 : 0;
+  const starStr = '⭐'.repeat(stars) + '✩'.repeat(3 - stars);
+  document.getElementById('result-icon').textContent  = starStr;
+  document.getElementById('result-title').textContent = passed ? `${tierName} passed!` : `${tierName} — try again`;
+  document.getElementById('result-score').innerHTML   = pct === 100 ? 'Perfect!' : `${pct}% correct`;
+
+  const ctaBtn = document.getElementById('result-cta');
+  const secBtn = document.getElementById('result-secondary');
+  secBtn.style.display = 'none';
+
+  if (passed && next) {
+    // Unlock next tier
+    document.getElementById('result-msg').innerHTML =
+      `Great work! <strong>${cap(next)}</strong> is now unlocked.`;
+    ctaBtn.textContent = `Try ${cap(next)} →`;
+    ctaBtn.onclick = () => startModule(moduleIndex, next);
+
+  } else if (passed && !next) {
+    // Gold passed → module complete
+    state.results[moduleIndex].complete = true;
+    const nextMod = moduleIndex + 1;
+
+    if (nextMod < LESSON.length) {
+      document.getElementById('result-msg').innerHTML =
+        `<strong>Module complete!</strong> Moving to the next exercise.`;
+      ctaBtn.textContent = 'Next module →';
+      ctaBtn.onclick = () => startModule(nextMod, 'bronze');
+    } else {
+      document.getElementById('result-msg').innerHTML =
+        `<strong>All done!</strong> You've completed every module.`;
+      ctaBtn.textContent = 'See my results →';
+      ctaBtn.onclick = () => showEndScreen();
+    }
+
+  } else {
+    // Failed
+    document.getElementById('result-msg').innerHTML =
+      `You need <strong>${Math.round(PASS_THRESHOLD * 100)}%</strong> to unlock the next level. You can do it!`;
+    ctaBtn.textContent = `↩ Try ${tierName} again`;
+    ctaBtn.onclick = () => startModule(moduleIndex, tier);
+  }
+
+  showScreen('screen-tier-result');
+}
+
+// ══════════════════════════════════════════════════
+//  SCREEN 4 — END SCREEN
+// ══════════════════════════════════════════════════
+
+function showEndScreen() {
+  document.getElementById('end-name').textContent = state.student;
+
+  // Overall score: highest-tier score per module, averaged
+  let total = 0;
+  state.results.forEach(r => {
+    for (const t of ['gold','silver','bronze']) {
+      if (r[t].score !== null) { total += r[t].score; break; }
+    }
+  });
+  const overallPct = Math.round((total / LESSON.length) * 100);
+  document.getElementById('end-total').innerHTML = `Overall score: <span>${overallPct}%</span>`;
+
+  const summaryList = document.getElementById('summary-list');
+  summaryList.innerHTML = '';
+  let hasIncomplete = false;
+
+  LESSON.forEach((mod, i) => {
+    const r = state.results[i];
+    if (!r.complete) hasIncomplete = true;
+
+    let highestTier = null, highestScore = null;
+    for (const t of ['gold','silver','bronze']) {
+      if (r[t].score !== null) { highestTier = t; highestScore = r[t].score; break; }
+    }
+
+    const item = document.createElement('div');
+    item.className = 'summary-item';
+    item.innerHTML = `
+      <div>
+        <div class="summary-item-label">${mod.label}</div>
+        <div class="summary-item-detail">${
+          highestScore !== null
+            ? `${cap(highestTier)} · ${Math.round(highestScore * 100)}%`
+            : 'Not attempted'
+        }</div>
+      </div>
+      <div class="summary-status ${r.complete ? 'complete' : 'incomplete'}">
+        ${r.complete ? '✓ Done' : 'Retry'}
+      </div>
+    `;
+    summaryList.appendChild(item);
+  });
+
+  const retryBtn = document.getElementById('retry-btn');
+  retryBtn.style.display = hasIncomplete ? 'block' : 'none';
+  retryBtn.onclick = retryFailed;
+
+  document.getElementById('done-btn').onclick = () => {
+    resetAll();
+    showScreen('screen-name');
+  };
+
+  showScreen('screen-end');
+}
+
+function retryFailed() {
+  const idx = state.results.findIndex(r => !r.complete);
+  if (idx === -1) { showEndScreen(); return; }
+  const r = state.results[idx];
+  const tier = r.silver.passed ? 'gold' : r.bronze.passed ? 'silver' : 'bronze';
+  startModule(idx, tier);
+}
+
+function resetAll() {
+  state.student = null;
+  state.results = buildResults();
+  document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+  startBtn.classList.remove('ready');
+}
+
+// ══════════════════════════════════════════════════
+//  MODULE REGISTRY
+//  Contract: render(container, data, tier, onComplete)
+//  onComplete(score)  score = 0–1
+// ══════════════════════════════════════════════════
+
+// Render ID — incremented on every render call.
+// All async callbacks (onend, setTimeout) check this before acting
+// so stale callbacks from a previous render can never fire into a new one.
+let _audioRID = 0;
+
+// ══════════════════════════════════════════════════
+//  SHARED UTILITIES
+//  speak(), speakThenSentence(), safeShuffle(),
+//  showReinforcePanel() — used by new module types
+// ══════════════════════════════════════════════════
+
+const TTS = window.speechSynthesis || null;
+
+const SPEAK_MOODS = {
+  neutral:   { rate:0.85, pitch:1.0,  volume:0.9 },
+  wrong:     { rate:0.80, pitch:0.9,  volume:0.8 },
+  celebrate: { rate:1.15, pitch:1.55, volume:1.0 },
+};
+
+function speak(text, mood='neutral', delay=0, audioFile=null) {
+  setTimeout(() => {
+    if (audioFile) {
+      const a = new Audio(audioFile);
+      a.onerror = () => speakViaTTS(text, mood); // missing/broken file — fall back, never go silent
+      a.play().catch(() => speakViaTTS(text, mood));
+      return;
+    }
+    speakViaTTS(text, mood);
+  }, delay);
+}
+
+function speakViaTTS(text, mood='neutral') {
+  if (!TTS) return;
+  TTS.cancel();
+  let u;
+  try { u = new SpeechSynthesisUtterance(text); } catch(e) { return; }
+  const m = SPEAK_MOODS[mood];
+  u.rate = m.rate; u.pitch = m.pitch; u.volume = m.volume;
+  TTS.speak(u);
+}
+
+function speakThenSentence(word, sentence, wordMood='celebrate', wordAudioFile=null, sentenceAudioFile=null) {
+  const playSentencePart = () => {
+    setTimeout(() => {
+      if (sentenceAudioFile) {
+        const a = new Audio(sentenceAudioFile);
+        a.onerror = () => speakViaTTS(sentence, 'neutral');
+        a.play().catch(() => speakViaTTS(sentence, 'neutral'));
+      } else {
+        speakViaTTS(sentence, 'neutral');
+      }
+    }, 400);
+  };
+
+  if (wordAudioFile) {
+    const wa = new Audio(wordAudioFile);
+    let done = false;
+    const advance = () => { if (done) return; done = true; playSentencePart(); };
+    wa.onended = advance;
+    wa.onerror = () => { done = true; speakWordThenSentenceViaTTS(word, sentence, wordMood); };
+    wa.play().catch(() => { done = true; speakWordThenSentenceViaTTS(word, sentence, wordMood); });
+    // No reliable duration fallback for a file we haven't loaded yet — onended covers the
+    // normal case; onerror/play() rejection covers the broken-file case.
+    return;
+  }
+  speakWordThenSentenceViaTTS(word, sentence, wordMood);
+}
+
+function speakWordThenSentenceViaTTS(word, sentence, wordMood='celebrate') {
+  if (!TTS) return;
+  TTS.cancel();
+  let wu;
+  try { wu = new SpeechSynthesisUtterance(word); } catch(e) { return; }
+  const wm = SPEAK_MOODS[wordMood];
+  wu.rate = wm.rate; wu.pitch = wm.pitch; wu.volume = wm.volume;
+  let done = false;
+  const playSentence = () => {
+    if (done) return; done = true;
+    setTimeout(() => {
+      if (!TTS) return;
+      let su;
+      try { su = new SpeechSynthesisUtterance(sentence); } catch(e) { return; }
+      const nm = SPEAK_MOODS['neutral'];
+      su.rate = nm.rate; su.pitch = nm.pitch; su.volume = nm.volume;
+      TTS.speak(su);
+    }, 400);
+  };
+  wu.onend = playSentence;
+  const fallback = Math.max(1200, (word.length / wu.rate) * 120) + 600;
+  setTimeout(playSentence, fallback);
+  TTS.speak(wu);
+}
+
+// Never returns a shuffled array that satisfies badFn (e.g. same order as input)
+function safeShuffle(arr, badFn, maxAttempts=20) {
+  const sh = a => [...a].sort(() => Math.random() - .5);
+  let result = sh(arr), attempts = 0;
+  while (badFn(result) && attempts++ < maxAttempts) result = sh(arr);
+  return result;
+}
+
+// Shared reinforcement panel — slides up, shows emoji/word/sentence, auto-closes
+const MIN_READ_MS   = 3500;
+const READ_PAUSE_MS = 1800;
+
+function showReinforcePanel(item, onClose) {
+  const plain = item.sentence.replace(/<[^>]+>/g, '');
+  const panel = document.getElementById('reinforce-panel');
+  const bar   = document.getElementById('rp-bar');
+
+  document.getElementById('rp-em').innerHTML = item.image
+    ? `<img src="${item.image}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;" alt="${item.word}">`
+    : item.emoji;
+  document.getElementById('rp-word').textContent = item.word;
+  document.getElementById('rp-sent').innerHTML   = item.sentence;
+
+  panel.style.transform = 'translateY(0)';
+
+  const wordMs  = Math.max(800,  (item.word.length / SPEAK_MOODS.celebrate.rate) * 120);
+  const sentMs  = Math.max(1500, (plain.length      / SPEAK_MOODS.neutral.rate)  * 60);
+  const panelMs = Math.max(MIN_READ_MS, wordMs + 400 + sentMs + READ_PAUSE_MS);
+
+  bar.style.transition = 'none'; bar.style.width = '0%';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    bar.style.transition = `width ${panelMs}ms linear`;
+    bar.style.width = '100%';
+  }));
+
+  speakThenSentence(item.word, plain, 'celebrate', item.audioFile, item.sentenceAudioFile);
+
+  setTimeout(() => {
+    panel.style.transform = 'translateY(100%)';
+    bar.style.transition = 'none'; bar.style.width = '0%';
+    if (onClose) onClose();
+  }, panelMs);
+}
+
+const MODULE_REGISTRY = {
+
+  // ─────────────────────────────────────────────
+  //  AUDIO UNDERSTANDING
+  //  Bronze: word → options unlock after 400ms safety window
+  //          (prevents ghost-click / tap-through from previous screen)
+  //  Silver: sentence → options appear after first listen
+  //  Gold:   sentence → options appear when audio ends,
+  //                     hidden again on replay
+  // ─────────────────────────────────────────────
+  'audio-understanding': {
+    render(container, data, tier, onComplete) {
+
+      const myRID    = ++_audioRID;   // snapshot this render's ID
+
+      const isBronze = tier === 'bronze';
+      const isSilver = tier === 'silver';
+      const isGold   = tier === 'gold';
+
+      let hasPlayed = false;
+      let playing   = false;
+      let answered  = false;
+
+      container.innerHTML = `
+        <p class="module-question">${data.question}</p>
+        <button class="listen-btn" id="listen-btn">
+          <span id="listen-icon">🔊</span>
+          <span id="listen-label">Listen</span>
+        </button>
+        <div class="options-grid" id="options-grid"></div>
+        <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
+      `;
+
+      const listenBtn  = container.querySelector('#listen-btn');
+      const listenIcon = container.querySelector('#listen-icon');
+      const listenLbl  = container.querySelector('#listen-label');
+      const grid       = container.querySelector('#options-grid');
+      const nextBtn    = container.querySelector('#next-btn');
+
+      // ── Build options ──────────────────────────────────────
+      // ALL options start disabled + locked, regardless of tier.
+      // Bronze unlocks via setTimeout below.
+      // Silver / Gold unlock after audio plays.
+      data.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className   = 'option-btn locked';
+        btn.textContent = opt;
+        btn.disabled    = true;
+
+        btn.addEventListener('click', () => {
+          if (answered || btn.disabled) return;
+          answered = true;
+          TTS && TTS.cancel();
+
+          const correct = (opt === data.answer);
+          btn.classList.add(correct ? 'correct' : 'wrong');
+          if (!correct) {
+            grid.querySelectorAll('.option-btn').forEach(b => {
+              if (b.textContent === data.answer) b.classList.add('correct');
+            });
+          }
+          grid.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+          nextBtn.style.display = 'block';
+          nextBtn.onclick = () => onComplete(correct ? 1 : 0);
+        });
+
+        grid.appendChild(btn);
+      });
+
+      // ── Unlock / lock helpers ──────────────────────────────
+      function unlockOptions() {
+        if (answered) return;
+        grid.querySelectorAll('.option-btn').forEach(b => {
+          b.classList.remove('locked');
+          b.disabled = false;
+        });
+      }
+      function lockOptions() {
+        if (answered) return;
+        grid.querySelectorAll('.option-btn').forEach(b => {
+          b.classList.add('locked');
+          b.disabled = true;
+        });
+      }
+
+      // Bronze: unlock after 400ms — prevents ghost clicks / tap-through
+      // events from the previous screen landing on newly rendered buttons.
+      if (isBronze) {
+        setTimeout(() => {
+          if (_audioRID !== myRID || answered) return; // stale or already done
+          unlockOptions();
+        }, 400);
+      }
+
+      // ── TTS ───────────────────────────────────────────────
+      function finishPlayback() {
+        if (_audioRID !== myRID) return;
+        playing = false;
+        hasPlayed = true;
+        listenIcon.textContent = '🔊';
+        listenLbl.textContent  = 'Listen again';
+        listenBtn.classList.remove('playing');
+        if (isSilver || isGold) unlockOptions();
+      }
+
+      function speak() {
+        if (playing) return;
+        playing = true;
+        listenIcon.textContent = '⏸';
+        listenLbl.textContent  = 'Playing…';
+        listenBtn.classList.add('playing');
+
+        // Gold: hide options on replay
+        if (isGold && hasPlayed) lockOptions();
+
+        if (data.audioFile) {
+          const a = new Audio(data.audioFile);
+          a.onended = finishPlayback;
+          a.onerror = () => speakViaSynthesis();
+          a.play().catch(() => speakViaSynthesis());
+          return;
+        }
+        speakViaSynthesis();
+      }
+
+      function speakViaSynthesis() {
+        if (!TTS) { playing = false; unlockOptions(); return; }
+        TTS.cancel();
+        let u;
+        try { u = new SpeechSynthesisUtterance(data.audio); }
+        catch(e) { playing = false; unlockOptions(); return; }
+        u.rate  = isBronze ? 0.8 : 0.85;
+        u.lang  = 'en-US';
+        u.onend = finishPlayback;
+        TTS.speak(u);
+      }
+
+      listenBtn.addEventListener('click', speak);
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  GAP FILL
+  //  One blank per question. Tap a word to fill it.
+  //  Tap the same word again to clear.
+  //  Check button confirms answer.
+  // ─────────────────────────────────────────────
+  'gap-fill': {
+    render(container, data, tier, onComplete) {
+      const { sentence, options, answer } = data;
+      let filled   = null;
+      let answered = false;
+
+      const sentenceHTML = sentence.replace(
+        '___',
+        '<span class="blank-slot" id="blank-slot">___</span>'
+      );
+
+      container.innerHTML = `
+        <p class="module-question">Choose the missing word.</p>
+        <div class="sentence-display">${sentenceHTML}</div>
+        <div class="word-bank" id="word-bank"></div>
+        <button class="next-ex-btn" id="check-btn" style="display:none;margin-top:16px">Check ✓</button>
+        <button class="next-ex-btn" id="next-btn"  style="display:none">Next →</button>
+      `;
+
+      const blankSlot = container.querySelector('#blank-slot');
+      const wordBank  = container.querySelector('#word-bank');
+      const checkBtn  = container.querySelector('#check-btn');
+      const nextBtn   = container.querySelector('#next-btn');
+
+      // Shuffle options
+      [...options].sort(() => Math.random() - 0.5).forEach(word => {
+        const btn = document.createElement('button');
+        btn.className    = 'word-btn';
+        btn.textContent  = word;
+        btn.dataset.word = word;
+
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          // Toggle: tap same word to deselect
+          if (filled === word) {
+            filled = null;
+            btn.classList.remove('selected');
+            blankSlot.textContent  = '___';
+            blankSlot.style.color  = '';
+            checkBtn.style.display = 'none';
+          } else {
+            // Deselect previous
+            wordBank.querySelectorAll('.word-btn').forEach(b => b.classList.remove('selected'));
+            filled = word;
+            btn.classList.add('selected');
+            blankSlot.textContent  = word;
+            blankSlot.style.color  = 'var(--text)';
+            checkBtn.style.display = 'block';
+          }
+        });
+
+        wordBank.appendChild(btn);
+      });
+
+      checkBtn.addEventListener('click', () => {
+        if (!filled || answered) return;
+        answered = true;
+
+        const correct = (filled === answer);
+
+        // Style the blank
+        blankSlot.style.color       = correct ? 'var(--pass)' : 'var(--fail)';
+        blankSlot.style.borderColor = correct ? 'var(--pass)' : 'var(--fail)';
+
+        // Style word bank buttons
+        wordBank.querySelectorAll('.word-btn').forEach(b => {
+          b.disabled = true;
+          if (b.dataset.word === answer)  b.classList.add('correct');
+          if (b.dataset.word === filled && !correct) b.classList.add('wrong');
+          b.classList.remove('selected');
+        });
+
+        // If wrong, show correct answer in blank too
+        if (!correct) {
+          setTimeout(() => { blankSlot.textContent = answer; }, 400);
+        }
+
+        checkBtn.style.display = 'none';
+        nextBtn.style.display  = 'block';
+        nextBtn.onclick = () => onComplete(correct ? 1 : 0);
+      });
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  TRUE / FALSE
+  //  Statement shown. Two big buttons.
+  //  Tap one → immediate feedback, show correct.
+  // ─────────────────────────────────────────────
+  'true-false': {
+    render(container, data, tier, onComplete) {
+      const { statement, answer } = data;
+
+      container.innerHTML = `
+        <p class="module-question">Is this true or false?</p>
+        <div class="tf-statement">${statement}</div>
+        <div class="tf-buttons">
+          <button class="tf-btn true-btn"  id="true-btn">✓ True</button>
+          <button class="tf-btn false-btn" id="false-btn">✗ False</button>
+        </div>
+        <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
+      `;
+
+      const trueBtn  = container.querySelector('#true-btn');
+      const falseBtn = container.querySelector('#false-btn');
+      const nextBtn  = container.querySelector('#next-btn');
+
+      function handleAnswer(chosen) {
+        const correct = (chosen === answer);
+
+        // Mark chosen button
+        const chosenBtn = chosen ? trueBtn : falseBtn;
+        chosenBtn.classList.add(correct ? 'highlight-correct' : 'highlight-wrong');
+
+        // Always show which was correct
+        if (!correct) {
+          const correctBtn = answer ? trueBtn : falseBtn;
+          correctBtn.classList.add('highlight-correct');
+        }
+
+        trueBtn.disabled  = true;
+        falseBtn.disabled = true;
+        nextBtn.style.display = 'block';
+        nextBtn.onclick = () => onComplete(correct ? 1 : 0);
+      }
+
+      trueBtn.addEventListener('click',  () => handleAnswer(true));
+      falseBtn.addEventListener('click', () => handleAnswer(false));
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  WORD MATCH
+  //  Tap a word on the left, then its match on the right.
+  //  Each matched pair gets a distinct colour from PALETTE.
+  //  Wrong → both flash red, deselect.
+  //  Score: 1.0 minus 0.1 per wrong attempt (floor 0.6).
+  // ─────────────────────────────────────────────
+  'word-match': {
+    render(container, data, tier, onComplete) {
+      const { pairs } = data;
+      let selectedLeft = null;
+      let matchedCount = 0;
+      let wrongCount   = 0;
+      const total      = pairs.length;
+
+      // One distinct colour per pair — dark-theme friendly
+      const PALETTE = [
+        { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' }, // teal
+        { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' }, // purple
+        { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' }, // orange
+        { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' }, // pink
+        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' }, // lime
+      ];
+
+      container.innerHTML = `
+        <p class="module-question">Match the words.</p>
+        <p class="match-score" id="match-score">${total} pairs to match</p>
+        <div class="match-grid">
+          <div class="match-col" id="left-col"></div>
+          <div class="match-col" id="right-col"></div>
+        </div>
+        <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
+      `;
+
+      const leftCol    = container.querySelector('#left-col');
+      const rightCol   = container.querySelector('#right-col');
+      const scoreLabel = container.querySelector('#match-score');
+      const nextBtn    = container.querySelector('#next-btn');
+
+      // Shuffle both columns independently, preserving pair index
+      const leftItems  = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
+      const rightItems = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
+
+      leftItems.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className       = 'match-btn';
+        btn.textContent     = pair.left;
+        btn.dataset.key     = pair.left;
+        btn.dataset.side    = 'left';
+        btn.dataset.pairIdx = pair.pairIdx;
+        leftCol.appendChild(btn);
+      });
+
+      rightItems.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className       = 'match-btn';
+        btn.textContent     = pair.right;
+        btn.dataset.key     = pair.left;   // keyed by left value
+        btn.dataset.side    = 'right';
+        btn.dataset.pairIdx = pair.pairIdx;
+        rightCol.appendChild(btn);
+      });
+
+      function applyMatchColor(btn) {
+        const c = PALETTE[parseInt(btn.dataset.pairIdx) % PALETTE.length];
+        btn.style.borderColor = c.border;
+        btn.style.background  = c.bg;
+        btn.style.color       = c.color;
+        btn.classList.add('matched');
+        btn.disabled = true;
+      }
+
+      container.querySelectorAll('.match-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('matched')) return;
+
+          if (btn.dataset.side === 'left') {
+            container.querySelectorAll('.match-btn[data-side="left"]')
+              .forEach(b => b.classList.remove('selected'));
+            if (selectedLeft === btn) {
+              selectedLeft = null;
+            } else {
+              selectedLeft = btn;
+              btn.classList.add('selected');
+            }
+            return;
+          }
+
+          if (!selectedLeft) return;
+
+          const isMatch = (selectedLeft.dataset.key === btn.dataset.key);
+
+          if (isMatch) {
+            const leftBtn = selectedLeft;
+            selectedLeft  = null;
+            applyMatchColor(leftBtn);
+            applyMatchColor(btn);
+            matchedCount++;
+
+            const remaining = total - matchedCount;
+            scoreLabel.textContent = remaining > 0
+              ? `${remaining} pair${remaining > 1 ? 's' : ''} left`
+              : 'All matched! ✓';
+
+            if (matchedCount === total) {
+              const score = Math.max(0.6, 1 - (wrongCount * 0.1));
+              nextBtn.style.display = 'block';
+              nextBtn.onclick = () => onComplete(score);
+            }
+          } else {
+            wrongCount++;
+            selectedLeft.classList.add('wrong-flash');
+            btn.classList.add('wrong-flash');
+            const prevLeft = selectedLeft;
+            selectedLeft   = null;
+            setTimeout(() => {
+              prevLeft.classList.remove('wrong-flash', 'selected');
+              btn.classList.remove('wrong-flash');
+            }, 500);
+          }
+        });
+      });
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  SEQUENCING
+  //  Items shown in pool. Tap to place into numbered slots.
+  //  Tap a filled slot to return item to pool.
+  //  Check button appears when all slots filled.
+  //  Score: correct positions / total.
+  // ─────────────────────────────────────────────
+  'sequencing': {
+    render(container, data, tier, onComplete) {
+      const { prompt, items, correct } = data;
+      const slots    = new Array(correct.length).fill(null);
+      let checked    = false;
+
+      // Shuffle pool
+      const shuffled = [...items].sort(() => Math.random() - 0.5);
+
+      container.innerHTML = `
+        <p class="seq-prompt">${prompt}</p>
+        <div class="seq-slots" id="seq-slots"></div>
+        <p class="seq-pool-label">Tap to place ↓</p>
+        <div class="seq-pool"  id="seq-pool"></div>
+        <button class="next-ex-btn" id="check-btn" style="display:none;margin-top:4px">Check ✓</button>
+        <button class="next-ex-btn" id="next-btn"  style="display:none">Next →</button>
+      `;
+
+      const slotsEl  = container.querySelector('#seq-slots');
+      const poolEl   = container.querySelector('#seq-pool');
+      const checkBtn = container.querySelector('#check-btn');
+      const nextBtn  = container.querySelector('#next-btn');
+
+      // ── Render slots ───────────────────────────
+      function renderSlots() {
+        slotsEl.innerHTML = '';
+        slots.forEach((val, i) => {
+          const slot = document.createElement('div');
+          slot.className = 'seq-slot' + (val ? ' filled' : '');
+          slot.innerHTML = `<div class="slot-num">${i + 1}</div><div class="slot-text">${val || ''}</div>`;
+
+          if (val && !checked) {
+            slot.addEventListener('click', () => {
+              // Return item to pool
+              const word = slots[i];
+              slots[i] = null;
+              poolEl.querySelectorAll('.seq-item').forEach(b => {
+                if (b.dataset.word === word) b.classList.remove('used');
+              });
+              renderSlots();
+              updateCheck();
+            });
+          }
+
+          slotsEl.appendChild(slot);
+        });
+      }
+
+      function updateCheck() {
+        checkBtn.style.display = slots.every(s => s !== null) ? 'block' : 'none';
+      }
+
+      // ── Render pool ────────────────────────────
+      shuffled.forEach(word => {
+        const btn = document.createElement('button');
+        btn.className    = 'seq-item';
+        btn.textContent  = word;
+        btn.dataset.word = word;
+
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('used') || checked) return;
+          const emptyIdx = slots.indexOf(null);
+          if (emptyIdx === -1) return;
+          slots[emptyIdx] = word;
+          btn.classList.add('used');
+          renderSlots();
+          updateCheck();
+        });
+
+        poolEl.appendChild(btn);
+      });
+
+      // ── Check answer ───────────────────────────
+      checkBtn.addEventListener('click', () => {
+        if (checked) return;
+        checked = true;
+        checkBtn.style.display = 'none';
+
+        // Disable pool items
+        poolEl.querySelectorAll('.seq-item').forEach(b => b.style.pointerEvents = 'none');
+
+        let correctCount = 0;
+        slotsEl.querySelectorAll('.seq-slot').forEach((slot, i) => {
+          const isCorrect = (slots[i] === correct[i]);
+          slot.classList.add(isCorrect ? 'correct' : 'wrong');
+          // Show correct label if wrong
+          if (!isCorrect) {
+            slot.querySelector('.slot-text').innerHTML =
+              `<span style="text-decoration:line-through;opacity:0.5">${slots[i]}</span>
+               <span style="color:var(--pass);margin-left:6px">→ ${correct[i]}</span>`;
+          }
+          if (isCorrect) correctCount++;
+        });
+
+        nextBtn.style.display = 'block';
+        nextBtn.onclick = () => onComplete(correctCount / correct.length);
+      });
+
+      renderSlots();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  AUDIO SPEAKING
+  //  Three-button compare mechanic:
+  //    [🔊 Model] — plays TTS (swap src for MP3 later)
+  //    [▶ You]   — plays back student's recording (unlocks after first record)
+  //    [🎤 Rec]  — records / re-records via MediaRecorder
+  //
+  //  Uses MediaRecorder API (works on iOS Safari 14.5+, Chrome, Firefox, Edge).
+  //  Falls back to model-only + self-assess if mic permission denied.
+  //  Scoring: self-assess only — student decides when they're happy.
+  // ─────────────────────────────────────────────
+  'audio-speaking': {
+    render(container, data, tier, onComplete) {
+      const { prompt, target } = data;
+      const isBronze = tier === 'bronze';
+
+      let modelPlaying   = false;
+      let modelAudio     = null;
+      let selfPlaying    = false;
+      let isRecording    = false;
+      let done           = false;
+      let recordingBlob  = null;
+      let selfAudio      = null;
+      let mediaRecorder  = null;
+      let stream         = null;
+
+      container.innerHTML = `
+        <p class="module-question">${prompt}</p>
+        <div class="speak-target">${target}</div>
+        <div class="speak-trio">
+          <button class="trio-btn model" id="model-btn">
+            <span class="trio-icon" id="model-icon">🔊</span>
+            <span class="trio-label">Model</span>
+          </button>
+          <button class="trio-btn playback" id="play-btn">
+            <span class="trio-icon" id="play-icon">▶</span>
+            <span class="trio-label">You</span>
+          </button>
+          <button class="trio-btn record" id="rec-btn">
+            <span class="trio-icon" id="rec-icon">🎤</span>
+            <span class="trio-label" id="rec-label">Record</span>
+          </button>
+        </div>
+        <p class="speak-hint" id="speak-hint">Hear the model, then record yourself.</p>
+        <div id="assess-wrap" style="display:none">
+          <div class="assess-btns">
+            <button class="assess-btn assess-yes" id="assess-yes">✓ That sounded right</button>
+            <button class="assess-btn assess-no"  id="assess-no">↩ I need more practice</button>
+          </div>
+        </div>
+        <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
+      `;
+
+      const modelBtn  = container.querySelector('#model-btn');
+      const modelIcon = container.querySelector('#model-icon');
+      const playBtn   = container.querySelector('#play-btn');
+      const playIcon  = container.querySelector('#play-icon');
+      const recBtn    = container.querySelector('#rec-btn');
+      const recIcon   = container.querySelector('#rec-icon');
+      const recLabel  = container.querySelector('#rec-label');
+      const hint      = container.querySelector('#speak-hint');
+      const assessWrap= container.querySelector('#assess-wrap');
+      const yesBtn    = container.querySelector('#assess-yes');
+      const noBtn     = container.querySelector('#assess-no');
+      const nextBtn   = container.querySelector('#next-btn');
+
+      // ── Model audio ─────────────────────────────
+      function finishModelPlayback() {
+        modelPlaying = false;
+        modelIcon.textContent = '🔊';
+        modelBtn.classList.remove('playing');
+      }
+
+      function playModel() {
+        if (modelPlaying) return;
+        stopSelf();
+        modelPlaying = true;
+        modelIcon.textContent = '⏸';
+        modelBtn.classList.add('playing');
+
+        if (data.audioFile) {
+          const a = new Audio(data.audioFile);
+          modelAudio = a;
+          a.onended = finishModelPlayback;
+          a.onerror = () => playModelViaSynthesis();
+          a.play().catch(() => playModelViaSynthesis());
+          return;
+        }
+        playModelViaSynthesis();
+      }
+
+      function playModelViaSynthesis() {
+        if (!TTS) { modelPlaying = false; return; }
+        TTS.cancel();
+        let u;
+        try { u = new SpeechSynthesisUtterance(target); }
+        catch(e) { modelPlaying = false; return; }
+        u.rate   = isBronze ? 0.8 : 0.85;
+        u.lang   = 'en-US';
+        u.onend  = finishModelPlayback;
+        TTS.speak(u);
+      }
+
+      modelBtn.addEventListener('click', () => {
+        if (modelPlaying) {
+          TTS && TTS.cancel();
+          if (modelAudio) { modelAudio.pause(); modelAudio.currentTime = 0; modelAudio = null; }
+          modelPlaying = false;
+          modelIcon.textContent = '🔊';
+          modelBtn.classList.remove('playing');
+        } else {
+          playModel();
+        }
+      });
+
+      // ── Self playback ──────────────────────────
+      function stopSelf() {
+        if (selfAudio) { selfAudio.pause(); selfAudio.currentTime = 0; }
+        selfPlaying = false;
+        playIcon.textContent = '▶';
+        playBtn.classList.remove('playing');
+      }
+
+      playBtn.addEventListener('click', () => {
+        if (!recordingBlob || isRecording || done) return;
+        if (selfPlaying) { stopSelf(); return; }
+
+        TTS && TTS.cancel();
+        modelPlaying = false;
+        modelIcon.textContent = '🔊';
+        modelBtn.classList.remove('playing');
+
+        selfPlaying = true;
+        playIcon.textContent = '⏸';
+        playBtn.classList.add('playing');
+
+        const url  = URL.createObjectURL(recordingBlob);
+        selfAudio  = new Audio(url);
+        selfAudio.play();
+        selfAudio.onended = () => {
+          stopSelf();
+          URL.revokeObjectURL(url);
+        };
+      });
+
+      // ── MediaRecorder ──────────────────────────
+      recBtn.addEventListener('click', async () => {
+        if (done) return;
+
+        if (isRecording) {
+          // Stop recording
+          mediaRecorder.stop();
+          return;
+        }
+
+        // Stop any playback first
+        stopSelf();
+        TTS && TTS.cancel();
+        modelPlaying = false;
+        modelIcon.textContent = '🔊';
+        modelBtn.classList.remove('playing');
+
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+          const mimeType = MediaRecorder.isTypeSupported('audio/webm')
+            ? 'audio/webm' : 'audio/mp4';
+
+          const chunks  = [];
+          mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+          mediaRecorder.ondataavailable = e => {
+            if (e.data.size > 0) chunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            // Release mic
+            stream.getTracks().forEach(t => t.stop());
+            isRecording = false;
+            recIcon.textContent  = '🎤';
+            recLabel.textContent = 'Re-record';
+            recBtn.classList.remove('recording');
+
+            recordingBlob = new Blob(chunks, { type: mimeType });
+
+            // Unlock playback button
+            playBtn.classList.add('ready');
+
+            // Show self-assess after first recording
+            assessWrap.style.display = 'block';
+            hint.textContent = 'Listen to both, then tap how it went.';
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recIcon.textContent  = '⏹';
+          recLabel.textContent = 'Stop';
+          recBtn.classList.add('recording');
+          hint.textContent = 'Recording… tap ⏹ to stop.';
+
+        } catch (err) {
+          // Mic permission denied or not available — fallback
+          showNoMicFallback();
+        }
+      });
+
+      // ── Self-assess ────────────────────────────
+      function lockAssess() {
+        done = true;
+        yesBtn.disabled = true;
+        noBtn.disabled  = true;
+        if (stream) stream.getTracks().forEach(t => t.stop());
+      }
+
+      yesBtn.addEventListener('click', () => {
+        if (done) return;
+        yesBtn.classList.add('selected');
+        lockAssess();
+        nextBtn.style.display = 'block';
+        nextBtn.onclick = () => onComplete(1);
+      });
+
+      noBtn.addEventListener('click', () => {
+        if (done) return;
+        noBtn.classList.add('selected');
+        lockAssess();
+        nextBtn.style.display = 'block';
+        nextBtn.onclick = () => onComplete(0);
+      });
+
+      // ── No-mic fallback ────────────────────────
+      function showNoMicFallback() {
+        recBtn.style.display  = 'none';
+        playBtn.style.display = 'none';
+        const msg = document.createElement('div');
+        msg.className   = 'no-mic-msg';
+        msg.textContent = 'Microphone not available. Listen to the model, say it aloud, then tap how it went.';
+        container.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
+        assessWrap.style.display = 'block';
+        hint.style.display = 'none';
+      }
+    }
+  },
+
+
+
+  // ─────────────────────────────────────────────
+  //  IMAGE VOCAB
+  //  Bronze: image → tap correct word
+  //  Silver: word  → tap correct image
+  //  Gold:   image + sentence blank → word bank
+  // ─────────────────────────────────────────────
+  'image-vocab': {
+    render(container, data, tier, onComplete) {
+      const { mode, items } = data;
+      const PICK = Math.min(items.length, 3);
+      const session = safeShuffle(items, () => false).slice(0, PICK);
+      let idx = 0, score = 0, locked = false, selected = null;
+
+      function visual(item, size=48) {
+        if (item.image) return `<img src="${item.image}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:8px;" alt="${item.word}">`;
+        return `<span style="font-size:${size}px;line-height:1;">${item.emoji}</span>`;
+      }
+
+      function pips() {
+        return session.map((_,i) =>
+          `<div class="pip${i<idx?' done':i===idx?' current':''}"></div>`
+        ).join('');
+      }
+
+      function render() {
+        locked = false; selected = null;
+        if (idx >= session.length) { finish(); return; }
+        const item = session[idx];
+
+        if (mode === 'image-to-word') {
+          const pool = safeShuffle(items.filter(i=>i.word!==item.word),()=>false).slice(0,2);
+          const opts = safeShuffle([item,...pool], r=>r[0].word===item.word);
+          container.innerHTML = `
+            <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
+            <div style="text-align:center;margin-bottom:1.25rem;">
+              ${visual(item,72)}
+              <p style="font-size:13px;color:var(--text-dim);margin-top:.5rem;">Tap the correct word</p>
+            </div>
+            <div class="options-grid">
+              ${opts.map(o=>`<button class="option-btn locked" data-val="${o.word}" data-ans="${item.word}" data-type="word" onclick="ivSelect(this)">${o.word}</button>`).join('')}
+            </div>
+            <div style="min-height:28px;text-align:center;margin:.75rem 0;" id="iv-fb"></div>
+            <button class="next-ex-btn" id="iv-chk" style="display:none;" onclick="ivCheck()">Check →</button>
+            <button class="next-ex-btn" id="iv-nxt" style="display:none;" onclick="ivNext()">Next →</button>`;
+        } else if (mode === 'word-to-image') {
+          const pool = safeShuffle(items.filter(i=>i.emoji!==item.emoji),()=>false).slice(0,2);
+          const opts = safeShuffle([item,...pool], r=>r[0].emoji===item.emoji);
+          container.innerHTML = `
+            <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
+            <div style="text-align:center;margin-bottom:1.25rem;">
+              <div style="font-size:26px;font-weight:600;color:var(--text);margin-bottom:.5rem;">${item.word}</div>
+              <p style="font-size:13px;color:var(--text-dim);">Tap the correct picture</p>
+            </div>
+            <div class="options-grid">
+              ${opts.map(o=>`<button class="option-btn locked" data-val="${o.emoji}" data-ans="${item.emoji}" data-type="emoji" onclick="ivSelect(this)" style="font-size:36px;">${o.image?`<img src="${o.image}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;">`:o.emoji}</button>`).join('')}
+            </div>
+            <div style="min-height:28px;text-align:center;margin:.75rem 0;" id="iv-fb"></div>
+            <button class="next-ex-btn" id="iv-chk" style="display:none;" onclick="ivCheck()">Check →</button>
+            <button class="next-ex-btn" id="iv-nxt" style="display:none;" onclick="ivNext()">Next →</button>`;
+        } else {
+          // cloze-image
+          const pool = safeShuffle(items.filter(i=>i.word!==item.word),()=>false).slice(0,3);
+          const opts = safeShuffle([item,...pool], r=>r[0].word===item.word);
+          container.innerHTML = `
+            <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
+            <div style="text-align:center;margin-bottom:1rem;">${visual(item,64)}</div>
+            <p style="font-size:17px;color:var(--text);text-align:center;line-height:1.8;margin-bottom:1rem;">
+              ${item.sentence.replace('___','<span id="iv-blank" style="display:inline-block;min-width:70px;border-bottom:2px solid var(--accent);color:var(--accent);font-weight:600;text-align:center;">___</span>')}
+            </p>
+            <div class="options-grid">
+              ${opts.map(o=>`<button class="option-btn locked" data-val="${o.word}" data-ans="${item.word}" data-type="cloze" onclick="ivSelect(this)">${o.word}</button>`).join('')}
+            </div>
+            <div style="min-height:28px;text-align:center;margin:.75rem 0;" id="iv-fb"></div>
+            <button class="next-ex-btn" id="iv-chk" style="display:none;" onclick="ivCheck()">Check →</button>
+            <button class="next-ex-btn" id="iv-nxt" style="display:none;margin-top:.5rem;" onclick="ivNext()">Got it →</button>`;
+        }
+        // speak prompt word
+        speak(item.word, 'neutral', 300, item.audioFile);
+      }
+
+      // Expose handlers on window so inline onclick works
+      window.ivSelect = function(btn) {
+        if (locked) return;
+        container.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selected = { val: btn.dataset.val, ans: btn.dataset.ans, type: btn.dataset.type };
+        const blk = container.querySelector('#iv-blank');
+        if (blk && btn.dataset.type === 'cloze') blk.textContent = btn.dataset.val;
+        const chk = container.querySelector('#iv-chk');
+        if (chk) chk.style.display = 'block';
+      };
+
+      window.ivCheck = function() {
+        if (!selected || locked) return;
+        locked = true;
+        const ok = selected.val === selected.ans;
+        if (ok) score++;
+        const fb = container.querySelector('#iv-fb');
+        const chk = container.querySelector('#iv-chk');
+        const nxt = container.querySelector('#iv-nxt');
+        if (fb) { fb.textContent = ok ? '✓ Correct!' : '✗ See the right answer'; fb.style.color = ok ? 'var(--pass)' : 'var(--fail)'; }
+        if (chk) chk.style.display = 'none';
+        container.querySelectorAll('.option-btn').forEach(b => {
+          b.disabled = true;
+          if (b.dataset.val === b.dataset.ans) b.classList.add('correct');
+          else if (b.dataset.val === selected.val && !ok) b.classList.add('wrong');
+          else b.classList.remove('selected');
+        });
+        const blk = container.querySelector('#iv-blank');
+        if (blk) blk.textContent = selected.ans;
+        speak(session[idx].word, ok ? 'celebrate' : 'wrong', 0, session[idx].audioFile);
+        if (nxt) nxt.style.display = 'block';
+      };
+
+      window.ivNext = function() { idx++; render(); };
+
+      function finish() { onComplete(score / PICK); }
+
+      render();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  MEMORY PAIRS
+  //  4 pairs drawn from pool. Image card + word
+  //  card. Flip two, find the match.
+  //  Audio: neutral on flip, celebrate on match.
+  //  Reinforcement panel on each match.
+  // ─────────────────────────────────────────────
+  'memory-pairs': {
+    render(container, data, tier, onComplete) {
+      const { items } = data;
+      const PAIRS = 4;
+      const picked = safeShuffle(items, ()=>false).slice(0, PAIRS);
+      const deckSrc = [
+        ...picked.map((it,i)=>({...it, kind:'image', pid:i})),
+        ...picked.map((it,i)=>({...it, kind:'word',  pid:i})),
+      ];
+      const deck = safeShuffle(deckSrc, r => {
+        for (let i=0;i<r.length-1;i++) if(r[i].pid===r[i+1].pid) return true;
+        return false;
+      });
+
+      let flipped=[], matched=0, flips=0, cardLocked=false;
+
+      function visual(item, size=32) {
+        if (item.image) return `<img src="${item.image}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:6px;" alt="${item.word}">`;
+        return `<span style="font-size:${size}px;line-height:1;">${item.emoji}</span>`;
+      }
+
+      container.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:.75rem;">
+          <div style="font-size:13px;color:var(--text-dim);">Find the pairs</div>
+          <div style="font-size:13px;color:var(--text-dim);">Flips: <span id="mp-flips" style="color:var(--text);">0</span></div>
+        </div>
+        <div id="mp-pips" style="display:flex;gap:6px;margin-bottom:1rem;">
+          ${picked.map((_,i)=>`<div class="pip" id="mp-pip-${i}" style="flex:1;"></div>`).join('')}
+        </div>
+        <div id="mp-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;">
+          ${deck.map((card,i)=>`
+            <div id="mp-cw-${i}" onclick="mpFlip(${i})" style="
+              aspect-ratio:1;perspective:600px;cursor:pointer;
+            ">
+              <div id="mp-ci-${i}" style="
+                width:100%;height:100%;position:relative;
+                transform-style:preserve-3d;
+                transition:transform .35s cubic-bezier(.4,0,.2,1);
+                border-radius:10px;
+              ">
+                <div style="
+                  position:absolute;inset:0;border-radius:10px;
+                  backface-visibility:hidden;
+                  background:var(--surface2);
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:1.4em;color:rgba(255,255,255,.2);
+                ">?</div>
+                <div id="mp-cf-${i}" style="
+                  position:absolute;inset:0;border-radius:10px;
+                  backface-visibility:hidden;
+                  background:var(--surface);
+                  border:1.5px solid var(--surface2);
+                  transform:rotateY(180deg);
+                  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+                  font-size:13px;font-weight:500;color:var(--text-dim);
+                  padding:4px;text-align:center;
+                ">
+                  ${card.kind==='image' ? visual(card,32) : `<span style="font-size:13px;font-weight:600;color:var(--text);">${card.word}</span>`}
+                </div>
+              </div>
+            </div>`).join('')}
+        </div>
+        <div id="mp-msg" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);"></div>`;
+
+      window.mpFlip = function(i) {
+        if (cardLocked) return;
+        const cw = document.getElementById(`mp-cw-${i}`);
+        const ci = document.getElementById(`mp-ci-${i}`);
+        if (!cw || cw.dataset.done || cw.dataset.flipped) return;
+        cw.dataset.flipped = '1';
+        ci.style.transform = 'rotateY(180deg)';
+        speak(deck[i].word, 'neutral', 0, deck[i].audioFile);
+        flips++;
+        document.getElementById('mp-flips').textContent = flips;
+        flipped.push(i);
+        if (flipped.length === 2) { cardLocked = true; setTimeout(mpCheck, 500); }
+      };
+
+      function mpCheck() {
+        const [a, b] = flipped;
+        const ca = deck[a], cb = deck[b];
+        const isMatch = ca.pid === cb.pid && ca.kind !== cb.kind;
+        if (isMatch) {
+          matched++;
+          ['mp-cf-'+a,'mp-cf-'+b].forEach(id=>{
+            const el=document.getElementById(id);
+            if(el){el.style.background='rgba(255,215,0,.1)';el.style.borderColor='var(--gold)';}
+          });
+          document.getElementById(`mp-cw-${a}`).dataset.done='1';
+          document.getElementById(`mp-cw-${b}`).dataset.done='1';
+          const pip=document.getElementById(`mp-pip-${ca.pid}`);
+          if(pip){pip.classList.add('done');}
+          flipped=[];
+          showReinforcePanel(ca, () => {
+            cardLocked = false;
+            if (matched === PAIRS) {
+              const stars = flips<=10?3:flips<=14?2:1;
+              const starStr='⭐'.repeat(stars)+'✩'.repeat(3-stars);
+              document.getElementById('mp-msg').textContent = starStr;
+              setTimeout(()=>onComplete(matched/PAIRS), 800);
+            }
+          });
+        } else {
+          const ciA=document.getElementById(`mp-ci-${a}`);
+          const ciB=document.getElementById(`mp-ci-${b}`);
+          if(ciA){ciA.style.borderRadius='10px';ciA.style.boxShadow='0 0 0 2px var(--fail)';}
+          if(ciB){ciB.style.borderRadius='10px';ciB.style.boxShadow='0 0 0 2px var(--fail)';}
+          speak(ca.word,'wrong', 0, ca.audioFile);
+          speak(cb.word,'wrong',700, cb.audioFile);
+          setTimeout(()=>{
+            if(ciA){ciA.style.transform='';ciA.style.boxShadow='';}
+            if(ciB){ciB.style.transform='';ciB.style.boxShadow='';}
+            delete document.getElementById(`mp-cw-${a}`).dataset.flipped;
+            delete document.getElementById(`mp-cw-${b}`).dataset.flipped;
+            flipped=[]; cardLocked=false;
+          },1100);
+        }
+      }
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  WORD SCRAMBLE
+  //  Image + audio shown. Tap scrambled letter
+  //  tiles to spell the word. Wrong = reset bank.
+  //  Reinforcement panel on correct.
+  // ─────────────────────────────────────────────
+  'word-scramble': {
+    render(container, data, tier, onComplete) {
+      const { items } = data;
+      const PICK = Math.min(items.length, 4);
+      const session = safeShuffle(items, ()=>false).slice(0, PICK);
+      let idx=0, score=0, slotData=[], bankData=[], wsLocked=false;
+
+      function visual(item) {
+        if (item.image) return `<img src="${item.image}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;" alt="${item.word}">`;
+        return `<span style="font-size:72px;line-height:1;">${item.emoji}</span>`;
+      }
+
+      function pips() {
+        return session.map((_,i)=>`<div class="pip${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+
+      function load() {
+        wsLocked=false;
+        if(idx>=session.length){onComplete(score/PICK);return;}
+        const item=session[idx];
+        const letters=item.word.toUpperCase().split('');
+        slotData=letters.map(()=>null);
+        const wordUp=item.word.toUpperCase();
+        bankData=safeShuffle(letters,r=>r.join('')===wordUp).map((l,i)=>({letter:l,id:i,used:false}));
+        drawWS();
+        speak(item.word,'neutral',300, item.audioFile);
+      }
+
+      function drawWS() {
+        const item=session[idx];
+        container.innerHTML=`
+          <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
+          <div style="text-align:center;margin-bottom:1rem;position:relative;display:inline-block;width:100%;">
+            ${visual(item)}
+            <button onclick="speak(session&&'${item.word}','neutral',0,'${item.audioFile||""}')" style="
+              position:absolute;right:8px;top:0;
+              background:var(--surface2);border:1px solid var(--surface2);
+              border-radius:50%;width:36px;height:36px;font-size:16px;
+              cursor:pointer;color:var(--accent);
+            ">🔊</button>
+          </div>
+          <div id="ws-slots" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;">
+            ${slotData.map((_,si)=>`<div id="ws-s-${si}" onclick="wsRemove(${si})" style="
+              width:44px;height:52px;border-radius:8px;
+              border:2px solid var(--surface2);background:var(--surface);
+              display:flex;align-items:center;justify-content:center;
+              font-size:20px;font-weight:700;color:var(--text);cursor:pointer;
+            "></div>`).join('')}
+          </div>
+          <div id="ws-bank" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:56px;margin-bottom:1rem;">
+            ${bankData.map((t,bi)=>`<button id="ws-t-${bi}" onclick="wsTap(${bi})" style="
+              width:44px;height:52px;border-radius:8px;
+              border:1.5px solid #4A6080;background:var(--surface);
+              font-size:20px;font-weight:700;color:var(--text);
+              cursor:pointer;box-shadow:0 2px 0 #1E3248;
+              transition:opacity .2s;
+            ">${t.letter}</button>`).join('')}
+          </div>
+          <div id="ws-fb" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);margin-bottom:.5rem;"></div>`;
+      }
+
+      function refreshSlots() {
+        slotData.forEach((entry,si)=>{
+          const el=document.getElementById(`ws-s-${si}`);
+          if(!el)return;
+          el.textContent=entry?entry.letter:'';
+          el.style.borderColor=entry?'var(--accent)':'var(--surface2)';
+          el.style.background=entry?'rgba(79,195,247,.08)':'var(--surface)';
+        });
+      }
+
+      function refreshBank() {
+        bankData.forEach((t,bi)=>{
+          const el=document.getElementById(`ws-t-${bi}`);
+          if(el)el.style.opacity=t.used?'0':'1';
+        });
+      }
+
+      window.wsTap=function(bi){
+        if(wsLocked)return;
+        const tile=bankData[bi];
+        if(tile.used)return;
+        const si=slotData.indexOf(null);
+        if(si===-1)return;
+        tile.used=true;
+        slotData[si]={letter:tile.letter,bankId:bi};
+        speak(session[idx].word,'neutral', 0, session[idx].audioFile);
+        refreshSlots();refreshBank();
+        if(slotData.indexOf(null)===-1)setTimeout(wsCheck,200);
+      };
+
+      window.wsRemove=function(si){
+        if(wsLocked)return;
+        const entry=slotData[si];
+        if(!entry)return;
+        bankData[entry.bankId].used=false;
+        slotData[si]=null;
+        refreshSlots();refreshBank();
+      };
+
+      function wsCheck(){
+        const item=session[idx];
+        const attempt=slotData.map(e=>e.letter).join('').toLowerCase();
+        const ok=attempt===item.word.toLowerCase();
+        wsLocked=true;
+        const fb=document.getElementById('ws-fb');
+        slotData.forEach((_,si)=>{
+          const el=document.getElementById(`ws-s-${si}`);
+          if(el){
+            el.style.borderColor=ok?'var(--gold)':'var(--fail)';
+            el.style.background=ok?'rgba(255,215,0,.1)':'rgba(239,83,80,.1)';
+          }
+        });
+        if(ok){
+          score++;
+          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
+          speak(item.word,'celebrate', 0, item.audioFile);
+          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+        } else {
+          if(fb){fb.textContent=`✗ The word is: ${item.word}`;fb.style.color='var(--fail)';}
+          speak(item.word,'wrong', 0, item.audioFile);
+          setTimeout(()=>{
+            slotData=slotData.map(()=>null);
+            bankData.forEach(t=>t.used=false);
+            wsLocked=false;
+            refreshSlots();refreshBank();
+            if(fb){fb.textContent='Try again!';fb.style.color='var(--text-dim)';}
+            speak(item.word,'neutral',300, item.audioFile);
+          },1500);
+        }
+      }
+
+      load();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  SPELLING
+  //  Bronze: image + audio → tap tiles
+  //  Silver: audio only   → tap tiles
+  //  Gold:   audio only   → free type, retype on fail
+  // ─────────────────────────────────────────────
+  'spelling': {
+    render(container, data, tier, onComplete) {
+      const { items } = data;
+      const PICK = Math.min(items.length, 4);
+      const session = safeShuffle(items, ()=>false).slice(0, PICK);
+      let idx=0, score=0, spLocked=false, retypeMode=false;
+      let slotData=[], bankData=[];
+
+      function visual(item) {
+        if (item.image) return `<img src="${item.image}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;" alt="${item.word}">`;
+        return `<span style="font-size:72px;line-height:1;">${item.emoji}</span>`;
+      }
+
+      function pips() {
+        return session.map((_,i)=>`<div class="pip${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+
+      function load() {
+        spLocked=false; retypeMode=false;
+        if(idx>=session.length){onComplete(score/PICK);return;}
+        const item=session[idx];
+        const letters=item.word.toUpperCase().split('');
+        slotData=letters.map(()=>null);
+        const wordUp=item.word.toUpperCase();
+        bankData=safeShuffle(letters,r=>r.join('')===wordUp).map((l,i)=>({letter:l,id:i,used:false}));
+
+        const showImage = tier==='bronze';
+        const isTile    = tier!=='gold';
+
+        container.innerHTML=`
+          <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
+          <div style="text-align:center;margin-bottom:1rem;">
+            ${showImage ? visual(item) : ''}
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:${showImage?'.75rem':'0'};">
+              <button onclick="speak('${item.word}','neutral',0,'${item.audioFile||""}')" style="
+                background:var(--surface2);border:1px solid var(--surface2);
+                border-radius:50%;width:42px;height:42px;font-size:18px;
+                cursor:pointer;color:var(--accent);flex-shrink:0;
+              ">🔊</button>
+              <span style="font-size:13px;color:var(--text-dim);">${tier==='bronze'?'Tap the letters to spell the word':tier==='silver'?'Listen and spell what you hear':'Listen and type the word'}</span>
+            </div>
+          </div>
+          ${isTile ? `
+          <div id="sp-slots" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;">
+            ${slotData.map((_,si)=>`<div id="sp-s-${si}" onclick="spRemove(${si})" style="
+              width:44px;height:52px;border-radius:8px;
+              border:2px solid var(--surface2);background:var(--surface);
+              display:flex;align-items:center;justify-content:center;
+              font-size:20px;font-weight:700;color:var(--text);cursor:pointer;
+            "></div>`).join('')}
+          </div>
+          <div id="sp-bank" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:56px;margin-bottom:1rem;">
+            ${bankData.map((t,bi)=>`<button id="sp-t-${bi}" onclick="spTap(${bi})" style="
+              width:44px;height:52px;border-radius:8px;
+              border:1.5px solid #4A6080;background:var(--surface);
+              font-size:20px;font-weight:700;color:var(--text);
+              cursor:pointer;box-shadow:0 2px 0 #1E3248;transition:opacity .2s;
+            ">${t.letter}</button>`).join('')}
+          </div>` : `
+          <div style="margin-bottom:1rem;">
+            <input id="sp-input" type="text"
+              autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+              placeholder="Type the word…"
+              oninput="spTypeInput()" onkeydown="spTypeKey(event)"
+              style="
+                width:100%;font-size:22px;font-weight:600;text-align:center;
+                padding:14px;border-radius:var(--radius);
+                border:2px solid var(--surface2);background:var(--surface);
+                color:var(--text);outline:none;letter-spacing:.08em;
+              ">
+            <button id="sp-chk" onclick="spCheckType()" disabled style="
+              width:100%;margin-top:10px;padding:13px;
+              border-radius:var(--radius);border:none;
+              background:var(--accent);color:var(--bg);
+              font-size:15px;font-weight:600;cursor:pointer;opacity:.4;
+              transition:opacity .15s;
+            ">Check →</button>
+          </div>`}
+          <div id="sp-fb" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);margin-bottom:.5rem;"></div>`;
+
+        speak(item.word,'neutral',350, item.audioFile);
+        if(tier==='gold') setTimeout(()=>{const inp=document.getElementById('sp-input');if(inp)inp.focus();},200);
+      }
+
+      // ── Tile mechanic ──
+      window.spTap=function(bi){
+        if(spLocked)return;
+        const tile=bankData[bi];
+        if(tile.used)return;
+        const si=slotData.indexOf(null);
+        if(si===-1)return;
+        tile.used=true;
+        slotData[si]={letter:tile.letter,bankId:bi};
+        speak(session[idx].word,'neutral', 0, session[idx].audioFile);
+        spRefreshSlots();spRefreshBank();
+        if(slotData.indexOf(null)===-1)setTimeout(spCheckTiles,200);
+      };
+      window.spRemove=function(si){
+        if(spLocked)return;
+        const entry=slotData[si];
+        if(!entry)return;
+        bankData[entry.bankId].used=false;
+        slotData[si]=null;
+        spRefreshSlots();spRefreshBank();
+      };
+
+      function spRefreshSlots(){
+        slotData.forEach((entry,si)=>{
+          const el=document.getElementById(`sp-s-${si}`);
+          if(!el)return;
+          el.textContent=entry?entry.letter:'';
+          el.style.borderColor=entry?'var(--accent)':'var(--surface2)';
+          el.style.background=entry?'rgba(79,195,247,.08)':'var(--surface)';
+        });
+      }
+      function spRefreshBank(){
+        bankData.forEach((t,bi)=>{
+          const el=document.getElementById(`sp-t-${bi}`);
+          if(el)el.style.opacity=t.used?'0':'1';
+        });
+      }
+
+      function spCheckTiles(){
+        const item=session[idx];
+        const attempt=slotData.map(e=>e.letter).join('').toLowerCase();
+        const ok=attempt===item.word.toLowerCase();
+        spLocked=true;
+        const fb=document.getElementById('sp-fb');
+        slotData.forEach((_,si)=>{
+          const el=document.getElementById(`sp-s-${si}`);
+          if(el){
+            el.style.borderColor=ok?'var(--gold)':'var(--fail)';
+            el.style.background=ok?'rgba(255,215,0,.1)':'rgba(239,83,80,.1)';
+          }
+        });
+        if(ok){
+          score++;
+          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
+          speak(item.word,'celebrate', 0, item.audioFile);
+          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+        } else {
+          if(fb){fb.textContent=`✗ The word is: ${item.word}`;fb.style.color='var(--fail)';}
+          speak(item.word,'wrong', 0, item.audioFile);
+          setTimeout(()=>{
+            slotData=slotData.map(()=>null);
+            bankData.forEach(t=>t.used=false);
+            spLocked=false;
+            spRefreshSlots();spRefreshBank();
+            if(fb){fb.textContent='Try again!';fb.style.color='var(--text-dim)';}
+            speak(item.word,'neutral',300, item.audioFile);
+          },1500);
+        }
+      }
+
+      // ── Free type (Gold) ──
+      window.spTypeInput=function(){
+        const inp=document.getElementById('sp-input');
+        const chk=document.getElementById('sp-chk');
+        if(!inp||!chk)return;
+        chk.disabled=inp.value.trim().length===0;
+        chk.style.opacity=inp.value.trim().length?'1':'.4';
+      };
+      window.spTypeKey=function(e){ if(e.key==='Enter')spCheckType(); };
+      window.spCheckType=function(){
+        if(spLocked)return;
+        const item=session[idx];
+        const inp=document.getElementById('sp-input');
+        if(!inp||!inp.value.trim())return;
+        const attempt=inp.value.trim().toLowerCase();
+        const ok=attempt===item.word.toLowerCase();
+        spLocked=true;
+        const fb=document.getElementById('sp-fb');
+        if(inp){inp.style.borderColor=ok?'var(--gold)':'var(--fail)';inp.style.background=ok?'rgba(255,215,0,.05)':'rgba(239,83,80,.05)';}
+        const chk=document.getElementById('sp-chk');
+        if(chk)chk.style.display='none';
+        if(ok){
+          if(!retypeMode)score++;
+          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
+          speak(item.word,'celebrate', 0, item.audioFile);
+          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+        } else {
+          if(fb){fb.textContent=`✗ The word is: ${item.word} — now type it correctly`;fb.style.color='var(--fail)';}
+          speak(item.word,'wrong', 0, item.audioFile);
+          setTimeout(()=>{
+            retypeMode=true; spLocked=false;
+            if(inp){
+              inp.value=''; inp.style.borderColor='var(--accent)';
+              inp.style.background='rgba(79,195,247,.05)';
+              inp.placeholder='Type the correct word…'; inp.focus();
+            }
+            if(chk){chk.style.display='block';chk.disabled=true;chk.style.opacity='.4';}
+            if(fb){fb.textContent=`Type: ${item.word}`;fb.style.color='var(--accent)';}
+            speak(item.word,'neutral',300, item.audioFile);
+          },1600);
+        }
+      };
+
+      load();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  AUDIO MATCH
+  //  Left col: tap to hear (unlimited replay, never disabled).
+  //  Right col: tap the matching text.
+  //  Same match/reveal mechanic as word-match — reuses its CSS.
+  //  Tiers differ only via data: bronze = single words,
+  //  silver/gold = sentences with deliberately similar distractors.
+  // ─────────────────────────────────────────────
+  'audio-match': {
+    render(container, data, tier, onComplete) {
+      const { pairs } = data;
+      let selectedLeft = null;
+      let matchedCount = 0;
+      let wrongCount   = 0;
+      const total      = pairs.length;
+
+      const PALETTE = [
+        { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' },
+        { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' },
+        { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' },
+        { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' },
+        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' },
+      ];
+
+      container.innerHTML = `
+        <p class="module-question">Listen, then tap the matching sentence.</p>
+        <p class="match-score" id="am-score">${total} to match</p>
+        <div class="match-grid">
+          <div class="match-col" id="am-left-col"></div>
+          <div class="match-col" id="am-right-col"></div>
+        </div>
+        <button class="next-ex-btn" id="am-next-btn" style="display:none">Next →</button>
+      `;
+
+      const leftCol    = container.querySelector('#am-left-col');
+      const rightCol   = container.querySelector('#am-right-col');
+      const scoreLabel = container.querySelector('#am-score');
+      const nextBtn    = container.querySelector('#am-next-btn');
+
+      const leftItems  = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
+      const rightItems = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
+
+      leftItems.forEach((pair, li) => {
+        const btn = document.createElement('button');
+        btn.className       = 'match-btn';
+        btn.innerHTML       = `🔊<br><span style="opacity:.55;font-size:11px;">Track ${li + 1}</span>`;
+        btn.dataset.key     = pair.text;
+        btn.dataset.side    = 'left';
+        btn.dataset.pairIdx = pair.pairIdx;
+        btn.dataset.audio   = pair.audio;
+        leftCol.appendChild(btn);
+      });
+
+      rightItems.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className       = 'match-btn';
+        btn.textContent     = pair.text;
+        btn.dataset.key     = pair.text;
+        btn.dataset.side    = 'right';
+        btn.dataset.pairIdx = pair.pairIdx;
+        rightCol.appendChild(btn);
+      });
+
+      function applyMatchColor(btn) {
+        const c = PALETTE[parseInt(btn.dataset.pairIdx) % PALETTE.length];
+        btn.style.borderColor = c.border;
+        btn.style.background  = c.bg;
+        btn.style.color       = c.color;
+        btn.classList.add('matched');
+        btn.disabled = true;
+      }
+
+      container.querySelectorAll('.match-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('matched')) return;
+
+          if (btn.dataset.side === 'left') {
+            speak(btn.dataset.audio, 'neutral', 0, btn.dataset.audioFile); // unlimited replay, every tap plays
+            if (selectedLeft !== btn) {
+              container.querySelectorAll('.match-btn[data-side="left"]')
+                .forEach(b => b.classList.remove('selected'));
+              selectedLeft = btn;
+              btn.classList.add('selected');
+            }
+            return;
+          }
+
+          if (!selectedLeft) return;
+
+          const isMatch = (selectedLeft.dataset.key === btn.dataset.key);
+
+          if (isMatch) {
+            const leftBtn = selectedLeft;
+            selectedLeft  = null;
+            applyMatchColor(leftBtn);
+            applyMatchColor(btn);
+            matchedCount++;
+
+            const remaining = total - matchedCount;
+            scoreLabel.textContent = remaining > 0 ? `${remaining} left` : 'All matched! ✓';
+
+            if (matchedCount === total) {
+              const score = Math.max(0.6, 1 - (wrongCount * 0.1));
+              nextBtn.style.display = 'block';
+              nextBtn.onclick = () => onComplete(score);
+            }
+          } else {
+            wrongCount++;
+            selectedLeft.classList.add('wrong-flash');
+            btn.classList.add('wrong-flash');
+            const prevLeft = selectedLeft;
+            selectedLeft   = null;
+            setTimeout(() => {
+              prevLeft.classList.remove('wrong-flash', 'selected');
+              btn.classList.remove('wrong-flash');
+            }, 500);
+          }
+        });
+      });
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  SENTENCE BUILDING
+  //  Word-tile version of Word Scramble: tap tiles from the bank into
+  //  ordered slots, auto-check on last slot filled, reset on wrong.
+  //  On correct: tiles recolour by grammar role (subject/verb/object/
+  //  place/time — 5 colours; everything else stays neutral) and the
+  //  full sentence plays. Manual "Next →" so the reveal isn't rushed.
+  // ─────────────────────────────────────────────
+  'sentence-building': {
+    render(container, data, tier, onComplete) {
+      const { items } = data;
+      const PICK = Math.min(items.length, 4);
+      const session = safeShuffle(items, ()=>false).slice(0, PICK);
+      let idx=0, score=0, sbLocked=false;
+      let slotData=[], bankData=[];
+
+      const ROLE_COLOR = {
+        subject: '#00BCD4',
+        verb:    '#8BC34A',
+        object:  '#FF9800',
+        place:   '#AB47BC',
+        time:    '#E91E63',
+      };
+      const roleColor = role => ROLE_COLOR[role] || null; // null = neutral grey
+
+      function pips() {
+        return session.map((_,i)=>`<div class="pip${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+
+      function sentenceText(tokens) {
+        return tokens.map(t=>t.text).join(' ');
+      }
+
+      function load() {
+        sbLocked=false;
+        if(idx>=session.length){onComplete(score/PICK);return;}
+        const item=session[idx];
+        slotData=item.tokens.map(()=>null);
+        const withId=item.tokens.map((t,i)=>({...t,id:i}));
+        bankData=safeShuffle(withId, r=>r.every((t,i)=>t.text===item.tokens[i].text))
+          .map(t=>({...t,used:false}));
+        draw();
+      }
+
+      function draw() {
+        container.innerHTML=`
+          <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
+          <p class="module-question" style="text-align:center;">Put the words in order.</p>
+          <div id="sb-slots" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;min-height:52px;">
+            ${slotData.map((_,si)=>`<div id="sb-s-${si}" onclick="sbRemove(${si})" style="
+              min-width:44px;height:44px;padding:0 10px;border-radius:8px;
+              border:2px solid var(--surface2);background:var(--surface);
+              display:flex;align-items:center;justify-content:center;
+              font-size:15px;font-weight:700;color:var(--text);cursor:pointer;
+            "></div>`).join('')}
+          </div>
+          <div id="sb-bank" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:52px;margin-bottom:1rem;">
+            ${bankData.map((t,bi)=>`<button id="sb-t-${bi}" onclick="sbTap(${bi})" style="
+              padding:11px 14px;border-radius:8px;
+              border:1.5px solid #4A6080;background:var(--surface);
+              font-size:15px;font-weight:600;color:var(--text);
+              cursor:pointer;box-shadow:0 2px 0 #1E3248;transition:opacity .2s;
+            ">${t.text}</button>`).join('')}
+          </div>
+          <div id="sb-fb" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);margin-bottom:.5rem;"></div>
+          <button class="next-ex-btn" id="sb-next-btn" style="display:none">Next →</button>`;
+      }
+
+      function refreshSlots() {
+        slotData.forEach((entry,si)=>{
+          const el=document.getElementById(`sb-s-${si}`);
+          if(!el)return;
+          el.textContent=entry?entry.text:'';
+          el.style.borderColor=entry?'var(--accent)':'var(--surface2)';
+          el.style.background=entry?'rgba(79,195,247,.08)':'var(--surface)';
+        });
+      }
+      function refreshBank() {
+        bankData.forEach((t,bi)=>{
+          const el=document.getElementById(`sb-t-${bi}`);
+          if(el)el.style.opacity=t.used?'0':'1';
+        });
+      }
+
+      window.sbTap=function(bi){
+        if(sbLocked)return;
+        const tile=bankData[bi];
+        if(tile.used)return;
+        const si=slotData.indexOf(null);
+        if(si===-1)return;
+        tile.used=true;
+        slotData[si]={text:tile.text,role:tile.role,bankId:bi};
+        refreshSlots();refreshBank();
+        if(slotData.indexOf(null)===-1)setTimeout(sbCheck,200);
+      };
+      window.sbRemove=function(si){
+        if(sbLocked)return;
+        const entry=slotData[si];
+        if(!entry)return;
+        bankData[entry.bankId].used=false;
+        slotData[si]=null;
+        refreshSlots();refreshBank();
+      };
+
+      function sbCheck(){
+        const item=session[idx];
+        const ok=slotData.every((e,i)=>e.text===item.tokens[i].text);
+        sbLocked=true;
+        const fb=document.getElementById('sb-fb');
+        const nextBtn=document.getElementById('sb-next-btn');
+
+        if(ok){
+          score++;
+          slotData.forEach((entry,si)=>{
+            const el=document.getElementById(`sb-s-${si}`);
+            if(!el)return;
+            const c=roleColor(entry.role);
+            el.style.borderColor=c||'var(--text-dim)';
+            el.style.background=c?c+'26':'rgba(255,255,255,.06)';
+            el.style.color=c||'var(--text-dim)';
+          });
+          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
+          speak(sentenceText(item.tokens),'celebrate', 0, item.audioFile);
+          if(nextBtn){
+            nextBtn.style.display='block';
+            nextBtn.onclick=()=>{idx++;load();};
+          }
+        } else {
+          slotData.forEach((_,si)=>{
+            const el=document.getElementById(`sb-s-${si}`);
+            if(el){el.style.borderColor='var(--fail)';el.style.background='rgba(239,83,80,.1)';}
+          });
+          if(fb){fb.textContent='✗ Not quite — listen and try again';fb.style.color='var(--fail)';}
+          speak(sentenceText(item.tokens),'wrong', 0, item.audioFile);
+          setTimeout(()=>{
+            slotData=slotData.map(()=>null);
+            bankData.forEach(t=>t.used=false);
+            sbLocked=false;
+            refreshSlots();refreshBank();
+            if(fb){fb.textContent='Try again!';fb.style.color='var(--text-dim)';}
+          },1600);
+        }
+      }
+
+      load();
+    }
+  },
+
+};
+
+
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+
+showScreen('screen-name');
+</script>
+</body>
+</html>

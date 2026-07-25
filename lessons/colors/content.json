@@ -1,0 +1,984 @@
+{
+  "lessonId": "colors",
+  "lessonName": "Colors Around Us",
+  "publishedAt": "2026-07-25T22:44:24.766Z",
+  "modules": [
+    {
+      "id": "gapfill",
+      "type": "gap-fill",
+      "label": "Gap-fill",
+      "data": {
+        "bronze": {
+          "sentence": "The apple is ___.",
+          "answer": "red",
+          "options": [
+            "red",
+            "blue",
+            "green",
+            "yellow"
+          ],
+          "tokens": [
+            {
+              "t": "The apple",
+              "r": "subject"
+            },
+            {
+              "t": "is",
+              "r": "verb"
+            },
+            {
+              "t": "red.",
+              "r": "object"
+            }
+          ]
+        },
+        "silver": {
+          "sentence": "I like yellow because it is ___.",
+          "answer": "bright",
+          "options": [
+            "bright",
+            "heavy",
+            "quiet",
+            "far"
+          ],
+          "tokens": [
+            {
+              "t": "I",
+              "r": "subject"
+            },
+            {
+              "t": "like",
+              "r": "verb"
+            },
+            {
+              "t": "yellow",
+              "r": "object"
+            },
+            {
+              "t": "because",
+              "r": "connector"
+            },
+            {
+              "t": "it is bright",
+              "r": null
+            }
+          ]
+        },
+        "gold": {
+          "sentence": "Although blue is calm, my favorite color is ___.",
+          "answer": "red",
+          "options": [
+            "red",
+            "blue",
+            "green",
+            "tired"
+          ],
+          "tokens": [
+            {
+              "t": "Although blue is calm",
+              "r": "connector"
+            },
+            {
+              "t": "my favorite color",
+              "r": "subject"
+            },
+            {
+              "t": "is",
+              "r": "verb"
+            },
+            {
+              "t": "red",
+              "r": "object"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "truefalse",
+      "type": "true-false",
+      "label": "True / False",
+      "data": {
+        "bronze": {
+          "statement": "The sky is blue.",
+          "answer": true,
+          "tokens": [
+            {
+              "t": "The sky",
+              "r": "subject"
+            },
+            {
+              "t": "is",
+              "r": "verb"
+            },
+            {
+              "t": "blue",
+              "r": "object"
+            }
+          ]
+        },
+        "silver": {
+          "statement": "Bananas are usually purple.",
+          "answer": false,
+          "tokens": [
+            {
+              "t": "Bananas",
+              "r": "subject"
+            },
+            {
+              "t": "are usually",
+              "r": "verb"
+            },
+            {
+              "t": "purple",
+              "r": "object"
+            }
+          ]
+        },
+        "gold": {
+          "statement": "Mixing red and yellow makes orange.",
+          "answer": true,
+          "tokens": [
+            {
+              "t": "Mixing red and yellow",
+              "r": "subject"
+            },
+            {
+              "t": "makes",
+              "r": "verb"
+            },
+            {
+              "t": "orange",
+              "r": "object"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wordmatch",
+      "type": "word-match",
+      "label": "Word Match",
+      "data": {
+        "bronze": {
+          "pairs": [
+            {
+              "left": "red",
+              "right": "apple"
+            },
+            {
+              "left": "blue",
+              "right": "sky"
+            },
+            {
+              "left": "yellow",
+              "right": "banana"
+            }
+          ]
+        },
+        "silver": {
+          "pairs": [
+            {
+              "left": "red",
+              "right": "apple"
+            },
+            {
+              "left": "blue",
+              "right": "sky"
+            },
+            {
+              "left": "yellow",
+              "right": "banana"
+            },
+            {
+              "left": "green",
+              "right": "leaf"
+            }
+          ]
+        },
+        "gold": {
+          "pairs": [
+            {
+              "left": "red",
+              "right": "apple"
+            },
+            {
+              "left": "blue",
+              "right": "sky"
+            },
+            {
+              "left": "yellow",
+              "right": "banana"
+            },
+            {
+              "left": "green",
+              "right": "leaf"
+            },
+            {
+              "left": "purple",
+              "right": "grape"
+            },
+            {
+              "left": "black",
+              "right": "night"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "memorypairs",
+      "type": "memory-pairs",
+      "label": "Memory Pairs",
+      "data": {
+        "bronze": {
+          "items": [
+            {
+              "word": "red",
+              "emoji": "🔴",
+              "image": null,
+              "sentence": "The apple is red.",
+              "sentenceAudioFile": "audio/the-apple-is-red--memorypairs.shared.item0.sentence.mp3"
+            },
+            {
+              "word": "blue",
+              "emoji": "🔵",
+              "image": null,
+              "sentence": "The sky is blue."
+            },
+            {
+              "word": "green",
+              "emoji": "🟢",
+              "image": null,
+              "sentence": "The grass is green."
+            },
+            {
+              "word": "yellow",
+              "emoji": "🟡",
+              "image": null,
+              "sentence": "The sun is yellow."
+            },
+            {
+              "word": "orange",
+              "emoji": "🟠",
+              "image": null,
+              "sentence": "The pumpkin is orange.",
+              "sentenceAudioFile": "audio/the-pumpkin-is-orange--memorypairs.shared.item4.sentence.mp3"
+            },
+            {
+              "word": "purple",
+              "emoji": "🟣",
+              "image": null,
+              "sentence": "The grape is purple.",
+              "sentenceAudioFile": "audio/the-grape-is-purple--memorypairs.shared.item5.sentence.mp3"
+            },
+            {
+              "word": "black",
+              "emoji": "⚫",
+              "image": null,
+              "sentence": "The night is black."
+            },
+            {
+              "word": "white",
+              "emoji": "⚪",
+              "image": null,
+              "sentence": "The cloud is white."
+            }
+          ]
+        },
+        "silver": {
+          "items": [
+            {
+              "word": "red",
+              "emoji": "🔴",
+              "image": null,
+              "sentence": "The apple is red.",
+              "sentenceAudioFile": "audio/the-apple-is-red--memorypairs.shared.item0.sentence.mp3"
+            },
+            {
+              "word": "blue",
+              "emoji": "🔵",
+              "image": null,
+              "sentence": "The sky is blue."
+            },
+            {
+              "word": "green",
+              "emoji": "🟢",
+              "image": null,
+              "sentence": "The grass is green."
+            },
+            {
+              "word": "yellow",
+              "emoji": "🟡",
+              "image": null,
+              "sentence": "The sun is yellow."
+            },
+            {
+              "word": "orange",
+              "emoji": "🟠",
+              "image": null,
+              "sentence": "The pumpkin is orange.",
+              "sentenceAudioFile": "audio/the-pumpkin-is-orange--memorypairs.shared.item4.sentence.mp3"
+            },
+            {
+              "word": "purple",
+              "emoji": "🟣",
+              "image": null,
+              "sentence": "The grape is purple.",
+              "sentenceAudioFile": "audio/the-grape-is-purple--memorypairs.shared.item5.sentence.mp3"
+            },
+            {
+              "word": "black",
+              "emoji": "⚫",
+              "image": null,
+              "sentence": "The night is black."
+            },
+            {
+              "word": "white",
+              "emoji": "⚪",
+              "image": null,
+              "sentence": "The cloud is white."
+            }
+          ]
+        },
+        "gold": {
+          "items": [
+            {
+              "word": "red",
+              "emoji": "🔴",
+              "image": null,
+              "sentence": "The apple is red.",
+              "sentenceAudioFile": "audio/the-apple-is-red--memorypairs.shared.item0.sentence.mp3"
+            },
+            {
+              "word": "blue",
+              "emoji": "🔵",
+              "image": null,
+              "sentence": "The sky is blue."
+            },
+            {
+              "word": "green",
+              "emoji": "🟢",
+              "image": null,
+              "sentence": "The grass is green."
+            },
+            {
+              "word": "yellow",
+              "emoji": "🟡",
+              "image": null,
+              "sentence": "The sun is yellow."
+            },
+            {
+              "word": "orange",
+              "emoji": "🟠",
+              "image": null,
+              "sentence": "The pumpkin is orange.",
+              "sentenceAudioFile": "audio/the-pumpkin-is-orange--memorypairs.shared.item4.sentence.mp3"
+            },
+            {
+              "word": "purple",
+              "emoji": "🟣",
+              "image": null,
+              "sentence": "The grape is purple.",
+              "sentenceAudioFile": "audio/the-grape-is-purple--memorypairs.shared.item5.sentence.mp3"
+            },
+            {
+              "word": "black",
+              "emoji": "⚫",
+              "image": null,
+              "sentence": "The night is black."
+            },
+            {
+              "word": "white",
+              "emoji": "⚪",
+              "image": null,
+              "sentence": "The cloud is white."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "listenchoose",
+      "type": "audio-understanding",
+      "label": "Listen & Choose",
+      "data": {
+        "bronze": {
+          "audio": "What color is the sun?",
+          "question": "What color is the sun?",
+          "options": [
+            "yellow",
+            "blue",
+            "black",
+            "green"
+          ],
+          "answer": "yellow"
+        },
+        "silver": {
+          "audio": "Which color means stop on a traffic light?",
+          "question": "Which color means stop on a traffic light?",
+          "options": [
+            "red",
+            "green",
+            "yellow",
+            "blue"
+          ],
+          "answer": "red"
+        },
+        "gold": {
+          "audio": "Which color do you get by mixing blue and yellow?",
+          "question": "Which color do you get by mixing blue and yellow?",
+          "options": [
+            "green",
+            "purple",
+            "orange",
+            "black"
+          ],
+          "answer": "green"
+        }
+      }
+    },
+    {
+      "id": "putinorder",
+      "type": "sequencing",
+      "label": "Put in Order",
+      "data": {
+        "bronze": {
+          "prompt": "Put the traffic light colors in order (top to bottom).",
+          "items": [
+            "red",
+            "yellow",
+            "green"
+          ],
+          "correct": [
+            "red",
+            "yellow",
+            "green"
+          ]
+        },
+        "silver": {
+          "prompt": "Order the first three rainbow colors.",
+          "items": [
+            "red",
+            "orange",
+            "yellow"
+          ],
+          "correct": [
+            "red",
+            "orange",
+            "yellow"
+          ]
+        },
+        "gold": {
+          "prompt": "Order these from darkest to lightest.",
+          "items": [
+            "black",
+            "purple",
+            "pink",
+            "white"
+          ],
+          "correct": [
+            "black",
+            "purple",
+            "pink",
+            "white"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sayit",
+      "type": "audio-speaking",
+      "label": "Say It",
+      "data": {
+        "bronze": {
+          "prompt": "Say the color of the sky.",
+          "target": "blue",
+          "keyWords": []
+        },
+        "silver": {
+          "prompt": "Say a sentence about your favorite color.",
+          "target": "My favorite color is green.",
+          "keyWords": []
+        },
+        "gold": {
+          "prompt": "Explain why you like this color.",
+          "target": "I like blue because it is calm.",
+          "keyWords": []
+        }
+      }
+    },
+    {
+      "id": "picword",
+      "type": "image-vocab",
+      "label": "Picture & Word",
+      "data": {
+        "bronze": {
+          "mode": "word-to-image",
+          "items": [
+            {
+              "word": "red",
+              "emoji": "🔴",
+              "image": null,
+              "sentence": "The apple is red."
+            },
+            {
+              "word": "blue",
+              "emoji": "🔵",
+              "image": null,
+              "sentence": "The sky is blue."
+            },
+            {
+              "word": "green",
+              "emoji": "🟢",
+              "image": null,
+              "sentence": "The grass is green."
+            },
+            {
+              "word": "yellow",
+              "emoji": "🟡",
+              "image": null,
+              "sentence": "The sun is yellow."
+            },
+            {
+              "word": "orange",
+              "emoji": "🟠",
+              "image": null,
+              "sentence": "The pumpkin is orange."
+            },
+            {
+              "word": "purple",
+              "emoji": "🟣",
+              "image": null,
+              "sentence": "The grape is purple."
+            }
+          ]
+        },
+        "silver": {
+          "mode": "image-to-word",
+          "items": [
+            {
+              "word": "red",
+              "emoji": "🔴",
+              "image": null,
+              "sentence": "The apple is red."
+            },
+            {
+              "word": "blue",
+              "emoji": "🔵",
+              "image": null,
+              "sentence": "The sky is blue."
+            },
+            {
+              "word": "green",
+              "emoji": "🟢",
+              "image": null,
+              "sentence": "The grass is green."
+            },
+            {
+              "word": "yellow",
+              "emoji": "🟡",
+              "image": null,
+              "sentence": "The sun is yellow."
+            },
+            {
+              "word": "orange",
+              "emoji": "🟠",
+              "image": null,
+              "sentence": "The pumpkin is orange."
+            },
+            {
+              "word": "purple",
+              "emoji": "🟣",
+              "image": null,
+              "sentence": "The grape is purple."
+            }
+          ]
+        },
+        "gold": {
+          "mode": "cloze-image",
+          "items": [
+            {
+              "word": "red",
+              "emoji": "🔴",
+              "image": null,
+              "sentence": "The apple is ___."
+            },
+            {
+              "word": "blue",
+              "emoji": "🔵",
+              "image": null,
+              "sentence": "The sky is ___."
+            },
+            {
+              "word": "green",
+              "emoji": "🟢",
+              "image": null,
+              "sentence": "The grass is ___."
+            },
+            {
+              "word": "yellow",
+              "emoji": "🟡",
+              "image": null,
+              "sentence": "The sun is ___."
+            },
+            {
+              "word": "orange",
+              "emoji": "🟠",
+              "image": null,
+              "sentence": "The pumpkin is ___."
+            },
+            {
+              "word": "purple",
+              "emoji": "🟣",
+              "image": null,
+              "sentence": "The grape is ___."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wordscramble",
+      "type": "word-scramble",
+      "label": "Word Scramble",
+      "data": {
+        "bronze": {
+          "items": [
+            {
+              "word": "red",
+              "emoji": "🔴",
+              "sentence": ""
+            },
+            {
+              "word": "blue",
+              "emoji": "🔵",
+              "sentence": ""
+            },
+            {
+              "word": "green",
+              "emoji": "🟢",
+              "sentence": ""
+            },
+            {
+              "word": "pink",
+              "emoji": "🩷",
+              "sentence": ""
+            }
+          ]
+        },
+        "silver": {
+          "items": [
+            {
+              "word": "orange",
+              "emoji": "🟠",
+              "sentence": ""
+            },
+            {
+              "word": "purple",
+              "emoji": "🟣",
+              "sentence": ""
+            },
+            {
+              "word": "yellow",
+              "emoji": "🟡",
+              "sentence": ""
+            },
+            {
+              "word": "brown",
+              "emoji": "🟤",
+              "sentence": ""
+            }
+          ]
+        },
+        "gold": {
+          "items": [
+            {
+              "word": "violet",
+              "emoji": "🟣",
+              "sentence": ""
+            },
+            {
+              "word": "indigo",
+              "emoji": "🔵",
+              "sentence": ""
+            },
+            {
+              "word": "magenta",
+              "emoji": "🩷",
+              "sentence": ""
+            },
+            {
+              "word": "charcoal",
+              "emoji": "⚫",
+              "sentence": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "spelling",
+      "type": "spelling",
+      "label": "Spelling",
+      "data": {
+        "bronze": {
+          "items": [
+            {
+              "word": "red",
+              "emoji": "🔴",
+              "sentence": "",
+              "tokens": null
+            },
+            {
+              "word": "blue",
+              "emoji": "🔵",
+              "sentence": "",
+              "tokens": null
+            },
+            {
+              "word": "green",
+              "emoji": "🟢",
+              "sentence": "",
+              "tokens": null
+            },
+            {
+              "word": "pink",
+              "emoji": "🩷",
+              "sentence": "",
+              "tokens": null
+            }
+          ]
+        },
+        "silver": {
+          "items": [
+            {
+              "word": "orange",
+              "emoji": "🟠",
+              "sentence": "",
+              "tokens": null
+            },
+            {
+              "word": "purple",
+              "emoji": "🟣",
+              "sentence": "",
+              "tokens": null
+            },
+            {
+              "word": "yellow",
+              "emoji": "🟡",
+              "sentence": "",
+              "tokens": null
+            },
+            {
+              "word": "brown",
+              "emoji": "🟤",
+              "sentence": "",
+              "tokens": null
+            }
+          ]
+        },
+        "gold": {
+          "items": [
+            {
+              "word": "turquoise",
+              "emoji": "🔵",
+              "sentence": "",
+              "tokens": null
+            },
+            {
+              "word": "maroon",
+              "emoji": "🔴",
+              "sentence": "",
+              "tokens": null
+            },
+            {
+              "word": "lavender",
+              "emoji": "🟣",
+              "sentence": "",
+              "tokens": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "listenmatch",
+      "type": "audio-match",
+      "label": "Listen & Match",
+      "data": {
+        "bronze": {
+          "pairs": [
+            {
+              "audio": "red",
+              "text": "red"
+            },
+            {
+              "audio": "blue",
+              "text": "blue"
+            },
+            {
+              "audio": "green",
+              "text": "green"
+            }
+          ]
+        },
+        "silver": {
+          "pairs": [
+            {
+              "audio": "red",
+              "text": "red"
+            },
+            {
+              "audio": "blue",
+              "text": "blue"
+            },
+            {
+              "audio": "green",
+              "text": "green"
+            },
+            {
+              "audio": "yellow",
+              "text": "yellow"
+            }
+          ]
+        },
+        "gold": {
+          "pairs": [
+            {
+              "audio": "red",
+              "text": "red"
+            },
+            {
+              "audio": "blue",
+              "text": "blue"
+            },
+            {
+              "audio": "green",
+              "text": "green"
+            },
+            {
+              "audio": "yellow",
+              "text": "yellow"
+            },
+            {
+              "audio": "purple",
+              "text": "purple"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "buildsentence",
+      "type": "sentence-building",
+      "label": "Build a Sentence",
+      "data": {
+        "bronze": {
+          "items": [
+            {
+              "tokens": [
+                {
+                  "text": "The",
+                  "role": null
+                },
+                {
+                  "text": "sky",
+                  "role": "subject"
+                },
+                {
+                  "text": "is",
+                  "role": "verb"
+                },
+                {
+                  "text": "blue",
+                  "role": "object"
+                }
+              ]
+            },
+            {
+              "tokens": [
+                {
+                  "text": "The",
+                  "role": null
+                },
+                {
+                  "text": "grass",
+                  "role": "subject"
+                },
+                {
+                  "text": "is",
+                  "role": "verb"
+                },
+                {
+                  "text": "green",
+                  "role": "object"
+                }
+              ]
+            }
+          ]
+        },
+        "silver": {
+          "items": [
+            {
+              "tokens": [
+                {
+                  "text": "I",
+                  "role": "subject"
+                },
+                {
+                  "text": "wear",
+                  "role": "verb"
+                },
+                {
+                  "text": "a",
+                  "role": null
+                },
+                {
+                  "text": "red",
+                  "role": null
+                },
+                {
+                  "text": "shirt",
+                  "role": "object"
+                },
+                {
+                  "text": "every day",
+                  "role": "time"
+                }
+              ]
+            }
+          ]
+        },
+        "gold": {
+          "items": [
+            {
+              "tokens": [
+                {
+                  "text": "I",
+                  "role": "subject"
+                },
+                {
+                  "text": "like",
+                  "role": "verb"
+                },
+                {
+                  "text": "blue",
+                  "role": "object"
+                },
+                {
+                  "text": "because",
+                  "role": "connector"
+                },
+                {
+                  "text": "it is calm",
+                  "role": null
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
