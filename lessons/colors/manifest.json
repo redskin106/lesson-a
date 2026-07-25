@@ -1,0 +1,589 @@
+{
+  "lesson": "colors",
+  "assets": [
+    {
+      "id": "memorypairs.shared.item0.word",
+      "text": "red",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item0.word.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item0.sentence",
+      "text": "The apple is red.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pushed",
+      "file": "lessons/colors/audio/memorypairs.shared.item0.sentence.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item1.word",
+      "text": "blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item1.word.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item1.sentence",
+      "text": "The sky is blue.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item1.sentence.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item2.word",
+      "text": "green",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item2.word.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item2.sentence",
+      "text": "The grass is green.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item2.sentence.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item3.word",
+      "text": "yellow",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item3.word.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item3.sentence",
+      "text": "The sun is yellow.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item3.sentence.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item4.word",
+      "text": "orange",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item4.word.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item4.sentence",
+      "text": "The pumpkin is orange.",
+      "voice": "teach",
+      "emotion": "calm",
+      "status": "pushed",
+      "file": "lessons/colors/audio/memorypairs.shared.item4.sentence.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item5.word",
+      "text": "purple",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item5.word.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item5.sentence",
+      "text": "The grape is purple.",
+      "voice": "celebrate",
+      "emotion": "calm",
+      "status": "pushed",
+      "file": "lessons/colors/audio/memorypairs.shared.item5.sentence.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item6.word",
+      "text": "black",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item6.word.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item6.sentence",
+      "text": "The night is black.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item6.sentence.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item7.word",
+      "text": "white",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item7.word.mp3"
+    },
+    {
+      "id": "memorypairs.shared.item7.sentence",
+      "text": "The cloud is white.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/memorypairs.shared.item7.sentence.mp3"
+    },
+    {
+      "id": "listenchoose.bronze.audio",
+      "text": "What color is the sun?",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenchoose.bronze.audio.mp3"
+    },
+    {
+      "id": "listenchoose.silver.audio",
+      "text": "Which color means stop on a traffic light?",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenchoose.silver.audio.mp3"
+    },
+    {
+      "id": "listenchoose.gold.audio",
+      "text": "Which color do you get by mixing blue and yellow?",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenchoose.gold.audio.mp3"
+    },
+    {
+      "id": "sayit.bronze.target",
+      "text": "blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/sayit.bronze.target.mp3"
+    },
+    {
+      "id": "sayit.silver.target",
+      "text": "My favorite color is green.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/sayit.silver.target.mp3"
+    },
+    {
+      "id": "sayit.gold.target",
+      "text": "I like blue because it is calm.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/sayit.gold.target.mp3"
+    },
+    {
+      "id": "picword.shared.item0.word",
+      "text": "red",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item0.word.mp3"
+    },
+    {
+      "id": "picword.shared.item0.sentence",
+      "text": "The apple is red.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item0.sentence.mp3"
+    },
+    {
+      "id": "picword.shared.item1.word",
+      "text": "blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item1.word.mp3"
+    },
+    {
+      "id": "picword.shared.item1.sentence",
+      "text": "The sky is blue.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item1.sentence.mp3"
+    },
+    {
+      "id": "picword.shared.item2.word",
+      "text": "green",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item2.word.mp3"
+    },
+    {
+      "id": "picword.shared.item2.sentence",
+      "text": "The grass is green.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item2.sentence.mp3"
+    },
+    {
+      "id": "picword.shared.item3.word",
+      "text": "yellow",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item3.word.mp3"
+    },
+    {
+      "id": "picword.shared.item3.sentence",
+      "text": "The sun is yellow.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item3.sentence.mp3"
+    },
+    {
+      "id": "picword.shared.item4.word",
+      "text": "orange",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item4.word.mp3"
+    },
+    {
+      "id": "picword.shared.item4.sentence",
+      "text": "The pumpkin is orange.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item4.sentence.mp3"
+    },
+    {
+      "id": "picword.shared.item5.word",
+      "text": "purple",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item5.word.mp3"
+    },
+    {
+      "id": "picword.shared.item5.sentence",
+      "text": "The grape is purple.",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/picword.shared.item5.sentence.mp3"
+    },
+    {
+      "id": "wordscramble.bronze.item0.word",
+      "text": "red",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.bronze.item0.word.mp3"
+    },
+    {
+      "id": "wordscramble.bronze.item1.word",
+      "text": "blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.bronze.item1.word.mp3"
+    },
+    {
+      "id": "wordscramble.bronze.item2.word",
+      "text": "green",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.bronze.item2.word.mp3"
+    },
+    {
+      "id": "wordscramble.bronze.item3.word",
+      "text": "pink",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.bronze.item3.word.mp3"
+    },
+    {
+      "id": "wordscramble.silver.item0.word",
+      "text": "orange",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.silver.item0.word.mp3"
+    },
+    {
+      "id": "wordscramble.silver.item1.word",
+      "text": "purple",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.silver.item1.word.mp3"
+    },
+    {
+      "id": "wordscramble.silver.item2.word",
+      "text": "yellow",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.silver.item2.word.mp3"
+    },
+    {
+      "id": "wordscramble.silver.item3.word",
+      "text": "brown",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.silver.item3.word.mp3"
+    },
+    {
+      "id": "wordscramble.gold.item0.word",
+      "text": "violet",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.gold.item0.word.mp3"
+    },
+    {
+      "id": "wordscramble.gold.item1.word",
+      "text": "indigo",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.gold.item1.word.mp3"
+    },
+    {
+      "id": "wordscramble.gold.item2.word",
+      "text": "magenta",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.gold.item2.word.mp3"
+    },
+    {
+      "id": "wordscramble.gold.item3.word",
+      "text": "charcoal",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/wordscramble.gold.item3.word.mp3"
+    },
+    {
+      "id": "spelling.bronze.item0.word",
+      "text": "red",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.bronze.item0.word.mp3"
+    },
+    {
+      "id": "spelling.bronze.item1.word",
+      "text": "blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.bronze.item1.word.mp3"
+    },
+    {
+      "id": "spelling.bronze.item2.word",
+      "text": "green",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.bronze.item2.word.mp3"
+    },
+    {
+      "id": "spelling.bronze.item3.word",
+      "text": "pink",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.bronze.item3.word.mp3"
+    },
+    {
+      "id": "spelling.silver.item0.word",
+      "text": "orange",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.silver.item0.word.mp3"
+    },
+    {
+      "id": "spelling.silver.item1.word",
+      "text": "purple",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.silver.item1.word.mp3"
+    },
+    {
+      "id": "spelling.silver.item2.word",
+      "text": "yellow",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.silver.item2.word.mp3"
+    },
+    {
+      "id": "spelling.silver.item3.word",
+      "text": "brown",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.silver.item3.word.mp3"
+    },
+    {
+      "id": "spelling.gold.item0.word",
+      "text": "turquoise",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.gold.item0.word.mp3"
+    },
+    {
+      "id": "spelling.gold.item1.word",
+      "text": "maroon",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.gold.item1.word.mp3"
+    },
+    {
+      "id": "spelling.gold.item2.word",
+      "text": "lavender",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/spelling.gold.item2.word.mp3"
+    },
+    {
+      "id": "listenmatch.bronze.pair0",
+      "text": "red",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.bronze.pair0.mp3"
+    },
+    {
+      "id": "listenmatch.bronze.pair1",
+      "text": "blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.bronze.pair1.mp3"
+    },
+    {
+      "id": "listenmatch.bronze.pair2",
+      "text": "green",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.bronze.pair2.mp3"
+    },
+    {
+      "id": "listenmatch.silver.pair0",
+      "text": "red",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.silver.pair0.mp3"
+    },
+    {
+      "id": "listenmatch.silver.pair1",
+      "text": "blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.silver.pair1.mp3"
+    },
+    {
+      "id": "listenmatch.silver.pair2",
+      "text": "green",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.silver.pair2.mp3"
+    },
+    {
+      "id": "listenmatch.silver.pair3",
+      "text": "yellow",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.silver.pair3.mp3"
+    },
+    {
+      "id": "listenmatch.gold.pair0",
+      "text": "red",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.gold.pair0.mp3"
+    },
+    {
+      "id": "listenmatch.gold.pair1",
+      "text": "blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.gold.pair1.mp3"
+    },
+    {
+      "id": "listenmatch.gold.pair2",
+      "text": "green",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.gold.pair2.mp3"
+    },
+    {
+      "id": "listenmatch.gold.pair3",
+      "text": "yellow",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.gold.pair3.mp3"
+    },
+    {
+      "id": "listenmatch.gold.pair4",
+      "text": "purple",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/listenmatch.gold.pair4.mp3"
+    },
+    {
+      "id": "buildsentence.bronze.item0.sentence",
+      "text": "The sky is blue",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/buildsentence.bronze.item0.sentence.mp3"
+    },
+    {
+      "id": "buildsentence.bronze.item1.sentence",
+      "text": "The grass is green",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/buildsentence.bronze.item1.sentence.mp3"
+    },
+    {
+      "id": "buildsentence.silver.item0.sentence",
+      "text": "I wear a red shirt every day",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/buildsentence.silver.item0.sentence.mp3"
+    },
+    {
+      "id": "buildsentence.gold.item0.sentence",
+      "text": "I like blue because it is calm",
+      "voice": "teach",
+      "emotion": "neutral",
+      "status": "pending",
+      "file": "lessons/colors/audio/buildsentence.gold.item0.sentence.mp3"
+    }
+  ]
+}
