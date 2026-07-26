@@ -821,69 +821,149 @@ const LESSON = [
 
   ,
   // ── GAP FILL ─────────────────────────────────────
+  // v2: per-tier pool. `pick` is configurable per lesson/module (teacher-set).
   {
     id: 'mod-4',
     type: 'gap-fill',
     label: 'Fill the Gap',
     data: {
       bronze: {
-        sentence: 'I ___ water every day.',
-        options: ['drink', 'eat', 'sleep', 'run'],
-        answer: 'drink',
-        tokens: [
-          { t:'I', r:'subject' }, { t:'drink', r:'verb' },
-          { t:'water', r:'object' }, { t:'every day', r:'time' }
+        pick: 2,
+        items: [
+          {
+            sentence: 'I ___ water every day.',
+            options: ['drink', 'eat', 'sleep', 'run'],
+            answer: 'drink',
+            tokens: [
+              { t:'I', r:'subject' }, { t:'drink', r:'verb' },
+              { t:'water', r:'object' }, { t:'every day', r:'time' }
+            ]
+          },
+          {
+            sentence: 'He ___ to school by bus.',
+            options: ['goes', 'eats', 'sleeps', 'drinks'],
+            answer: 'goes',
+            tokens: [
+              { t:'He', r:'subject' }, { t:'goes', r:'verb' },
+              { t:'to school', r:'place' }, { t:'by bus', r:'time' }
+            ]
+          }
         ]
       },
       silver: {
-        sentence: 'She ___ her homework before dinner.',
-        options: ['does', 'eats', 'reads', 'plays', 'sleeps'],
-        answer: 'does',
-        tokens: [
-          { t:'She', r:'subject' }, { t:'does', r:'verb' },
-          { t:'her homework', r:'object' }, { t:'before dinner', r:'time' }
+        pick: 2,
+        items: [
+          {
+            sentence: 'She ___ her homework before dinner.',
+            options: ['does', 'eats', 'reads', 'plays', 'sleeps'],
+            answer: 'does',
+            tokens: [
+              { t:'She', r:'subject' }, { t:'does', r:'verb' },
+              { t:'her homework', r:'object' }, { t:'before dinner', r:'time' }
+            ]
+          },
+          {
+            sentence: 'They ___ football every Saturday.',
+            options: ['play', 'eat', 'read', 'watch', 'sleep'],
+            answer: 'play',
+            tokens: [
+              { t:'They', r:'subject' }, { t:'play', r:'verb' },
+              { t:'football', r:'object' }, { t:'every Saturday', r:'time' }
+            ]
+          }
         ]
       },
       gold: {
-        sentence: 'My uncle works at the hospital and ___ sick people.',
-        options: ['helps', 'calls', 'reads', 'drives', 'meets', 'teaches'],
-        answer: 'helps',
-        tokens: [
-          { t:'My uncle', r:'subject' }, { t:'works', r:'verb' },
-          { t:'at the hospital', r:'place' }, { t:'and', r:'connector' },
-          { t:'helps', r:'verb' }, { t:'sick people', r:'object' }
+        pick: 2,
+        items: [
+          {
+            sentence: 'My uncle works at the hospital and ___ sick people.',
+            options: ['helps', 'calls', 'reads', 'drives', 'meets', 'teaches'],
+            answer: 'helps',
+            tokens: [
+              { t:'My uncle', r:'subject' }, { t:'works', r:'verb' },
+              { t:'at the hospital', r:'place' }, { t:'and', r:'connector' },
+              { t:'helps', r:'verb' }, { t:'sick people', r:'object' }
+            ]
+          },
+          {
+            sentence: 'We usually visit our grandparents and ___ dinner together.',
+            options: ['eat', 'buy', 'read', 'watch', 'drive', 'clean'],
+            answer: 'eat',
+            tokens: [
+              { t:'We', r:'subject' }, { t:'usually', r:'connector' }, { t:'visit', r:'verb' },
+              { t:'our grandparents', r:'object' }, { t:'and', r:'connector' },
+              { t:'eat', r:'verb' }, { t:'dinner', r:'object' }, { t:'together', r:'connector' }
+            ]
+          }
         ]
       }
     }
   },
 
   // ── TRUE / FALSE ──────────────────────────────────
+  // v2: per-tier pool. `pick` is configurable per lesson/module (teacher-set).
   {
     id: 'mod-5',
     type: 'true-false',
     label: 'True or False',
     data: {
       bronze: {
-        statement: 'A dog is an animal.',
-        answer: true,
-        tokens: [
-          { t:'A dog', r:'subject' }, { t:'is', r:'verb' }, { t:'an animal', r:'object' }
+        pick: 2,
+        items: [
+          {
+            statement: 'A dog is an animal.',
+            answer: true,
+            tokens: [{ t:'A dog', r:'subject' }, { t:'is', r:'verb' }, { t:'an animal', r:'object' }]
+          },
+          {
+            statement: 'A cat can fly.',
+            answer: false,
+            tokens: [{ t:'A cat', r:'subject' }, { t:'can fly', r:'verb' }]
+          }
         ]
       },
       silver: {
-        statement: 'We eat breakfast at night.',
-        answer: false,
-        tokens: [
-          { t:'We', r:'subject' }, { t:'eat', r:'verb' },
-          { t:'breakfast', r:'object' }, { t:'at night', r:'time' }
+        pick: 2,
+        items: [
+          {
+            statement: 'We eat breakfast at night.',
+            answer: false,
+            tokens: [
+              { t:'We', r:'subject' }, { t:'eat', r:'verb' },
+              { t:'breakfast', r:'object' }, { t:'at night', r:'time' }
+            ]
+          },
+          {
+            statement: 'Students go to school on Sunday.',
+            answer: false,
+            tokens: [
+              { t:'Students', r:'subject' }, { t:'go', r:'verb' },
+              { t:'to school', r:'place' }, { t:'on Sunday', r:'time' }
+            ]
+          }
         ]
       },
       gold: {
-        statement: 'She goes to the library after class to study quietly.',
-        answer: true,
-        tokens: [
-          { t:'She', r:'subject' }, { t:'goes', r:'verb' },
-          { t:'to the library', r:'place' }, { t:'after class', r:'time' }
+        pick: 2,
+        items: [
+          {
+            statement: 'She goes to the library after class to study quietly.',
+            answer: true,
+            tokens: [
+              { t:'She', r:'subject' }, { t:'goes', r:'verb' },
+              { t:'to the library', r:'place' }, { t:'after class', r:'time' }
+            ]
+          },
+          {
+            statement: 'My brother works at a hospital and fixes cars every night.',
+            answer: false,
+            tokens: [
+              { t:'My brother', r:'subject' }, { t:'works', r:'verb' },
+              { t:'at a hospital', r:'place' }, { t:'and', r:'connector' },
+              { t:'fixes cars', r:'verb' }, { t:'every night', r:'time' }
+            ]
+          }
         ]
       }
     }
@@ -1010,26 +1090,43 @@ const LESSON = [
   },
 
   // ── Image Vocab (Picture & Word) ──────────────
-  // v2 contract: shared allItems pool + tiers[].mode. `cloze` is just the
+  // v2: separate pool PER TIER — { pick, mode, items }. `cloze` is just the
   // answer word; `sentence` already contains the ___ blank for cloze-image.
   {
     id: 'mod-image-vocab',
     type: 'image-vocab',
     label: 'Picture & Word',
     data: {
-      allItems: [
-        { word:'dog',    emoji:'🐕', sentence:'The dog ___ in the park.',     cloze:'runs' },
-        { word:'water',  emoji:'💧', sentence:'I ___ water every day.',       cloze:'drink' },
-        { word:'school', emoji:'🏫', sentence:'School ___ at eight o\'clock.', cloze:'starts' },
-        { word:'book',   emoji:'📚', sentence:'She ___ a book every night.',  cloze:'reads' },
-        { word:'bus',    emoji:'🚌', sentence:'She ___ the bus to school.',   cloze:'takes' },
-        { word:'cat',    emoji:'🐈', sentence:'The cat ___ on the chair.',    cloze:'sleeps' }
-      ],
-      tiers: [
-        { mode:'word-to-image' },
-        { mode:'image-to-word' },
-        { mode:'cloze-image' }
-      ]
+      bronze: {
+        pick: 3,
+        mode: 'word-to-image',
+        items: [
+          { word:'dog',    emoji:'🐕', sentence:'The dog ___ in the park.',       cloze:'runs' },
+          { word:'water',  emoji:'💧', sentence:'I ___ water every day.',         cloze:'drink' },
+          { word:'cat',    emoji:'🐈', sentence:'The cat ___ on the chair.',      cloze:'sleeps' },
+          { word:'bus',    emoji:'🚌', sentence:'She ___ the bus to school.',     cloze:'takes' }
+        ]
+      },
+      silver: {
+        pick: 3,
+        mode: 'image-to-word',
+        items: [
+          { word:'school', emoji:'🏫', sentence:'School ___ at eight o\'clock.',   cloze:'starts' },
+          { word:'book',   emoji:'📚', sentence:'She ___ a book every night.',     cloze:'reads' },
+          { word:'bird',   emoji:'🐦', sentence:'The bird ___ in the tree.',       cloze:'sings' },
+          { word:'phone',  emoji:'📱', sentence:'He ___ his phone every day.',     cloze:'uses' }
+        ]
+      },
+      gold: {
+        pick: 3,
+        mode: 'cloze-image',
+        items: [
+          { word:'letter', emoji:'✉️', sentence:'My uncle ___ a letter every week.', cloze:'writes' },
+          { word:'garden', emoji:'🌷', sentence:'They ___ the garden on Sundays.',   cloze:'water' },
+          { word:'guitar', emoji:'🎸', sentence:'My sister ___ the guitar well.',    cloze:'plays' },
+          { word:'bread',  emoji:'🍞', sentence:'She ___ bread every morning.',      cloze:'bakes' }
+        ]
+      }
     }
   },
 
@@ -1293,14 +1390,10 @@ function startModule(moduleIndex, tier) {
     return;
   }
 
-  // Pool-based modules (shared allItems + tiers array) need the full data object,
-  // not just this tier's slice — per SHELL_MERGE_SPEC.md. Only image-vocab is
-  // converted so far this round; memory-pairs is still the old per-tier shape
-  // until its own merge pass (next round) — don't special-case it yet.
-  const POOL_BASED = ['image-vocab'];
-  const dataForRenderer = POOL_BASED.includes(mod.type) ? mod.data : mod.data[tier];
-
-  renderer.render(container, dataForRenderer, tier, score => {
+  // Every module now uses a per-tier pool: { pick, items: [...], ...mode? }.
+  // No more shared-across-tiers special-casing needed (Nick's call: pools
+  // shouldn't be shared across tiers since difficulty differs per tier).
+  renderer.render(container, mod.data[tier], tier, score => {
     handleTierResult(moduleIndex, tier, score);
   });
 }
@@ -1787,17 +1880,15 @@ const MODULE_REGISTRY = {
   //  Check button confirms answer.
   // ─────────────────────────────────────────────
   'gap-fill': {
-    // v2 design: retry-until-correct. First-try correct → score 1 (3 stars).
-    // Correct after one or more wrong attempts → score 0.6 (2 stars).
-    // Grammar-color reinforcement (with audio) shows only once the student
-    // actually gets it right, then hands off to onComplete.
+    // v2 design: pool-based. Each tier is { pick, items: [...] } — a separate
+    // pool per tier (per Nick's decision: difficulty differs per tier, so
+    // pools shouldn't be shared across tiers). Draws `pick` items, runs each
+    // with retry-until-correct scoring (first-try=1, retry-then-correct=0.6),
+    // then averages across the session for the tier's overall score.
     render(container, data, tier, onComplete) {
-      const { sentence, options, answer, tokens } = data;
-      let selected = null;
-      let attemptedWrong = false;
-      let locked = false;
-
-      document.getElementById('v2-qlabel').textContent = 'Fill in the blank';
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0, totalScore = 0;
 
       const PALETTE = [
         { border:'#00BCD4', bg:'rgba(0,188,212,.18)',  color:'#4DD0E1' },
@@ -1807,64 +1898,78 @@ const MODULE_REGISTRY = {
         { border:'#8BC34A', bg:'rgba(139,195,74,.18)', color:'#AED581' }
       ];
 
-      container.innerHTML = `
-        <p class="gf-sentence" id="gf-sentence"></p>
-        <div class="gf-pill-row" id="gf-pill-row"></div>
-        <button id="gf-check-btn" class="gf-check-btn">Check</button>
-        <p class="gf-status" id="gf-status">&nbsp;</p>
-      `;
+      function renderQuestion() {
+        const { sentence, options, answer, tokens } = session[idx];
+        let selected = null, attemptedWrong = false, locked = false;
 
-      container.querySelector('#gf-sentence').innerHTML =
-        sentence.replace('___', '<span class="gf-blank" id="gf-blank-slot">&nbsp;</span>');
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
-      const pillRow  = container.querySelector('#gf-pill-row');
-      const checkBtn = container.querySelector('#gf-check-btn');
-      const statusEl = container.querySelector('#gf-status');
+        container.innerHTML = `
+          <p class="gf-sentence" id="gf-sentence"></p>
+          <div class="gf-pill-row" id="gf-pill-row"></div>
+          <button id="gf-check-btn" class="gf-check-btn">Check</button>
+          <p class="gf-status" id="gf-status">&nbsp;</p>
+        `;
 
-      options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'gf-pill';
-        btn.textContent = opt;
-        btn.dataset.word = opt;
-        const c = PALETTE[idx % PALETTE.length];
-        btn.addEventListener('click', () => {
-          if (locked) return;
-          pillRow.querySelectorAll('.gf-pill').forEach(x => {
-            x.classList.remove('selected');
-            x.style.borderColor = ''; x.style.background = ''; x.style.color = '';
+        container.querySelector('#gf-sentence').innerHTML =
+          sentence.replace('___', '<span class="gf-blank" id="gf-blank-slot">&nbsp;</span>');
+
+        const pillRow  = container.querySelector('#gf-pill-row');
+        const checkBtn = container.querySelector('#gf-check-btn');
+        const statusEl = container.querySelector('#gf-status');
+
+        options.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'gf-pill';
+          btn.textContent = opt;
+          btn.dataset.word = opt;
+          const c = PALETTE[i % PALETTE.length];
+          btn.addEventListener('click', () => {
+            if (locked) return;
+            pillRow.querySelectorAll('.gf-pill').forEach(x => {
+              x.classList.remove('selected');
+              x.style.borderColor = ''; x.style.background = ''; x.style.color = '';
+            });
+            btn.classList.add('selected');
+            btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+            selected = opt;
+            const blank = container.querySelector('#gf-blank-slot');
+            if (blank) { blank.textContent = opt; blank.style.color = c.color; }
           });
-          btn.classList.add('selected');
-          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
-          selected = opt;
-          const blank = container.querySelector('#gf-blank-slot');
-          if (blank) { blank.textContent = opt; blank.style.color = c.color; }
+          pillRow.appendChild(btn);
         });
-        pillRow.appendChild(btn);
-      });
 
-      checkBtn.addEventListener('click', () => {
-        if (locked) return;
-        if (!selected) { statusEl.textContent = 'pick an option first'; return; }
+        checkBtn.addEventListener('click', () => {
+          if (locked) return;
+          if (!selected) { statusEl.textContent = 'pick an option first'; return; }
 
-        if (selected === answer) {
-          locked = true;
-          checkBtn.disabled = true;
-          statusEl.textContent = attemptedWrong ? 'correct, nice recovery' : 'correct, first try';
-          const score = attemptedWrong ? 0.6 : 1;
-          const plain = (tokens || []).map(t => t.t).join(' ');
-          setTimeout(() => {
-            showGrammarReinforce(tokens, plain, () => onComplete(score));
-          }, 550);
-        } else {
-          attemptedWrong = true;
-          statusEl.textContent = 'not quite, try again';
-          const sel = pillRow.querySelector(`[data-word="${selected}"]`);
-          if (sel) sel.animate(
-            [{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}],
-            {duration:350}
-          );
-        }
-      });
+          if (selected === answer) {
+            locked = true;
+            checkBtn.disabled = true;
+            statusEl.textContent = attemptedWrong ? 'correct, nice recovery' : 'correct, first try';
+            const score = attemptedWrong ? 0.6 : 1;
+            totalScore += score;
+            const plain = (tokens || []).map(t => t.t).join(' ');
+            setTimeout(() => {
+              showGrammarReinforce(tokens, plain, () => {
+                idx++;
+                if (idx < session.length) renderQuestion();
+                else onComplete(totalScore / session.length);
+              });
+            }, 550);
+          } else {
+            attemptedWrong = true;
+            statusEl.textContent = 'not quite, try again';
+            const sel = pillRow.querySelector(`[data-word="${selected}"]`);
+            if (sel) sel.animate(
+              [{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}],
+              {duration:350}
+            );
+          }
+        });
+      }
+
+      renderQuestion();
     }
   },
 
@@ -1874,60 +1979,74 @@ const MODULE_REGISTRY = {
   //  Tap one → immediate feedback, show correct.
   // ─────────────────────────────────────────────
   'true-false': {
-    // v2 design: tap True/False to select, then Check. Single attempt —
-    // grammar-color reinforcement (with audio) shows either way, correct or
-    // wrong, so the student always gets the teaching moment.
+    // v2 design: pool-based, { pick, items: [...] } per tier, separate pool
+    // per tier. Tap True/False then Check, single attempt per question —
+    // grammar reinforcement shows either way, correct or wrong — then
+    // averages across the session for the tier's overall score.
     render(container, data, tier, onComplete) {
-      const { statement, answer, tokens } = data;
-      let selectedChoice = null;
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0, totalScore = 0;
 
-      document.getElementById('v2-qlabel').textContent = 'Is it true or false?';
+      function renderQuestion() {
+        const { statement, answer, tokens } = session[idx];
+        let selectedChoice = null;
 
-      container.innerHTML = `
-        <div class="tf-statement-v2" id="tf-statement">${statement}</div>
-        <div class="tf-buttons-v2">
-          <button class="tf-btn-v2" id="tf-true-btn">✓ True</button>
-          <button class="tf-btn-v2" id="tf-false-btn">✗ False</button>
-        </div>
-        <button id="gf-check-btn" class="gf-check-btn">Check</button>
-        <p class="gf-status" id="tf-status">&nbsp;</p>
-      `;
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
-      const trueBtn  = container.querySelector('#tf-true-btn');
-      const falseBtn = container.querySelector('#tf-false-btn');
-      const checkBtn = container.querySelector('#gf-check-btn');
-      const statusEl = container.querySelector('#tf-status');
+        container.innerHTML = `
+          <div class="tf-statement-v2" id="tf-statement">${statement}</div>
+          <div class="tf-buttons-v2">
+            <button class="tf-btn-v2" id="tf-true-btn">✓ True</button>
+            <button class="tf-btn-v2" id="tf-false-btn">✗ False</button>
+          </div>
+          <button id="gf-check-btn" class="gf-check-btn">Check</button>
+          <p class="gf-status" id="tf-status">&nbsp;</p>
+        `;
 
-      function selectChoice(choice) {
-        if (trueBtn.disabled) return;
-        selectedChoice = (selectedChoice === choice) ? null : choice;
-        trueBtn.classList.toggle('selected', selectedChoice === true);
-        falseBtn.classList.toggle('selected', selectedChoice === false);
-        statusEl.textContent = '\u00A0';
+        const trueBtn  = container.querySelector('#tf-true-btn');
+        const falseBtn = container.querySelector('#tf-false-btn');
+        const checkBtn = container.querySelector('#gf-check-btn');
+        const statusEl = container.querySelector('#tf-status');
+
+        function selectChoice(choice) {
+          if (trueBtn.disabled) return;
+          selectedChoice = (selectedChoice === choice) ? null : choice;
+          trueBtn.classList.toggle('selected', selectedChoice === true);
+          falseBtn.classList.toggle('selected', selectedChoice === false);
+          statusEl.textContent = '\u00A0';
+        }
+        trueBtn.addEventListener('click', () => selectChoice(true));
+        falseBtn.addEventListener('click', () => selectChoice(false));
+
+        checkBtn.addEventListener('click', () => {
+          if (trueBtn.disabled) return;
+          if (selectedChoice === null) { statusEl.textContent = 'pick True or False first'; return; }
+
+          const correct = (selectedChoice === answer);
+          trueBtn.disabled = true;
+          falseBtn.disabled = true;
+          checkBtn.disabled = true;
+          if (correct) totalScore += 1;
+
+          const chosenBtn = selectedChoice ? trueBtn : falseBtn;
+          chosenBtn.classList.remove('selected');
+          chosenBtn.classList.add(correct ? 'hl-correct' : 'hl-wrong');
+          statusEl.textContent = correct ? 'correct!' : 'not quite right';
+
+          const plain = tokens && tokens.length ? tokens.map(t => t.t).join(' ') : statement;
+          setTimeout(() => {
+            setGrammarReinforceLabel(correct);
+            showGrammarReinforce(tokens, plain, () => {
+              idx++;
+              if (idx < session.length) renderQuestion();
+              else onComplete(totalScore / session.length);
+            });
+          }, 550);
+        });
       }
-      trueBtn.addEventListener('click', () => selectChoice(true));
-      falseBtn.addEventListener('click', () => selectChoice(false));
 
-      checkBtn.addEventListener('click', () => {
-        if (trueBtn.disabled) return;
-        if (selectedChoice === null) { statusEl.textContent = 'pick True or False first'; return; }
-
-        const correct = (selectedChoice === answer);
-        trueBtn.disabled = true;
-        falseBtn.disabled = true;
-        checkBtn.disabled = true;
-
-        const chosenBtn = selectedChoice ? trueBtn : falseBtn;
-        chosenBtn.classList.remove('selected');
-        chosenBtn.classList.add(correct ? 'hl-correct' : 'hl-wrong');
-        statusEl.textContent = correct ? 'correct!' : 'not quite right';
-
-        const plain = tokens && tokens.length ? tokens.map(t => t.t).join(' ') : statement;
-        setTimeout(() => {
-          setGrammarReinforceLabel(correct);
-          showGrammarReinforce(tokens, plain, () => onComplete(correct ? 1 : 0));
-        }, 550);
-      });
+      renderQuestion();
     }
   },
 
@@ -2421,17 +2540,13 @@ const MODULE_REGISTRY = {
     // "Picture & Word" module — kept as 'image-vocab' to match the real
     // production `type` field; SHELL_MERGE_SPEC's "picture-word" is a
     // descriptive name, not the actual data-contract key.
-    // v2 design (SHELL_MERGE_SPEC.md): shared allItems pool + tiers[].mode,
-    // NOT per-tier item lists. `cloze` is just the answer word (e.g. "runs"),
-    // not a full sentence — `sentence` already contains the ___ blank.
-    // `data` here is the FULL mod.data object (allItems + tiers), not a
-    // per-tier slice — see the POOL_BASED special-case in startModule().
+    // v2 design: separate pool PER TIER — { pick, mode, items: [...] } —
+    // per Nick's decision that difficulty (and content) shouldn't be shared
+    // across tiers. `cloze` is just the answer word (e.g. "runs"), not a
+    // full sentence — `sentence` already contains the ___ blank.
     render(container, data, tier, onComplete) {
-      const { allItems, tiers } = data;
-      const tierIndex = TIERS.indexOf(tier);
-      const mode = tiers[tierIndex].mode;
-      const PICK = Math.min(allItems.length, 3);
-      const session = safeShuffle(allItems, () => false).slice(0, PICK);
+      const { pick, mode, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
       let idx = 0, score = 0, locked = false, selected = null;
 
       function pips() {
@@ -2459,7 +2574,7 @@ const MODULE_REGISTRY = {
         let spokenWord;
 
         if (mode === 'image-to-word') {
-          const pool = safeShuffle(allItems.filter(i => i.word !== item.word), () => false).slice(0, 2);
+          const pool = safeShuffle(items.filter(i => i.word !== item.word), () => false).slice(0, 2);
           const opts = safeShuffle([item, ...pool], r => r[0].word === item.word);
           content.innerHTML = `
             <div class="iv-visual"><div class="iv-emoji">${item.emoji}</div><p class="iv-instruction">Tap the correct word</p></div>
@@ -2467,7 +2582,7 @@ const MODULE_REGISTRY = {
           `;
           spokenWord = item.word;
         } else if (mode === 'word-to-image') {
-          const pool = safeShuffle(allItems.filter(i => i.emoji !== item.emoji), () => false).slice(0, 2);
+          const pool = safeShuffle(items.filter(i => i.emoji !== item.emoji), () => false).slice(0, 2);
           const opts = safeShuffle([item, ...pool], r => r[0].emoji === item.emoji);
           content.innerHTML = `
             <div class="iv-visual"><div class="iv-word">${item.word}</div><p class="iv-instruction">Tap the correct picture</p></div>
@@ -2476,7 +2591,7 @@ const MODULE_REGISTRY = {
           spokenWord = item.word;
         } else {
           // cloze-image: `sentence` already has ___, `cloze` is the answer word
-          const pool = safeShuffle(allItems.filter(i => i.cloze !== item.cloze), () => false).slice(0, 3);
+          const pool = safeShuffle(items.filter(i => i.cloze !== item.cloze), () => false).slice(0, 3);
           const opts = safeShuffle([item, ...pool], r => r[0].cloze === item.cloze);
           content.innerHTML = `
             <div class="iv-visual"><div class="iv-emoji" style="font-size:9cqw;">${item.emoji}</div></div>
@@ -2523,7 +2638,7 @@ const MODULE_REGISTRY = {
         nextBtn.addEventListener('click', () => {
           idx++;
           if (idx < session.length) renderQuestion();
-          else onComplete(score / PICK);
+          else onComplete(score / session.length);
         });
       }
 
