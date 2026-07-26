@@ -618,12 +618,12 @@ html, body {
      Jumps straight to any module/tier, skipping the
      name picker and linear tier progression.
 ════════════════════════════════════ -->
-<div id="debug-harness" style="display:none; position:fixed; top:0; left:0; right:0; z-index:999; background:#0D1B2A; border-bottom:1px solid #1E3248; padding:10px 12px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-  <select id="debug-module-select" style="flex:1; min-width:160px; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.12); color:#fff; font-size:14px; padding:8px 10px; border-radius:8px; font-family:inherit;"></select>
-  <select id="debug-tier-select" style="background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.12); color:#fff; font-size:14px; padding:8px 10px; border-radius:8px; font-family:inherit;">
-    <option value="bronze">Bronze</option>
-    <option value="silver">Silver</option>
-    <option value="gold">Gold</option>
+<div id="debug-harness" style="display:none; position:fixed; top:0; left:0; right:0; z-index:999; background:#0D1B2A; border-bottom:1px solid #1E3248; padding:10px 12px; gap:8px; flex-wrap:wrap; justify-content:center;">
+  <select id="debug-module-select" style="flex:1; min-width:160px; background:#0D1B2A; border:1.5px solid rgba(255,255,255,0.12); color:#fff; font-size:14px; padding:8px 10px; border-radius:8px; font-family:inherit;"></select>
+  <select id="debug-tier-select" style="background:#0D1B2A; border:1.5px solid rgba(255,255,255,0.12); color:#fff; font-size:14px; padding:8px 10px; border-radius:8px; font-family:inherit;">
+    <option value="bronze" style="background:#0D1B2A; color:#fff;">Bronze</option>
+    <option value="silver" style="background:#0D1B2A; color:#fff;">Silver</option>
+    <option value="gold" style="background:#0D1B2A; color:#fff;">Gold</option>
   </select>
 </div>
 
@@ -3300,6 +3300,8 @@ showScreen('screen-name');
     const opt = document.createElement('option');
     opt.value = i;
     opt.textContent = `${i + 1}. ${mod.label} (${mod.type})`;
+    opt.style.background = '#0D1B2A';
+    opt.style.color = '#fff';
     moduleSelect.appendChild(opt);
   });
 
