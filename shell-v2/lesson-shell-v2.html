@@ -1911,10 +1911,9 @@ const MODULE_REGISTRY = {
         checkBtn.disabled = true;
 
         const chosenBtn = selectedChoice ? trueBtn : falseBtn;
+        chosenBtn.classList.remove('selected');
         chosenBtn.classList.add(correct ? 'hl-correct' : 'hl-wrong');
-        if (!correct) {
-          (answer ? trueBtn : falseBtn).classList.add('hl-correct');
-        }
+        statusEl.textContent = correct ? 'correct!' : 'not quite right';
 
         const plain = tokens && tokens.length ? tokens.map(t => t.t).join(' ') : statement;
         setTimeout(() => {
