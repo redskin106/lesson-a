@@ -614,6 +614,20 @@ html, body {
 <body>
 
 <!-- ═══════════════════════════════════
+     DEBUG HARNESS — only shown with ?debug=1
+     Jumps straight to any module/tier, skipping the
+     name picker and linear tier progression.
+════════════════════════════════════ -->
+<div id="debug-harness" style="display:none; position:fixed; top:0; left:0; right:0; z-index:999; background:#0D1B2A; border-bottom:1px solid #1E3248; padding:10px 12px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+  <select id="debug-module-select" style="flex:1; min-width:160px; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.12); color:#fff; font-size:14px; padding:8px 10px; border-radius:8px; font-family:inherit;"></select>
+  <select id="debug-tier-select" style="background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.12); color:#fff; font-size:14px; padding:8px 10px; border-radius:8px; font-family:inherit;">
+    <option value="bronze">Bronze</option>
+    <option value="silver">Silver</option>
+    <option value="gold">Gold</option>
+  </select>
+</div>
+
+<!-- ═══════════════════════════════════
      SCREEN 1 — NAME PICKER
 ════════════════════════════════════ -->
 <div id="screen-name" class="screen active">
@@ -3265,6 +3279,50 @@ const MODULE_REGISTRY = {
 // ══════════════════════════════════════════════════
 
 showScreen('screen-name');
+
+// ══════════════════════════════════════════════════
+//  DEBUG HARNESS — ?debug=1
+//  Skips the name picker/linear tier flow so any
+//  module + tier can be jumped to directly, the same
+//  way module-demos/test-harness.html works for the
+//  standalone demo files.
+// ══════════════════════════════════════════════════
+(function initDebugHarness() {
+  if (new URLSearchParams(location.search).get('debug') !== '1') return;
+
+  document.getElementById('debug-harness').style.display = 'flex';
+  document.querySelectorAll('.screen').forEach(s => s.style.paddingTop = '54px');
+
+  const moduleSelect = document.getElementById('debug-module-select');
+  const tierSelect = document.getElementById('debug-tier-select');
+
+  LESSON.forEach((mod, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${i + 1}. ${mod.label} (${mod.type})`;
+    moduleSelect.appendChild(opt);
+  });
+
+  // Auto-pick the first student so audio/name display works without
+  // clicking through the name picker.
+  state.student = STUDENTS[0];
+  state.results = buildResults();
+
+  function jump() {
+    startModule(Number(moduleSelect.value), tierSelect.value);
+  }
+  moduleSelect.addEventListener('change', jump);
+  tierSelect.addEventListener('change', jump);
+
+  // Read initial state from URL if provided (?module=<index>&tier=bronze)
+  const params = new URLSearchParams(location.search);
+  const initialModule = params.get('module');
+  const initialTier = params.get('tier');
+  if (initialModule !== null && LESSON[initialModule]) moduleSelect.value = initialModule;
+  if (initialTier) tierSelect.value = initialTier;
+
+  jump();
+})();
 </script>
 </body>
 </html>
