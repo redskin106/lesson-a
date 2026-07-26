@@ -1271,7 +1271,10 @@ function startModule(moduleIndex, tier) {
   document.getElementById('v2-medal-img').alt = `${cap(tier)} tier`;
 
   // v2 chrome: student name + tier, shown in the qlabel slot
-  document.getElementById('v2-qlabel').textContent = `${state.student} — ${cap(tier)} tier`;
+  // qlabel text is now set per-module (short instruction or live question
+  // progress) inside each renderer — see MODULE_REGISTRY. Clear it here so
+  // stale text doesn't linger from the previous module.
+  document.getElementById('v2-qlabel').textContent = '';
 
   // v2 chrome: overall lesson progress (modules fully complete / total)
   const doneCount = state.results.filter(r => r.complete).length;
@@ -1794,6 +1797,8 @@ const MODULE_REGISTRY = {
       let attemptedWrong = false;
       let locked = false;
 
+      document.getElementById('v2-qlabel').textContent = 'Fill in the blank';
+
       const PALETTE = [
         { border:'#00BCD4', bg:'rgba(0,188,212,.18)',  color:'#4DD0E1' },
         { border:'#AB47BC', bg:'rgba(171,71,188,.18)', color:'#CE93D8' },
@@ -1875,6 +1880,8 @@ const MODULE_REGISTRY = {
     render(container, data, tier, onComplete) {
       const { statement, answer, tokens } = data;
       let selectedChoice = null;
+
+      document.getElementById('v2-qlabel').textContent = 'Is it true or false?';
 
       container.innerHTML = `
         <div class="tf-statement-v2" id="tf-statement">${statement}</div>
@@ -2435,6 +2442,7 @@ const MODULE_REGISTRY = {
 
       function renderQuestion() {
         locked = false; selected = null;
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
         container.innerHTML = `
           <div class="iv-pips-row" id="iv-pips"></div>
           <div id="iv-content"></div>
