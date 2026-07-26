@@ -610,6 +610,29 @@ html, body {
 .iv-feedback { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 3%; }
 .iv-action-btn { display: none; margin: 0 auto; padding: 3% 12%; border-radius: 999px; background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5); color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit; }
 .iv-proceed-btn { display: none; margin: 0 auto; padding: 3% 12%; border-radius: 999px; border: none; background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%); color: #fff; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit; }
+
+/* Put in Order (v2) */
+.seq-prompt-v2 { color: #fff; font-size: 4cqw; text-align: center; margin-bottom: 5%; line-height: 1.4; }
+.seq-slots-v2 { display: flex; flex-direction: column; gap: 1.44cqw; margin-bottom: 5%; }
+.seq-slot-v2 {
+  display: flex; align-items: center; gap: 3%;
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 999px; padding: 1.6cqw 5%;
+  font-size: 3.4cqw; color: rgba(255,255,255,0.4);
+  transition: transform .12s, background .15s, border-color .15s, color .15s;
+}
+.slot-num-v2 { font-weight: 700; font-size: 3.8cqw; flex-shrink: 0; width: 6%; }
+.slot-text-v2 { color: rgba(255,255,255,0.85); line-height: 1.3; }
+.seq-pool-label-v2 { color: rgba(255,255,255,0.4); font-size: 3cqw; text-align: center; margin-bottom: 3%; }
+.seq-pool-v2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.44cqw; margin-bottom: 5%; }
+.seq-item-v2 {
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 4% 3%;
+  color: rgba(255,255,255,0.85); font-size: 3.4cqw; font-family: inherit;
+  cursor: pointer; transition: transform .12s, background .15s, border-color .15s, color .15s;
+  line-height: 1.3;
+}
+.seq-item-v2.used { opacity: 0.25; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -1003,25 +1026,56 @@ const LESSON = [
   },
 
   // ── SEQUENCING ────────────────────────────────────
+  // v2: per-tier pool, { pick, items: [{prompt, sequence, correct}] }.
   {
     id: 'mod-7',
     type: 'sequencing',
     label: 'Put in Order',
     data: {
       bronze: {
-        prompt: 'Put these in order — morning first.',
-        items:   ['eat lunch', 'wake up', 'eat breakfast'],
-        correct: ['wake up', 'eat breakfast', 'eat lunch']
+        pick: 2,
+        items: [
+          {
+            prompt: 'Put these in order — morning first.',
+            sequence: ['eat lunch', 'wake up', 'eat breakfast'],
+            correct:  ['wake up', 'eat breakfast', 'eat lunch']
+          },
+          {
+            prompt: 'Put these in order.',
+            sequence: ['go to bed', 'eat dinner', 'brush teeth'],
+            correct:  ['eat dinner', 'brush teeth', 'go to bed']
+          }
+        ]
       },
       silver: {
-        prompt: 'Put these in the right order.',
-        items:   ['go to school', 'wake up', 'eat dinner', 'eat breakfast'],
-        correct: ['wake up', 'eat breakfast', 'go to school', 'eat dinner']
+        pick: 2,
+        items: [
+          {
+            prompt: 'Put these in the right order.',
+            sequence: ['go to school', 'wake up', 'eat dinner', 'eat breakfast'],
+            correct:  ['wake up', 'eat breakfast', 'go to school', 'eat dinner']
+          },
+          {
+            prompt: 'Put these in the right order.',
+            sequence: ['do homework', 'come home', 'eat lunch', 'go to school'],
+            correct:  ['go to school', 'eat lunch', 'come home', 'do homework']
+          }
+        ]
       },
       gold: {
-        prompt: 'Put these in the right order.',
-        items:   ['go home', 'wake up', 'eat dinner', 'eat breakfast', 'go to school'],
-        correct: ['wake up', 'eat breakfast', 'go to school', 'go home', 'eat dinner']
+        pick: 2,
+        items: [
+          {
+            prompt: 'Put these in the right order.',
+            sequence: ['go home', 'wake up', 'eat dinner', 'eat breakfast', 'go to school'],
+            correct:  ['wake up', 'eat breakfast', 'go to school', 'go home', 'eat dinner']
+          },
+          {
+            prompt: 'Put these in the right order.',
+            sequence: ['brush teeth', 'wake up', 'go to bed', 'get dressed', 'eat breakfast'],
+            correct:  ['wake up', 'brush teeth', 'get dressed', 'eat breakfast', 'go to bed']
+          }
+        ]
       }
     }
   },
@@ -2224,111 +2278,139 @@ const MODULE_REGISTRY = {
   },
 
   // ─────────────────────────────────────────────
-  //  SEQUENCING
+  //  SEQUENCING ("Put in Order")
+  //  v2 design: pool-based { pick, items: [{prompt, sequence, correct}] },
+  //  same standard as every other module. Each slot is colored by its
+  //  POSITION (1st, 2nd, 3rd...) using the same 5-color PALETTE as
+  //  gap-fill/word-match, not by which word occupies it — matches
+  //  put-in-order-demo.html exactly (SEQ_PALETTE there).
   //  Items shown in pool. Tap to place into numbered slots.
   //  Tap a filled slot to return item to pool.
   //  Check button appears when all slots filled.
-  //  Score: correct positions / total.
+  //  Score per question: correct positions / total. Averaged across the
+  //  `pick` questions drawn for the tier's session.
   // ─────────────────────────────────────────────
   'sequencing': {
     render(container, data, tier, onComplete) {
-      const { prompt, items, correct } = data;
-      const slots    = new Array(correct.length).fill(null);
-      let checked    = false;
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0, totalScore = 0;
 
-      // Shuffle pool
-      const shuffled = [...items].sort(() => Math.random() - 0.5);
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)',  text:'#00BCD4' },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)', text:'#CE93D8' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)',  text:'#FFB74D' },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)',  text:'#F48FB1' },
+        { border:'#8BC34A', bg:'rgba(139,195,74,.15)', text:'#AED581' }
+      ];
 
-      container.innerHTML = `
-        <p class="seq-prompt">${prompt}</p>
-        <div class="seq-slots" id="seq-slots"></div>
-        <p class="seq-pool-label">Tap to place ↓</p>
-        <div class="seq-pool"  id="seq-pool"></div>
-        <button class="next-ex-btn" id="check-btn" style="display:none;margin-top:4px">Check ✓</button>
-        <button class="next-ex-btn" id="next-btn"  style="display:none">Next →</button>
-      `;
+      function renderQuestion() {
+        const { prompt, sequence, correct } = session[idx];
+        const slots = new Array(correct.length).fill(null);
+        let checked = false;
 
-      const slotsEl  = container.querySelector('#seq-slots');
-      const poolEl   = container.querySelector('#seq-pool');
-      const checkBtn = container.querySelector('#check-btn');
-      const nextBtn  = container.querySelector('#next-btn');
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
-      // ── Render slots ───────────────────────────
-      function renderSlots() {
-        slotsEl.innerHTML = '';
-        slots.forEach((val, i) => {
-          const slot = document.createElement('div');
-          slot.className = 'seq-slot' + (val ? ' filled' : '');
-          slot.innerHTML = `<div class="slot-num">${i + 1}</div><div class="slot-text">${val || ''}</div>`;
+        container.innerHTML = `
+          <p class="seq-prompt-v2">${prompt}</p>
+          <div class="seq-slots-v2" id="seq-slots"></div>
+          <p class="seq-pool-label-v2">Tap to place ↓</p>
+          <div class="seq-pool-v2" id="seq-pool"></div>
+          <button id="gf-check-btn" class="gf-check-btn" style="display:none;">Check</button>
+          <button id="seq-next-btn" class="iv-proceed-btn">Next →</button>
+        `;
 
-          if (val && !checked) {
-            slot.addEventListener('click', () => {
-              // Return item to pool
-              const word = slots[i];
-              slots[i] = null;
-              poolEl.querySelectorAll('.seq-item').forEach(b => {
-                if (b.dataset.word === word) b.classList.remove('used');
+        const slotsEl  = container.querySelector('#seq-slots');
+        const poolEl   = container.querySelector('#seq-pool');
+        const checkBtn = container.querySelector('#gf-check-btn');
+        const nextBtn  = container.querySelector('#seq-next-btn');
+
+        function renderSlots() {
+          slotsEl.innerHTML = '';
+          slots.forEach((val, i) => {
+            const c = PALETTE[i % PALETTE.length];
+            const slot = document.createElement('div');
+            slot.className = 'seq-slot-v2';
+            const numColor = val ? c.border : 'rgba(255,255,255,0.3)';
+            slot.innerHTML = `<div class="slot-num-v2" style="color:${numColor};">${i + 1}</div><div class="slot-text-v2">${val || ''}</div>`;
+
+            if (val && !checked) {
+              slot.style.borderColor = c.border;
+              slot.style.background = c.bg;
+              slot.querySelector('.slot-text-v2').style.color = c.text;
+              slot.style.cursor = 'pointer';
+              slot.addEventListener('click', () => {
+                const word = slots[i];
+                slots[i] = null;
+                poolEl.querySelectorAll('.seq-item-v2').forEach(b => {
+                  if (b.dataset.word === word) b.classList.remove('used');
+                });
+                renderSlots();
+                updateCheck();
               });
-              renderSlots();
-              updateCheck();
-            });
-          }
+            }
+            slotsEl.appendChild(slot);
+          });
+        }
 
-          slotsEl.appendChild(slot);
+        function updateCheck() {
+          checkBtn.style.display = slots.every(s => s !== null) ? 'block' : 'none';
+        }
+
+        const shuffled = [...sequence].sort(() => Math.random() - 0.5);
+        shuffled.forEach(word => {
+          const btn = document.createElement('button');
+          btn.className = 'seq-item-v2';
+          btn.textContent = word;
+          btn.dataset.word = word;
+          btn.addEventListener('click', () => {
+            if (btn.classList.contains('used') || checked) return;
+            const emptyIdx = slots.indexOf(null);
+            if (emptyIdx === -1) return;
+            slots[emptyIdx] = word;
+            btn.classList.add('used');
+            renderSlots();
+            updateCheck();
+          });
+          poolEl.appendChild(btn);
         });
+
+        checkBtn.addEventListener('click', () => {
+          if (checked) return;
+          checked = true;
+          checkBtn.style.display = 'none';
+          poolEl.querySelectorAll('.seq-item-v2').forEach(b => b.style.pointerEvents = 'none');
+
+          let correctCount = 0;
+          slotsEl.querySelectorAll('.seq-slot-v2').forEach((slot, i) => {
+            const isCorrect = (slots[i] === correct[i]);
+            if (isCorrect) {
+              slot.style.borderColor = '#8BC34A';
+              slot.style.background = 'rgba(139,195,74,0.15)';
+              correctCount++;
+            } else {
+              slot.style.borderColor = '#E91E63';
+              slot.style.background = 'rgba(233,30,99,0.12)';
+              slot.querySelector('.slot-text-v2').innerHTML =
+                `<span style="text-decoration:line-through;opacity:0.5;">${slots[i]}</span> <span style="color:#AED581;margin-left:4px;">→ ${correct[i]}</span>`;
+            }
+          });
+
+          const score = correctCount / correct.length;
+          totalScore += score;
+          nextBtn.style.display = 'block';
+        });
+
+        nextBtn.addEventListener('click', () => {
+          idx++;
+          if (idx < session.length) renderQuestion();
+          else onComplete(totalScore / session.length);
+        });
+
+        renderSlots();
       }
 
-      function updateCheck() {
-        checkBtn.style.display = slots.every(s => s !== null) ? 'block' : 'none';
-      }
-
-      // ── Render pool ────────────────────────────
-      shuffled.forEach(word => {
-        const btn = document.createElement('button');
-        btn.className    = 'seq-item';
-        btn.textContent  = word;
-        btn.dataset.word = word;
-
-        btn.addEventListener('click', () => {
-          if (btn.classList.contains('used') || checked) return;
-          const emptyIdx = slots.indexOf(null);
-          if (emptyIdx === -1) return;
-          slots[emptyIdx] = word;
-          btn.classList.add('used');
-          renderSlots();
-          updateCheck();
-        });
-
-        poolEl.appendChild(btn);
-      });
-
-      // ── Check answer ───────────────────────────
-      checkBtn.addEventListener('click', () => {
-        if (checked) return;
-        checked = true;
-        checkBtn.style.display = 'none';
-
-        // Disable pool items
-        poolEl.querySelectorAll('.seq-item').forEach(b => b.style.pointerEvents = 'none');
-
-        let correctCount = 0;
-        slotsEl.querySelectorAll('.seq-slot').forEach((slot, i) => {
-          const isCorrect = (slots[i] === correct[i]);
-          slot.classList.add(isCorrect ? 'correct' : 'wrong');
-          // Show correct label if wrong
-          if (!isCorrect) {
-            slot.querySelector('.slot-text').innerHTML =
-              `<span style="text-decoration:line-through;opacity:0.5">${slots[i]}</span>
-               <span style="color:var(--pass);margin-left:6px">→ ${correct[i]}</span>`;
-          }
-          if (isCorrect) correctCount++;
-        });
-
-        nextBtn.style.display = 'block';
-        nextBtn.onclick = () => onComplete(correctCount / correct.length);
-      });
-
-      renderSlots();
+      renderQuestion();
     }
   },
 
