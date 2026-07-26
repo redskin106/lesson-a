@@ -539,7 +539,7 @@ html, body {
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12.7cqw; }
 .layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; }
-.layer-scene { position: absolute; left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; }
+.layer-scene { position: absolute; left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
 .frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
 
 .pos            { position: absolute; z-index: 2; }
@@ -1396,6 +1396,12 @@ function startModule(moduleIndex, tier) {
   renderer.render(container, mod.data[tier], tier, score => {
     handleTierResult(moduleIndex, tier, score);
   });
+
+  // Illustration "slides down" to clear whatever height this module's
+  // content actually renders at, and stays live via MutationObserver for
+  // any later content change within the same module (multi-question
+  // sessions, retries, etc.) without each renderer needing to know about it.
+  watchModuleContentForSceneReposition();
 }
 
 // ══════════════════════════════════════════════════
@@ -1671,6 +1677,48 @@ function showReinforcePanel(item, onClose) {
     bar.style.transition = 'none'; bar.style.width = '0%';
     if (onClose) onClose();
   }, panelMs);
+}
+
+// ══════════════════════════════════════════════════
+//  SCENE REPOSITIONING — illustration "slides down" to clear content
+//  The frame uses a fixed aspect-ratio box (matching bg_and_border.png/
+//  frame_mask.png), so the illustration can't rely on normal document
+//  flow to avoid overlapping tall module content. Instead, after every
+//  content change, measure the flowzone's actual rendered bottom edge
+//  and move .layer-scene down to clear it. Its original design position
+//  (51.47%) is the floor — it never moves *up* past that. If content is
+//  tall enough to push the illustration mostly off-frame, fade it out
+//  rather than showing an awkward sliver.
+// ══════════════════════════════════════════════════
+const SCENE_DEFAULT_TOP = 51.47;
+let _sceneObserver = null;
+
+function repositionSceneLayer() {
+  const flowzone = document.getElementById('module-container');
+  const scene = document.querySelector('.layer-scene');
+  const appFrame = document.querySelector('.app-frame');
+  if (!flowzone || !scene || !appFrame) return;
+
+  const frameRect = appFrame.getBoundingClientRect();
+  const flowRect = flowzone.getBoundingClientRect();
+  if (frameRect.height === 0) return;
+
+  const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
+  const GAP_PCT = 2; // breathing room below content before the illustration starts
+  const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
+
+  scene.style.top = newTop + '%';
+  // Fade out once less than ~8% of the frame's height is left for it to show in
+  scene.style.opacity = (100 - newTop) < 8 ? '0' : '1';
+}
+
+function watchModuleContentForSceneReposition() {
+  const flowzone = document.getElementById('module-container');
+  if (!flowzone) return;
+  if (_sceneObserver) _sceneObserver.disconnect();
+  _sceneObserver = new MutationObserver(() => repositionSceneLayer());
+  _sceneObserver.observe(flowzone, { childList: true, subtree: true, characterData: true });
+  repositionSceneLayer();
 }
 
 // ══════════════════════════════════════════════════
