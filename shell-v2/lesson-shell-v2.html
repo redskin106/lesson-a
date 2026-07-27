@@ -649,6 +649,28 @@ html, body {
 .mp-card-inner-v2.flipped .mp-card-front-v2 { opacity: 1; transform: scaleX(1); pointer-events: auto; }
 .mp-card-front-v2 .mp-emoji-v2 { font-size: 10.5cqw; line-height: 1; }
 .mp-status-v2 { min-height: 5cqw; text-align: center; font-size: 3.4cqw; color: rgba(255,255,255,0.5); margin-bottom: 3%; }
+
+/* Word Match (v2) */
+.wm-grid-v2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 3cqw; margin-bottom: 5%; }
+.wm-col-v2 { display: flex; flex-direction: column; gap: 1.44cqw; }
+.wm-btn-v2 {
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 4% 3%;
+  color: rgba(255,255,255,0.85); font-size: 3.4cqw; font-family: inherit;
+  cursor: pointer; transition: transform .12s, background .15s, border-color .15s, color .15s;
+  min-height: 0; line-height: 1.3;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.wm-encourage-v2 { text-align: center; font-size: 3.2cqw; color: #AED581; font-weight: 500; opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0; }
+.wm-nudge-v2 { text-align: center; font-size: 3.2cqw; color: #E8B44A; font-weight: 500; opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0; }
+.wm-notquite-btn-v2 {
+  display: none; margin: 0 auto;
+  padding: 3% 12%; border-radius: 999px;
+  background: rgba(233,30,99,0.14); border: 1.5px solid rgba(233,30,99,0.4);
+  color: #F48FB1; font-size: 4.4cqw; font-weight: 500; font-family: inherit;
+  cursor: default; pointer-events: none;
+  align-items: center; justify-content: center;
+}
 </style>
 </head>
 <body>
@@ -1009,20 +1031,25 @@ const LESSON = [
   },
 
   // ── WORD MATCH ────────────────────────────────────
+  // v2: per-tier pool, { pick, items: [{left,right}] }. pick defaults to
+  // the full pool size for now (matches the locked demo's "use them all"
+  // behavior) but is ready for a teacher to add more than pick draws.
   {
     id: 'mod-6',
     type: 'word-match',
     label: 'Word Match',
     data: {
       bronze: {
-        pairs: [
+        pick: 3,
+        items: [
           { left: 'dog',   right: 'an animal' },
           { left: 'water', right: 'a drink'   },
           { left: 'book',  right: 'you read it' }
         ]
       },
       silver: {
-        pairs: [
+        pick: 4,
+        items: [
           { left: 'hungry', right: 'want food'  },
           { left: 'tired',  right: 'need sleep' },
           { left: 'happy',  right: 'feel good'  },
@@ -1030,7 +1057,8 @@ const LESSON = [
         ]
       },
       gold: {
-        pairs: [
+        pick: 5,
+        items: [
           { left: 'library',   right: 'place to study'    },
           { left: 'homework',  right: 'work after school' },
           { left: 'breakfast', right: 'morning meal'      },
@@ -2190,119 +2218,204 @@ const MODULE_REGISTRY = {
   //  Wrong → both flash red, deselect.
   //  Score: 1.0 minus 0.1 per wrong attempt (floor 0.6).
   // ─────────────────────────────────────────────
+  // ─────────────────────────────────────────────
+  //  WORD MATCH
+  //  v2 design: pool-based { pick, items: [{left,right}] }, separate pool
+  //  per tier. Free re-pairing model (not lock-on-first-click) — tap a left,
+  //  tap a right to assign it (unlinking any prior pairing on either side
+  //  first), reassign as much as you want. Only checks correctness once
+  //  every left has SOME right assigned; if not fully correct, shows
+  //  "Not quite yet" and lets you keep adjusting rather than penalizing.
+  //  Bronze-only nudge message on a wrong-but-complete-looking assignment.
+  //  Always full score on completion — this module requires eventual full
+  //  correctness to advance, not partial credit.
+  // ─────────────────────────────────────────────
   'word-match': {
     render(container, data, tier, onComplete) {
-      const { pairs } = data;
-      let selectedLeft = null;
-      let matchedCount = 0;
-      let wrongCount   = 0;
-      const total      = pairs.length;
+      const { pick, items } = data;
+      const pairs = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const total = pairs.length;
+      const isBronze = (tier === 'bronze');
 
-      // One distinct colour per pair — dark-theme friendly
       const PALETTE = [
-        { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' }, // teal
-        { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' }, // purple
-        { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' }, // orange
-        { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' }, // pink
-        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' }, // lime
+        { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' },
+        { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' },
+        { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' },
+        { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' },
+        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' }
       ];
+      const pairColor = pairs.map((_, i) => PALETTE[i % PALETTE.length]);
+
+      document.getElementById('v2-qlabel').innerHTML =
+        `<span>Match the words.</span><span id="wm-score">0 of ${total} paired</span>`;
 
       container.innerHTML = `
-        <p class="module-question">Match the words.</p>
-        <p class="match-score" id="match-score">${total} pairs to match</p>
-        <div class="match-grid">
-          <div class="match-col" id="left-col"></div>
-          <div class="match-col" id="right-col"></div>
+        <div class="wm-grid-v2">
+          <div class="wm-col-v2" id="wm-left-col"></div>
+          <div class="wm-col-v2" id="wm-right-col"></div>
         </div>
-        <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
+        <p class="wm-encourage-v2" id="wm-encourage"></p>
+        <p class="wm-nudge-v2" id="wm-nudge"></p>
+        <button id="wm-notquite-btn" class="wm-notquite-btn-v2" disabled>Not quite yet</button>
+        <button id="wm-next-btn" class="iv-proceed-btn">Next →</button>
       `;
 
-      const leftCol    = container.querySelector('#left-col');
-      const rightCol   = container.querySelector('#right-col');
-      const scoreLabel = container.querySelector('#match-score');
-      const nextBtn    = container.querySelector('#next-btn');
+      const leftCol      = container.querySelector('#wm-left-col');
+      const rightCol     = container.querySelector('#wm-right-col');
+      const scoreLabel   = document.getElementById('wm-score');
+      const encourageEl  = container.querySelector('#wm-encourage');
+      const nudgeEl      = container.querySelector('#wm-nudge');
+      const notQuiteBtn  = container.querySelector('#wm-notquite-btn');
+      const nextBtn      = container.querySelector('#wm-next-btn');
 
-      // Shuffle both columns independently, preserving pair index
-      const leftItems  = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
-      const rightItems = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
+      let pairings = new Map();   // leftIdx -> rightIdx
+      let rightUsed = new Map();  // rightIdx -> leftIdx
+      let selectedLeftBtn = null;
+      let confirmed = false;
+
+      function styleLeft(btn) {
+        if (confirmed) return;
+        const idx = parseInt(btn.dataset.pairIdx);
+        const c = pairColor[idx];
+        const isSelected = (btn === selectedLeftBtn);
+        const isPaired = pairings.has(idx);
+        if (isSelected) {
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+          btn.style.boxShadow = `0 0 0 3px ${c.border}`;
+        } else if (isPaired) {
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+          btn.style.boxShadow = '';
+        } else {
+          btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.color = 'rgba(255,255,255,0.85)'; btn.style.boxShadow = '';
+        }
+      }
+      function styleRight(btn) {
+        if (confirmed) return;
+        const rightIdx = parseInt(btn.dataset.pairIdx);
+        if (rightUsed.has(rightIdx)) {
+          const c = pairColor[rightUsed.get(rightIdx)];
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+        } else {
+          btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.color = 'rgba(255,255,255,0.85)';
+        }
+      }
+      function checkAllCorrect() {
+        if (pairings.size !== total) return false;
+        for (const leftIdx of pairings.keys()) {
+          if (pairings.get(leftIdx) !== leftIdx) return false;
+        }
+        return true;
+      }
+      function refreshAll() {
+        container.querySelectorAll('.wm-btn-v2[data-side="left"]').forEach(styleLeft);
+        container.querySelectorAll('.wm-btn-v2[data-side="right"]').forEach(styleRight);
+
+        let correctSoFar = 0, wrongSoFar = 0;
+        pairings.forEach((rightIdx, leftIdx) => {
+          if (rightIdx === leftIdx) correctSoFar++; else wrongSoFar++;
+        });
+
+        if (pairings.size === total) {
+          if (checkAllCorrect()) {
+            confirmed = true;
+            scoreLabel.textContent = 'Good job!';
+            scoreLabel.style.color = '#AED581';
+            notQuiteBtn.style.display = 'none';
+            nudgeEl.style.opacity = '0';
+            encourageEl.style.opacity = '0';
+            nextBtn.style.display = 'flex';
+            nextBtn.onclick = () => onComplete(1);
+          } else {
+            scoreLabel.textContent = `${Math.min(pairings.size, total)} of ${total} paired`;
+            scoreLabel.style.color = '';
+            nextBtn.style.display = 'none';
+            notQuiteBtn.style.display = 'flex';
+            nudgeEl.style.opacity = '0';
+            encourageEl.style.opacity = '0';
+          }
+        } else {
+          scoreLabel.textContent = `${pairings.size} of ${total} paired`;
+          scoreLabel.style.color = '';
+          nextBtn.style.display = 'none';
+          notQuiteBtn.style.display = 'none';
+
+          // Bronze only: nudge the moment a wrong pairing exists, takes priority over encouragement
+          if (isBronze && wrongSoFar > 0) {
+            nudgeEl.textContent = 'Are you sure about that one?';
+            nudgeEl.style.opacity = '1';
+            encourageEl.style.opacity = '0';
+          } else {
+            nudgeEl.style.opacity = '0';
+            if (correctSoFar > 0) {
+              const ratio = correctSoFar / total;
+              encourageEl.textContent = ratio >= 0.66 ? 'Almost there!'
+                                       : ratio >= 0.34 ? 'Getting there!'
+                                       : 'Nice, keep going!';
+              encourageEl.style.opacity = '1';
+            } else {
+              encourageEl.style.opacity = '0';
+            }
+          }
+        }
+      }
+
+      const withIdx = pairs.map((p, i) => ({ left: p.left, right: p.right, pairIdx: i }));
+      const leftItems = safeShuffle(withIdx, () => false);
+      const rightItems = safeShuffle(withIdx, r => r.some((item, pos) => item.pairIdx === leftItems[pos].pairIdx));
 
       leftItems.forEach(pair => {
         const btn = document.createElement('button');
-        btn.className       = 'match-btn';
-        btn.textContent     = pair.left;
-        btn.dataset.key     = pair.left;
-        btn.dataset.side    = 'left';
+        btn.className = 'wm-btn-v2';
+        btn.textContent = pair.left;
+        btn.dataset.side = 'left';
         btn.dataset.pairIdx = pair.pairIdx;
         leftCol.appendChild(btn);
       });
-
       rightItems.forEach(pair => {
         const btn = document.createElement('button');
-        btn.className       = 'match-btn';
-        btn.textContent     = pair.right;
-        btn.dataset.key     = pair.left;   // keyed by left value
-        btn.dataset.side    = 'right';
+        btn.className = 'wm-btn-v2';
+        btn.textContent = pair.right;
+        btn.dataset.side = 'right';
         btn.dataset.pairIdx = pair.pairIdx;
         rightCol.appendChild(btn);
       });
 
-      function applyMatchColor(btn) {
-        const c = PALETTE[parseInt(btn.dataset.pairIdx) % PALETTE.length];
-        btn.style.borderColor = c.border;
-        btn.style.background  = c.bg;
-        btn.style.color       = c.color;
-        btn.classList.add('matched');
-        btn.disabled = true;
-      }
-
-      container.querySelectorAll('.match-btn').forEach(btn => {
+      container.querySelectorAll('.wm-btn-v2').forEach(btn => {
         btn.addEventListener('click', () => {
-          if (btn.classList.contains('matched')) return;
+          if (confirmed) return;
 
           if (btn.dataset.side === 'left') {
-            container.querySelectorAll('.match-btn[data-side="left"]')
-              .forEach(b => b.classList.remove('selected'));
-            if (selectedLeft === btn) {
-              selectedLeft = null;
-            } else {
-              selectedLeft = btn;
-              btn.classList.add('selected');
-            }
+            selectedLeftBtn = (btn === selectedLeftBtn) ? null : btn;
+            refreshAll();
             return;
           }
 
-          if (!selectedLeft) return;
+          // Right button — always unlink any existing pairing first, then optionally re-pair
+          const rightIdx = parseInt(btn.dataset.pairIdx);
+          const leftIdx = selectedLeftBtn ? parseInt(selectedLeftBtn.dataset.pairIdx) : null;
 
-          const isMatch = (selectedLeft.dataset.key === btn.dataset.key);
-
-          if (isMatch) {
-            const leftBtn = selectedLeft;
-            selectedLeft  = null;
-            applyMatchColor(leftBtn);
-            applyMatchColor(btn);
-            matchedCount++;
-
-            const remaining = total - matchedCount;
-            scoreLabel.textContent = remaining > 0
-              ? `${remaining} pair${remaining > 1 ? 's' : ''} left`
-              : 'All matched! ✓';
-
-            if (matchedCount === total) {
-              const score = Math.max(0.6, 1 - (wrongCount * 0.1));
-              nextBtn.style.display = 'block';
-              nextBtn.onclick = () => onComplete(score);
+          if (rightUsed.has(rightIdx)) {
+            const prevLeftIdx = rightUsed.get(rightIdx);
+            pairings.delete(prevLeftIdx);
+            rightUsed.delete(rightIdx);
+            if (leftIdx === null || leftIdx === prevLeftIdx) {
+              selectedLeftBtn = null;
+              refreshAll();
+              return;
             }
-          } else {
-            wrongCount++;
-            selectedLeft.classList.add('wrong-flash');
-            btn.classList.add('wrong-flash');
-            const prevLeft = selectedLeft;
-            selectedLeft   = null;
-            setTimeout(() => {
-              prevLeft.classList.remove('wrong-flash', 'selected');
-              btn.classList.remove('wrong-flash');
-            }, 500);
           }
+          if (leftIdx === null) { refreshAll(); return; }
+
+          if (pairings.has(leftIdx)) {
+            rightUsed.delete(pairings.get(leftIdx));
+            pairings.delete(leftIdx);
+          }
+          pairings.set(leftIdx, rightIdx);
+          rightUsed.set(rightIdx, leftIdx);
+          selectedLeftBtn = null;
+          refreshAll();
         });
       });
     }
