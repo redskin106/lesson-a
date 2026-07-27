@@ -2906,6 +2906,10 @@ const MODULE_REGISTRY = {
           const blank = content.querySelector('#iv-blank');
           if (blank) blank.textContent = selected.ans;
           speak(spokenWord, ok ? 'celebrate' : 'wrong');
+          if (mode === 'cloze-image') {
+            const fullSentence = item.sentence.replace('___', selected.ans);
+            speak(fullSentence, ok ? 'celebrate' : 'neutral', 900);
+          }
           nextBtn.style.display = 'block';
         });
 
