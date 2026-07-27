@@ -554,7 +554,7 @@ html, body {
 .v2-module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .v2-medal-icon { flex-shrink: 0; }
 .v2-medal-icon img { width: 6.5cqw; height: 6.5cqw; display: block; }
-.v2-qlabel { color: rgba(255,255,255,0.75); font-size: 3cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+.v2-qlabel { color: rgba(255,255,255,0.75); font-size: 3cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.6); justify-content: space-between; }
 .v2-prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
 .v2-prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
 
@@ -633,6 +633,22 @@ html, body {
   line-height: 1.3;
 }
 .seq-item-v2.used { opacity: 0.25; pointer-events: none; }
+
+/* Memory Pairs (v2) */
+.mp-qlabel-row { display: flex; justify-content: space-between; }
+.mp-pips-row-v2 { display: flex; gap: 1.5%; margin-bottom: 3%; }
+.mp-pip-v2 { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); opacity: 0.5; transition: all .25s; }
+.mp-pip-v2.done { opacity: 1; border: none; }
+.mp-card-grid-v2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; margin-bottom: 5%; }
+.mp-card-wrap-v2 { aspect-ratio: 1/1; cursor: pointer; }
+.mp-card-inner-v2 { width: 100%; height: 100%; position: relative; border-radius: 10px; }
+.mp-card-face-v2 { position: absolute; inset: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: opacity .25s ease, transform .25s ease; }
+.mp-card-back-v2 { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.2); font-size: 6.5cqw; opacity: 1; transform: scaleX(1); }
+.mp-card-front-v2 { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); flex-direction: column; gap: 3%; font-size: 4cqw; font-weight: 600; color: rgba(255,255,255,0.85); padding: 4%; text-align: center; opacity: 0; transform: scaleX(0); pointer-events: none; }
+.mp-card-inner-v2.flipped .mp-card-back-v2 { opacity: 0; transform: scaleX(0); }
+.mp-card-inner-v2.flipped .mp-card-front-v2 { opacity: 1; transform: scaleX(1); pointer-events: auto; }
+.mp-card-front-v2 .mp-emoji-v2 { font-size: 10.5cqw; line-height: 1; }
+.mp-status-v2 { min-height: 5cqw; text-align: center; font-size: 3.4cqw; color: rgba(255,255,255,0.5); margin-bottom: 3%; }
 </style>
 </head>
 <body>
@@ -1105,39 +1121,54 @@ const LESSON = [
   },
 
   // ── GAME 1: Memory Pairs ──────────────────────
+  // v2: per-tier pool — { pick, flipback(ms), items }. Separate pool per
+  // tier now (was shared across tiers) — same standardization as everything
+  // else. `tokens` drive the grammar-color sentence reveal on match.
   {
     id: 'mod-game-1',
     type: 'memory-pairs',
     label: 'Memory Pairs',
     data: {
       bronze: {
+        pick: 3,
+        flipback: 1200,
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'dog',   emoji:'🐕', image:null, sentence:'The dog runs in the park.',
+            tokens:[{t:'The dog',r:'subject'},{t:'runs',r:'verb'},{t:'in the park',r:'place'}] },
+          { word:'water', emoji:'💧', image:null, sentence:'I drink water every day.',
+            tokens:[{t:'I',r:'subject'},{t:'drink',r:'verb'},{t:'water',r:'object'},{t:'every day',r:'time'}] },
+          { word:'cat',   emoji:'🐈', image:null, sentence:'The cat sleeps on the chair.',
+            tokens:[{t:'The cat',r:'subject'},{t:'sleeps',r:'verb'},{t:'on the chair',r:'place'}] },
+          { word:'bus',   emoji:'🚌', image:null, sentence:'She takes the bus to school.',
+            tokens:[{t:'She',r:'subject'},{t:'takes',r:'verb'},{t:'the bus',r:'object'},{t:'to school',r:'place'}] }
         ]
       },
       silver: {
+        pick: 4,
+        flipback: 900,
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'school', emoji:'🏫', image:null, sentence:'School starts at eight o\'clock.',
+            tokens:[{t:'School',r:'subject'},{t:'starts',r:'verb'},{t:'at eight o\'clock',r:'time'}] },
+          { word:'book',   emoji:'📚', image:null, sentence:'She reads a book every night.',
+            tokens:[{t:'She',r:'subject'},{t:'reads',r:'verb'},{t:'a book',r:'object'},{t:'every night',r:'time'}] },
+          { word:'bird',   emoji:'🐦', image:null, sentence:'The bird sings in the tree.',
+            tokens:[{t:'The bird',r:'subject'},{t:'sings',r:'verb'},{t:'in the tree',r:'place'}] },
+          { word:'phone',  emoji:'📱', image:null, sentence:'He uses his phone every day.',
+            tokens:[{t:'He',r:'subject'},{t:'uses',r:'verb'},{t:'his phone',r:'object'},{t:'every day',r:'time'}] }
         ]
       },
       gold: {
+        pick: 4,
+        flipback: 700,
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'letter', emoji:'✉️', image:null, sentence:'My uncle writes a letter every week.',
+            tokens:[{t:'My uncle',r:'subject'},{t:'writes',r:'verb'},{t:'a letter',r:'object'},{t:'every week',r:'time'}] },
+          { word:'garden', emoji:'🌷', image:null, sentence:'They water the garden on Sundays.',
+            tokens:[{t:'They',r:'subject'},{t:'water',r:'verb'},{t:'the garden',r:'object'},{t:'on Sundays',r:'time'}] },
+          { word:'guitar', emoji:'🎸', image:null, sentence:'My sister plays the guitar well.',
+            tokens:[{t:'My sister',r:'subject'},{t:'plays',r:'verb'},{t:'the guitar',r:'object'},{t:'well',r:'connector'}] },
+          { word:'bread',  emoji:'🍞', image:null, sentence:'She bakes bread every morning.',
+            tokens:[{t:'She',r:'subject'},{t:'bakes',r:'verb'},{t:'bread',r:'object'},{t:'every morning',r:'time'}] }
         ]
       }
     }
@@ -2778,15 +2809,21 @@ const MODULE_REGISTRY = {
 
   // ─────────────────────────────────────────────
   //  MEMORY PAIRS
-  //  4 pairs drawn from pool. Image card + word
-  //  card. Flip two, find the match.
-  //  Audio: neutral on flip, celebrate on match.
-  //  Reinforcement panel on each match.
+  //  v2 design: per-tier pool { pick, flipback(ms), items }, separate pool
+  //  per tier (not shared across tiers — same standardization as every
+  //  other module now). `pick` pairs drawn, image card + word card each.
+  //  Flip two, find the match. Cards colored by pair via PALETTE on match,
+  //  matching Put in Order/Gap-fill's shared palette convention.
+  //  Audio rule (confirmed with Nick): every flip says its word immediately,
+  //  EXCEPT the 2nd flip is silent if it matches the 1st (already just
+  //  heard it). On mismatch, both cards' audio already played at flip-time.
+  //  On match: grammar-color sentence reinforcement (shared with
+  //  gap-fill/true-false), not the generic word/emoji panel.
   // ─────────────────────────────────────────────
   'memory-pairs': {
     render(container, data, tier, onComplete) {
-      const { items } = data;
-      const PAIRS = 4;
+      const { pick, flipback, items } = data;
+      const PAIRS = Math.min(pick, items.length);
       const picked = safeShuffle(items, ()=>false).slice(0, PAIRS);
       const deckSrc = [
         ...picked.map((it,i)=>({...it, kind:'image', pid:i})),
@@ -2797,63 +2834,63 @@ const MODULE_REGISTRY = {
         return false;
       });
 
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)'  },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)'  },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)'  },
+        { border:'#8BC34A', bg:'rgba(139,195,74,.15)' }
+      ];
+
       let flipped=[], matched=0, flips=0, cardLocked=false;
 
-      function visual(item, size=32) {
-        if (item.image) return `<img src="${item.image}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:6px;" alt="${item.word}">`;
-        return `<span style="font-size:${size}px;line-height:1;">${item.emoji}</span>`;
-      }
+      document.getElementById('v2-qlabel').innerHTML =
+        `<span>Find the pairs</span><span>Flips: <span id="mp-flips">0</span></span>`;
 
       container.innerHTML = `
-        <div style="display:flex;justify-content:space-between;margin-bottom:.75rem;">
-          <div style="font-size:13px;color:var(--text-dim);">Find the pairs</div>
-          <div style="font-size:13px;color:var(--text-dim);">Flips: <span id="mp-flips" style="color:var(--text);">0</span></div>
-        </div>
-        <div id="mp-pips" style="display:flex;gap:6px;margin-bottom:1rem;">
-          ${picked.map((_,i)=>`<div class="pip" id="mp-pip-${i}" style="flex:1;"></div>`).join('')}
-        </div>
-        <div id="mp-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;">
-          ${deck.map((card,i)=>`
-            <div id="mp-cw-${i}" onclick="mpFlip(${i})" style="
-              aspect-ratio:1;perspective:600px;cursor:pointer;
-            ">
-              <div id="mp-ci-${i}" style="
-                width:100%;height:100%;position:relative;
-                transform-style:preserve-3d;
-                transition:transform .35s cubic-bezier(.4,0,.2,1);
-                border-radius:10px;
-              ">
-                <div style="
-                  position:absolute;inset:0;border-radius:10px;
-                  backface-visibility:hidden;
-                  background:var(--surface2);
-                  display:flex;align-items:center;justify-content:center;
-                  font-size:1.4em;color:rgba(255,255,255,.2);
-                ">?</div>
-                <div id="mp-cf-${i}" style="
-                  position:absolute;inset:0;border-radius:10px;
-                  backface-visibility:hidden;
-                  background:var(--surface);
-                  border:1.5px solid var(--surface2);
-                  transform:rotateY(180deg);
-                  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-                  font-size:13px;font-weight:500;color:var(--text-dim);
-                  padding:4px;text-align:center;
-                ">
-                  ${card.kind==='image' ? visual(card,32) : `<span style="font-size:13px;font-weight:600;color:var(--text);">${card.word}</span>`}
-                </div>
-              </div>
-            </div>`).join('')}
-        </div>
-        <div id="mp-msg" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);"></div>`;
+        <div class="mp-pips-row-v2" id="mp-pips"></div>
+        <div class="mp-card-grid-v2" id="mp-grid"></div>
+        <p class="mp-status-v2" id="mp-msg">&nbsp;</p>
+      `;
 
-      window.mpFlip = function(i) {
+      const pipsEl = container.querySelector('#mp-pips');
+      picked.forEach((_, i) => {
+        const c = PALETTE[i % PALETTE.length];
+        const pip = document.createElement('div');
+        pip.className = 'mp-pip-v2';
+        pip.id = `mp-pip-${i}`;
+        pip.style.background = c.bg;
+        pip.style.borderColor = c.border;
+        pipsEl.appendChild(pip);
+      });
+
+      const gridEl = container.querySelector('#mp-grid');
+      deck.forEach((card, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'mp-card-wrap-v2';
+        wrap.id = `mp-cw-${i}`;
+        wrap.innerHTML = `
+          <div class="mp-card-inner-v2" id="mp-ci-${i}">
+            <div class="mp-card-face-v2 mp-card-back-v2">?</div>
+            <div class="mp-card-face-v2 mp-card-front-v2" id="mp-cf-${i}">
+              ${card.kind === 'image'
+                ? (card.image
+                    ? `<img src="${card.image}" alt="${card.word}" style="width:70%;height:70%;object-fit:cover;border-radius:8px;">`
+                    : `<span class="mp-emoji-v2">${card.emoji}</span>`)
+                : `<span>${card.word}</span>`}
+            </div>
+          </div>`;
+        wrap.addEventListener('click', () => mpFlip(i));
+        gridEl.appendChild(wrap);
+      });
+
+      function mpFlip(i) {
         if (cardLocked) return;
         const cw = document.getElementById(`mp-cw-${i}`);
         const ci = document.getElementById(`mp-ci-${i}`);
         if (!cw || cw.dataset.done || cw.dataset.flipped) return;
         cw.dataset.flipped = '1';
-        ci.style.transform = 'rotateY(180deg)';
+        ci.classList.add('flipped');
 
         if (flipped.length === 0) {
           // First card of the pair — always say it.
@@ -2871,7 +2908,7 @@ const MODULE_REGISTRY = {
         document.getElementById('mp-flips').textContent = flips;
         flipped.push(i);
         if (flipped.length === 2) { cardLocked = true; setTimeout(mpCheck, 500); }
-      };
+      }
 
       function mpCheck() {
         const [a, b] = flipped;
@@ -2879,38 +2916,38 @@ const MODULE_REGISTRY = {
         const isMatch = ca.pid === cb.pid && ca.kind !== cb.kind;
         if (isMatch) {
           matched++;
+          const c = PALETTE[ca.pid % PALETTE.length];
           ['mp-cf-'+a,'mp-cf-'+b].forEach(id=>{
             const el=document.getElementById(id);
-            if(el){el.style.background='rgba(255,215,0,.1)';el.style.borderColor='var(--gold)';}
+            if(el){el.style.background=c.bg;el.style.borderColor=c.border;}
           });
           document.getElementById(`mp-cw-${a}`).dataset.done='1';
           document.getElementById(`mp-cw-${b}`).dataset.done='1';
           const pip=document.getElementById(`mp-pip-${ca.pid}`);
-          if(pip){pip.classList.add('done');}
+          if(pip){pip.classList.add('done');pip.style.background=c.border;}
           flipped=[];
-          showReinforcePanel(ca, () => {
+
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+          showGrammarReinforce(ca.tokens, ca.sentence, () => {
             cardLocked = false;
             if (matched === PAIRS) {
-              const stars = flips<=10?3:flips<=14?2:1;
-              const starStr='⭐'.repeat(stars)+'✩'.repeat(3-stars);
-              document.getElementById('mp-msg').textContent = starStr;
-              setTimeout(()=>onComplete(matched/PAIRS), 800);
+              setTimeout(()=>onComplete(matched/PAIRS), 400);
             }
           });
         } else {
           const ciA=document.getElementById(`mp-ci-${a}`);
           const ciB=document.getElementById(`mp-ci-${b}`);
-          if(ciA){ciA.style.borderRadius='10px';ciA.style.boxShadow='0 0 0 2px var(--fail)';}
-          if(ciB){ciB.style.borderRadius='10px';ciB.style.boxShadow='0 0 0 2px var(--fail)';}
+          if(ciA){ciA.style.boxShadow='0 0 0 2px #E91E63';}
+          if(ciB){ciB.style.boxShadow='0 0 0 2px #E91E63';}
           // No audio here — both cards already said their word at flip-time
           // (see mpFlip). Playing again here would just repeat them.
           setTimeout(()=>{
-            if(ciA){ciA.style.transform='';ciA.style.boxShadow='';}
-            if(ciB){ciB.style.transform='';ciB.style.boxShadow='';}
+            if(ciA){ciA.classList.remove('flipped');ciA.style.boxShadow='';}
+            if(ciB){ciB.classList.remove('flipped');ciB.style.boxShadow='';}
             delete document.getElementById(`mp-cw-${a}`).dataset.flipped;
             delete document.getElementById(`mp-cw-${b}`).dataset.flipped;
             flipped=[]; cardLocked=false;
-          },1100);
+          }, flipback || 1100);
         }
       }
     }
