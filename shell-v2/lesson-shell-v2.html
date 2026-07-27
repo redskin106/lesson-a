@@ -2854,7 +2854,9 @@ const MODULE_REGISTRY = {
         if (!cw || cw.dataset.done || cw.dataset.flipped) return;
         cw.dataset.flipped = '1';
         ci.style.transform = 'rotateY(180deg)';
-        speak(deck[i].word, 'neutral', 0, deck[i].audioFile);
+        // No audio here — the flip itself stays silent. Audio only fires
+        // once the pair is complete and we know match/no-match (see
+        // mpCheck below): once for a match, both cards for a mismatch.
         flips++;
         document.getElementById('mp-flips').textContent = flips;
         flipped.push(i);
