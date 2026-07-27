@@ -638,6 +638,7 @@ html, body {
 .mp-qlabel-row { display: flex; justify-content: space-between; }
 .mp-pips-row-v2 { display: flex; gap: 1.5%; margin-bottom: 3%; }
 .mp-pip-v2 { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); opacity: 0.5; transition: all .25s; }
+.mp-pip-v2.current { opacity: 1; border-color: #7052B4; }
 .mp-pip-v2.done { opacity: 1; border: none; }
 .mp-card-grid-v2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; margin-bottom: 5%; }
 .mp-card-wrap-v2 { aspect-ratio: 1/1; cursor: pointer; }
@@ -694,6 +695,33 @@ html, body {
   transition: opacity .25s, transform .12s, border-color .15s, background .15s;
 }
 .lc-option-btn-v2.locked { opacity: 0.35; }
+
+/* Word Scramble (v2) */
+.ws-visual-v2 { text-align: center; margin-bottom: 5%; position: relative; }
+.ws-emoji-v2 { font-size: 15cqw; line-height: 1; }
+.ws-play-btn-v2 {
+  position: absolute; left: 0; top: 0;
+  background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+  border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
+  cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
+}
+.ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 3%; }
+.ws-slot-v2 {
+  width: 11cqw; height: 13cqw; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5cqw; font-weight: 700; color: #fff; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.ws-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; margin-bottom: 4%; }
+.ws-tile-v2 {
+  width: 11cqw; height: 13cqw; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  font-size: 5cqw; font-weight: 700; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-family: inherit; transition: opacity .2s;
+}
+.ws-tile-v2.used { opacity: 0; pointer-events: none; }
+.ws-feedback-v2 { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
 </style>
 </head>
 <body>
@@ -1294,39 +1322,43 @@ const LESSON = [
   },
 
   // ── GAME 2: Word Scramble ─────────────────────
+  // v2: per-tier pool, { pick, items: [{word,emoji,sentence,tokens}] }.
   {
     id: 'mod-game-2',
     type: 'word-scramble',
     label: 'Word Scramble',
     data: {
       bronze: {
+        pick: 4,
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
+          { word:'dog',   emoji:'🐕', tokens:[{t:'The dog',r:'subject'},{t:'runs',r:'verb'},{t:'in the park',r:'place'}] },
+          { word:'water', emoji:'💧', tokens:[{t:'I',r:'subject'},{t:'drink',r:'verb'},{t:'water',r:'object'},{t:'every day',r:'time'}] },
+          { word:'school',emoji:'🏫', tokens:[{t:'School',r:'subject'},{t:'starts',r:'verb'},{t:"at eight o'clock",r:'time'}] },
+          { word:'book',  emoji:'📚', tokens:[{t:'She',r:'subject'},{t:'reads',r:'verb'},{t:'a book',r:'object'},{t:'every night',r:'time'}] },
+          { word:'bus',   emoji:'🚌', tokens:[{t:'She',r:'subject'},{t:'takes',r:'verb'},{t:'the bus',r:'object'},{t:'to school',r:'place'}] },
+          { word:'cat',   emoji:'🐈', tokens:[{t:'The cat',r:'subject'},{t:'sleeps',r:'verb'},{t:'on the chair',r:'place'}] }
         ]
       },
       silver: {
+        pick: 4,
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.' },
-          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.' },
+          { word:'dog',   emoji:'🐕', tokens:[{t:'The dog',r:'subject'},{t:'runs',r:'verb'},{t:'in the park',r:'place'}] },
+          { word:'water', emoji:'💧', tokens:[{t:'I',r:'subject'},{t:'drink',r:'verb'},{t:'water',r:'object'},{t:'every day',r:'time'}] },
+          { word:'school',emoji:'🏫', tokens:[{t:'School',r:'subject'},{t:'starts',r:'verb'},{t:"at eight o'clock",r:'time'}] },
+          { word:'book',  emoji:'📚', tokens:[{t:'She',r:'subject'},{t:'reads',r:'verb'},{t:'a book',r:'object'},{t:'every night',r:'time'}] },
+          { word:'rain',  emoji:'🌧️', tokens:[{t:'It',r:'subject'},{t:'rains',r:'verb'},{t:'every morning',r:'time'}] },
+          { word:'phone', emoji:'📱', tokens:[{t:'She',r:'subject'},{t:'calls',r:'verb'},{t:'her friend',r:'object'},{t:'on the phone',r:'place'}] }
         ]
       },
       gold: {
+        pick: 4,
         items: [
-          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.' },
-          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.' },
-          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.' },
-          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
+          { word:'friend',emoji:'👫', tokens:[{t:'My friend',r:'subject'},{t:'lives',r:'verb'},{t:'near me',r:'place'}] },
+          { word:'money', emoji:'💰', tokens:[{t:'He',r:'subject'},{t:'saves',r:'verb'},{t:'his money',r:'object'},{t:'every month',r:'time'}] },
+          { word:'rain',  emoji:'🌧️', tokens:[{t:'It',r:'subject'},{t:'rains',r:'verb'},{t:'every morning',r:'time'}] },
+          { word:'phone', emoji:'📱', tokens:[{t:'She',r:'subject'},{t:'calls',r:'verb'},{t:'her friend',r:'object'},{t:'on the phone',r:'place'}] },
+          { word:'water', emoji:'💧', tokens:[{t:'I',r:'subject'},{t:'drink',r:'verb'},{t:'water',r:'object'},{t:'every day',r:'time'}] },
+          { word:'school',emoji:'🏫', tokens:[{t:'School',r:'subject'},{t:'starts',r:'verb'},{t:"at eight o'clock",r:'time'}] }
         ]
       }
     }
@@ -3147,141 +3179,163 @@ const MODULE_REGISTRY = {
 
   // ─────────────────────────────────────────────
   //  WORD SCRAMBLE
-  //  Image + audio shown. Tap scrambled letter
-  //  tiles to spell the word. Wrong = reset bank.
-  //  Reinforcement panel on correct.
+  //  v2 design: pool-based { pick, items: [{word,emoji,tokens}] },
+  //  separate pool per tier. Tap scrambled letter tiles into slots; tap a
+  //  filled slot to remove. Manual play button only — no auto-announce on
+  //  question load, matching the locked demo (word-scramble-demo.html).
+  //  Each question gets one color from PALETTE (not per-letter), cycling
+  //  across the session.
+  //  Audio (confirmed with Nick): correct → word once, then the sentence
+  //  (not word-word-sentence). Wrong → word once, then silent retry (not
+  //  twice). Grammar-color sentence reinforcement on correct via
+  //  showGrammarReinforce, same as gap-fill/true-false/memory-pairs.
   // ─────────────────────────────────────────────
   'word-scramble': {
     render(container, data, tier, onComplete) {
-      const { items } = data;
-      const PICK = Math.min(items.length, 4);
-      const session = safeShuffle(items, ()=>false).slice(0, PICK);
-      let idx=0, score=0, slotData=[], bankData=[], wsLocked=false;
+      const { pick, items } = data;
+      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      let idx = 0, score = 0, slotData = [], bankData = [], wsLocked = false;
 
-      function visual(item) {
-        if (item.image) return `<img src="${item.image}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;" alt="${item.word}">`;
-        return `<span style="font-size:72px;line-height:1;">${item.emoji}</span>`;
-      }
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)' },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)' },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)' }
+      ];
+      function itemColor() { return PALETTE[idx % PALETTE.length]; }
 
       function pips() {
-        return session.map((_,i)=>`<div class="pip${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
       }
 
       function load() {
-        wsLocked=false;
-        if(idx>=session.length){onComplete(score/PICK);return;}
-        const item=session[idx];
-        const letters=item.word.toUpperCase().split('');
-        slotData=letters.map(()=>null);
-        const wordUp=item.word.toUpperCase();
-        bankData=safeShuffle(letters,r=>r.join('')===wordUp).map((l,i)=>({letter:l,id:i,used:false}));
-        drawWS();
-        speak(item.word,'neutral',300, item.audioFile);
+        wsLocked = false;
+        const item = session[idx];
+        const letters = item.word.toUpperCase().split('');
+        slotData = letters.map(() => null);
+        const wordUp = item.word.toUpperCase();
+        bankData = safeShuffle(letters, r => r.join('') === wordUp).map((l, i) => ({ letter: l, id: i, used: false }));
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+        draw();
       }
 
-      function drawWS() {
-        const item=session[idx];
-        container.innerHTML=`
-          <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
-          <div style="text-align:center;margin-bottom:1rem;position:relative;display:inline-block;width:100%;">
-            ${visual(item)}
-            <button onclick="speak(session&&'${item.word}','neutral',0,'${item.audioFile||""}')" style="
-              position:absolute;right:8px;top:0;
-              background:var(--surface2);border:1px solid var(--surface2);
-              border-radius:50%;width:36px;height:36px;font-size:16px;
-              cursor:pointer;color:var(--accent);
-            ">🔊</button>
+      function draw() {
+        const item = session[idx];
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="ws-pips"></div>
+          <div class="ws-visual-v2">
+            <div class="ws-emoji-v2">${item.emoji}</div>
+            <button class="ws-play-btn-v2" id="ws-play-btn">🔊</button>
           </div>
-          <div id="ws-slots" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;">
-            ${slotData.map((_,si)=>`<div id="ws-s-${si}" onclick="wsRemove(${si})" style="
-              width:44px;height:52px;border-radius:8px;
-              border:2px solid var(--surface2);background:var(--surface);
-              display:flex;align-items:center;justify-content:center;
-              font-size:20px;font-weight:700;color:var(--text);cursor:pointer;
-            "></div>`).join('')}
-          </div>
-          <div id="ws-bank" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:56px;margin-bottom:1rem;">
-            ${bankData.map((t,bi)=>`<button id="ws-t-${bi}" onclick="wsTap(${bi})" style="
-              width:44px;height:52px;border-radius:8px;
-              border:1.5px solid #4A6080;background:var(--surface);
-              font-size:20px;font-weight:700;color:var(--text);
-              cursor:pointer;box-shadow:0 2px 0 #1E3248;
-              transition:opacity .2s;
-            ">${t.letter}</button>`).join('')}
-          </div>
-          <div id="ws-fb" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);margin-bottom:.5rem;"></div>`;
+          <div class="ws-slots-v2" id="ws-slots"></div>
+          <div class="ws-bank-v2" id="ws-bank"></div>
+          <p class="ws-feedback-v2" id="ws-fb">&nbsp;</p>
+        `;
+        container.querySelector('#ws-pips').innerHTML = pips();
+
+        const wsSlots = container.querySelector('#ws-slots');
+        slotData.forEach((_, si) => {
+          const d = document.createElement('div');
+          d.className = 'ws-slot-v2';
+          d.id = `ws-s-${si}`;
+          d.addEventListener('click', () => wsRemove(si));
+          wsSlots.appendChild(d);
+        });
+
+        const wsBank = container.querySelector('#ws-bank');
+        bankData.forEach((t, bi) => {
+          const b = document.createElement('button');
+          b.className = 'ws-tile-v2';
+          b.id = `ws-t-${bi}`;
+          b.textContent = t.letter;
+          b.addEventListener('click', () => wsTap(bi));
+          wsBank.appendChild(b);
+        });
+
+        container.querySelector('#ws-play-btn').addEventListener('click', () => {
+          speak(item.word, 'neutral');
+        });
+
+        refreshSlots(); refreshBank();
       }
 
       function refreshSlots() {
-        slotData.forEach((entry,si)=>{
-          const el=document.getElementById(`ws-s-${si}`);
-          if(!el)return;
-          el.textContent=entry?entry.letter:'';
-          el.style.borderColor=entry?'var(--accent)':'var(--surface2)';
-          el.style.background=entry?'rgba(79,195,247,.08)':'var(--surface)';
+        const c = itemColor();
+        slotData.forEach((entry, si) => {
+          const el = document.getElementById(`ws-s-${si}`);
+          if (!el) return;
+          el.textContent = entry ? entry.letter : '';
+          el.style.borderColor = entry ? c.border : 'rgba(255,255,255,0.08)';
+          el.style.background = entry ? c.bg : 'rgba(255,255,255,0.05)';
+          el.style.color = entry ? c.border : '#fff';
         });
       }
-
       function refreshBank() {
-        bankData.forEach((t,bi)=>{
-          const el=document.getElementById(`ws-t-${bi}`);
-          if(el)el.style.opacity=t.used?'0':'1';
+        bankData.forEach((t, bi) => {
+          const el = document.getElementById(`ws-t-${bi}`);
+          if (el) el.classList.toggle('used', t.used);
         });
       }
 
-      window.wsTap=function(bi){
-        if(wsLocked)return;
-        const tile=bankData[bi];
-        if(tile.used)return;
-        const si=slotData.indexOf(null);
-        if(si===-1)return;
-        tile.used=true;
-        slotData[si]={letter:tile.letter,bankId:bi};
-        // No audio here — the word is already announced once when the
-        // question loads and once on successful completion. Speaking it
-        // again on every tile tap was repeating it up to once per letter.
-        refreshSlots();refreshBank();
-        if(slotData.indexOf(null)===-1)setTimeout(wsCheck,200);
-      };
+      function wsTap(bi) {
+        if (wsLocked) return;
+        const tile = bankData[bi];
+        if (tile.used) return;
+        const si = slotData.indexOf(null);
+        if (si === -1) return;
+        tile.used = true;
+        slotData[si] = { letter: tile.letter, bankId: bi };
+        refreshSlots(); refreshBank();
+        if (slotData.indexOf(null) === -1) setTimeout(wsCheck, 200);
+      }
+      function wsRemove(si) {
+        if (wsLocked) return;
+        const entry = slotData[si];
+        if (!entry) return;
+        bankData[entry.bankId].used = false;
+        slotData[si] = null;
+        refreshSlots(); refreshBank();
+      }
 
-      window.wsRemove=function(si){
-        if(wsLocked)return;
-        const entry=slotData[si];
-        if(!entry)return;
-        bankData[entry.bankId].used=false;
-        slotData[si]=null;
-        refreshSlots();refreshBank();
-      };
+      function wsCheck() {
+        const item = session[idx];
+        const attempt = slotData.map(e => e.letter).join('').toLowerCase();
+        const ok = attempt === item.word.toLowerCase();
+        wsLocked = true;
+        const c = itemColor();
+        const fb = document.getElementById('ws-fb');
 
-      function wsCheck(){
-        const item=session[idx];
-        const attempt=slotData.map(e=>e.letter).join('').toLowerCase();
-        const ok=attempt===item.word.toLowerCase();
-        wsLocked=true;
-        const fb=document.getElementById('ws-fb');
-        slotData.forEach((_,si)=>{
-          const el=document.getElementById(`ws-s-${si}`);
-          if(el){
-            el.style.borderColor=ok?'var(--gold)':'var(--fail)';
-            el.style.background=ok?'rgba(255,215,0,.1)':'rgba(239,83,80,.1)';
+        slotData.forEach((_, si) => {
+          const el = document.getElementById(`ws-s-${si}`);
+          if (el) {
+            el.style.borderColor = ok ? c.border : '#E91E63';
+            el.style.background = ok ? c.bg : 'rgba(233,30,99,0.12)';
+            el.style.color = ok ? c.border : '#F48FB1';
           }
         });
-        if(ok){
+
+        if (ok) {
           score++;
-          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
-          speak(item.word,'celebrate', 0, item.audioFile);
-          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
+          speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel, not repeated here
+          setTimeout(() => {
+            const plainSentence = item.tokens.map(t => t.t).join(' ');
+            showGrammarReinforce(item.tokens, plainSentence, () => {
+              idx++;
+              if (idx < session.length) load();
+              else onComplete(score / session.length);
+            });
+          }, 500);
         } else {
-          if(fb){fb.textContent=`✗ The word is: ${item.word}`;fb.style.color='var(--fail)';}
-          speak(item.word,'wrong', 0, item.audioFile);
-          setTimeout(()=>{
-            slotData=slotData.map(()=>null);
-            bankData.forEach(t=>t.used=false);
-            wsLocked=false;
-            refreshSlots();refreshBank();
-            if(fb){fb.textContent='Try again!';fb.style.color='var(--text-dim)';}
-            speak(item.word,'neutral',300, item.audioFile);
-          },1500);
+          if (fb) { fb.textContent = `✗ The word is: ${item.word}`; fb.style.color = '#F48FB1'; }
+          speak(item.word, 'wrong'); // word once, then silent retry — no second play
+          setTimeout(() => {
+            slotData = slotData.map(() => null);
+            bankData.forEach(t => t.used = false);
+            wsLocked = false;
+            refreshSlots(); refreshBank();
+            if (fb) { fb.textContent = 'Try again!'; fb.style.color = 'rgba(255,255,255,0.4)'; }
+          }, 1500);
         }
       }
 
