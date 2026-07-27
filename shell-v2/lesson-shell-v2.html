@@ -1452,35 +1452,41 @@ const LESSON = [
   },
 
   // ── AUDIO MATCH ───────────────────────────────
-  // Left column: tap to hear (unlimited replay). Right column: tap the
-  // matching text. Distractors in silver/gold are deliberately close
-  // (before/after, he/she, morning/evening) to force careful listening.
+  // v2: per-tier pool, { pick, items: [{left,right}] } — same shape and
+  // engine as Word Match. Confirmed via the locked demo: left always
+  // equals right (it's an audio-echo match, not a translation pair) —
+  // resolves the open question flagged in lesson-builder-schema.md.
+  // Distractors in silver/gold are deliberately close (before/after,
+  // he/she, morning/evening) to force careful listening.
   {
     id: 'mod-audio-match',
     type: 'audio-match',
     label: 'Listen & Match',
     data: {
       bronze: {
-        pairs: [
-          { audio: 'dog',    text: 'dog'    },
-          { audio: 'cat',    text: 'cat'    },
-          { audio: 'bus',    text: 'bus'    },
-          { audio: 'book',   text: 'book'   },
+        pick: 4,
+        items: [
+          { left: 'dog',  right: 'dog'  },
+          { left: 'cat',  right: 'cat'  },
+          { left: 'bus',  right: 'bus'  },
+          { left: 'book', right: 'book' }
         ]
       },
       silver: {
-        pairs: [
-          { audio: 'I eat breakfast before school.', text: 'I eat breakfast before school.' },
-          { audio: 'I eat breakfast after school.',   text: 'I eat breakfast after school.'  },
-          { audio: 'I eat lunch before school.',      text: 'I eat lunch before school.'     },
+        pick: 3,
+        items: [
+          { left: 'I eat breakfast before school.', right: 'I eat breakfast before school.' },
+          { left: 'I eat breakfast after school.',  right: 'I eat breakfast after school.'  },
+          { left: 'I eat lunch before school.',     right: 'I eat lunch before school.'     }
         ]
       },
       gold: {
-        pairs: [
-          { audio: 'He walks to school every morning.', text: 'He walks to school every morning.' },
-          { audio: 'She walks to school every morning.', text: 'She walks to school every morning.' },
-          { audio: 'He walks to school every evening.',  text: 'He walks to school every evening.'  },
-          { audio: 'He runs to school every morning.',   text: 'He runs to school every morning.'   },
+        pick: 4,
+        items: [
+          { left: 'He walks to school every morning.',  right: 'He walks to school every morning.'  },
+          { left: 'She walks to school every morning.', right: 'She walks to school every morning.' },
+          { left: 'He walks to school every evening.',  right: 'He walks to school every evening.'  },
+          { left: 'He runs to school every morning.',   right: 'He runs to school every morning.'   }
         ]
       }
     }
@@ -3598,122 +3604,200 @@ const MODULE_REGISTRY = {
   },
 
   // ─────────────────────────────────────────────
-  //  AUDIO MATCH
-  //  Left col: tap to hear (unlimited replay, never disabled).
-  //  Right col: tap the matching text.
-  //  Same match/reveal mechanic as word-match — reuses its CSS.
-  //  Tiers differ only via data: bronze = single words,
-  //  silver/gold = sentences with deliberately similar distractors.
+  //  LISTEN & MATCH
+  //  v2 design: pool-based { pick, items: [{left,right}] } — same shape
+  //  and free-pairing engine as Word Match, confirmed identical in the
+  //  locked demo (listen-match-demo.html). Only real difference: left
+  //  buttons show a 🔊 icon and play audio on every tap (unlimited
+  //  replay) instead of showing text. left always equals right in the
+  //  data — it's an audio-echo match, not a translation pair.
   // ─────────────────────────────────────────────
   'audio-match': {
     render(container, data, tier, onComplete) {
-      const { pairs } = data;
-      let selectedLeft = null;
-      let matchedCount = 0;
-      let wrongCount   = 0;
-      const total      = pairs.length;
+      const { pick, items } = data;
+      const pairs = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const total = pairs.length;
+      const isBronze = (tier === 'bronze');
 
       const PALETTE = [
         { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' },
         { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' },
         { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' },
         { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' },
-        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' },
+        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' }
       ];
+      const pairColor = pairs.map((_, i) => PALETTE[i % PALETTE.length]);
+
+      document.getElementById('v2-qlabel').innerHTML =
+        `<span>Tap 🔊 to listen, then match.</span><span id="am-score">0 of ${total} paired</span>`;
 
       container.innerHTML = `
-        <p class="module-question">Listen, then tap the matching sentence.</p>
-        <p class="match-score" id="am-score">${total} to match</p>
-        <div class="match-grid">
-          <div class="match-col" id="am-left-col"></div>
-          <div class="match-col" id="am-right-col"></div>
+        <div class="wm-grid-v2">
+          <div class="wm-col-v2" id="am-left-col"></div>
+          <div class="wm-col-v2" id="am-right-col"></div>
         </div>
-        <button class="next-ex-btn" id="am-next-btn" style="display:none">Next →</button>
+        <p class="wm-encourage-v2" id="am-encourage"></p>
+        <p class="wm-nudge-v2" id="am-nudge"></p>
+        <button id="am-notquite-btn" class="wm-notquite-btn-v2" disabled>Not quite yet</button>
+        <button id="am-next-btn" class="iv-proceed-btn">Next →</button>
       `;
 
-      const leftCol    = container.querySelector('#am-left-col');
-      const rightCol   = container.querySelector('#am-right-col');
-      const scoreLabel = container.querySelector('#am-score');
-      const nextBtn    = container.querySelector('#am-next-btn');
+      const leftCol      = container.querySelector('#am-left-col');
+      const rightCol     = container.querySelector('#am-right-col');
+      const scoreLabel   = document.getElementById('am-score');
+      const encourageEl  = container.querySelector('#am-encourage');
+      const nudgeEl      = container.querySelector('#am-nudge');
+      const notQuiteBtn  = container.querySelector('#am-notquite-btn');
+      const nextBtn      = container.querySelector('#am-next-btn');
 
-      const leftItems  = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
-      const rightItems = pairs.map((p, i) => ({ ...p, pairIdx: i })).sort(() => Math.random() - 0.5);
+      let pairings = new Map();
+      let rightUsed = new Map();
+      let selectedLeftBtn = null;
+      let confirmed = false;
 
-      leftItems.forEach((pair, li) => {
+      function styleLeft(btn) {
+        if (confirmed) return;
+        const idx = parseInt(btn.dataset.pairIdx);
+        const c = pairColor[idx];
+        const isSelected = (btn === selectedLeftBtn);
+        const isPaired = pairings.has(idx);
+        if (isSelected) {
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+          btn.style.boxShadow = `0 0 0 3px ${c.border}`;
+        } else if (isPaired) {
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+          btn.style.boxShadow = '';
+        } else {
+          btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.color = 'rgba(255,255,255,0.85)'; btn.style.boxShadow = '';
+        }
+      }
+      function styleRight(btn) {
+        if (confirmed) return;
+        const rightIdx = parseInt(btn.dataset.pairIdx);
+        if (rightUsed.has(rightIdx)) {
+          const c = pairColor[rightUsed.get(rightIdx)];
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+        } else {
+          btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.color = 'rgba(255,255,255,0.85)';
+        }
+      }
+      function checkAllCorrect() {
+        if (pairings.size !== total) return false;
+        for (const leftIdx of pairings.keys()) {
+          if (pairings.get(leftIdx) !== leftIdx) return false;
+        }
+        return true;
+      }
+      function refreshAll() {
+        container.querySelectorAll('.wm-btn-v2[data-side="left"]').forEach(styleLeft);
+        container.querySelectorAll('.wm-btn-v2[data-side="right"]').forEach(styleRight);
+
+        let correctSoFar = 0, wrongSoFar = 0;
+        pairings.forEach((rightIdx, leftIdx) => {
+          if (rightIdx === leftIdx) correctSoFar++; else wrongSoFar++;
+        });
+
+        if (pairings.size === total) {
+          if (checkAllCorrect()) {
+            confirmed = true;
+            scoreLabel.textContent = 'Good job!';
+            scoreLabel.style.color = '#AED581';
+            notQuiteBtn.style.display = 'none';
+            nudgeEl.style.opacity = '0';
+            encourageEl.style.opacity = '0';
+            nextBtn.style.display = 'flex';
+            nextBtn.onclick = () => onComplete(1);
+          } else {
+            scoreLabel.textContent = `${Math.min(pairings.size, total)} of ${total} paired`;
+            scoreLabel.style.color = '';
+            nextBtn.style.display = 'none';
+            notQuiteBtn.style.display = 'flex';
+            nudgeEl.style.opacity = '0';
+            encourageEl.style.opacity = '0';
+          }
+        } else {
+          scoreLabel.textContent = `${pairings.size} of ${total} paired`;
+          scoreLabel.style.color = '';
+          nextBtn.style.display = 'none';
+          notQuiteBtn.style.display = 'none';
+
+          if (isBronze && wrongSoFar > 0) {
+            nudgeEl.textContent = 'Are you sure about that one?';
+            nudgeEl.style.opacity = '1';
+            encourageEl.style.opacity = '0';
+          } else {
+            nudgeEl.style.opacity = '0';
+            if (correctSoFar > 0) {
+              const ratio = correctSoFar / total;
+              encourageEl.textContent = ratio >= 0.66 ? 'Almost there!'
+                                       : ratio >= 0.34 ? 'Getting there!'
+                                       : 'Nice, keep going!';
+              encourageEl.style.opacity = '1';
+            } else {
+              encourageEl.style.opacity = '0';
+            }
+          }
+        }
+      }
+
+      const withIdx = pairs.map((p, i) => ({ left: p.left, right: p.right, pairIdx: i }));
+      const leftItems = safeShuffle(withIdx, () => false);
+      const rightItems = safeShuffle(withIdx, r => r.some((item, pos) => item.pairIdx === leftItems[pos].pairIdx));
+
+      leftItems.forEach(pair => {
         const btn = document.createElement('button');
-        btn.className       = 'match-btn';
-        btn.innerHTML       = `🔊<br><span style="opacity:.55;font-size:11px;">Track ${li + 1}</span>`;
-        btn.dataset.key     = pair.text;
-        btn.dataset.side    = 'left';
+        btn.className = 'wm-btn-v2';
+        btn.innerHTML = '🔊';
+        btn.dataset.side = 'left';
         btn.dataset.pairIdx = pair.pairIdx;
-        btn.dataset.audio   = pair.audio;
+        btn.dataset.audio = pair.left;
         leftCol.appendChild(btn);
       });
-
       rightItems.forEach(pair => {
         const btn = document.createElement('button');
-        btn.className       = 'match-btn';
-        btn.textContent     = pair.text;
-        btn.dataset.key     = pair.text;
-        btn.dataset.side    = 'right';
+        btn.className = 'wm-btn-v2';
+        btn.textContent = pair.right;
+        btn.dataset.side = 'right';
         btn.dataset.pairIdx = pair.pairIdx;
         rightCol.appendChild(btn);
       });
 
-      function applyMatchColor(btn) {
-        const c = PALETTE[parseInt(btn.dataset.pairIdx) % PALETTE.length];
-        btn.style.borderColor = c.border;
-        btn.style.background  = c.bg;
-        btn.style.color       = c.color;
-        btn.classList.add('matched');
-        btn.disabled = true;
-      }
-
-      container.querySelectorAll('.match-btn').forEach(btn => {
+      container.querySelectorAll('.wm-btn-v2').forEach(btn => {
         btn.addEventListener('click', () => {
-          if (btn.classList.contains('matched')) return;
+          if (confirmed) return;
 
           if (btn.dataset.side === 'left') {
-            speak(btn.dataset.audio, 'neutral', 0, btn.dataset.audioFile); // unlimited replay, every tap plays
-            if (selectedLeft !== btn) {
-              container.querySelectorAll('.match-btn[data-side="left"]')
-                .forEach(b => b.classList.remove('selected'));
-              selectedLeft = btn;
-              btn.classList.add('selected');
-            }
+            speak(btn.dataset.audio, 'neutral'); // unlimited replay — plays every tap, matched or not
+            selectedLeftBtn = (btn === selectedLeftBtn) ? null : btn;
+            refreshAll();
             return;
           }
 
-          if (!selectedLeft) return;
+          const rightIdx = parseInt(btn.dataset.pairIdx);
+          const leftIdx = selectedLeftBtn ? parseInt(selectedLeftBtn.dataset.pairIdx) : null;
 
-          const isMatch = (selectedLeft.dataset.key === btn.dataset.key);
-
-          if (isMatch) {
-            const leftBtn = selectedLeft;
-            selectedLeft  = null;
-            applyMatchColor(leftBtn);
-            applyMatchColor(btn);
-            matchedCount++;
-
-            const remaining = total - matchedCount;
-            scoreLabel.textContent = remaining > 0 ? `${remaining} left` : 'All matched! ✓';
-
-            if (matchedCount === total) {
-              const score = Math.max(0.6, 1 - (wrongCount * 0.1));
-              nextBtn.style.display = 'block';
-              nextBtn.onclick = () => onComplete(score);
+          if (rightUsed.has(rightIdx)) {
+            const prevLeftIdx = rightUsed.get(rightIdx);
+            pairings.delete(prevLeftIdx);
+            rightUsed.delete(rightIdx);
+            if (leftIdx === null || leftIdx === prevLeftIdx) {
+              selectedLeftBtn = null;
+              refreshAll();
+              return;
             }
-          } else {
-            wrongCount++;
-            selectedLeft.classList.add('wrong-flash');
-            btn.classList.add('wrong-flash');
-            const prevLeft = selectedLeft;
-            selectedLeft   = null;
-            setTimeout(() => {
-              prevLeft.classList.remove('wrong-flash', 'selected');
-              btn.classList.remove('wrong-flash');
-            }, 500);
           }
+          if (leftIdx === null) { refreshAll(); return; }
+
+          if (pairings.has(leftIdx)) {
+            rightUsed.delete(pairings.get(leftIdx));
+            pairings.delete(leftIdx);
+          }
+          pairings.set(leftIdx, rightIdx);
+          rightUsed.set(rightIdx, leftIdx);
+          selectedLeftBtn = null;
+          refreshAll();
         });
       });
     }
