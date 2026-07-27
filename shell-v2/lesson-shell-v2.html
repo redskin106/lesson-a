@@ -722,6 +722,48 @@ html, body {
 }
 .ws-tile-v2.used { opacity: 0; pointer-events: none; }
 .ws-feedback-v2 { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
+
+/* Spelling (v2) */
+.sp-visual-v2 { text-align: center; margin-bottom: 4%; }
+.sp-emoji-v2 { font-size: 13cqw; line-height: 1; margin-bottom: 2%; }
+.sp-listen-row-v2 { display: flex; align-items: center; justify-content: center; gap: 3%; }
+.sp-play-btn-v2 {
+  background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+  border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
+  cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sp-instruction-v2 { font-size: 3cqw; color: rgba(255,255,255,0.4); }
+.sp-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 3%; }
+.sp-slot-v2 {
+  width: 11cqw; height: 13cqw; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5cqw; font-weight: 700; color: #fff; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.sp-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; margin-bottom: 4%; }
+.sp-tile-v2 {
+  width: 11cqw; height: 13cqw; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  font-size: 5cqw; font-weight: 700; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-family: inherit; transition: opacity .2s;
+}
+.sp-tile-v2.used { opacity: 0; pointer-events: none; }
+.sp-input-v2 {
+  width: 100%; font-size: 5.5cqw; font-weight: 600; text-align: center;
+  padding: 4%; border-radius: 12px; letter-spacing: .08em;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  color: #fff; outline: none; margin-bottom: 4%; font-family: inherit;
+}
+.sp-check-btn-v2 {
+  display: none; margin: 0 auto 3%;
+  padding: 3% 12%; border-radius: 999px;
+  background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+  color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+}
+.sp-check-btn-v2:disabled { opacity: 0.4; pointer-events: none; }
+.sp-feedback-v2 { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
 </style>
 </head>
 <body>
@@ -1365,39 +1407,45 @@ const LESSON = [
   },
 
   // ── Spelling ──────────────────────────────────
+  // v2: per-tier pool, { pick, items: [{word,emoji,tokens}] }. tokens can
+  // be null (library/hospital below) — the reinforcement falls back to
+  // just the word when that happens.
   {
     id: 'mod-spelling',
     type: 'spelling',
     label: 'Spelling',
     data: {
       bronze: {
+        pick: 4,
         items: [
-          { word:'dog',    emoji:'🐕', image:null, sentence:'The dog <strong>runs</strong> in the park.' },
-          { word:'cat',    emoji:'🐈', image:null, sentence:'The cat <strong>sleeps</strong> on the chair.' },
-          { word:'bus',    emoji:'🚌', image:null, sentence:'She <strong>takes</strong> the bus to school.' },
-          { word:'book',   emoji:'📚', image:null, sentence:'She <strong>reads</strong> a book every night.' },
-          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
+          { word:'dog',   emoji:'🐕', tokens:[{t:'The dog',r:'subject'},{t:'runs',r:'verb'},{t:'in the park',r:'place'}] },
+          { word:'cat',   emoji:'🐈', tokens:[{t:'The cat',r:'subject'},{t:'sleeps',r:'verb'},{t:'on the chair',r:'place'}] },
+          { word:'bus',   emoji:'🚌', tokens:[{t:'She',r:'subject'},{t:'takes',r:'verb'},{t:'the bus',r:'object'},{t:'to school',r:'place'}] },
+          { word:'book',  emoji:'📚', tokens:[{t:'She',r:'subject'},{t:'reads',r:'verb'},{t:'a book',r:'object'},{t:'every night',r:'time'}] },
+          { word:'rain',  emoji:'🌧️', tokens:[{t:'It',r:'subject'},{t:'rains',r:'verb'},{t:'every morning',r:'time'}] },
+          { word:'water', emoji:'💧', tokens:[{t:'I',r:'subject'},{t:'drink',r:'verb'},{t:'water',r:'object'},{t:'every day',r:'time'}] }
         ]
       },
       silver: {
+        pick: 4,
         items: [
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.' },
-          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.' },
-          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.' },
-          { word:'rain',   emoji:'🌧️', image:null, sentence:'It <strong>rains</strong> every morning.' },
-          { word:'water',  emoji:'💧', image:null, sentence:'I <strong>drink</strong> water every day.' },
+          { word:'school', emoji:'🏫', tokens:[{t:'School',r:'subject'},{t:'starts',r:'verb'},{t:"at eight o'clock",r:'time'}] },
+          { word:'phone',  emoji:'📱', tokens:[{t:'She',r:'subject'},{t:'calls',r:'verb'},{t:'her friend',r:'object'},{t:'on the phone',r:'place'}] },
+          { word:'money',  emoji:'💰', tokens:[{t:'He',r:'subject'},{t:'saves',r:'verb'},{t:'his money',r:'object'},{t:'every month',r:'time'}] },
+          { word:'friend', emoji:'👫', tokens:[{t:'My friend',r:'subject'},{t:'lives',r:'verb'},{t:'near me',r:'place'}] },
+          { word:'rain',   emoji:'🌧️', tokens:[{t:'It',r:'subject'},{t:'rains',r:'verb'},{t:'every morning',r:'time'}] },
+          { word:'water',  emoji:'💧', tokens:[{t:'I',r:'subject'},{t:'drink',r:'verb'},{t:'water',r:'object'},{t:'every day',r:'time'}] }
         ]
       },
       gold: {
+        pick: 4,
         items: [
-          { word:'school', emoji:'🏫', image:null, sentence:'School <strong>starts</strong> at eight o\'clock.' },
-          { word:'phone',  emoji:'📱', image:null, sentence:'She <strong>calls</strong> her friend on the phone.' },
-          { word:'money',  emoji:'💰', image:null, sentence:'He <strong>saves</strong> his money every month.' },
-          { word:'friend', emoji:'👫', image:null, sentence:'My <strong>friend</strong> lives near me.' },
-          { word:'library',emoji:'📖', image:null, sentence:'She <strong>goes</strong> to the library after class.' },
-          { word:'hospital',emoji:'🏥',image:null, sentence:'My uncle <strong>works</strong> at the hospital.' },
+          { word:'school',  emoji:'🏫', tokens:[{t:'School',r:'subject'},{t:'starts',r:'verb'},{t:"at eight o'clock",r:'time'}] },
+          { word:'phone',   emoji:'📱', tokens:[{t:'She',r:'subject'},{t:'calls',r:'verb'},{t:'her friend',r:'object'},{t:'on the phone',r:'place'}] },
+          { word:'money',   emoji:'💰', tokens:[{t:'He',r:'subject'},{t:'saves',r:'verb'},{t:'his money',r:'object'},{t:'every month',r:'time'}] },
+          { word:'friend',  emoji:'👫', tokens:[{t:'My friend',r:'subject'},{t:'lives',r:'verb'},{t:'near me',r:'place'}] },
+          { word:'library', emoji:'📖', tokens:null },
+          { word:'hospital',emoji:'🏥', tokens:null }
         ]
       }
     }
@@ -3345,206 +3393,205 @@ const MODULE_REGISTRY = {
 
   // ─────────────────────────────────────────────
   //  SPELLING
-  //  Bronze: image + audio → tap tiles
-  //  Silver: audio only   → tap tiles
-  //  Gold:   audio only   → free type, retype on fail
+  //  v2 design: pool-based { pick, items: [{word,emoji,tokens}] }, separate
+  //  pool per tier. Bronze: image + tap tiles. Silver: audio-only + tap
+  //  tiles. Gold: audio-only + free typing (no letter bank at all — this
+  //  is the genuine skill difference from Word Scramble: production
+  //  spelling from memory, not anagram-solving). tokens can be null
+  //  (library/hospital) — falls back to just the word for reinforcement.
+  //  Manual play button only — no auto-announce, matching Word Scramble.
+  //  Audio: correct → word once, then sentence. Wrong → word once, silent
+  //  retry. Same rule Nick confirmed for Word Scramble.
   // ─────────────────────────────────────────────
   'spelling': {
     render(container, data, tier, onComplete) {
-      const { items } = data;
-      const PICK = Math.min(items.length, 4);
-      const session = safeShuffle(items, ()=>false).slice(0, PICK);
-      let idx=0, score=0, spLocked=false, retypeMode=false;
-      let slotData=[], bankData=[];
-
-      function visual(item) {
-        if (item.image) return `<img src="${item.image}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;" alt="${item.word}">`;
-        return `<span style="font-size:72px;line-height:1;">${item.emoji}</span>`;
-      }
+      const { pick, items } = data;
+      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      let idx = 0, score = 0, spLocked = false, retypeMode = false;
+      let slotData = [], bankData = [];
 
       function pips() {
-        return session.map((_,i)=>`<div class="pip${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
       }
 
       function load() {
-        spLocked=false; retypeMode=false;
-        if(idx>=session.length){onComplete(score/PICK);return;}
-        const item=session[idx];
-        const letters=item.word.toUpperCase().split('');
-        slotData=letters.map(()=>null);
-        const wordUp=item.word.toUpperCase();
-        bankData=safeShuffle(letters,r=>r.join('')===wordUp).map((l,i)=>({letter:l,id:i,used:false}));
+        spLocked = false; retypeMode = false;
+        const item = session[idx];
+        const letters = item.word.toUpperCase().split('');
+        slotData = letters.map(() => null);
+        const wordUp = item.word.toUpperCase();
+        bankData = safeShuffle(letters, r => r.join('') === wordUp).map((l, i) => ({ letter: l, id: i, used: false }));
 
-        const showImage = tier==='bronze';
-        const isTile    = tier!=='gold';
+        const showImage = tier === 'bronze';
+        const isTile = tier !== 'gold';
+        const instruction = tier === 'bronze' ? 'Tap the letters to spell the word'
+                           : tier === 'silver' ? 'Listen and spell what you hear'
+                           : 'Listen and type the word';
 
-        container.innerHTML=`
-          <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
-          <div style="text-align:center;margin-bottom:1rem;">
-            ${showImage ? visual(item) : ''}
-            <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:${showImage?'.75rem':'0'};">
-              <button onclick="speak('${item.word}','neutral',0,'${item.audioFile||""}')" style="
-                background:var(--surface2);border:1px solid var(--surface2);
-                border-radius:50%;width:42px;height:42px;font-size:18px;
-                cursor:pointer;color:var(--accent);flex-shrink:0;
-              ">🔊</button>
-              <span style="font-size:13px;color:var(--text-dim);">${tier==='bronze'?'Tap the letters to spell the word':tier==='silver'?'Listen and spell what you hear':'Listen and type the word'}</span>
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="sp-pips"></div>
+          <div class="sp-visual-v2">
+            ${showImage ? `<div class="sp-emoji-v2">${item.emoji}</div>` : ''}
+            <div class="sp-listen-row-v2">
+              <button class="sp-play-btn-v2" id="sp-play-btn">🔊</button>
+              <span class="sp-instruction-v2">${instruction}</span>
             </div>
           </div>
           ${isTile ? `
-          <div id="sp-slots" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;">
-            ${slotData.map((_,si)=>`<div id="sp-s-${si}" onclick="spRemove(${si})" style="
-              width:44px;height:52px;border-radius:8px;
-              border:2px solid var(--surface2);background:var(--surface);
-              display:flex;align-items:center;justify-content:center;
-              font-size:20px;font-weight:700;color:var(--text);cursor:pointer;
-            "></div>`).join('')}
-          </div>
-          <div id="sp-bank" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:56px;margin-bottom:1rem;">
-            ${bankData.map((t,bi)=>`<button id="sp-t-${bi}" onclick="spTap(${bi})" style="
-              width:44px;height:52px;border-radius:8px;
-              border:1.5px solid #4A6080;background:var(--surface);
-              font-size:20px;font-weight:700;color:var(--text);
-              cursor:pointer;box-shadow:0 2px 0 #1E3248;transition:opacity .2s;
-            ">${t.letter}</button>`).join('')}
-          </div>` : `
-          <div style="margin-bottom:1rem;">
-            <input id="sp-input" type="text"
-              autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
-              placeholder="Type the word…"
-              oninput="spTypeInput()" onkeydown="spTypeKey(event)"
-              style="
-                width:100%;font-size:22px;font-weight:600;text-align:center;
-                padding:14px;border-radius:var(--radius);
-                border:2px solid var(--surface2);background:var(--surface);
-                color:var(--text);outline:none;letter-spacing:.08em;
-              ">
-            <button id="sp-chk" onclick="spCheckType()" disabled style="
-              width:100%;margin-top:10px;padding:13px;
-              border-radius:var(--radius);border:none;
-              background:var(--accent);color:var(--bg);
-              font-size:15px;font-weight:600;cursor:pointer;opacity:.4;
-              transition:opacity .15s;
-            ">Check →</button>
-          </div>`}
-          <div id="sp-fb" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);margin-bottom:.5rem;"></div>`;
+          <div class="sp-slots-v2" id="sp-slots"></div>
+          <div class="sp-bank-v2" id="sp-bank"></div>
+          ` : `
+          <input id="sp-input" class="sp-input-v2" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Type the word…">
+          <button id="sp-chk" class="sp-check-btn-v2" disabled>Check →</button>
+          `}
+          <p class="sp-feedback-v2" id="sp-fb">&nbsp;</p>
+        `;
+        container.querySelector('#sp-pips').innerHTML = pips();
 
-        speak(item.word,'neutral',350, item.audioFile);
-        if(tier==='gold') setTimeout(()=>{const inp=document.getElementById('sp-input');if(inp)inp.focus();},200);
+        container.querySelector('#sp-play-btn').addEventListener('click', () => speak(item.word, 'neutral'));
+
+        if (isTile) {
+          const slotsEl = container.querySelector('#sp-slots');
+          slotData.forEach((_, si) => {
+            const d = document.createElement('div');
+            d.className = 'sp-slot-v2';
+            d.id = `sp-s-${si}`;
+            d.addEventListener('click', () => spRemove(si));
+            slotsEl.appendChild(d);
+          });
+          const bankEl = container.querySelector('#sp-bank');
+          bankData.forEach((t, bi) => {
+            const b = document.createElement('button');
+            b.className = 'sp-tile-v2';
+            b.id = `sp-t-${bi}`;
+            b.textContent = t.letter;
+            b.addEventListener('click', () => spTap(bi));
+            bankEl.appendChild(b);
+          });
+          spRefreshSlots(); spRefreshBank();
+        } else {
+          const inp = container.querySelector('#sp-input');
+          const chk = container.querySelector('#sp-chk');
+          inp.addEventListener('input', () => {
+            chk.style.display = 'block';
+            chk.disabled = inp.value.trim().length === 0;
+            chk.style.opacity = inp.value.trim().length ? '1' : '.4';
+          });
+          inp.addEventListener('keydown', e => { if (e.key === 'Enter') spCheckType(); });
+          chk.addEventListener('click', spCheckType);
+          setTimeout(() => inp.focus(), 200);
+        }
       }
 
-      // ── Tile mechanic ──
-      window.spTap=function(bi){
-        if(spLocked)return;
-        const tile=bankData[bi];
-        if(tile.used)return;
-        const si=slotData.indexOf(null);
-        if(si===-1)return;
-        tile.used=true;
-        slotData[si]={letter:tile.letter,bankId:bi};
-        speak(session[idx].word,'neutral', 0, session[idx].audioFile);
-        spRefreshSlots();spRefreshBank();
-        if(slotData.indexOf(null)===-1)setTimeout(spCheckTiles,200);
-      };
-      window.spRemove=function(si){
-        if(spLocked)return;
-        const entry=slotData[si];
-        if(!entry)return;
-        bankData[entry.bankId].used=false;
-        slotData[si]=null;
-        spRefreshSlots();spRefreshBank();
-      };
-
-      function spRefreshSlots(){
-        slotData.forEach((entry,si)=>{
-          const el=document.getElementById(`sp-s-${si}`);
-          if(!el)return;
-          el.textContent=entry?entry.letter:'';
-          el.style.borderColor=entry?'var(--accent)':'var(--surface2)';
-          el.style.background=entry?'rgba(79,195,247,.08)':'var(--surface)';
+      function spTap(bi) {
+        if (spLocked) return;
+        const tile = bankData[bi];
+        if (tile.used) return;
+        const si = slotData.indexOf(null);
+        if (si === -1) return;
+        tile.used = true;
+        slotData[si] = { letter: tile.letter, bankId: bi };
+        spRefreshSlots(); spRefreshBank();
+        if (slotData.indexOf(null) === -1) setTimeout(spCheckTiles, 200);
+      }
+      function spRemove(si) {
+        if (spLocked) return;
+        const entry = slotData[si];
+        if (!entry) return;
+        bankData[entry.bankId].used = false;
+        slotData[si] = null;
+        spRefreshSlots(); spRefreshBank();
+      }
+      function spRefreshSlots() {
+        slotData.forEach((entry, si) => {
+          const el = document.getElementById(`sp-s-${si}`);
+          if (!el) return;
+          el.textContent = entry ? entry.letter : '';
+          el.style.borderColor = entry ? '#7052B4' : 'rgba(255,255,255,0.08)';
+          el.style.background = entry ? 'rgba(112,82,180,0.15)' : 'rgba(255,255,255,0.05)';
         });
       }
-      function spRefreshBank(){
-        bankData.forEach((t,bi)=>{
-          const el=document.getElementById(`sp-t-${bi}`);
-          if(el)el.style.opacity=t.used?'0':'1';
+      function spRefreshBank() {
+        bankData.forEach((t, bi) => {
+          const el = document.getElementById(`sp-t-${bi}`);
+          if (el) el.classList.toggle('used', t.used);
         });
       }
 
-      function spCheckTiles(){
-        const item=session[idx];
-        const attempt=slotData.map(e=>e.letter).join('').toLowerCase();
-        const ok=attempt===item.word.toLowerCase();
-        spLocked=true;
-        const fb=document.getElementById('sp-fb');
-        slotData.forEach((_,si)=>{
-          const el=document.getElementById(`sp-s-${si}`);
-          if(el){
-            el.style.borderColor=ok?'var(--gold)':'var(--fail)';
-            el.style.background=ok?'rgba(255,215,0,.1)':'rgba(239,83,80,.1)';
+      function reinforceThenAdvance(item) {
+        const plainSentence = item.tokens ? item.tokens.map(t => t.t).join(' ') : item.word;
+        showGrammarReinforce(item.tokens, plainSentence, () => {
+          idx++;
+          if (idx < session.length) load();
+          else onComplete(score / session.length);
+        });
+      }
+
+      function spCheckTiles() {
+        const item = session[idx];
+        const attempt = slotData.map(e => e.letter).join('').toLowerCase();
+        const ok = attempt === item.word.toLowerCase();
+        spLocked = true;
+        const fb = document.getElementById('sp-fb');
+        slotData.forEach((_, si) => {
+          const el = document.getElementById(`sp-s-${si}`);
+          if (el) {
+            el.style.borderColor = ok ? '#8BC34A' : '#E91E63';
+            el.style.background = ok ? 'rgba(139,195,74,0.15)' : 'rgba(233,30,99,0.12)';
           }
         });
-        if(ok){
+        if (ok) {
           score++;
-          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
-          speak(item.word,'celebrate', 0, item.audioFile);
-          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
+          speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel
+          setTimeout(() => reinforceThenAdvance(item), 500);
         } else {
-          if(fb){fb.textContent=`✗ The word is: ${item.word}`;fb.style.color='var(--fail)';}
-          speak(item.word,'wrong', 0, item.audioFile);
-          setTimeout(()=>{
-            slotData=slotData.map(()=>null);
-            bankData.forEach(t=>t.used=false);
-            spLocked=false;
-            spRefreshSlots();spRefreshBank();
-            if(fb){fb.textContent='Try again!';fb.style.color='var(--text-dim)';}
-            speak(item.word,'neutral',300, item.audioFile);
-          },1500);
+          if (fb) { fb.textContent = `✗ The word is: ${item.word}`; fb.style.color = '#F48FB1'; }
+          speak(item.word, 'wrong'); // word once, then silent retry
+          setTimeout(() => {
+            slotData = slotData.map(() => null);
+            bankData.forEach(t => t.used = false);
+            spLocked = false;
+            spRefreshSlots(); spRefreshBank();
+            if (fb) { fb.textContent = 'Try again!'; fb.style.color = 'rgba(255,255,255,0.4)'; }
+          }, 1500);
         }
       }
 
-      // ── Free type (Gold) ──
-      window.spTypeInput=function(){
-        const inp=document.getElementById('sp-input');
-        const chk=document.getElementById('sp-chk');
-        if(!inp||!chk)return;
-        chk.disabled=inp.value.trim().length===0;
-        chk.style.opacity=inp.value.trim().length?'1':'.4';
-      };
-      window.spTypeKey=function(e){ if(e.key==='Enter')spCheckType(); };
-      window.spCheckType=function(){
-        if(spLocked)return;
-        const item=session[idx];
-        const inp=document.getElementById('sp-input');
-        if(!inp||!inp.value.trim())return;
-        const attempt=inp.value.trim().toLowerCase();
-        const ok=attempt===item.word.toLowerCase();
-        spLocked=true;
-        const fb=document.getElementById('sp-fb');
-        if(inp){inp.style.borderColor=ok?'var(--gold)':'var(--fail)';inp.style.background=ok?'rgba(255,215,0,.05)':'rgba(239,83,80,.05)';}
-        const chk=document.getElementById('sp-chk');
-        if(chk)chk.style.display='none';
-        if(ok){
-          if(!retypeMode)score++;
-          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
-          speak(item.word,'celebrate', 0, item.audioFile);
-          setTimeout(()=>showReinforcePanel(item,()=>{idx++;load();}),500);
+      function spCheckType() {
+        if (spLocked) return;
+        const item = session[idx];
+        const inp = document.getElementById('sp-input');
+        if (!inp || !inp.value.trim()) return;
+        const attempt = inp.value.trim().toLowerCase();
+        const ok = attempt === item.word.toLowerCase();
+        spLocked = true;
+        const fb = document.getElementById('sp-fb');
+        inp.style.borderColor = ok ? '#8BC34A' : '#E91E63';
+        inp.style.background = ok ? 'rgba(139,195,74,0.08)' : 'rgba(233,30,99,0.08)';
+        const chk = document.getElementById('sp-chk');
+        if (chk) chk.style.display = 'none';
+
+        if (ok) {
+          if (!retypeMode) score++;
+          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
+          speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel
+          setTimeout(() => reinforceThenAdvance(item), 500);
         } else {
-          if(fb){fb.textContent=`✗ The word is: ${item.word} — now type it correctly`;fb.style.color='var(--fail)';}
-          speak(item.word,'wrong', 0, item.audioFile);
-          setTimeout(()=>{
-            retypeMode=true; spLocked=false;
-            if(inp){
-              inp.value=''; inp.style.borderColor='var(--accent)';
-              inp.style.background='rgba(79,195,247,.05)';
-              inp.placeholder='Type the correct word…'; inp.focus();
-            }
-            if(chk){chk.style.display='block';chk.disabled=true;chk.style.opacity='.4';}
-            if(fb){fb.textContent=`Type: ${item.word}`;fb.style.color='var(--accent)';}
-            speak(item.word,'neutral',300, item.audioFile);
-          },1600);
+          if (fb) { fb.textContent = `✗ The word is: ${item.word} — now type it correctly`; fb.style.color = '#F48FB1'; }
+          speak(item.word, 'wrong'); // word once, then silent retry
+          setTimeout(() => {
+            retypeMode = true; spLocked = false;
+            inp.value = ''; inp.style.borderColor = 'rgba(255,255,255,0.08)';
+            inp.style.background = 'rgba(255,255,255,0.05)';
+            inp.placeholder = 'Type the correct word…'; inp.focus();
+            if (chk) { chk.style.display = 'block'; chk.disabled = true; chk.style.opacity = '.4'; }
+            if (fb) { fb.textContent = `Type: ${item.word}`; fb.style.color = '#C9B8EA'; }
+          }, 1600);
         }
-      };
+      }
 
       load();
     }
