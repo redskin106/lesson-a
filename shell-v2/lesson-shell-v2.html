@@ -2854,9 +2854,19 @@ const MODULE_REGISTRY = {
         if (!cw || cw.dataset.done || cw.dataset.flipped) return;
         cw.dataset.flipped = '1';
         ci.style.transform = 'rotateY(180deg)';
-        // No audio here — the flip itself stays silent. Audio only fires
-        // once the pair is complete and we know match/no-match (see
-        // mpCheck below): once for a match, both cards for a mismatch.
+
+        if (flipped.length === 0) {
+          // First card of the pair — always say it.
+          speak(deck[i].word, 'neutral', 0, deck[i].audioFile);
+        } else {
+          // Second card — only say it if it's NOT a match with the first;
+          // a match means it's the same word we just said a second ago.
+          const first = deck[flipped[0]];
+          const second = deck[i];
+          const isMatch = first.pid === second.pid && first.kind !== second.kind;
+          if (!isMatch) speak(second.word, 'neutral', 0, second.audioFile);
+        }
+
         flips++;
         document.getElementById('mp-flips').textContent = flips;
         flipped.push(i);
@@ -2892,8 +2902,8 @@ const MODULE_REGISTRY = {
           const ciB=document.getElementById(`mp-ci-${b}`);
           if(ciA){ciA.style.borderRadius='10px';ciA.style.boxShadow='0 0 0 2px var(--fail)';}
           if(ciB){ciB.style.borderRadius='10px';ciB.style.boxShadow='0 0 0 2px var(--fail)';}
-          speak(ca.word,'wrong', 0, ca.audioFile);
-          speak(cb.word,'wrong',700, cb.audioFile);
+          // No audio here — both cards already said their word at flip-time
+          // (see mpFlip). Playing again here would just repeat them.
           setTimeout(()=>{
             if(ciA){ciA.style.transform='';ciA.style.boxShadow='';}
             if(ciB){ciB.style.transform='';ciB.style.boxShadow='';}
