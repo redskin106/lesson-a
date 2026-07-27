@@ -3237,7 +3237,9 @@ const MODULE_REGISTRY = {
         if(si===-1)return;
         tile.used=true;
         slotData[si]={letter:tile.letter,bankId:bi};
-        speak(session[idx].word,'neutral', 0, session[idx].audioFile);
+        // No audio here — the word is already announced once when the
+        // question loads and once on successful completion. Speaking it
+        // again on every tile tap was repeating it up to once per letter.
         refreshSlots();refreshBank();
         if(slotData.indexOf(null)===-1)setTimeout(wsCheck,200);
       };
