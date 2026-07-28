@@ -175,6 +175,8 @@ html, body {
 /* ─── TIER RESULT SCREEN ─────────────────── */
 
 .result-icon  { font-size: 64px; text-align: center; margin: 28px 0 14px; }
+.stars-row-v2 { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 28px 0 14px; min-height: 64px; }
+.stars-row-v2 img { width: 56px; height: 56px; }
 .result-title { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 6px; }
 .result-score { font-size: 17px; color: var(--text-dim); text-align: center; margin-bottom: 28px; }
 .result-score span { color: var(--text); font-weight: 700; }
@@ -857,7 +859,7 @@ html, body {
      SCREEN 3 — TIER RESULT
 ════════════════════════════════════ -->
 <div id="screen-tier-result" class="screen">
-  <div class="result-icon"  id="result-icon"></div>
+  <div class="stars-row-v2" id="stars-row"></div>
   <h2 class="result-title"  id="result-title"></h2>
   <p  class="result-score"  id="result-score"></p>
   <p  class="result-msg"    id="result-msg"></p>
@@ -1685,6 +1687,46 @@ function startModule(moduleIndex, tier) {
 //  TIER RESULT HANDLER
 // ══════════════════════════════════════════════════
 
+// Ported verbatim from module-demos' finishTier()/dropStar() — stars pop
+// in one at a time (scale 0→1, opacity 0→1) with a tone each, then once
+// all are in, a completion chime plus a staggered brightness/glow shimmer
+// sweeps across all of them.
+function animateStarsReveal(starCount) {
+  const starsEl = document.getElementById('stars-row');
+  starsEl.innerHTML = '';
+  for (let s = 0; s < starCount; s++) {
+    const img = document.createElement('img');
+    img.src = 'assets/star.png';
+    img.alt = '';
+    img.style.opacity = '0';
+    img.style.transform = 'scale(0)';
+    starsEl.appendChild(img);
+  }
+  const allStarImgs = starsEl.querySelectorAll('img');
+  let i = 0;
+  function dropStar() {
+    if (i >= starCount) {
+      sfx('complete');
+      allStarImgs.forEach((img, si) => {
+        setTimeout(() => {
+          img.animate([
+            { filter: 'brightness(1) drop-shadow(0 0 0px rgba(240,174,99,0))' },
+            { filter: 'brightness(1.6) drop-shadow(0 0 10px rgba(240,174,99,0.9))' },
+            { filter: 'brightness(1) drop-shadow(0 0 0px rgba(240,174,99,0))' }
+          ], { duration: 500, easing: 'ease-in-out' });
+        }, si * 120);
+      });
+      return;
+    }
+    const img = allStarImgs[i];
+    img.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320, easing: 'ease-out', fill: 'forwards' });
+    sfx('star');
+    i++;
+    setTimeout(dropStar, 220);
+  }
+  dropStar();
+}
+
 function handleTierResult(moduleIndex, tier, score) {
   const passed = score >= PASS_THRESHOLD;
   state.results[moduleIndex][tier] = { score, passed };
@@ -1694,8 +1736,7 @@ function handleTierResult(moduleIndex, tier, score) {
   const next     = nextTier(tier);
 
   const stars   = pct === 100 ? 3 : pct >= 60 ? 2 : pct > 0 ? 1 : 0;
-  const starStr = '⭐'.repeat(stars) + '✩'.repeat(3 - stars);
-  document.getElementById('result-icon').textContent  = starStr;
+  animateStarsReveal(stars);
   document.getElementById('result-title').textContent = passed ? `${tierName} passed!` : `${tierName} — try again`;
   document.getElementById('result-score').innerHTML   = pct === 100 ? 'Perfect!' : `${pct}% correct`;
 
@@ -1831,6 +1872,35 @@ let _audioRID = 0;
 // ══════════════════════════════════════════════════
 
 const TTS = window.speechSynthesis || null;
+
+// ══════════════════════════════════════════════════
+//  SOUND EFFECTS — ported verbatim from module-demos/*.html.
+//  Every demo file has this exact same tone system (tap/star/complete),
+//  consistently, but none of it made it into the shell until now.
+// ══════════════════════════════════════════════════
+let _sfxCtx = null;
+function sfxUnlock() {
+  if (!_sfxCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) _sfxCtx = new AC();
+  }
+  if (_sfxCtx && _sfxCtx.state === 'suspended') _sfxCtx.resume();
+}
+function tone(freq, dur) {
+  sfxUnlock();
+  if (!_sfxCtx) return;
+  const o = _sfxCtx.createOscillator(), g = _sfxCtx.createGain();
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.15, _sfxCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, _sfxCtx.currentTime + dur);
+  o.connect(g); g.connect(_sfxCtx.destination);
+  o.start(); o.stop(_sfxCtx.currentTime + dur);
+}
+function sfx(name) {
+  if (name === 'tap') tone(600, 0.06);
+  if (name === 'star') tone(1000, 0.1);
+  if (name === 'complete') { tone(700, 0.1); setTimeout(() => tone(1050, 0.16), 110); }
+}
 
 const SPEAK_MOODS = {
   neutral:   { rate:0.85, pitch:1.0,  volume:0.9 },
