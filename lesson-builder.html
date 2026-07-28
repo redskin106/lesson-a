@@ -399,7 +399,8 @@ function blankPutInOrderData(){
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankSayItData(){
-  const blankTier = () => ({ prompt:'', target:'' });
+  const blankItem = () => ({ prompt:'', target:'' });
+  const blankTier = () => ({ pick:2, items:[blankItem()] });
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankPicWordData(){
@@ -501,9 +502,15 @@ const COLORS_PUTINORDER = {
 };
 
 const COLORS_SAYIT = {
-  bronze:{ prompt:'Say the color of the sky.', target:'blue' },
-  silver:{ prompt:'Say a sentence about your favorite color.', target:'My favorite color is green.' },
-  gold:{ prompt:'Explain why you like this color.', target:'I like blue because it is calm.' },
+  bronze:{ pick:1, items:[
+    { prompt:'Say the color of the sky.', target:'blue' }
+  ]},
+  silver:{ pick:1, items:[
+    { prompt:'Say a sentence about your favorite color.', target:'My favorite color is green.' }
+  ]},
+  gold:{ pick:1, items:[
+    { prompt:'Explain why you like this color.', target:'I like blue because it is calm.' }
+  ]},
 };
 
 const COLORS_PICWORD = {
@@ -608,7 +615,7 @@ function isTierFilled(moduleId, tier, dataOverride){
       case 'gapfill': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.sentence && it.answer && it.options.some(o=>o)); }
       case 'truefalse': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.statement); }
       case 'listenchoose': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.question && it.answer); }
-      case 'sayit': return !!data[tier].target;
+      case 'sayit': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.target); }
       case 'putinorder': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.items.length>=2 && it.items.every(w=>w) && !!it.prompt); }
       case 'wordmatch': case 'listenmatch':
         return data[tier].length>=1 && data[tier].every(p=>p.left && p.right);
@@ -677,13 +684,13 @@ function copyFromBronze(){
 }
 
 function selectModule(id){
-  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0;
+  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   document.getElementById('crumbMod').textContent = instanceLabel(id);
   renderSidebar(); renderTierTabs(); renderMain();
 }
 function selectTier(t){
-  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0;
+  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   renderTierTabs(); renderMain();
 }
@@ -1097,32 +1104,83 @@ function lcSyncOptions(){
 }
 
 // ---- Say It ----
+let siExpandedIndex = 0; // Say It's own expanded-item index
+
 function renderSayItForm(){
   const editView = document.getElementById('editView');
-  const d = md('sayit')[currentTier];
+  const tierData = md('sayit')[currentTier];
+  if(siExpandedIndex >= tierData.items.length) siExpandedIndex = Math.max(0, tierData.items.length - 1);
+  const d = tierData.items[siExpandedIndex];
   editView.innerHTML = `
     <div class="card">
-      <div class="card-label">Prompt <span style="font-weight:400;text-transform:none;letter-spacing:0;">instruction shown to the student</span></div>
-      <div class="field"><input type="text" id="siPrompt" value="${d.prompt}"></div>
+      <div class="pool-header">
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — prompts</div>
+        <div class="pool-count">${tierData.items.length} in pool</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Prompts per session (pick)</label>
+        <input type="number" min="1" max="${tierData.items.length}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="siSetPick(this.value)">
+      </div>
     </div>
-    <div class="card">
-      <div class="card-label">Target <span style="font-weight:400;text-transform:none;letter-spacing:0;">what the student should say</span></div>
-      <div class="field"><div class="row-inline">
-        <input type="text" id="siTarget" value="${d.target}">
-        <button class="speak-btn" onclick="openFieldAudioModal('sayit','target',null,document.getElementById('siTarget').value)">🔊</button>
-        <span class="audio-status" id="siAudioStatus" onclick="openFieldAudioModal('sayit','target',null,document.getElementById('siTarget').value)" style="cursor:pointer;"></span>
-      </div></div>
-    </div>`;
+    <div id="siItemList">
+      ${tierData.items.map((it,i)=>`
+        <div class="card">
+          ${i===siExpandedIndex ? `
+            <div class="pool-header">
+              <div class="card-label" style="margin-bottom:0;">Prompt ${i+1}</div>
+              ${tierData.items.length>1 ? `<span class="del" onclick="siRemoveItem(${i})">✕ remove</span>` : ''}
+            </div>
+            <div class="card-label" style="margin-top:10px;">Prompt <span style="font-weight:400;text-transform:none;letter-spacing:0;">instruction shown to the student</span></div>
+            <div class="field"><input type="text" id="siPrompt" value="${it.prompt}"></div>
+            <div class="card-label" style="margin-top:16px;">Target <span style="font-weight:400;text-transform:none;letter-spacing:0;">what the student should say</span></div>
+            <div class="field"><div class="row-inline">
+              <input type="text" id="siTarget" value="${it.target}">
+              <button class="speak-btn" onclick="openFieldAudioModal('sayit','target',null,document.getElementById('siTarget').value,currentTier,siExpandedIndex)">🔊</button>
+              <span class="audio-status" id="siAudioStatus" onclick="openFieldAudioModal('sayit','target',null,document.getElementById('siTarget').value,currentTier,siExpandedIndex)" style="cursor:pointer;"></span>
+            </div></div>
+          ` : `
+            <div class="pool-header" style="cursor:pointer;" onclick="siExpandItem(${i})">
+              <div style="font-size:13.5px;color:var(--text);">${it.target || '(empty prompt)'}</div>
+              <span style="color:var(--text-lo);font-size:12px;">Edit ›</span>
+            </div>
+          `}
+        </div>`).join('')}
+    </div>
+    <div class="add-link" onclick="siAddItem()">+ add prompt</div>`;
   document.getElementById('siPrompt').addEventListener('input', ()=>{ d.prompt = document.getElementById('siPrompt').value; renderPreview(); });
   document.getElementById('siTarget').addEventListener('input', siSyncTarget);
   siSyncTarget();
 }
+function siSetPick(val){
+  const n = Math.max(1, parseInt(val)||1);
+  md('sayit')[currentTier].pick = n;
+  renderPreview();
+}
+function siExpandItem(i){
+  siExpandedIndex = i;
+  renderMain();
+}
+function siAddItem(){
+  const tierData = md('sayit')[currentTier];
+  tierData.items.push({ prompt:'', target:'' });
+  siExpandedIndex = tierData.items.length - 1;
+  renderMain();
+}
+function siRemoveItem(i){
+  const tierData = md('sayit')[currentTier];
+  if(tierData.items.length <= 1) return;
+  tierData.items.splice(i,1);
+  if(tierData.pick > tierData.items.length) tierData.pick = tierData.items.length;
+  siExpandedIndex = 0;
+  renderMain();
+}
 function siSyncTarget(){
-  const d = md('sayit')[currentTier];
+  const d = md('sayit')[currentTier].items[siExpandedIndex];
   const val = document.getElementById('siTarget').value;
   d.target = val;
   const statusEl = document.getElementById('siAudioStatus');
-  const needs = syncSpeakableField('sayit', 'target', null, val, statusEl);
+  const needs = syncSpeakableField('sayit', 'target', null, val, statusEl, undefined, currentTier, siExpandedIndex);
   setAudioStatusBadge(statusEl, needs);
   renderPreview();
 }
@@ -1457,9 +1515,8 @@ function compareCardHtml(moduleId, t){
     }
     if(instanceType(moduleId) === 'sayit'){
       const d = md('sayit')[t];
-      return `<div class="compare-card ${t}">${head}</span></div>
-        <div class="compare-sentence">${d.prompt || '<span style="color:var(--text-lo);">empty</span>'}</div>
-        <div class="compare-opts"><span class="ans">🎤 ${d.target || '&nbsp;'}</span></div>
+      return `<div class="compare-card ${t}">${head}<span>${d.items.length} prompt${d.items.length===1?'':'s'} · pick ${d.pick}</span></div>
+        <div class="compare-word-list">${d.items.map(it=>`<div class="compare-word">🎤 ${it.target || '<span style="color:var(--text-lo);">empty</span>'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'putinorder'){
@@ -1791,9 +1848,11 @@ function renderPreview(){
       <div class="phone-opts">${(d.options||[]).map(o=>`<div class="phone-opt ${o===d.answer?'correct':''}">${o||'&nbsp;'}</div>`).join('')}</div>
       <div class="phone-stars">☆ ☆ ☆</div>`;
   } else if(instanceType(currentModule)==='sayit'){
-    const d = md('sayit')[t];
+    const tierData = md('sayit')[t];
+    const siIdx = Math.min(siExpandedIndex, tierData.items.length - 1);
+    const d = tierData.items[siIdx];
     phone.innerHTML = `
-      <div class="phone-tier">${t.toUpperCase()}</div>
+      <div class="phone-tier">${t.toUpperCase()} · ${siIdx+1} of ${tierData.items.length} · pick ${tierData.pick}</div>
       <div class="phone-q">${d.prompt || '<span style="color:var(--text-lo);">No prompt yet</span>'}</div>
       <div class="phone-opts"><div class="phone-opt">🎤 ${d.target || '&nbsp;'}</div></div>
       <div class="phone-stars">☆ ☆ ☆</div>`;
@@ -2538,7 +2597,10 @@ function getBaselineValue(moduleId, tierKey, fieldType, index, itemIndex){
         const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
         return (it && it.question) || '';
       }
-      case 'sayit': return (tier && tier.target) || '';
+      case 'sayit': {
+        const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
+        return (it && it.target) || '';
+      }
       case 'putinorder': {
         const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
         return (it && it.items && it.items[index]) || '';
@@ -2589,7 +2651,14 @@ function setBaselineValue(lessonId, moduleId, tierKey, fieldType, index, value, 
       t.items[ii].question = value;
       break;
     }
-    case 'sayit': ensureTier({}).target = value; break;
+    case 'sayit': {
+      const t = ensureTier({ items:[] });
+      if(!t.items) t.items = [];
+      const ii = itemIndex!=null ? itemIndex : 0;
+      if(!t.items[ii]) t.items[ii] = {};
+      t.items[ii].target = value;
+      break;
+    }
     case 'putinorder': {
       const t = ensureTier({ items:[] });
       if(!t.items) t.items = [];
@@ -2789,8 +2858,11 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
 
     case 'sayit':
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        prompt: data[t].prompt, target: data[t].target, keyWords: data[t].keyWords || [],
-        audioFile: audioFor(`${t}.target`, data[t].target),
+        pick: data[t].pick,
+        items: data[t].items.map((it,i) => ({
+          prompt: it.prompt, target: it.target, keyWords: it.keyWords || [],
+          audioFile: audioFor(`${t}.item${i}.target`, it.target),
+        }))
       }]));
 
     case 'putinorder':
