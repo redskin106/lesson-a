@@ -764,6 +764,27 @@ html, body {
 }
 .sp-check-btn-v2:disabled { opacity: 0.4; pointer-events: none; }
 .sp-feedback-v2 { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
+
+/* Build a Sentence (v2) */
+.sb-prompt-v2 { color: rgba(255,255,255,0.5); font-size: 3.4cqw; text-align: center; margin-bottom: 4%; }
+.sb-slots-v2 { display: flex; gap: 2%; flex-wrap: wrap; justify-content: center; min-height: 12cqw; margin-bottom: 5%; }
+.sb-slot-v2 {
+  min-width: 11%; height: 10cqw; padding: 0 3%;
+  border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.6cqw; font-weight: 600; color: #fff; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.sb-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 10cqw; margin-bottom: 4%; }
+.sb-tile-v2 {
+  padding: 3% 4%; border-radius: 12px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  font-size: 3.6cqw; font-weight: 600; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-family: inherit; transition: opacity .2s;
+}
+.sb-tile-v2.used { opacity: 0; pointer-events: none; }
+.sb-feedback-v2 { min-height: 5cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
+.sb-legend-v2 { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -1493,40 +1514,47 @@ const LESSON = [
   },
 
   // ── SENTENCE BUILDING ─────────────────────────
-  // Tap word tiles into order. On correct: tiles reveal their grammar
-  // role colour (subject/verb/object/place/time; everything else neutral).
+  // v2: per-tier pool, { pick, items: [{tokens}] }. Tap word tiles into
+  // order. On correct: tiles reveal their grammar role colour in place
+  // (subject/verb/object/place/time; everything else neutral) — no
+  // separate overlay here, the reveal happens directly in the tile slots,
+  // matching the locked demo's design (different from every other
+  // module's reinforcement pattern, deliberately).
   {
     id: 'mod-sentence-building',
     type: 'sentence-building',
     label: 'Build a Sentence',
     data: {
       bronze: {
+        pick: 4,
         items: [
           { tokens: [ {text:'I',   role:'subject'}, {text:'like',  role:'verb'}, {text:'it',       role:'object'} ] },
           { tokens: [ {text:'I',   role:'subject'}, {text:'eat',   role:'verb'}, {text:'breakfast',role:'object'} ] },
           { tokens: [ {text:'She', role:'subject'}, {text:'reads', role:'verb'}, {text:'books',    role:'object'} ] },
           { tokens: [ {text:'We',  role:'subject'}, {text:'drink', role:'verb'}, {text:'water',    role:'object'} ] },
           { tokens: [ {text:'He',  role:'subject'}, {text:'walks', role:'verb'}, {text:'home',     role:'place'}  ] },
-          { tokens: [ {text:'They',role:'subject'}, {text:'go',    role:'verb'}, {text:'home',     role:'place'}  ] },
+          { tokens: [ {text:'They',role:'subject'}, {text:'go',    role:'verb'}, {text:'home',     role:'place'}  ] }
         ]
       },
       silver: {
+        pick: 4,
         items: [
-          { tokens: [ {text:'I',   role:'subject'}, {text:'like',   role:'verb'}, {text:'it',     role:'object'}, {text:'because', role:'connector'}, {text:'hot',   role:'detail'} ] },
-          { tokens: [ {text:'She', role:'subject'}, {text:'needs',  role:'verb'}, {text:'help',   role:'object'}, {text:'because', role:'connector'}, {text:'tired', role:'detail'} ] },
-          { tokens: [ {text:'We',  role:'subject'}, {text:'eat',    role:'verb'}, {text:'lunch',  role:'object'}, {text:'before',  role:'connector'}, {text:'school',role:'place'}  ] },
-          { tokens: [ {text:'He',  role:'subject'}, {text:'likes',  role:'verb'}, {text:'it',     role:'object'}, {text:'because', role:'connector'}, {text:'sweet', role:'detail'} ] },
-          { tokens: [ {text:'I',   role:'subject'}, {text:'go',     role:'verb'}, {text:'home',   role:'place'},  {text:'after',   role:'connector'}, {text:'school',role:'place'}  ] },
-          { tokens: [ {text:'She', role:'subject'}, {text:'drinks', role:'verb'}, {text:'water',  role:'object'}, {text:'before',  role:'connector'}, {text:'bed',   role:'place'}  ] },
+          { tokens: [ {text:'I',   role:'subject'}, {text:'like',   role:'verb'}, {text:'it',     role:'object'}, {text:'because', role:null}, {text:'it is hot',   role:null} ] },
+          { tokens: [ {text:'She', role:'subject'}, {text:'needs',  role:'verb'}, {text:'help',   role:'object'}, {text:'because', role:null}, {text:'she is tired',role:null} ] },
+          { tokens: [ {text:'We',  role:'subject'}, {text:'eat',    role:'verb'}, {text:'lunch',  role:'object'}, {text:'before',  role:null}, {text:'school',      role:'place'}  ] },
+          { tokens: [ {text:'He',  role:'subject'}, {text:'likes',  role:'verb'}, {text:'it',     role:'object'}, {text:'because', role:null}, {text:'it is sweet', role:null} ] },
+          { tokens: [ {text:'I',   role:'subject'}, {text:'go',     role:'verb'}, {text:'home',   role:'place'},  {text:'after',   role:null}, {text:'school',      role:'place'}  ] },
+          { tokens: [ {text:'She', role:'subject'}, {text:'drinks', role:'verb'}, {text:'water',  role:'object'}, {text:'before',  role:null}, {text:'bed',         role:'place'}  ] }
         ]
       },
       gold: {
+        pick: 4,
         items: [
-          { tokens: [ {text:'I',    role:'subject'}, {text:'really', role:'connector'}, {text:'like',  role:'verb'}, {text:'it',        role:'object'}, {text:'because', role:'connector'}, {text:'it',   role:'subject'}, {text:'is',    role:'verb'}, {text:'warm', role:'detail'} ] },
-          { tokens: [ {text:'She',  role:'subject'}, {text:'eats',   role:'verb'},      {text:'breakfast', role:'object'}, {text:'before', role:'connector'}, {text:'she',  role:'subject'}, {text:'goes',  role:'verb'}, {text:'to', role:'connector'}, {text:'school', role:'place'} ] },
-          { tokens: [ {text:'He',   role:'subject'}, {text:'drives', role:'verb'},      {text:'the',   role:'connector'},   {text:'car',   role:'object'}, {text:'because', role:'connector'}, {text:'he',   role:'subject'}, {text:'likes', role:'verb'}, {text:'it', role:'object'} ] },
-          { tokens: [ {text:'We',   role:'subject'}, {text:'visit',  role:'verb'},      {text:'our',   role:'connector'},   {text:'grandparents', role:'object'}, {text:'because', role:'connector'}, {text:'we', role:'subject'}, {text:'miss', role:'verb'}, {text:'them', role:'object'} ] },
-          { tokens: [ {text:'I',    role:'subject'}, {text:'drink',  role:'verb'},      {text:'water', role:'object'},      {text:'every', role:'connector'}, {text:'morning', role:'time'}, {text:'before', role:'connector'}, {text:'school', role:'place'} ] },
+          { tokens: [ {text:'I',    role:'subject'}, {text:'really', role:null}, {text:'like',  role:'verb'}, {text:'it',        role:'object'}, {text:'because', role:null}, {text:'it',   role:'subject'}, {text:'is',    role:'verb'}, {text:'warm', role:null} ] },
+          { tokens: [ {text:'She',  role:'subject'}, {text:'eats',   role:'verb'}, {text:'breakfast', role:'object'}, {text:'before', role:null}, {text:'she',  role:'subject'}, {text:'goes',  role:'verb'}, {text:'to', role:null}, {text:'school', role:'place'} ] },
+          { tokens: [ {text:'He',   role:'subject'}, {text:'drives', role:'verb'}, {text:'the',   role:null},   {text:'car',   role:'object'}, {text:'because', role:null}, {text:'he',   role:'subject'}, {text:'likes', role:'verb'}, {text:'it', role:'object'} ] },
+          { tokens: [ {text:'We',   role:'subject'}, {text:'visit',  role:'verb'}, {text:'our',   role:null},   {text:'grandparents', role:'object'}, {text:'because', role:null}, {text:'we', role:'subject'}, {text:'miss', role:'verb'}, {text:'them', role:'object'} ] },
+          { tokens: [ {text:'I',    role:'subject'}, {text:'drink',  role:'verb'}, {text:'water', role:'object'},      {text:'every', role:null}, {text:'morning', role:'time'}, {text:'before', role:null}, {text:'school', role:'place'} ] }
         ]
       }
     }
@@ -3805,145 +3833,157 @@ const MODULE_REGISTRY = {
 
   // ─────────────────────────────────────────────
   //  SENTENCE BUILDING
-  //  Word-tile version of Word Scramble: tap tiles from the bank into
-  //  ordered slots, auto-check on last slot filled, reset on wrong.
-  //  On correct: tiles recolour by grammar role (subject/verb/object/
-  //  place/time — 5 colours; everything else stays neutral) and the
-  //  full sentence plays. Manual "Next →" so the reveal isn't rushed.
+  //  v2 design: pool-based { pick, items: [{tokens}] }, separate pool per
+  //  tier. Word-tile version of Word Scramble: tap tiles from the bank
+  //  into ordered slots, auto-check on last slot filled, reset on wrong.
+  //  On correct: tiles recolour by grammar role IN PLACE (subject/verb/
+  //  object/place/time; everything else neutral) and a legend + the full
+  //  sentence play — no separate overlay here, deliberately different
+  //  from every other module's reinforcement pattern, matching the
+  //  locked demo exactly. Audio was already correct in the old renderer
+  //  (single speak on each outcome, no per-tap bug) — kept as-is.
   // ─────────────────────────────────────────────
   'sentence-building': {
     render(container, data, tier, onComplete) {
-      const { items } = data;
-      const PICK = Math.min(items.length, 4);
-      const session = safeShuffle(items, ()=>false).slice(0, PICK);
-      let idx=0, score=0, sbLocked=false;
-      let slotData=[], bankData=[];
+      const { pick, items } = data;
+      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      let idx = 0, score = 0, sbLocked = false;
+      let slotData = [], bankData = [];
 
-      const ROLE_COLOR = {
-        subject: '#00BCD4',
-        verb:    '#8BC34A',
-        object:  '#FF9800',
-        place:   '#AB47BC',
-        time:    '#E91E63',
-      };
-      const roleColor = role => ROLE_COLOR[role] || null; // null = neutral grey
+      const ROLE_COLOR = { subject:'#00BCD4', verb:'#8BC34A', object:'#FF9800', place:'#AB47BC', time:'#E91E63' };
+      const roleColor = role => ROLE_COLOR[role] || null;
 
       function pips() {
-        return session.map((_,i)=>`<div class="pip${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
       }
-
       function sentenceText(tokens) {
-        return tokens.map(t=>t.text).join(' ');
+        return tokens.map(t => t.text).join(' ');
       }
 
       function load() {
-        sbLocked=false;
-        if(idx>=session.length){onComplete(score/PICK);return;}
-        const item=session[idx];
-        slotData=item.tokens.map(()=>null);
-        const withId=item.tokens.map((t,i)=>({...t,id:i}));
-        bankData=safeShuffle(withId, r=>r.every((t,i)=>t.text===item.tokens[i].text))
-          .map(t=>({...t,used:false}));
+        sbLocked = false;
+        const item = session[idx];
+        slotData = item.tokens.map(() => null);
+        const withId = item.tokens.map((t, i) => ({ ...t, id: i }));
+        bankData = safeShuffle(withId, r => r.every((t, i) => t.text === item.tokens[i].text))
+          .map(t => ({ ...t, used: false }));
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
         draw();
       }
 
       function draw() {
-        container.innerHTML=`
-          <div class="progress-row" style="margin-bottom:1rem;">${pips()}</div>
-          <p class="module-question" style="text-align:center;">Put the words in order.</p>
-          <div id="sb-slots" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;min-height:52px;">
-            ${slotData.map((_,si)=>`<div id="sb-s-${si}" onclick="sbRemove(${si})" style="
-              min-width:44px;height:44px;padding:0 10px;border-radius:8px;
-              border:2px solid var(--surface2);background:var(--surface);
-              display:flex;align-items:center;justify-content:center;
-              font-size:15px;font-weight:700;color:var(--text);cursor:pointer;
-            "></div>`).join('')}
-          </div>
-          <div id="sb-bank" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:52px;margin-bottom:1rem;">
-            ${bankData.map((t,bi)=>`<button id="sb-t-${bi}" onclick="sbTap(${bi})" style="
-              padding:11px 14px;border-radius:8px;
-              border:1.5px solid #4A6080;background:var(--surface);
-              font-size:15px;font-weight:600;color:var(--text);
-              cursor:pointer;box-shadow:0 2px 0 #1E3248;transition:opacity .2s;
-            ">${t.text}</button>`).join('')}
-          </div>
-          <div id="sb-fb" style="min-height:24px;text-align:center;font-size:14px;color:var(--text-dim);margin-bottom:.5rem;"></div>
-          <button class="next-ex-btn" id="sb-next-btn" style="display:none">Next →</button>`;
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="sb-pips"></div>
+          <p class="sb-prompt-v2">Put the words in order.</p>
+          <div class="sb-slots-v2" id="sb-slots"></div>
+          <div class="sb-bank-v2" id="sb-bank"></div>
+          <div class="sb-feedback-v2" id="sb-fb">&nbsp;</div>
+          <button class="iv-proceed-btn" id="sb-next-btn">Next →</button>
+        `;
+        container.querySelector('#sb-pips').innerHTML = pips();
+
+        const slotsEl = container.querySelector('#sb-slots');
+        slotData.forEach((_, si) => {
+          const d = document.createElement('div');
+          d.className = 'sb-slot-v2';
+          d.id = `sb-s-${si}`;
+          d.addEventListener('click', () => sbRemove(si));
+          slotsEl.appendChild(d);
+        });
+        const bankEl = container.querySelector('#sb-bank');
+        bankData.forEach((t, bi) => {
+          const b = document.createElement('button');
+          b.className = 'sb-tile-v2';
+          b.id = `sb-t-${bi}`;
+          b.textContent = t.text;
+          b.addEventListener('click', () => sbTap(bi));
+          bankEl.appendChild(b);
+        });
+        refreshSlots(); refreshBank();
       }
 
       function refreshSlots() {
-        slotData.forEach((entry,si)=>{
-          const el=document.getElementById(`sb-s-${si}`);
-          if(!el)return;
-          el.textContent=entry?entry.text:'';
-          el.style.borderColor=entry?'var(--accent)':'var(--surface2)';
-          el.style.background=entry?'rgba(79,195,247,.08)':'var(--surface)';
+        slotData.forEach((entry, si) => {
+          const el = document.getElementById(`sb-s-${si}`);
+          if (!el) return;
+          el.textContent = entry ? entry.text : '';
+          el.style.borderColor = entry ? '#7052B4' : 'rgba(255,255,255,0.08)';
+          el.style.background = entry ? 'rgba(112,82,180,0.15)' : 'rgba(255,255,255,0.05)';
+          el.style.color = '#fff';
         });
       }
       function refreshBank() {
-        bankData.forEach((t,bi)=>{
-          const el=document.getElementById(`sb-t-${bi}`);
-          if(el)el.style.opacity=t.used?'0':'1';
+        bankData.forEach((t, bi) => {
+          const el = document.getElementById(`sb-t-${bi}`);
+          if (el) el.classList.toggle('used', t.used);
         });
       }
 
-      window.sbTap=function(bi){
-        if(sbLocked)return;
-        const tile=bankData[bi];
-        if(tile.used)return;
-        const si=slotData.indexOf(null);
-        if(si===-1)return;
-        tile.used=true;
-        slotData[si]={text:tile.text,role:tile.role,bankId:bi};
-        refreshSlots();refreshBank();
-        if(slotData.indexOf(null)===-1)setTimeout(sbCheck,200);
-      };
-      window.sbRemove=function(si){
-        if(sbLocked)return;
-        const entry=slotData[si];
-        if(!entry)return;
-        bankData[entry.bankId].used=false;
-        slotData[si]=null;
-        refreshSlots();refreshBank();
-      };
+      function sbTap(bi) {
+        if (sbLocked) return;
+        const tile = bankData[bi];
+        if (tile.used) return;
+        const si = slotData.indexOf(null);
+        if (si === -1) return;
+        tile.used = true;
+        slotData[si] = { text: tile.text, role: tile.role, bankId: bi };
+        refreshSlots(); refreshBank();
+        if (slotData.indexOf(null) === -1) setTimeout(sbCheck, 200);
+      }
+      function sbRemove(si) {
+        if (sbLocked) return;
+        const entry = slotData[si];
+        if (!entry) return;
+        bankData[entry.bankId].used = false;
+        slotData[si] = null;
+        refreshSlots(); refreshBank();
+      }
 
-      function sbCheck(){
-        const item=session[idx];
-        const ok=slotData.every((e,i)=>e.text===item.tokens[i].text);
-        sbLocked=true;
-        const fb=document.getElementById('sb-fb');
-        const nextBtn=document.getElementById('sb-next-btn');
+      function sbCheck() {
+        const item = session[idx];
+        const ok = slotData.every((e, i) => e.text === item.tokens[i].text);
+        sbLocked = true;
+        const fb = document.getElementById('sb-fb');
+        const nextBtn = document.getElementById('sb-next-btn');
 
-        if(ok){
+        if (ok) {
           score++;
-          slotData.forEach((entry,si)=>{
-            const el=document.getElementById(`sb-s-${si}`);
-            if(!el)return;
-            const c=roleColor(entry.role);
-            el.style.borderColor=c||'var(--text-dim)';
-            el.style.background=c?c+'26':'rgba(255,255,255,.06)';
-            el.style.color=c||'var(--text-dim)';
+          slotData.forEach((entry, si) => {
+            const el = document.getElementById(`sb-s-${si}`);
+            if (!el) return;
+            const c = roleColor(entry.role);
+            el.style.borderColor = c || 'rgba(255,255,255,0.3)';
+            el.style.background = c ? c + '26' : 'rgba(255,255,255,0.06)';
+            el.style.color = c || 'rgba(255,255,255,0.6)';
           });
-          if(fb){fb.textContent='✓ Correct!';fb.style.color='var(--pass)';}
-          speak(sentenceText(item.tokens),'celebrate', 0, item.audioFile);
-          if(nextBtn){
-            nextBtn.style.display='block';
-            nextBtn.onclick=()=>{idx++;load();};
-          }
+          // Reuse the shared grammarLegend helper — remap text/role to t/r
+          // since this module's tokens use different field names than the
+          // gap-fill/true-false grammar-token convention.
+          const legendTokens = item.tokens.map(t => ({ t: t.text, r: t.role }));
+          fb.innerHTML = `<div class="sb-legend-v2">${grammarLegend(legendTokens)}</div>`;
+          speak(sentenceText(item.tokens), 'celebrate');
+          nextBtn.style.display = 'block';
+          nextBtn.onclick = () => {
+            idx++;
+            if (idx < session.length) load();
+            else onComplete(score / session.length);
+          };
         } else {
-          slotData.forEach((_,si)=>{
-            const el=document.getElementById(`sb-s-${si}`);
-            if(el){el.style.borderColor='var(--fail)';el.style.background='rgba(239,83,80,.1)';}
+          slotData.forEach((_, si) => {
+            const el = document.getElementById(`sb-s-${si}`);
+            if (el) { el.style.borderColor = '#E91E63'; el.style.background = 'rgba(233,30,99,0.1)'; }
           });
-          if(fb){fb.textContent='✗ Not quite — listen and try again';fb.style.color='var(--fail)';}
-          speak(sentenceText(item.tokens),'wrong', 0, item.audioFile);
-          setTimeout(()=>{
-            slotData=slotData.map(()=>null);
-            bankData.forEach(t=>t.used=false);
-            sbLocked=false;
-            refreshSlots();refreshBank();
-            if(fb){fb.textContent='Try again!';fb.style.color='var(--text-dim)';}
-          },1600);
+          fb.textContent = '✗ Not quite — listen and try again';
+          fb.style.color = '#F48FB1';
+          speak(sentenceText(item.tokens), 'wrong'); // deliberately speaks even on wrong here, matches locked demo
+          setTimeout(() => {
+            slotData = slotData.map(() => null);
+            bankData.forEach(t => t.used = false);
+            sbLocked = false;
+            refreshSlots(); refreshBank();
+            fb.textContent = 'Try again!';
+            fb.style.color = 'rgba(255,255,255,0.4)';
+          }, 1600);
         }
       }
 
