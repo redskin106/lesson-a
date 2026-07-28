@@ -378,7 +378,8 @@ function blankSpellingData(){
   return { bronze:[], silver:[], gold:[] };
 }
 function blankTrueFalseData(){
-  const blankTier = () => ({ statement:'', answer:true, tokens:[] });
+  const blankItem = () => ({ statement:'', answer:true, tokens:[] });
+  const blankTier = () => ({ pick:2, items:[blankItem()] });
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankPairsData(){ // Word Match & Listen & Match share this shape
@@ -433,12 +434,18 @@ const COLORS_GAPFILL = {
 };
 
 const COLORS_TRUEFALSE = {
-  bronze:{ statement:'The sky is blue.', answer:true,
-    tokens:[{t:'The sky',r:'subject'},{t:'is',r:'verb'},{t:'blue',r:'object'}] },
-  silver:{ statement:'Bananas are usually purple.', answer:false,
-    tokens:[{t:'Bananas',r:'subject'},{t:'are usually',r:'verb'},{t:'purple',r:'object'}] },
-  gold:{ statement:'Mixing red and yellow makes orange.', answer:true,
-    tokens:[{t:'Mixing red and yellow',r:'subject'},{t:'makes',r:'verb'},{t:'orange',r:'object'}] },
+  bronze:{ pick:1, items:[
+    { statement:'The sky is blue.', answer:true,
+      tokens:[{t:'The sky',r:'subject'},{t:'is',r:'verb'},{t:'blue',r:'object'}] }
+  ]},
+  silver:{ pick:1, items:[
+    { statement:'Bananas are usually purple.', answer:false,
+      tokens:[{t:'Bananas',r:'subject'},{t:'are usually',r:'verb'},{t:'purple',r:'object'}] }
+  ]},
+  gold:{ pick:1, items:[
+    { statement:'Mixing red and yellow makes orange.', answer:true,
+      tokens:[{t:'Mixing red and yellow',r:'subject'},{t:'makes',r:'verb'},{t:'orange',r:'object'}] }
+  ]},
 };
 
 const COLORS_WORDMATCH = {
@@ -576,6 +583,7 @@ let currentModule = 'gapfill';
 let currentTier = 'bronze';
 let compareMode = false;
 let gfExpandedIndex = 0; // which pool item's full editor (sentence/options/tags) is open
+let tfExpandedIndex = 0; // same, for true-false's statement pool
 
 function isTierFilled(moduleId, tier, dataOverride){
   const data = dataOverride !== undefined ? dataOverride : md(moduleId);
@@ -584,7 +592,7 @@ function isTierFilled(moduleId, tier, dataOverride){
   try{
     switch(type){
       case 'gapfill': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.sentence && it.answer && it.options.some(o=>o)); }
-      case 'truefalse': return !!data[tier].statement;
+      case 'truefalse': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.statement); }
       case 'listenchoose': { const d=data[tier]; return !!(d.question && d.answer); }
       case 'sayit': return !!data[tier].target;
       case 'putinorder': { const d=data[tier]; return d.items.length>=2 && d.items.every(it=>it) && !!d.prompt; }
@@ -655,13 +663,13 @@ function copyFromBronze(){
 }
 
 function selectModule(id){
-  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0;
+  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   document.getElementById('crumbMod').textContent = instanceLabel(id);
   renderSidebar(); renderTierTabs(); renderMain();
 }
 function selectTier(t){
-  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0;
+  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   renderTierTabs(); renderMain();
 }
@@ -871,47 +879,94 @@ function pairRemove(moduleId, i){
 // ---- True / False ----
 function renderTrueFalseForm(){
   const editView = document.getElementById('editView');
-  const d = md('truefalse')[currentTier];
+  const tierData = md('truefalse')[currentTier];
+  if(tfExpandedIndex >= tierData.items.length) tfExpandedIndex = Math.max(0, tierData.items.length - 1);
+  const d = tierData.items[tfExpandedIndex];
   editView.innerHTML = `
     <div class="card">
-      <div class="card-label">Statement</div>
-      <div class="field"><div class="row-inline">
-        <input type="text" id="tfStatement" value="${d.statement}">
-        <button class="speak-btn" onclick="openFieldAudioModal('truefalse','statement',null,document.getElementById('tfStatement').value)">🔊</button>
-        <span class="audio-status" id="tfAudioStatus" onclick="openFieldAudioModal('truefalse','statement',null,document.getElementById('tfStatement').value)" style="cursor:pointer;"></span>
-      </div></div>
-    </div>
-    <div class="card">
-      <div class="card-label">Answer</div>
-      <div class="toggle-group">
-        <div class="toggle-btn true ${d.answer===true?'active true':''}" onclick="tfSetAnswer(true)">True</div>
-        <div class="toggle-btn false ${d.answer===false?'active false':''}" onclick="tfSetAnswer(false)">False</div>
+      <div class="pool-header">
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — statements</div>
+        <div class="pool-count">${tierData.items.length} in pool</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Statements per session (pick)</label>
+        <input type="number" min="1" max="${tierData.items.length}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="tfSetPick(this.value)">
       </div>
     </div>
-    <div class="card">
-      <div class="card-label">Tag the statement <span style="font-weight:400;text-transform:none;letter-spacing:0;">tap a word, shift-click to select more, then pick a color</span></div>
-      <div class="token-editor" id="tokenEditor"></div>
-      <div class="token-actions" id="tokenActions"></div>
-      ${roleSwatchesHtml()}
-    </div>`;
+    <div id="tfItemList">
+      ${tierData.items.map((it,i)=>`
+        <div class="card">
+          ${i===tfExpandedIndex ? `
+            <div class="pool-header">
+              <div class="card-label" style="margin-bottom:0;">Statement ${i+1}</div>
+              ${tierData.items.length>1 ? `<span class="del" onclick="tfRemoveItem(${i})">✕ remove</span>` : ''}
+            </div>
+            <div class="field" style="margin-top:10px;"><div class="row-inline">
+              <input type="text" id="tfStatement" value="${it.statement}">
+              <button class="speak-btn" onclick="openFieldAudioModal('truefalse','statement',null,document.getElementById('tfStatement').value,currentTier,tfExpandedIndex)">🔊</button>
+              <span class="audio-status" id="tfAudioStatus" onclick="openFieldAudioModal('truefalse','statement',null,document.getElementById('tfStatement').value,currentTier,tfExpandedIndex)" style="cursor:pointer;"></span>
+            </div></div>
+            <div class="card-label" style="margin-top:16px;">Answer</div>
+            <div class="toggle-group">
+              <div class="toggle-btn true ${it.answer===true?'active true':''}" onclick="tfSetAnswer(true)">True</div>
+              <div class="toggle-btn false ${it.answer===false?'active false':''}" onclick="tfSetAnswer(false)">False</div>
+            </div>
+            <div class="card-label" style="margin-top:16px;">Tag the statement <span style="font-weight:400;text-transform:none;letter-spacing:0;">tap a word, shift-click to select more, then pick a color</span></div>
+            <div class="token-editor" id="tokenEditor"></div>
+            <div class="token-actions" id="tokenActions"></div>
+            ${roleSwatchesHtml()}
+          ` : `
+            <div class="pool-header" style="cursor:pointer;" onclick="tfExpandItem(${i})">
+              <div style="font-size:13.5px;color:var(--text);">${it.statement || '(empty statement)'}</div>
+              <span style="color:var(--text-lo);font-size:12px;">Edit ›</span>
+            </div>
+          `}
+        </div>`).join('')}
+    </div>
+    <div class="add-link" onclick="tfAddItem()">+ add statement</div>`;
   document.getElementById('tfStatement').addEventListener('input', tfUpdatePreview);
   tfUpdatePreview();
 }
 function tfSetAnswer(val){
-  md('truefalse')[currentTier].answer = val;
+  md('truefalse')[currentTier].items[tfExpandedIndex].answer = val;
+  renderMain();
+}
+function tfSetPick(val){
+  const n = Math.max(1, parseInt(val)||1);
+  md('truefalse')[currentTier].pick = n;
+  renderPreview();
+}
+function tfExpandItem(i){
+  tfExpandedIndex = i;
+  selectedChunkIds = new Set();
+  renderMain();
+}
+function tfAddItem(){
+  const tierData = md('truefalse')[currentTier];
+  tierData.items.push({ statement:'', answer:true, tokens:[] });
+  tfExpandedIndex = tierData.items.length - 1;
+  renderMain();
+}
+function tfRemoveItem(i){
+  const tierData = md('truefalse')[currentTier];
+  if(tierData.items.length <= 1) return;
+  tierData.items.splice(i,1);
+  if(tierData.pick > tierData.items.length) tierData.pick = tierData.items.length;
+  tfExpandedIndex = 0;
   renderMain();
 }
 function tfUpdatePreview(){
-  const d = md('truefalse')[currentTier];
+  const d = md('truefalse')[currentTier].items[tfExpandedIndex];
   const statement = document.getElementById('tfStatement').value;
   d.statement = statement;
-  const scope = currentLessonId+'::truefalse::'+currentTier;
+  const scope = currentLessonId+'::truefalse::'+currentTier+'::'+tfExpandedIndex;
   ensureLiveTokensForScope(scope, d.tokens);
   rebuildTokensForScope(scope, statement);
   onTokenEditorChange = () => { d.tokens = getChunks(scope).map(c=>({t:c.words.join(' '), r:c.role})); };
   renderTokenEditor(scope);
   const statusEl = document.getElementById('tfAudioStatus');
-  const needs = syncSpeakableField('truefalse', 'statement', null, statement, statusEl);
+  const needs = syncSpeakableField('truefalse', 'statement', null, statement, statusEl, undefined, currentTier, tfExpandedIndex);
   setAudioStatusBadge(statusEl, needs);
   renderPreview();
 }
@@ -1271,8 +1326,8 @@ function compareCardHtml(moduleId, t){
     }
     if(instanceType(moduleId) === 'truefalse'){
       const d = md('truefalse')[t];
-      return `<div class="compare-card ${t}">${head}<span>${d.answer===true?'True':'False'}</span></div>
-        <div class="compare-sentence">${d.statement || '<span style="color:var(--text-lo);">empty</span>'}</div>
+      return `<div class="compare-card ${t}">${head}<span>${d.items.length} statement${d.items.length===1?'':'s'} · pick ${d.pick}</span></div>
+        <div class="compare-word-list">${d.items.map(it=>`<div class="compare-word">${it.statement || '<span style="color:var(--text-lo);">empty</span>'} <em style="color:var(--text-lo);">(${it.answer?'True':'False'})</em></div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'listenchoose'){
@@ -1598,9 +1653,11 @@ function renderPreview(){
         <div class="phone-stars">☆ ☆ ☆</div>`;
     }
   } else if(instanceType(currentModule)==='truefalse'){
-    const d = md('truefalse')[t];
+    const tierData = md('truefalse')[t];
+    const tfIdx = Math.min(tfExpandedIndex, tierData.items.length - 1);
+    const d = tierData.items[tfIdx];
     phone.innerHTML = `
-      <div class="phone-tier">${t.toUpperCase()}</div>
+      <div class="phone-tier">${t.toUpperCase()} · ${tfIdx+1} of ${tierData.items.length} · pick ${tierData.pick}</div>
       <div class="phone-q">${d.statement || '<span style="color:var(--text-lo);">No statement yet</span>'}</div>
       <div class="phone-opts">
         <div class="phone-opt ${d.answer===true?'correct':''}">True</div>
@@ -2352,7 +2409,10 @@ function getBaselineValue(moduleId, tierKey, fieldType, index, itemIndex){
         const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
         return fieldType==='sentence' ? (it && it.sentence || '') : (it && it.options && it.options[index] || '');
       }
-      case 'truefalse': return (tier && tier.statement) || '';
+      case 'truefalse': {
+        const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
+        return (it && it.statement) || '';
+      }
       case 'listenchoose': return (tier && tier.question) || '';
       case 'sayit': return (tier && tier.target) || '';
       case 'putinorder': return (tier && tier.items && tier.items[index]) || '';
@@ -2386,7 +2446,14 @@ function setBaselineValue(lessonId, moduleId, tierKey, fieldType, index, value, 
       else { if(!t.items[ii].options) t.items[ii].options = []; t.items[ii].options[index] = value; }
       break;
     }
-    case 'truefalse': ensureTier({}).statement = value; break;
+    case 'truefalse': {
+      const t = ensureTier({ items:[] });
+      if(!t.items) t.items = [];
+      const ii = itemIndex!=null ? itemIndex : 0;
+      if(!t.items[ii]) t.items[ii] = {};
+      t.items[ii].statement = value;
+      break;
+    }
     case 'listenchoose': ensureTier({}).question = value; break;
     case 'sayit': ensureTier({}).target = value; break;
     case 'putinorder': {
@@ -2566,7 +2633,11 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
 
     case 'truefalse':
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        statement: data[t].statement, answer: data[t].answer, tokens: data[t].tokens
+        pick: data[t].pick,
+        items: data[t].items.map((it,i) => ({
+          statement: it.statement, answer: it.answer, tokens: it.tokens,
+          audioFile: audioFor(`${t}.item${i}.statement`, it.statement),
+        }))
       }]));
 
     case 'listenchoose':
