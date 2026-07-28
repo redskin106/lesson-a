@@ -361,9 +361,9 @@ const FOOD_COURT_GAPFILL = {
 };
 
 const FOOD_COURT_SPELLING = {
-  bronze:[ {word:'dog',emoji:'🐕'}, {word:'cat',emoji:'🐈'}, {word:'bus',emoji:'🚌'}, {word:'book',emoji:'📚'}, {word:'rain',emoji:'🌧️'}, {word:'water',emoji:'💧'} ],
-  silver:[ {word:'kitchen',emoji:'🍳'}, {word:'ticket',emoji:'🎫'}, {word:'delivery',emoji:'🛵'}, {word:'receipt',emoji:'🧾'}, {word:'napkin',emoji:'🧻'} ],
-  gold:[ {word:'restaurant',emoji:'🍽️'}, {word:'convenience',emoji:'🏪'}, {word:'notification',emoji:'🔔'}, {word:'apartment',emoji:'🏢'} ],
+  bronze:{ pick:4, items:[ {word:'dog',emoji:'🐕'}, {word:'cat',emoji:'🐈'}, {word:'bus',emoji:'🚌'}, {word:'book',emoji:'📚'}, {word:'rain',emoji:'🌧️'}, {word:'water',emoji:'💧'} ]},
+  silver:{ pick:4, items:[ {word:'kitchen',emoji:'🍳'}, {word:'ticket',emoji:'🎫'}, {word:'delivery',emoji:'🛵'}, {word:'receipt',emoji:'🧾'}, {word:'napkin',emoji:'🧻'} ]},
+  gold:{ pick:4, items:[ {word:'restaurant',emoji:'🍽️'}, {word:'convenience',emoji:'🏪'}, {word:'notification',emoji:'🔔'}, {word:'apartment',emoji:'🏢'} ]},
 };
 
 // ---- Per-lesson content store. Every lesson gets its own data, not a shared global. ----
@@ -374,8 +374,12 @@ function blankGapfillData(){
   const blankTier = () => ({ pick:2, items:[blankItem()] });
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
+function blankPoolWithPick(pick){
+  const blankTier = () => ({ pick, items:[] });
+  return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
+}
 function blankSpellingData(){
-  return { bronze:[], silver:[], gold:[] };
+  return blankPoolWithPick(4);
 }
 function blankTrueFalseData(){
   const blankItem = () => ({ statement:'', answer:true, tokens:[] });
@@ -383,7 +387,7 @@ function blankTrueFalseData(){
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankPairsData(){ // Word Match & Listen & Match share this shape
-  return { bronze:[], silver:[], gold:[] };
+  return blankPoolWithPick(4);
 }
 function blankMemoryPairsData(){
   const blankItem = () => ({ word:'', emoji:'', image:null, sentence:'', tokens:[] });
@@ -412,10 +416,10 @@ function blankPicWordData(){
   return { bronze: blankTier('word-to-image'), silver: blankTier('image-to-word'), gold: blankTier('cloze-image') };
 }
 function blankWordScrambleData(){
-  return { bronze:[], silver:[], gold:[] };
+  return blankPoolWithPick(4);
 }
 function blankBuildSentenceData(){
-  return { bronze:[], silver:[], gold:[] }; // each pool item is just { tokens: [...] }
+  return blankPoolWithPick(4); // each pool item is just { tokens: [...] }
 }
 
 const BLANK_DATA_BY_MODULE = {
@@ -457,15 +461,15 @@ const COLORS_TRUEFALSE = {
 };
 
 const COLORS_WORDMATCH = {
-  bronze:[ {left:'red',right:'apple'}, {left:'blue',right:'sky'}, {left:'yellow',right:'banana'} ],
-  silver:[ {left:'red',right:'apple'}, {left:'blue',right:'sky'}, {left:'yellow',right:'banana'}, {left:'green',right:'leaf'} ],
-  gold:[ {left:'red',right:'apple'}, {left:'blue',right:'sky'}, {left:'yellow',right:'banana'}, {left:'green',right:'leaf'}, {left:'purple',right:'grape'}, {left:'black',right:'night'} ],
+  bronze:{ pick:3, items:[ {left:'red',right:'apple'}, {left:'blue',right:'sky'}, {left:'yellow',right:'banana'} ]},
+  silver:{ pick:4, items:[ {left:'red',right:'apple'}, {left:'blue',right:'sky'}, {left:'yellow',right:'banana'}, {left:'green',right:'leaf'} ]},
+  gold:{ pick:5, items:[ {left:'red',right:'apple'}, {left:'blue',right:'sky'}, {left:'yellow',right:'banana'}, {left:'green',right:'leaf'}, {left:'purple',right:'grape'}, {left:'black',right:'night'} ]},
 };
 
 const COLORS_LISTENMATCH = {
-  bronze:[ {left:'red',right:'red'}, {left:'blue',right:'blue'}, {left:'green',right:'green'} ],
-  silver:[ {left:'red',right:'red'}, {left:'blue',right:'blue'}, {left:'green',right:'green'}, {left:'yellow',right:'yellow'} ],
-  gold:[ {left:'red',right:'red'}, {left:'blue',right:'blue'}, {left:'green',right:'green'}, {left:'yellow',right:'yellow'}, {left:'purple',right:'purple'} ],
+  bronze:{ pick:3, items:[ {left:'red',right:'red'}, {left:'blue',right:'blue'}, {left:'green',right:'green'} ]},
+  silver:{ pick:4, items:[ {left:'red',right:'red'}, {left:'blue',right:'blue'}, {left:'green',right:'green'}, {left:'yellow',right:'yellow'} ]},
+  gold:{ pick:4, items:[ {left:'red',right:'red'}, {left:'blue',right:'blue'}, {left:'green',right:'green'}, {left:'yellow',right:'yellow'}, {left:'purple',right:'purple'} ]},
 };
 
 const COLORS_MEMORYPAIRS = {
@@ -549,28 +553,28 @@ const COLORS_PICWORD = {
 };
 
 const COLORS_WORDSCRAMBLE = {
-  bronze:[ {word:'red',emoji:'🔴'}, {word:'blue',emoji:'🔵'}, {word:'green',emoji:'🟢'}, {word:'pink',emoji:'🩷'} ],
-  silver:[ {word:'orange',emoji:'🟠'}, {word:'purple',emoji:'🟣'}, {word:'yellow',emoji:'🟡'}, {word:'brown',emoji:'🟤'} ],
-  gold:[ {word:'violet',emoji:'🟣'}, {word:'indigo',emoji:'🔵'}, {word:'magenta',emoji:'🩷'}, {word:'charcoal',emoji:'⚫'} ],
+  bronze:{ pick:4, items:[ {word:'red',emoji:'🔴'}, {word:'blue',emoji:'🔵'}, {word:'green',emoji:'🟢'}, {word:'pink',emoji:'🩷'} ]},
+  silver:{ pick:4, items:[ {word:'orange',emoji:'🟠'}, {word:'purple',emoji:'🟣'}, {word:'yellow',emoji:'🟡'}, {word:'brown',emoji:'🟤'} ]},
+  gold:{ pick:4, items:[ {word:'violet',emoji:'🟣'}, {word:'indigo',emoji:'🔵'}, {word:'magenta',emoji:'🩷'}, {word:'charcoal',emoji:'⚫'} ]},
 };
 
 const COLORS_BUILDSENTENCE = {
-  bronze:[
+  bronze:{ pick:2, items:[
     { tokens:[{text:'The',role:null,chunkId:0},{text:'sky',role:'subject',chunkId:1},{text:'is',role:'verb',chunkId:2},{text:'blue',role:'object',chunkId:3}] },
     { tokens:[{text:'The',role:null,chunkId:0},{text:'grass',role:'subject',chunkId:1},{text:'is',role:'verb',chunkId:2},{text:'green',role:'object',chunkId:3}] },
-  ],
-  silver:[
+  ]},
+  silver:{ pick:1, items:[
     { tokens:[{text:'I',role:'subject',chunkId:0},{text:'wear',role:'verb',chunkId:1},{text:'a',role:null,chunkId:2},{text:'red',role:null,chunkId:2},{text:'shirt',role:'object',chunkId:3},{text:'every day',role:'time',chunkId:4}] },
-  ],
-  gold:[
+  ]},
+  gold:{ pick:1, items:[
     { tokens:[{text:'I',role:'subject',chunkId:0},{text:'like',role:'verb',chunkId:1},{text:'blue',role:'object',chunkId:2},{text:'because',role:'connector',chunkId:3},{text:'it is calm',role:null,chunkId:4}] },
-  ],
+  ]},
 };
 
 const COLORS_SPELLING = {
-  bronze:[ {word:'red',emoji:'🔴'}, {word:'blue',emoji:'🔵'}, {word:'green',emoji:'🟢'}, {word:'pink',emoji:'🩷'} ],
-  silver:[ {word:'orange',emoji:'🟠'}, {word:'purple',emoji:'🟣'}, {word:'yellow',emoji:'🟡'}, {word:'brown',emoji:'🟤'} ],
-  gold:[ {word:'turquoise',emoji:'🔵'}, {word:'maroon',emoji:'🔴'}, {word:'lavender',emoji:'🟣'} ],
+  bronze:{ pick:4, items:[ {word:'red',emoji:'🔴'}, {word:'blue',emoji:'🔵'}, {word:'green',emoji:'🟢'}, {word:'pink',emoji:'🩷'} ]},
+  silver:{ pick:4, items:[ {word:'orange',emoji:'🟠'}, {word:'purple',emoji:'🟣'}, {word:'yellow',emoji:'🟡'}, {word:'brown',emoji:'🟤'} ]},
+  gold:{ pick:3, items:[ {word:'turquoise',emoji:'🔵'}, {word:'maroon',emoji:'🔴'}, {word:'lavender',emoji:'🟣'} ]},
 };
 
 function seedColorsContent(lesson){
@@ -641,11 +645,11 @@ function isTierFilled(moduleId, tier, dataOverride){
       case 'sayit': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.target); }
       case 'putinorder': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.items.length>=2 && it.items.every(w=>w) && !!it.prompt); }
       case 'wordmatch': case 'listenmatch':
-        return data[tier].length>=1 && data[tier].every(p=>p.left && p.right);
+        return data[tier].items.length>=1 && data[tier].items.every(p=>p.left && p.right);
       case 'spelling': case 'wordscramble':
-        return data[tier].length>=1 && data[tier].every(it=>it.word);
+        return data[tier].items.length>=1 && data[tier].items.every(it=>it.word);
       case 'buildsentence':
-        return data[tier].length>=1 && data[tier].every(it=>it.tokens.length>=1);
+        return data[tier].items.length>=1 && data[tier].items.every(it=>it.tokens.length>=1);
       case 'memorypairs':
         return data[tier].items.length>=2 && data[tier].items.every(it=>it.word);
       case 'picword':
@@ -822,19 +826,25 @@ function renderMain(){
 // ---- Word + emoji pool (Spelling, Word Scramble) ----
 function renderWordEmojiPoolForm(moduleId){
   const editView = document.getElementById('editView');
-  const items = md(moduleId)[currentTier];
+  const tierData = md(moduleId)[currentTier];
+  const items = tierData.items;
   const label = instanceType(moduleId) === 'spelling' ? 'Spelling pool' : 'Scramble pool';
   editView.innerHTML = `
     <div class="card">
       <div class="pool-header">
         <div class="card-label" style="margin-bottom:0;">${currentTier} — ${label}</div>
-        <div class="pool-count">${items.length} items · session draws ${Math.min(4,items.length)}</div>
+        <div class="pool-count">${items.length} items</div>
       </div>
-      ${items.length < 4 ? `<div class="shared-pool-note">Only ${items.length} item${items.length===1?'':'s'} in this pool — add a few more for real variety between sessions.</div>` : ''}
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Words drawn this session (pick)</label>
+        <input type="number" min="1" max="${Math.max(1,items.length)}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="weSetPick('${moduleId}',this.value)">
+      </div>
+      ${items.length < tierData.pick ? `<div class="shared-pool-note">Only ${items.length} item${items.length===1?'':'s'} but pick is ${tierData.pick} — add a few more for real variety between sessions.</div>` : ''}
       <div id="weList">
         ${items.map((it,i)=>`
           <div class="pool-item">
-            <span class="opt-audio-icon" id="weIcon${i}" onclick="openFieldAudioModal('${moduleId}','word',${i},document.querySelectorAll('#weList .pool-item')[${i}].querySelector('input').value)">🔊</span>
+            <span class="opt-audio-icon" id="weIcon${i}" onclick="openFieldAudioModal('${moduleId}','word',${i},document.querySelectorAll('#weList .pool-item')[${i}].querySelector('input').value,currentTier)">🔊</span>
             <button class="emoji-field-btn ${it.emoji?'':'empty'}" onclick="openEmojiPicker(function(e){ weUpdate('${moduleId}',${i},'emoji',e); })">${it.emoji || '?'}</button>
             <input type="text" value="${it.word}" oninput="weUpdate('${moduleId}',${i},'word',this.value)">
             <span class="del" onclick="weRemove('${moduleId}',${i})">✕</span>
@@ -842,13 +852,18 @@ function renderWordEmojiPoolForm(moduleId){
       </div>
       <div class="add-link" onclick="weAdd('${moduleId}')">+ add word to pool</div>
     </div>`;
-  items.forEach((it,i) => syncSpeakableField(moduleId, 'word', i, it.word, document.getElementById('weIcon'+i)));
+  items.forEach((it,i) => syncSpeakableField(moduleId, 'word', i, it.word, document.getElementById('weIcon'+i), null, currentTier));
+}
+function weSetPick(moduleId, val){
+  const n = Math.max(1, parseInt(val)||1);
+  md(moduleId)[currentTier].pick = n;
+  renderPreview();
 }
 function weUpdate(moduleId, i, field, val){
-  md(moduleId)[currentTier][i][field] = val;
+  md(moduleId)[currentTier].items[i][field] = val;
   if(field === 'word'){
     const icon = document.getElementById('weIcon'+i);
-    syncSpeakableField(moduleId, 'word', i, val, icon);
+    syncSpeakableField(moduleId, 'word', i, val, icon, null, currentTier);
     renderPreview();
   } else {
     renderMain(); // emoji change needs a full re-render so the picker button shows the new glyph
@@ -856,19 +871,20 @@ function weUpdate(moduleId, i, field, val){
 }
 function weAdd(moduleId){
   openWordBankPicker(function(entry){
-    md(moduleId)[currentTier].push({ word: entry.word, emoji: entry.emoji });
+    md(moduleId)[currentTier].items.push({ word: entry.word, emoji: entry.emoji });
     renderMain();
   });
 }
 function weRemove(moduleId, i){
-  md(moduleId)[currentTier].splice(i,1);
+  md(moduleId)[currentTier].items.splice(i,1);
   renderMain();
 }
 
 // ---- Pairs pool (Word Match, Listen & Match) ----
 function renderPairsForm(moduleId){
   const editView = document.getElementById('editView');
-  const pairs = md(moduleId)[currentTier];
+  const tierData = md(moduleId)[currentTier];
+  const pairs = tierData.items;
   const isListen = instanceType(moduleId) === 'listenmatch';
   editView.innerHTML = `
     <div class="card">
@@ -876,16 +892,21 @@ function renderPairsForm(moduleId){
         <div class="card-label" style="margin-bottom:0;">${currentTier} — pairs</div>
         <div class="pool-count">${pairs.length} pairs</div>
       </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Pairs drawn this session (pick)</label>
+        <input type="number" min="1" max="${Math.max(1,pairs.length)}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="pairSetPick('${moduleId}',this.value)">
+      </div>
       ${isListen ? '<div class="shared-pool-note">This module matches spoken audio to written text — left and right are usually the same word.</div>' : '<div class="shared-pool-note">This is a visual matching exercise, not audio-driven — no audio tracking on these fields.</div>'}
-      ${pairs.length < 4 ? `<div class="shared-pool-note">Only ${pairs.length} pair${pairs.length===1?'':'s'} — 4 or more gives students real variety between sessions.</div>` : ''}
+      ${pairs.length < tierData.pick ? `<div class="shared-pool-note">Only ${pairs.length} pair${pairs.length===1?'':'s'} but pick is ${tierData.pick} — add more for real variety between sessions.</div>` : ''}
       <div id="pairList">
         ${pairs.map((p,i)=>`
           <div class="pair-row">
-            ${isListen ? `<span class="opt-audio-icon" id="pairIconL${i}" onclick="openFieldAudioModal('${moduleId}','pairLeft',${i},document.querySelectorAll('#pairList .pair-row')[${i}].querySelectorAll('input')[0].value)">🔊</span>` : ''}
+            ${isListen ? `<span class="opt-audio-icon" id="pairIconL${i}" onclick="openFieldAudioModal('${moduleId}','pairLeft',${i},document.querySelectorAll('#pairList .pair-row')[${i}].querySelectorAll('input')[0].value,currentTier)">🔊</span>` : ''}
             <input type="text" value="${p.left}" oninput="pairUpdate('${moduleId}',${i},'left',this.value)">
             <span class="pair-arrow">↔</span>
             <input type="text" value="${p.right}" oninput="pairUpdate('${moduleId}',${i},'right',this.value)">
-            ${isListen ? `<span class="opt-audio-icon" id="pairIconR${i}" onclick="openFieldAudioModal('${moduleId}','pairRight',${i},document.querySelectorAll('#pairList .pair-row')[${i}].querySelectorAll('input')[1].value)">🔊</span>` : ''}
+            ${isListen ? `<span class="opt-audio-icon" id="pairIconR${i}" onclick="openFieldAudioModal('${moduleId}','pairRight',${i},document.querySelectorAll('#pairList .pair-row')[${i}].querySelectorAll('input')[1].value,currentTier)">🔊</span>` : ''}
             <span class="del" onclick="pairRemove('${moduleId}',${i})">✕</span>
           </div>`).join('') || '<div class="hint" style="color:var(--text-lo);">No pairs yet — add one below.</div>'}
       </div>
@@ -893,28 +914,33 @@ function renderPairsForm(moduleId){
     </div>`;
   if(isListen){
     pairs.forEach((p,i) => {
-      syncSpeakableField(moduleId, 'pairLeft', i, p.left, document.getElementById('pairIconL'+i));
-      syncSpeakableField(moduleId, 'pairRight', i, p.right, document.getElementById('pairIconR'+i));
+      syncSpeakableField(moduleId, 'pairLeft', i, p.left, document.getElementById('pairIconL'+i), null, currentTier);
+      syncSpeakableField(moduleId, 'pairRight', i, p.right, document.getElementById('pairIconR'+i), null, currentTier);
     });
   }
 }
+function pairSetPick(moduleId, val){
+  const n = Math.max(1, parseInt(val)||1);
+  md(moduleId)[currentTier].pick = n;
+  renderPreview();
+}
 function pairUpdate(moduleId, i, field, val){
-  md(moduleId)[currentTier][i][field] = val;
+  md(moduleId)[currentTier].items[i][field] = val;
   if(instanceType(moduleId) === 'listenmatch'){
     const iconId = field==='left' ? 'pairIconL'+i : 'pairIconR'+i;
     const fieldType = field==='left' ? 'pairLeft' : 'pairRight';
-    syncSpeakableField(moduleId, fieldType, i, val, document.getElementById(iconId));
+    syncSpeakableField(moduleId, fieldType, i, val, document.getElementById(iconId), null, currentTier);
   }
   renderPreview();
 }
 function pairAdd(moduleId){
-  md(moduleId)[currentTier].push({ left:'', right:'' });
+  md(moduleId)[currentTier].items.push({ left:'', right:'' });
   renderMain();
   const inputs = document.querySelectorAll('#pairList .pair-row input');
   if(inputs.length) inputs[inputs.length-2].focus();
 }
 function pairRemove(moduleId, i){
-  md(moduleId)[currentTier].splice(i,1);
+  md(moduleId)[currentTier].items.splice(i,1);
   renderMain();
 }
 
@@ -1402,7 +1428,8 @@ function spItemRemove(moduleId, i){
 let bsActiveItemIndex = null;
 function renderBuildSentenceForm(){
   const editView = document.getElementById('editView');
-  const items = md('buildsentence')[currentTier];
+  const tierData = md('buildsentence')[currentTier];
+  const items = tierData.items;
   if(bsActiveItemIndex !== null && bsActiveItemIndex >= items.length) bsActiveItemIndex = null;
 
   editView.innerHTML = `
@@ -1410,6 +1437,11 @@ function renderBuildSentenceForm(){
       <div class="pool-header">
         <div class="card-label" style="margin-bottom:0;">${currentTier} — sentence pool</div>
         <div class="pool-count">${items.length} sentences</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Sentences drawn this session (pick)</label>
+        <input type="number" min="1" max="${Math.max(1,items.length)}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="bsSetPick(this.value)">
       </div>
       <div id="bsList">
         ${items.map((it,i)=>`
@@ -1459,8 +1491,13 @@ function renderBuildSentenceForm(){
     }
   }
 }
+function bsSetPick(val){
+  const n = Math.max(1, parseInt(val)||1);
+  md('buildsentence')[currentTier].pick = n;
+  renderPreview();
+}
 function bsAssembledText(i){
-  const items = md('buildsentence')[currentTier];
+  const items = md('buildsentence')[currentTier].items;
   return items[i] ? items[i].tokens.map(t=>t.text).join(' ') : '';
 }
 function bsSyncAudio(){
@@ -1468,21 +1505,21 @@ function bsSyncAudio(){
   const statusEl = document.getElementById('bsAudioStatus');
   if(!statusEl) return;
   const text = bsAssembledText(bsActiveItemIndex);
-  const needs = syncSpeakableField('buildsentence', 'sentence', bsActiveItemIndex, text, statusEl);
+  const needs = syncSpeakableField('buildsentence', 'sentence', bsActiveItemIndex, text, statusEl, null, currentTier);
   setAudioStatusBadge(statusEl, needs);
 }
 function bsOpenAudioModal(){
   if(bsActiveItemIndex === null) return;
-  openFieldAudioModal('buildsentence', 'sentence', bsActiveItemIndex, bsAssembledText(bsActiveItemIndex));
+  openFieldAudioModal('buildsentence', 'sentence', bsActiveItemIndex, bsAssembledText(bsActiveItemIndex), currentTier);
 }
 function bsSelectItem(i){ bsActiveItemIndex = i; selectedChunkIds = new Set(); renderMain(); }
 function bsAddItem(){
-  md('buildsentence')[currentTier].push({ tokens: [] });
-  bsActiveItemIndex = md('buildsentence')[currentTier].length - 1;
+  md('buildsentence')[currentTier].items.push({ tokens: [] });
+  bsActiveItemIndex = md('buildsentence')[currentTier].items.length - 1;
   renderMain();
 }
 function bsRemoveItem(i){
-  md('buildsentence')[currentTier].splice(i,1);
+  md('buildsentence')[currentTier].items.splice(i,1);
   bsActiveItemIndex = null;
   renderMain();
 }
@@ -1493,7 +1530,7 @@ function bsAddWord(){
   const scope = currentLessonId+'::buildsentence::'+currentTier+'::item'+bsActiveItemIndex;
   LIVE_TOKENS[scope] = LIVE_TOKENS[scope] || [];
   LIVE_TOKENS[scope].push({ text: word, role: null, chunkId: newChunkId() });
-  md('buildsentence')[currentTier][bsActiveItemIndex].tokens = getChunks(scope).flatMap(c => c.words.map(w=>({text:w, role:c.role, chunkId:c.chunkId})));
+  md('buildsentence')[currentTier].items[bsActiveItemIndex].tokens = getChunks(scope).flatMap(c => c.words.map(w=>({text:w, role:c.role, chunkId:c.chunkId})));
   input.value = '';
   renderTokenEditor(scope);
   bsSyncAudio();
@@ -1506,7 +1543,7 @@ function bsSplitFullSentence(){
   const scope = currentLessonId+'::buildsentence::'+currentTier+'::item'+bsActiveItemIndex;
   const words = text.split(/\s+/).filter(Boolean);
   LIVE_TOKENS[scope] = words.map(w => ({ text: w, role: null, chunkId: newChunkId() }));
-  md('buildsentence')[currentTier][bsActiveItemIndex].tokens = words.map(w => ({ text: w, role: null, chunkId: null }));
+  md('buildsentence')[currentTier].items[bsActiveItemIndex].tokens = words.map(w => ({ text: w, role: null, chunkId: null }));
   input.value = '';
   renderMain(); // rebuild pool preview + tagger with the new chips
 }
@@ -1522,9 +1559,9 @@ function compareCardHtml(moduleId, t){
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'spelling' || instanceType(moduleId) === 'wordscramble'){
-      const items = md(moduleId)[t];
-      return `<div class="compare-card ${t}">${head}<span>${items.length} items</span></div>
-        <div class="compare-word-list">${items.map(it=>`<div class="compare-word"><span>${it.emoji||'?'}</span>${it.word||'<span style="color:var(--text-lo);">empty</span>'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
+      const tierData = md(moduleId)[t];
+      return `<div class="compare-card ${t}">${head}<span>${tierData.items.length} items · pick ${tierData.pick}</span></div>
+        <div class="compare-word-list">${tierData.items.map(it=>`<div class="compare-word"><span>${it.emoji||'?'}</span>${it.word||'<span style="color:var(--text-lo);">empty</span>'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'truefalse'){
@@ -1552,9 +1589,9 @@ function compareCardHtml(moduleId, t){
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'wordmatch' || instanceType(moduleId) === 'listenmatch'){
-      const pairs = md(moduleId)[t];
-      return `<div class="compare-card ${t}">${head}<span>${pairs.length} pairs</span></div>
-        <div class="compare-word-list">${pairs.map(p=>`<div class="compare-word">${p.left||'&nbsp;'} ↔ ${p.right||'&nbsp;'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">no pairs</div>'}</div>
+      const tierData = md(moduleId)[t];
+      return `<div class="compare-card ${t}">${head}<span>${tierData.items.length} pairs · pick ${tierData.pick}</span></div>
+        <div class="compare-word-list">${tierData.items.map(p=>`<div class="compare-word">${p.left||'&nbsp;'} ↔ ${p.right||'&nbsp;'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">no pairs</div>'}</div>
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'memorypairs'){
@@ -1573,9 +1610,9 @@ function compareCardHtml(moduleId, t){
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'buildsentence'){
-      const items = md('buildsentence')[t];
-      return `<div class="compare-card ${t}">${head}<span>${items.length} sentences</span></div>
-        <div class="compare-word-list">${items.map(it=>`<div class="compare-word">${it.tokens.length ? it.tokens.map(tk=>tk.text).join(' ') : '<span style="color:var(--text-lo);">empty</span>'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">no sentences</div>'}</div>
+      const tierData = md('buildsentence')[t];
+      return `<div class="compare-card ${t}">${head}<span>${tierData.items.length} sentences · pick ${tierData.pick}</span></div>
+        <div class="compare-word-list">${tierData.items.map(it=>`<div class="compare-word">${it.tokens.length ? it.tokens.map(tk=>tk.text).join(' ') : '<span style="color:var(--text-lo);">empty</span>'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">no sentences</div>'}</div>
         ${editLink}</div>`;
     }
   }catch(e){
@@ -1829,26 +1866,28 @@ function renderPreview(){
       <div class="phone-opts">${d.options.map(o=>`<div class="phone-opt ${o===d.answer?'correct':''}">${o || '&nbsp;'}</div>`).join('')}</div>
       <div class="phone-stars">☆ ☆ ☆</div>`;
   } else if(instanceType(currentModule)==='spelling' || instanceType(currentModule)==='wordscramble'){
-    const items = md(currentModule)[t];
+    const tierData = md(currentModule)[t];
+    const items = tierData.items;
     if(!items || items.length===0){
       phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Add words to this tier's pool to preview.</div>`;
     } else {
       const label = instanceType(currentModule)==='spelling' ? 'Spell the word:' : 'Unscramble the word:';
       const wordDisplay = instanceType(currentModule)==='spelling' ? '_ _ _' : (items[0].word||'').split('').sort(()=>Math.random()-0.5).join(' ').toUpperCase();
       phone.innerHTML = `
-        <div class="phone-tier">${t.toUpperCase()}</div>
+        <div class="phone-tier">${t.toUpperCase()} · pick ${tierData.pick}</div>
         <div class="phone-q">${label}</div>
         <div style="text-align:center;font-size:40px;margin-bottom:14px;">${items[0].emoji||''}</div>
         <div class="phone-opts"><div class="phone-opt">${wordDisplay}</div></div>
         <div class="phone-stars">☆ ☆ ☆</div>`;
     }
   } else if(instanceType(currentModule)==='wordmatch' || instanceType(currentModule)==='listenmatch'){
-    const pairs = md(currentModule)[t];
+    const tierData = md(currentModule)[t];
+    const pairs = tierData.items;
     if(!pairs || pairs.length===0){
       phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Add pairs to preview.</div>`;
     } else {
       phone.innerHTML = `
-        <div class="phone-tier">${t.toUpperCase()}</div>
+        <div class="phone-tier">${t.toUpperCase()} · pick ${tierData.pick}</div>
         <div class="phone-q">Match the pairs:</div>
         <div class="phone-opts">${pairs.map(p=>`<div class="phone-opt">${p.left||'&nbsp;'} ↔ ${p.right||'&nbsp;'}</div>`).join('')}</div>
         <div class="phone-stars">☆ ☆ ☆</div>`;
@@ -1914,13 +1953,14 @@ function renderPreview(){
         <div class="phone-stars">☆ ☆ ☆</div>`;
     }
   } else if(instanceType(currentModule)==='buildsentence'){
-    const items = md('buildsentence')[t];
+    const tierData = md('buildsentence')[t];
+    const items = tierData.items;
     if(!items || items.length===0){
       phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Add a sentence to preview.</div>`;
     } else {
       const it = items[0];
       phone.innerHTML = `
-        <div class="phone-tier">${t.toUpperCase()}</div>
+        <div class="phone-tier">${t.toUpperCase()} · pick ${tierData.pick}</div>
         <div class="phone-q">Build the sentence:</div>
         <div class="phone-opts">${it.tokens.length ? it.tokens.map(tk=>`<div class="phone-opt">${tk.text}</div>`).join('') : '<div class="phone-opt">Empty sentence</div>'}</div>
         <div class="phone-stars">☆ ☆ ☆</div>`;
@@ -2630,15 +2670,17 @@ function getBaselineValue(moduleId, tierKey, fieldType, index, itemIndex){
         const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
         return (it && it.items && it.items[index]) || '';
       }
-      case 'wordmatch': case 'listenmatch':
-        if(!tier || !tier[index]) return '';
-        return fieldType==='pairLeft' ? (tier[index].left||'') : (tier[index].right||'');
+      case 'wordmatch': case 'listenmatch': {
+        const it = tier && tier.items && tier.items[index];
+        if(!it) return '';
+        return fieldType==='pairLeft' ? (it.left||'') : (it.right||'');
+      }
       case 'spelling': case 'wordscramble':
-        return (tier && tier[index] && tier[index].word) || '';
+        return (tier && tier.items && tier.items[index] && tier.items[index].word) || '';
       case 'memorypairs': case 'picword':
         return (tier && tier.items && tier.items[index] && tier.items[index].word) || '';
       case 'buildsentence':
-        return (tier && tier[index] && tier[index]._recordedSpoken) || '';
+        return (tier && tier.items && tier.items[index] && tier.items[index]._recordedSpoken) || '';
       default: return '';
     }
   }catch(e){ return ''; }
@@ -2694,15 +2736,17 @@ function setBaselineValue(lessonId, moduleId, tierKey, fieldType, index, value, 
       break;
     }
     case 'wordmatch': case 'listenmatch': {
-      const t = ensureTier([]);
-      if(!t[index]) t[index] = {};
-      if(fieldType==='pairLeft') t[index].left = value; else t[index].right = value;
+      const t = ensureTier({ items:[] });
+      if(!t.items) t.items = [];
+      if(!t.items[index]) t.items[index] = {};
+      if(fieldType==='pairLeft') t.items[index].left = value; else t.items[index].right = value;
       break;
     }
     case 'spelling': case 'wordscramble': {
-      const t = ensureTier([]);
-      if(!t[index]) t[index] = {};
-      t[index].word = value;
+      const t = ensureTier({ items:[] });
+      if(!t.items) t.items = [];
+      if(!t.items[index]) t.items[index] = {};
+      t.items[index].word = value;
       break;
     }
     case 'memorypairs': case 'picword': {
@@ -2713,9 +2757,10 @@ function setBaselineValue(lessonId, moduleId, tierKey, fieldType, index, value, 
       break;
     }
     case 'buildsentence': {
-      const t = ensureTier([]);
-      if(!t[index]) t[index] = {};
-      t[index]._recordedSpoken = value;
+      const t = ensureTier({ items:[] });
+      if(!t.items) t.items = [];
+      if(!t.items[index]) t.items[index] = {};
+      t.items[index]._recordedSpoken = value;
       break;
     }
   }
@@ -2902,22 +2947,29 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
       }]));
 
     case 'wordmatch':
+      // { pick, items:[{left,right}] } — confirmed directly against lesson-shell-v2.html's
+      // 'word-match' renderer, which destructures exactly { pick, items }.
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        pairs: data[t].map(p => ({ left: p.left, right: p.right }))
+        pick: data[t].pick,
+        items: data[t].items.map(p => ({ left: p.left, right: p.right }))
       }]));
 
     case 'listenmatch':
-      // CORRECTED against the real shell: audio-match reads pair.audio and pair.text, not
-      // pair.left/pair.right — that was the wordmatch-shaped default, carried over incorrectly.
-      // Internally left===right always for this module (an audio-echo match), so either value
-      // works for both fields.
+      // { pick, items:[{left,right}] } — same shape and engine as word-match, confirmed against
+      // shell-v2's 'audio-match' renderer (also destructures { pick, items }, reuses word-match's
+      // PALETTE/pairing logic verbatim). The audio/text field-name "correction" this replaced was
+      // itself wrong, written against some other/earlier shell version — left is what actually
+      // gets spoken (dataset.audio = pair.left in the real renderer), right is the tap target.
+      // left===right always here in practice (an audio-echo match), so either value works either way.
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        pairs: data[t].map((p,i) => ({ audio: p.left, text: p.left, audioFile: audioFor(`${t}.pair${i}`, p.left) }))
+        pick: data[t].pick,
+        items: data[t].items.map((p,i) => ({ left: p.left, right: p.right, audioFile: audioFor(`${t}.item${i}.left`, p.left) }))
       }]));
 
     case 'wordscramble':
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        items: data[t].map((it,i) => {
+        pick: data[t].pick,
+        items: data[t].items.map((it,i) => {
           const o = { word: it.word };
           if(it.emoji) o.emoji = it.emoji;
           // Unconditional, not "if truthy": showReinforcePanel() calls item.sentence.replace(...)
@@ -2938,7 +2990,8 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
       // item.sentence.replace(...) unconditionally. Omitting it was a real crash waiting to
       // happen the first time a student spelled a word correctly.
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        items: data[t].map((it,i) => ({
+        pick: data[t].pick,
+        items: data[t].items.map((it,i) => ({
           word: it.word,
           emoji: it.emoji || undefined,
           sentence: it.sentence || '',
@@ -2952,7 +3005,8 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
       // Each chip is its own token here — unlike Gap-fill/True-False, chips aren't merged into
       // phrases, since every chip is individually draggable in the live module.
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        items: data[t].map((it,i) => ({
+        pick: data[t].pick,
+        items: data[t].items.map((it,i) => ({
           tokens: it.tokens.map(tk => ({ text: tk.text, role: tk.role })),
           audioFile: audioFor(`${t}.item${i}.sentence`, it.tokens.map(tk => tk.text).join(' ')),
         }))
