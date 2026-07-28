@@ -389,11 +389,13 @@ function blankMemoryPairsData(){
   return { allItems:[], tiers:{ bronze:{pairs:3,flipback:1500}, silver:{pairs:4,flipback:1200}, gold:{pairs:6,flipback:900} } };
 }
 function blankListenChooseData(){
-  const blankTier = () => ({ audio:'', question:'', options:['',''], answer:'' });
+  const blankItem = () => ({ audio:'', question:'', options:['',''], answer:'' });
+  const blankTier = () => ({ pick:2, items:[blankItem()] });
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankPutInOrderData(){
-  const blankTier = () => ({ prompt:'', items:[] });
+  const blankItem = () => ({ prompt:'', items:[] }); // 'items' here = the correct order (teacher-authored); maps to 'correct' + synthesized 'sequence' at publish time
+  const blankTier = () => ({ pick:2, items:[blankItem()] });
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankSayItData(){
@@ -475,15 +477,27 @@ const COLORS_MEMORYPAIRS = {
 };
 
 const COLORS_LISTENCHOOSE = {
-  bronze:{ audio:'What color is the sun?', question:'What color is the sun?', options:['yellow','blue','black','green'], answer:'yellow' },
-  silver:{ audio:'Which color means stop on a traffic light?', question:'Which color means stop on a traffic light?', options:['red','green','yellow','blue'], answer:'red' },
-  gold:{ audio:'Which color do you get by mixing blue and yellow?', question:'Which color do you get by mixing blue and yellow?', options:['green','purple','orange','black'], answer:'green' },
+  bronze:{ pick:1, items:[
+    { audio:'What color is the sun?', question:'What color is the sun?', options:['yellow','blue','black','green'], answer:'yellow' }
+  ]},
+  silver:{ pick:1, items:[
+    { audio:'Which color means stop on a traffic light?', question:'Which color means stop on a traffic light?', options:['red','green','yellow','blue'], answer:'red' }
+  ]},
+  gold:{ pick:1, items:[
+    { audio:'Which color do you get by mixing blue and yellow?', question:'Which color do you get by mixing blue and yellow?', options:['green','purple','orange','black'], answer:'green' }
+  ]},
 };
 
 const COLORS_PUTINORDER = {
-  bronze:{ prompt:'Put the traffic light colors in order (top to bottom).', items:['red','yellow','green'] },
-  silver:{ prompt:'Order the first three rainbow colors.', items:['red','orange','yellow'] },
-  gold:{ prompt:'Order these from darkest to lightest.', items:['black','purple','pink','white'] },
+  bronze:{ pick:1, items:[
+    { prompt:'Put the traffic light colors in order (top to bottom).', items:['red','yellow','green'] }
+  ]},
+  silver:{ pick:1, items:[
+    { prompt:'Order the first three rainbow colors.', items:['red','orange','yellow'] }
+  ]},
+  gold:{ pick:1, items:[
+    { prompt:'Order these from darkest to lightest.', items:['black','purple','pink','white'] }
+  ]},
 };
 
 const COLORS_SAYIT = {
@@ -593,9 +607,9 @@ function isTierFilled(moduleId, tier, dataOverride){
     switch(type){
       case 'gapfill': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.sentence && it.answer && it.options.some(o=>o)); }
       case 'truefalse': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.statement); }
-      case 'listenchoose': { const d=data[tier]; return !!(d.question && d.answer); }
+      case 'listenchoose': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.question && it.answer); }
       case 'sayit': return !!data[tier].target;
-      case 'putinorder': { const d=data[tier]; return d.items.length>=2 && d.items.every(it=>it) && !!d.prompt; }
+      case 'putinorder': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.items.length>=2 && it.items.every(w=>w) && !!it.prompt); }
       case 'wordmatch': case 'listenmatch':
         return data[tier].length>=1 && data[tier].every(p=>p.left && p.right);
       case 'spelling': case 'wordscramble':
@@ -663,13 +677,13 @@ function copyFromBronze(){
 }
 
 function selectModule(id){
-  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0;
+  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   document.getElementById('crumbMod').textContent = instanceLabel(id);
   renderSidebar(); renderTierTabs(); renderMain();
 }
 function selectTier(t){
-  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0;
+  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   renderTierTabs(); renderMain();
 }
@@ -972,35 +986,86 @@ function tfUpdatePreview(){
 }
 
 // ---- Listen & Choose ----
+let lcExpandedIndex = 0; // Listen & Choose's own expanded-item index
+
 function renderListenChooseForm(){
   const editView = document.getElementById('editView');
-  const d = md('listenchoose')[currentTier];
+  const tierData = md('listenchoose')[currentTier];
+  if(lcExpandedIndex >= tierData.items.length) lcExpandedIndex = Math.max(0, tierData.items.length - 1);
+  const d = tierData.items[lcExpandedIndex];
   editView.innerHTML = `
     <div class="card">
-      <div class="card-label">Question <span style="font-weight:400;text-transform:none;letter-spacing:0;">what the student hears and reads</span></div>
-      <div class="field"><div class="row-inline">
-        <input type="text" id="lcQuestion" value="${d.question}">
-        <button class="speak-btn" onclick="openFieldAudioModal('listenchoose','question',null,document.getElementById('lcQuestion').value)">🔊</button>
-        <span class="audio-status" id="lcAudioStatus" onclick="openFieldAudioModal('listenchoose','question',null,document.getElementById('lcQuestion').value)" style="cursor:pointer;"></span>
-      </div></div>
-    </div>
-    <div class="card">
-      <div class="card-label">Answer &amp; distractor options <span style="font-weight:400;text-transform:none;letter-spacing:0;">click a tag to set the correct one</span></div>
-      <div class="options-list" id="lcOptions">
-        ${d.options.map(o=>`<div class="opt-row"><input type="text" value="${o}"><span class="opt-tag ${o===d.answer?'is-correct':''}" onclick="lcSetCorrect(this)">${o===d.answer?'✓ answer':'mark correct'}</span><span class="del" onclick="this.closest('.opt-row').remove(); lcSyncOptions();">✕</span></div>`).join('')}
+      <div class="pool-header">
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — questions</div>
+        <div class="pool-count">${tierData.items.length} in pool</div>
       </div>
-      <div class="add-link" onclick="lcAddOption()">+ add another option</div>
-    </div>`;
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Questions per session (pick)</label>
+        <input type="number" min="1" max="${tierData.items.length}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="lcSetPick(this.value)">
+      </div>
+    </div>
+    <div id="lcItemList">
+      ${tierData.items.map((it,i)=>`
+        <div class="card">
+          ${i===lcExpandedIndex ? `
+            <div class="pool-header">
+              <div class="card-label" style="margin-bottom:0;">Question ${i+1}</div>
+              ${tierData.items.length>1 ? `<span class="del" onclick="lcRemoveItem(${i})">✕ remove</span>` : ''}
+            </div>
+            <div class="card-label" style="margin-top:10px;">Question <span style="font-weight:400;text-transform:none;letter-spacing:0;">what the student hears and reads</span></div>
+            <div class="field"><div class="row-inline">
+              <input type="text" id="lcQuestion" value="${it.question}">
+              <button class="speak-btn" onclick="openFieldAudioModal('listenchoose','question',null,document.getElementById('lcQuestion').value,currentTier,lcExpandedIndex)">🔊</button>
+              <span class="audio-status" id="lcAudioStatus" onclick="openFieldAudioModal('listenchoose','question',null,document.getElementById('lcQuestion').value,currentTier,lcExpandedIndex)" style="cursor:pointer;"></span>
+            </div></div>
+            <div class="card-label" style="margin-top:16px;">Answer &amp; distractor options <span style="font-weight:400;text-transform:none;letter-spacing:0;">click a tag to set the correct one</span></div>
+            <div class="options-list" id="lcOptions">
+              ${it.options.map(o=>`<div class="opt-row"><input type="text" value="${o}"><span class="opt-tag ${o===it.answer?'is-correct':''}" onclick="lcSetCorrect(this)">${o===it.answer?'✓ answer':'mark correct'}</span><span class="del" onclick="this.closest('.opt-row').remove(); lcSyncOptions();">✕</span></div>`).join('')}
+            </div>
+            <div class="add-link" onclick="lcAddOption()">+ add another option</div>
+          ` : `
+            <div class="pool-header" style="cursor:pointer;" onclick="lcExpandItem(${i})">
+              <div style="font-size:13.5px;color:var(--text);">${it.question || '(empty question)'}</div>
+              <span style="color:var(--text-lo);font-size:12px;">Edit ›</span>
+            </div>
+          `}
+        </div>`).join('')}
+    </div>
+    <div class="add-link" onclick="lcAddItem()">+ add question</div>`;
   document.getElementById('lcQuestion').addEventListener('input', lcSyncQuestion);
   document.querySelectorAll('#lcOptions .opt-row input').forEach(inp=>inp.addEventListener('input', lcSyncOptions));
   lcSyncQuestion();
 }
+function lcSetPick(val){
+  const n = Math.max(1, parseInt(val)||1);
+  md('listenchoose')[currentTier].pick = n;
+  renderPreview();
+}
+function lcExpandItem(i){
+  lcExpandedIndex = i;
+  renderMain();
+}
+function lcAddItem(){
+  const tierData = md('listenchoose')[currentTier];
+  tierData.items.push({ audio:'', question:'', options:['',''], answer:'' });
+  lcExpandedIndex = tierData.items.length - 1;
+  renderMain();
+}
+function lcRemoveItem(i){
+  const tierData = md('listenchoose')[currentTier];
+  if(tierData.items.length <= 1) return;
+  tierData.items.splice(i,1);
+  if(tierData.pick > tierData.items.length) tierData.pick = tierData.items.length;
+  lcExpandedIndex = 0;
+  renderMain();
+}
 function lcSyncQuestion(){
-  const d = md('listenchoose')[currentTier];
+  const d = md('listenchoose')[currentTier].items[lcExpandedIndex];
   const val = document.getElementById('lcQuestion').value;
   d.question = val; d.audio = val;
   const statusEl = document.getElementById('lcAudioStatus');
-  const needs = syncSpeakableField('listenchoose', 'question', null, val, statusEl);
+  const needs = syncSpeakableField('listenchoose', 'question', null, val, statusEl, undefined, currentTier, lcExpandedIndex);
   setAudioStatusBadge(statusEl, needs);
   renderPreview();
 }
@@ -1020,7 +1085,7 @@ function lcAddOption(){
   lcSyncOptions();
 }
 function lcSyncOptions(){
-  const d = md('listenchoose')[currentTier];
+  const d = md('listenchoose')[currentTier].items[lcExpandedIndex];
   let options = [], answer = '';
   document.querySelectorAll('#lcOptions .opt-row').forEach(r=>{
     const val = r.querySelector('input').value;
@@ -1063,41 +1128,95 @@ function siSyncTarget(){
 }
 
 // ---- Put in Order ----
+let pioExpandedIndex = 0; // Put in Order's own expanded-item index
+
 function renderPutInOrderForm(){
   const editView = document.getElementById('editView');
-  const d = md('putinorder')[currentTier];
+  const tierData = md('putinorder')[currentTier];
+  if(pioExpandedIndex >= tierData.items.length) pioExpandedIndex = Math.max(0, tierData.items.length - 1);
+  const d = tierData.items[pioExpandedIndex]; // this pool item's own {prompt, items:[words in correct order]}
   editView.innerHTML = `
     <div class="card">
-      <div class="card-label">Prompt</div>
-      <div class="field"><input type="text" id="pioPrompt" value="${d.prompt}"></div>
-    </div>
-    <div class="card">
-      <div class="card-label">Correct order <span style="font-weight:400;text-transform:none;letter-spacing:0;">students see these shuffled — type them here in the right order</span></div>
-      <div id="pioList">
-        ${d.items.map((it,i)=>`
-          <div class="reorder-row">
-            <span class="step-num">${i+1}.</span>
-            <span class="arrows"><span onclick="pioMove(${i},-1)">▲</span><span onclick="pioMove(${i},1)">▼</span></span>
-            <span class="opt-audio-icon" id="pioIcon${i}" onclick="openFieldAudioModal('putinorder','item',${i},document.querySelectorAll('#pioList input')[${i}].value)">🔊</span>
-            <input type="text" value="${it}" oninput="pioUpdate(${i},this.value)" style="flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--glass-brd);border-radius:8px;padding:7px 10px;color:var(--text-hi);font-size:13.5px;">
-            <span class="del" onclick="pioRemove(${i})">✕</span>
-          </div>`).join('') || '<div class="hint" style="color:var(--text-lo);">Add the first item below.</div>'}
+      <div class="pool-header">
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — sequences</div>
+        <div class="pool-count">${tierData.items.length} in pool</div>
       </div>
-      <div class="add-link" onclick="pioAdd()">+ add item</div>
-    </div>`;
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Sequences per session (pick)</label>
+        <input type="number" min="1" max="${tierData.items.length}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="pioSetPick(this.value)">
+      </div>
+    </div>
+    <div id="pioItemList">
+      ${tierData.items.map((puzzle,pi)=>`
+        <div class="card">
+          ${pi===pioExpandedIndex ? `
+            <div class="pool-header">
+              <div class="card-label" style="margin-bottom:0;">Sequence ${pi+1}</div>
+              ${tierData.items.length>1 ? `<span class="del" onclick="pioRemoveItem(${pi})">✕ remove</span>` : ''}
+            </div>
+            <div class="field" style="margin-top:10px;"><input type="text" id="pioPrompt" value="${puzzle.prompt}"></div>
+            <div class="card-label" style="margin-top:16px;">Correct order <span style="font-weight:400;text-transform:none;letter-spacing:0;">students see these shuffled — type them here in the right order</span></div>
+            <div id="pioList">
+              ${puzzle.items.map((it,i)=>`
+                <div class="reorder-row">
+                  <span class="step-num">${i+1}.</span>
+                  <span class="arrows"><span onclick="pioMove(${i},-1)">▲</span><span onclick="pioMove(${i},1)">▼</span></span>
+                  <span class="opt-audio-icon" id="pioIcon${i}" onclick="openFieldAudioModal('putinorder','item',${i},document.querySelectorAll('#pioList input')[${i}].value,currentTier,pioExpandedIndex)">🔊</span>
+                  <input type="text" value="${it}" oninput="pioUpdate(${i},this.value)" style="flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--glass-brd);border-radius:8px;padding:7px 10px;color:var(--text-hi);font-size:13.5px;">
+                  <span class="del" onclick="pioRemove(${i})">✕</span>
+                </div>`).join('') || '<div class="hint" style="color:var(--text-lo);">Add the first item below.</div>'}
+            </div>
+            <div class="add-link" onclick="pioAdd()">+ add item</div>
+          ` : `
+            <div class="pool-header" style="cursor:pointer;" onclick="pioExpandItem(${pi})">
+              <div style="font-size:13.5px;color:var(--text);">${puzzle.prompt || '(empty sequence)'} <span style="color:var(--text-lo);">— ${puzzle.items.length} steps</span></div>
+              <span style="color:var(--text-lo);font-size:12px;">Edit ›</span>
+            </div>
+          `}
+        </div>`).join('')}
+    </div>
+    <div class="add-link" onclick="pioAddItem()">+ add sequence</div>`;
   document.getElementById('pioPrompt').addEventListener('input', ()=>{ d.prompt = document.getElementById('pioPrompt').value; renderPreview(); });
-  d.items.forEach((it,i) => syncSpeakableField('putinorder', 'item', i, it, document.getElementById('pioIcon'+i)));
+  d.items.forEach((it,i) => syncSpeakableField('putinorder', 'item', i, it, document.getElementById('pioIcon'+i), undefined, currentTier, pioExpandedIndex));
   renderPreview();
+}
+function pioSetPick(val){
+  const n = Math.max(1, parseInt(val)||1);
+  md('putinorder')[currentTier].pick = n;
+  renderPreview();
+}
+function pioExpandItem(i){
+  pioExpandedIndex = i;
+  renderMain();
+}
+function pioAddItem(){
+  const tierData = md('putinorder')[currentTier];
+  tierData.items.push({ prompt:'', items:[] });
+  pioExpandedIndex = tierData.items.length - 1;
+  renderMain();
+}
+function pioRemoveItem(i){
+  const tierData = md('putinorder')[currentTier];
+  if(tierData.items.length <= 1) return;
+  tierData.items.splice(i,1);
+  if(tierData.pick > tierData.items.length) tierData.pick = tierData.items.length;
+  pioExpandedIndex = 0;
+  renderMain();
 }
 function pioUpdate(i,val){
-  md('putinorder')[currentTier].items[i] = val;
-  syncSpeakableField('putinorder', 'item', i, val, document.getElementById('pioIcon'+i));
+  md('putinorder')[currentTier].items[pioExpandedIndex].items[i] = val;
+  syncSpeakableField('putinorder', 'item', i, val, document.getElementById('pioIcon'+i), undefined, currentTier, pioExpandedIndex);
   renderPreview();
 }
-function pioAdd(){ md('putinorder')[currentTier].items.push(''); renderMain(); const inputs=document.querySelectorAll('#pioList input'); if(inputs.length) inputs[inputs.length-1].focus(); }
-function pioRemove(i){ md('putinorder')[currentTier].items.splice(i,1); renderMain(); }
+function pioAdd(){
+  md('putinorder')[currentTier].items[pioExpandedIndex].items.push('');
+  renderMain();
+  const inputs=document.querySelectorAll('#pioList input'); if(inputs.length) inputs[inputs.length-1].focus();
+}
+function pioRemove(i){ md('putinorder')[currentTier].items[pioExpandedIndex].items.splice(i,1); renderMain(); }
 function pioMove(i,dir){
-  const items = md('putinorder')[currentTier].items;
+  const items = md('putinorder')[currentTier].items[pioExpandedIndex].items;
   const j = i+dir;
   if(j<0||j>=items.length) return;
   [items[i],items[j]]=[items[j],items[i]];
@@ -1332,9 +1451,8 @@ function compareCardHtml(moduleId, t){
     }
     if(instanceType(moduleId) === 'listenchoose'){
       const d = md('listenchoose')[t];
-      return `<div class="compare-card ${t}">${head}</span></div>
-        <div class="compare-sentence">🔊 ${d.question || '<span style="color:var(--text-lo);">empty</span>'}</div>
-        <div class="compare-opts">${(d.options||[]).map(o=>`<span class="${o===d.answer?'ans':''}">${o||'&nbsp;'}</span>`).join('')}</div>
+      return `<div class="compare-card ${t}">${head}<span>${d.items.length} question${d.items.length===1?'':'s'} · pick ${d.pick}</span></div>
+        <div class="compare-word-list">${d.items.map(it=>`<div class="compare-word">🔊 ${it.question || '<span style="color:var(--text-lo);">empty</span>'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'sayit'){
@@ -1346,9 +1464,8 @@ function compareCardHtml(moduleId, t){
     }
     if(instanceType(moduleId) === 'putinorder'){
       const d = md('putinorder')[t];
-      return `<div class="compare-card ${t}">${head}<span>${d.items.length} steps</span></div>
-        <div class="compare-sentence">${d.prompt || '<span style="color:var(--text-lo);">empty</span>'}</div>
-        <div class="compare-opts">${(d.items||[]).map((it,i)=>`<span>${i+1}. ${it||'&nbsp;'}</span>`).join('') || '<span style="color:var(--text-lo);">no items</span>'}</div>
+      return `<div class="compare-card ${t}">${head}<span>${d.items.length} sequence${d.items.length===1?'':'s'} · pick ${d.pick}</span></div>
+        <div class="compare-word-list">${d.items.map(puzzle=>`<div class="compare-word">${puzzle.prompt || '<span style="color:var(--text-lo);">empty</span>'} <em style="color:var(--text-lo);">(${puzzle.items.length} steps)</em></div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'wordmatch' || instanceType(moduleId) === 'listenmatch'){
@@ -1665,9 +1782,11 @@ function renderPreview(){
       </div>
       <div class="phone-stars">☆ ☆ ☆</div>`;
   } else if(instanceType(currentModule)==='listenchoose'){
-    const d = md('listenchoose')[t];
+    const tierData = md('listenchoose')[t];
+    const lcIdx = Math.min(lcExpandedIndex, tierData.items.length - 1);
+    const d = tierData.items[lcIdx];
     phone.innerHTML = `
-      <div class="phone-tier">${t.toUpperCase()}</div>
+      <div class="phone-tier">${t.toUpperCase()} · ${lcIdx+1} of ${tierData.items.length} · pick ${tierData.pick}</div>
       <div class="phone-q">🔊 ${d.question || '<span style="color:var(--text-lo);">No question yet</span>'}</div>
       <div class="phone-opts">${(d.options||[]).map(o=>`<div class="phone-opt ${o===d.answer?'correct':''}">${o||'&nbsp;'}</div>`).join('')}</div>
       <div class="phone-stars">☆ ☆ ☆</div>`;
@@ -1679,9 +1798,11 @@ function renderPreview(){
       <div class="phone-opts"><div class="phone-opt">🎤 ${d.target || '&nbsp;'}</div></div>
       <div class="phone-stars">☆ ☆ ☆</div>`;
   } else if(instanceType(currentModule)==='putinorder'){
-    const d = md('putinorder')[t];
+    const tierData = md('putinorder')[t];
+    const pioIdx = Math.min(pioExpandedIndex, tierData.items.length - 1);
+    const d = tierData.items[pioIdx];
     phone.innerHTML = `
-      <div class="phone-tier">${t.toUpperCase()}</div>
+      <div class="phone-tier">${t.toUpperCase()} · ${pioIdx+1} of ${tierData.items.length} · pick ${tierData.pick}</div>
       <div class="phone-q">${d.prompt || '<span style="color:var(--text-lo);">No prompt yet</span>'}</div>
       <div class="phone-opts">${(d.items||[]).map(it=>`<div class="phone-opt">${it||'&nbsp;'}</div>`).join('') || '<div class="phone-opt">Add items to preview</div>'}</div>
       <div class="phone-stars">☆ ☆ ☆</div>`;
@@ -2413,9 +2534,15 @@ function getBaselineValue(moduleId, tierKey, fieldType, index, itemIndex){
         const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
         return (it && it.statement) || '';
       }
-      case 'listenchoose': return (tier && tier.question) || '';
+      case 'listenchoose': {
+        const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
+        return (it && it.question) || '';
+      }
       case 'sayit': return (tier && tier.target) || '';
-      case 'putinorder': return (tier && tier.items && tier.items[index]) || '';
+      case 'putinorder': {
+        const it = tier && tier.items && tier.items[itemIndex!=null?itemIndex:0];
+        return (it && it.items && it.items[index]) || '';
+      }
       case 'wordmatch': case 'listenmatch':
         if(!tier || !tier[index]) return '';
         return fieldType==='pairLeft' ? (tier[index].left||'') : (tier[index].right||'');
@@ -2454,12 +2581,22 @@ function setBaselineValue(lessonId, moduleId, tierKey, fieldType, index, value, 
       t.items[ii].statement = value;
       break;
     }
-    case 'listenchoose': ensureTier({}).question = value; break;
+    case 'listenchoose': {
+      const t = ensureTier({ items:[] });
+      if(!t.items) t.items = [];
+      const ii = itemIndex!=null ? itemIndex : 0;
+      if(!t.items[ii]) t.items[ii] = {};
+      t.items[ii].question = value;
+      break;
+    }
     case 'sayit': ensureTier({}).target = value; break;
     case 'putinorder': {
       const t = ensureTier({ items:[] });
       if(!t.items) t.items = [];
-      t.items[index] = value;
+      const ii = itemIndex!=null ? itemIndex : 0;
+      if(!t.items[ii]) t.items[ii] = { items:[] };
+      if(!t.items[ii].items) t.items[ii].items = [];
+      t.items[ii].items[index] = value;
       break;
     }
     case 'wordmatch': case 'listenmatch': {
@@ -2642,9 +2779,12 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
 
     case 'listenchoose':
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        audio: data[t].audio || data[t].question, question: data[t].question,
-        options: data[t].options, answer: data[t].answer,
-        audioFile: audioFor(`${t}.audio`, data[t].audio),
+        pick: data[t].pick,
+        items: data[t].items.map((it,i) => ({
+          audio: it.audio || it.question, question: it.question,
+          options: it.options, answer: it.answer,
+          audioFile: audioFor(`${t}.item${i}.audio`, it.audio),
+        }))
       }]));
 
     case 'sayit':
@@ -2654,10 +2794,13 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
       }]));
 
     case 'putinorder':
-      // "items" is the shuffled display order at runtime — we hand over the correct order for
+      // 'sequence' is the shuffled display order at runtime — we hand over the correct order for
       // both; the live module's own safeShuffle() does the actual shuffling client-side.
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
-        prompt: data[t].prompt, items: [...data[t].items], correct: [...data[t].items]
+        pick: data[t].pick,
+        items: data[t].items.map(puzzle => ({
+          prompt: puzzle.prompt, sequence: [...puzzle.items], correct: [...puzzle.items]
+        }))
       }]));
 
     case 'wordmatch':
