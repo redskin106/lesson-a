@@ -386,7 +386,9 @@ function blankPairsData(){ // Word Match & Listen & Match share this shape
   return { bronze:[], silver:[], gold:[] };
 }
 function blankMemoryPairsData(){
-  return { allItems:[], tiers:{ bronze:{pairs:3,flipback:1500}, silver:{pairs:4,flipback:1200}, gold:{pairs:6,flipback:900} } };
+  const blankItem = () => ({ word:'', emoji:'', image:null, sentence:'', tokens:[] });
+  const blankTier = () => ({ pick:3, flipback:1200, items:[blankItem()] });
+  return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankListenChooseData(){
   const blankItem = () => ({ audio:'', question:'', options:['',''], answer:'' });
@@ -404,7 +406,10 @@ function blankSayItData(){
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankPicWordData(){
-  return { allItems:[], tiers:{ bronze:{mode:'word-to-image'}, silver:{mode:'image-to-word'}, gold:{mode:'cloze-image'} } };
+  // cloze = just the answer word (e.g. 'red'); sentence = the blanked sentence (e.g. 'The apple is ___.')
+  const blankItem = () => ({ word:'', emoji:'', sentence:'', cloze:'' });
+  const blankTier = (mode) => ({ pick:3, mode, items:[blankItem()] });
+  return { bronze: blankTier('word-to-image'), silver: blankTier('image-to-word'), gold: blankTier('cloze-image') };
 }
 function blankWordScrambleData(){
   return { bronze:[], silver:[], gold:[] };
@@ -464,17 +469,26 @@ const COLORS_LISTENMATCH = {
 };
 
 const COLORS_MEMORYPAIRS = {
-  allItems:[
+  bronze:{ pick:3, flipback:1500, items:[
     {word:'red',emoji:'🔴',image:null,sentence:'The apple is red.',tokens:[]},
     {word:'blue',emoji:'🔵',image:null,sentence:'The sky is blue.',tokens:[]},
     {word:'green',emoji:'🟢',image:null,sentence:'The grass is green.',tokens:[]},
     {word:'yellow',emoji:'🟡',image:null,sentence:'The sun is yellow.',tokens:[]},
+  ]},
+  silver:{ pick:4, flipback:1200, items:[
     {word:'orange',emoji:'🟠',image:null,sentence:'The pumpkin is orange.',tokens:[]},
     {word:'purple',emoji:'🟣',image:null,sentence:'The grape is purple.',tokens:[]},
     {word:'black',emoji:'⚫',image:null,sentence:'The night is black.',tokens:[]},
     {word:'white',emoji:'⚪',image:null,sentence:'The cloud is white.',tokens:[]},
-  ],
-  tiers:{ bronze:{pairs:3,flipback:1500}, silver:{pairs:4,flipback:1200}, gold:{pairs:6,flipback:900} }
+  ]},
+  gold:{ pick:6, flipback:900, items:[
+    {word:'red',emoji:'🔴',image:null,sentence:'The apple is red.',tokens:[]},
+    {word:'blue',emoji:'🔵',image:null,sentence:'The sky is blue.',tokens:[]},
+    {word:'green',emoji:'🟢',image:null,sentence:'The grass is green.',tokens:[]},
+    {word:'orange',emoji:'🟠',image:null,sentence:'The pumpkin is orange.',tokens:[]},
+    {word:'purple',emoji:'🟣',image:null,sentence:'The grape is purple.',tokens:[]},
+    {word:'black',emoji:'⚫',image:null,sentence:'The night is black.',tokens:[]},
+  ]},
 };
 
 const COLORS_LISTENCHOOSE = {
@@ -514,15 +528,24 @@ const COLORS_SAYIT = {
 };
 
 const COLORS_PICWORD = {
-  allItems:[
-    {word:'red',emoji:'🔴',sentence:'The apple is red.',cloze:'The apple is ___.'},
-    {word:'blue',emoji:'🔵',sentence:'The sky is blue.',cloze:'The sky is ___.'},
-    {word:'green',emoji:'🟢',sentence:'The grass is green.',cloze:'The grass is ___.'},
-    {word:'yellow',emoji:'🟡',sentence:'The sun is yellow.',cloze:'The sun is ___.'},
-    {word:'orange',emoji:'🟠',sentence:'The pumpkin is orange.',cloze:'The pumpkin is ___.'},
-    {word:'purple',emoji:'🟣',sentence:'The grape is purple.',cloze:'The grape is ___.'},
-  ],
-  tiers:{ bronze:{mode:'word-to-image'}, silver:{mode:'image-to-word'}, gold:{mode:'cloze-image'} }
+  bronze:{ pick:3, mode:'word-to-image', items:[
+    {word:'red',emoji:'🔴',sentence:'The apple is ___.',cloze:'red'},
+    {word:'blue',emoji:'🔵',sentence:'The sky is ___.',cloze:'blue'},
+    {word:'green',emoji:'🟢',sentence:'The grass is ___.',cloze:'green'},
+    {word:'yellow',emoji:'🟡',sentence:'The sun is ___.',cloze:'yellow'},
+  ]},
+  silver:{ pick:3, mode:'image-to-word', items:[
+    {word:'orange',emoji:'🟠',sentence:'The pumpkin is ___.',cloze:'orange'},
+    {word:'purple',emoji:'🟣',sentence:'The grape is ___.',cloze:'purple'},
+    {word:'red',emoji:'🔴',sentence:'The apple is ___.',cloze:'red'},
+    {word:'blue',emoji:'🔵',sentence:'The sky is ___.',cloze:'blue'},
+  ]},
+  gold:{ pick:3, mode:'cloze-image', items:[
+    {word:'green',emoji:'🟢',sentence:'The grass is ___.',cloze:'green'},
+    {word:'yellow',emoji:'🟡',sentence:'The sun is ___.',cloze:'yellow'},
+    {word:'orange',emoji:'🟠',sentence:'The pumpkin is ___.',cloze:'orange'},
+    {word:'purple',emoji:'🟣',sentence:'The grape is ___.',cloze:'purple'},
+  ]},
 };
 
 const COLORS_WORDSCRAMBLE = {
@@ -623,8 +646,10 @@ function isTierFilled(moduleId, tier, dataOverride){
         return data[tier].length>=1 && data[tier].every(it=>it.word);
       case 'buildsentence':
         return data[tier].length>=1 && data[tier].every(it=>it.tokens.length>=1);
-      case 'memorypairs': case 'picword':
-        return data.allItems.length>=1; // shared pool — same fill status for every tier
+      case 'memorypairs':
+        return data[tier].items.length>=2 && data[tier].items.every(it=>it.word);
+      case 'picword':
+        return data[tier].items.length>=1 && data[tier].items.every(it=>it.word && it.cloze);
       default: return false;
     }
   }catch(e){ return false; }
@@ -674,11 +699,7 @@ function renderTierTabs(){
 function copyFromBronze(){
   const data = md(currentModule);
   if(!data) return;
-  if(instanceType(currentModule) === 'memorypairs' || instanceType(currentModule) === 'picword'){
-    data.tiers[currentTier] = JSON.parse(JSON.stringify(data.tiers.bronze));
-  } else {
-    data[currentTier] = JSON.parse(JSON.stringify(data.bronze));
-  }
+  data[currentTier] = JSON.parse(JSON.stringify(data.bronze));
   if(instanceType(currentModule) === 'buildsentence') bsActiveItemIndex = null;
   renderMain();
 }
@@ -1295,64 +1316,69 @@ function roleSwatchesHtml(){
 // ---- Shared pool + tier config (Memory Pairs, Picture & Word) ----
 function renderSharedPoolForm(moduleId){
   const editView = document.getElementById('editView');
-  const data = md(moduleId);
-  const items = data.allItems;
-  const tierConfig = data.tiers[currentTier];
+  const tierData = md(moduleId)[currentTier];
+  const items = tierData.items;
   const isMemory = instanceType(moduleId) === 'memorypairs';
 
   const configHtml = isMemory
     ? `<div class="card">
          <div class="card-label">${currentTier} settings</div>
-         <div class="field"><label>Pairs shown this session</label>
-           <input type="text" value="${tierConfig.pairs}" style="width:80px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-brd);border-radius:8px;padding:7px 10px;color:var(--text-hi);" oninput="spSetTierField('${moduleId}','pairs',this.value)"></div>
+         <div class="field"><label>Pairs drawn this session (pick)</label>
+           <input type="text" value="${tierData.pick}" style="width:80px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-brd);border-radius:8px;padding:7px 10px;color:var(--text-hi);" oninput="spSetTierField('${moduleId}','pick',this.value)"></div>
          <div class="field"><label>Flip-back speed (ms) <span style="color:var(--text-lo);">lower = faster, harder</span></label>
-           <input type="text" value="${tierConfig.flipback}" style="width:100px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-brd);border-radius:8px;padding:7px 10px;color:var(--text-hi);" oninput="spSetTierField('${moduleId}','flipback',this.value)"></div>
+           <input type="text" value="${tierData.flipback}" style="width:100px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-brd);border-radius:8px;padding:7px 10px;color:var(--text-hi);" oninput="spSetTierField('${moduleId}','flipback',this.value)"></div>
        </div>`
     : `<div class="card">
-         <div class="card-label">${currentTier} mode</div>
+         <div class="card-label">${currentTier} settings</div>
+         <div class="field"><label>Items drawn this session (pick)</label>
+           <input type="text" value="${tierData.pick}" style="width:80px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-brd);border-radius:8px;padding:7px 10px;color:var(--text-hi);" oninput="spSetTierField('${moduleId}','pick',this.value)"></div>
+         <div class="field" style="margin-top:10px;"><label>Mode</label>
          <div class="mode-select">
-           <div class="mode-opt ${tierConfig.mode==='word-to-image'?'active':''}" onclick="spSetMode('${moduleId}','word-to-image')">Word → Image</div>
-           <div class="mode-opt ${tierConfig.mode==='image-to-word'?'active':''}" onclick="spSetMode('${moduleId}','image-to-word')">Image → Word</div>
-           <div class="mode-opt ${tierConfig.mode==='cloze-image'?'active':''}" onclick="spSetMode('${moduleId}','cloze-image')">Cloze + Image</div>
-         </div>
+           <div class="mode-opt ${tierData.mode==='word-to-image'?'active':''}" onclick="spSetMode('${moduleId}','word-to-image')">Word → Image</div>
+           <div class="mode-opt ${tierData.mode==='image-to-word'?'active':''}" onclick="spSetMode('${moduleId}','image-to-word')">Image → Word</div>
+           <div class="mode-opt ${tierData.mode==='cloze-image'?'active':''}" onclick="spSetMode('${moduleId}','cloze-image')">Cloze + Image</div>
+         </div></div>
        </div>`;
 
   editView.innerHTML = `
-    <div class="shared-pool-note">${isMemory ? 'Memory Pairs' : 'Picture & Word'} uses ONE shared word pool across all three tiers — editing it here changes every tier. Each tier only controls ${isMemory ? 'how many pairs and how fast cards flip back' : 'which mode is played'}.</div>
+    <div class="shared-pool-note">${isMemory ? 'Memory Pairs' : 'Picture & Word'} — this pool is just for ${currentTier}, separate from the other tiers (difficulty grows tier to tier, so pools aren't shared).</div>
     ${configHtml}
     <div class="card">
       <div class="pool-header">
-        <div class="card-label" style="margin-bottom:0;">Shared word pool</div>
-        <div class="pool-count">${items.length} items</div>
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — word pool</div>
+        <div class="pool-count">${items.length} items · pick ${tierData.pick}</div>
       </div>
-      ${isMemory && items.length < tierConfig.pairs ? `<div class="shared-pool-note">Gold wants ${data.tiers.gold.pairs} pairs but the shared pool only has ${items.length} words — add more or sessions will repeat.</div>` : ''}
+      ${items.length < tierData.pick ? `<div class="shared-pool-note">This tier wants ${tierData.pick} but the pool only has ${items.length} words — add more or sessions will repeat.</div>` : ''}
       <div id="spList">
         ${items.map((it,i)=>`
           <div class="pool-item">
-            <span class="opt-audio-icon" id="spIcon${i}" onclick="openFieldAudioModal('${moduleId}','word',${i},document.querySelectorAll('#spList .pool-item')[${i}].querySelector('input').value,'shared')">🔊</span>
+            <span class="opt-audio-icon" id="spIcon${i}" onclick="openFieldAudioModal('${moduleId}','word',${i},document.querySelectorAll('#spList .pool-item')[${i}].querySelector('input').value,currentTier)">🔊</span>
             <button class="emoji-field-btn ${it.emoji?'':'empty'}" onclick="openEmojiPicker(function(e){ spItemUpdate('${moduleId}',${i},'emoji',e); })">${it.emoji || '?'}</button>
             <input type="text" value="${it.word}" placeholder="word" oninput="spItemUpdate('${moduleId}',${i},'word',this.value)">
-            <input type="text" value="${it.sentence||''}" placeholder="example sentence" oninput="spItemUpdate('${moduleId}',${i},'sentence',this.value)">
+            <input type="text" value="${it.sentence||''}" placeholder="${isMemory ? 'example sentence' : 'sentence with ___ blank'}" oninput="spItemUpdate('${moduleId}',${i},'sentence',this.value)">
+            ${!isMemory ? `<input type="text" value="${it.cloze||''}" placeholder="cloze answer" style="max-width:110px;" oninput="spItemUpdate('${moduleId}',${i},'cloze',this.value)">` : ''}
             <span class="del" onclick="spItemRemove('${moduleId}',${i})">✕</span>
           </div>`).join('') || '<div class="hint" style="color:var(--text-lo);">Pool is empty — add a word below.</div>'}
       </div>
-      <div class="add-link" onclick="spItemAdd('${moduleId}')">+ add word to shared pool</div>
+      <div class="add-link" onclick="spItemAdd('${moduleId}')">+ add word to pool</div>
     </div>`;
-  items.forEach((it,i) => syncSpeakableField(moduleId, 'word', i, it.word, document.getElementById('spIcon'+i), null, 'shared'));
+  items.forEach((it,i) => syncSpeakableField(moduleId, 'word', i, it.word, document.getElementById('spIcon'+i), null, currentTier));
 }
 function spSetTierField(moduleId, field, val){
   const num = parseInt(val,10);
-  md(moduleId).tiers[currentTier][field] = isNaN(num) ? val : num;
+  md(moduleId)[currentTier][field] = isNaN(num) ? val : num;
   renderMain();
 }
 function spSetMode(moduleId, mode){
-  md(moduleId).tiers[currentTier].mode = mode;
+  md(moduleId)[currentTier].mode = mode;
   renderMain();
 }
 function spItemUpdate(moduleId, i, field, val){
-  md(moduleId).allItems[i][field] = val;
+  md(moduleId)[currentTier].items[i][field] = val;
   if(field === 'word'){
-    syncSpeakableField(moduleId, 'word', i, val, document.getElementById('spIcon'+i), null, 'shared');
+    syncSpeakableField(moduleId, 'word', i, val, document.getElementById('spIcon'+i), null, currentTier);
+    renderPreview();
+  } else if(field === 'sentence' || field === 'cloze'){
     renderPreview();
   } else {
     renderMain(); // emoji change needs a full re-render so the picker button shows the new glyph
@@ -1362,13 +1388,13 @@ function spItemAdd(moduleId){
   openWordBankPicker(function(entry){
     const item = instanceType(moduleId)==='memorypairs'
       ? { word: entry.word, emoji: entry.emoji, image:null, sentence: entry.sentence, tokens:[] }
-      : { word: entry.word, emoji: entry.emoji, sentence: entry.sentence, cloze:'' };
-    md(moduleId).allItems.push(item);
+      : { word: entry.word, emoji: entry.emoji, sentence: entry.sentence, cloze: entry.word || '' };
+    md(moduleId)[currentTier].items.push(item);
     renderMain();
   });
 }
 function spItemRemove(moduleId, i){
-  md(moduleId).allItems.splice(i,1);
+  md(moduleId)[currentTier].items.splice(i,1);
   renderMain();
 }
 
@@ -1532,18 +1558,19 @@ function compareCardHtml(moduleId, t){
         ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'memorypairs'){
-      const cfg = md('memorypairs').tiers[t];
-      return `<div class="compare-card ${t}">${head}</span></div>
-        <div class="compare-sentence">${cfg.pairs} pairs shown</div>
-        <div class="compare-opts"><span>${cfg.flipback}ms flip-back</span></div>
-        <div class="compare-edit-link" onclick="selectTier('${t}')">Edit settings →</div></div>`;
+      const tierData = md('memorypairs')[t];
+      return `<div class="compare-card ${t}">${head}<span>${tierData.items.length} words · pick ${tierData.pick}</span></div>
+        <div class="compare-sentence">${tierData.flipback}ms flip-back</div>
+        <div class="compare-word-list">${tierData.items.map(it=>`<div class="compare-word">${it.emoji||''} ${it.word||'&nbsp;'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">no words</div>'}</div>
+        ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'picword'){
-      const cfg = md('picword').tiers[t];
-      const modeLabel = {'word-to-image':'Word → Image','image-to-word':'Image → Word','cloze-image':'Cloze + Image'}[cfg.mode] || cfg.mode;
-      return `<div class="compare-card ${t}">${head}</span></div>
+      const tierData = md('picword')[t];
+      const modeLabel = {'word-to-image':'Word → Image','image-to-word':'Image → Word','cloze-image':'Cloze + Image'}[tierData.mode] || tierData.mode;
+      return `<div class="compare-card ${t}">${head}<span>${tierData.items.length} words · pick ${tierData.pick}</span></div>
         <div class="compare-sentence">Mode: ${modeLabel}</div>
-        <div class="compare-edit-link" onclick="selectTier('${t}')">Edit settings →</div></div>`;
+        <div class="compare-word-list">${tierData.items.map(it=>`<div class="compare-word">${it.emoji||''} ${it.word||'&nbsp;'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">no words</div>'}</div>
+        ${editLink}</div>`;
     }
     if(instanceType(moduleId) === 'buildsentence'){
       const items = md('buildsentence')[t];
@@ -1866,26 +1893,24 @@ function renderPreview(){
       <div class="phone-opts">${(d.items||[]).map(it=>`<div class="phone-opt">${it||'&nbsp;'}</div>`).join('') || '<div class="phone-opt">Add items to preview</div>'}</div>
       <div class="phone-stars">☆ ☆ ☆</div>`;
   } else if(instanceType(currentModule)==='memorypairs' || instanceType(currentModule)==='picword'){
-    const data = md(currentModule);
-    const items = data.allItems;
+    const tierData = md(currentModule)[t];
+    const items = tierData.items;
     if(!items || items.length===0){
-      phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Add words to the shared pool to preview.</div>`;
+      phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Add words to this tier's pool to preview.</div>`;
     } else if(instanceType(currentModule)==='memorypairs'){
-      const cfg = data.tiers[t];
-      const shown = items.slice(0, cfg.pairs);
+      const shown = items.slice(0, tierData.pick);
       phone.innerHTML = `
-        <div class="phone-tier">${t.toUpperCase()}</div>
-        <div class="phone-q">Memory Pairs — ${cfg.pairs} pairs, ${cfg.flipback}ms flip-back</div>
+        <div class="phone-tier">${t.toUpperCase()} · pick ${tierData.pick}</div>
+        <div class="phone-q">Memory Pairs — ${tierData.pick} pairs, ${tierData.flipback}ms flip-back</div>
         <div class="phone-opts">${shown.map(it=>`<div class="phone-opt">${it.emoji||'?'}</div>`).join('')}</div>
         <div class="phone-stars">☆ ☆ ☆</div>`;
     } else {
-      const cfg = data.tiers[t];
       const it = items[0];
       phone.innerHTML = `
-        <div class="phone-tier">${t.toUpperCase()}</div>
-        <div class="phone-q">Mode: ${cfg.mode}</div>
+        <div class="phone-tier">${t.toUpperCase()} · pick ${tierData.pick}</div>
+        <div class="phone-q">Mode: ${tierData.mode}</div>
         <div style="text-align:center;font-size:40px;margin-bottom:14px;">${it.emoji||''}</div>
-        <div class="phone-opts"><div class="phone-opt">${cfg.mode==='cloze-image' ? (it.cloze||'&nbsp;') : (it.word||'&nbsp;')}</div></div>
+        <div class="phone-opts"><div class="phone-opt">${tierData.mode==='cloze-image' ? (it.cloze||'&nbsp;') : (it.word||'&nbsp;')}</div></div>
         <div class="phone-stars">☆ ☆ ☆</div>`;
     }
   } else if(instanceType(currentModule)==='buildsentence'){
@@ -1969,8 +1994,8 @@ function seedWordBankFromColors(){
 
   if(content.spelling) Object.values(content.spelling).flat().forEach(it => addCandidate(it.word, it.emoji));
   if(content.wordscramble) Object.values(content.wordscramble).flat().forEach(it => addCandidate(it.word, it.emoji));
-  if(content.memorypairs) content.memorypairs.allItems.forEach(it => addCandidate(it.word, it.emoji, it.sentence));
-  if(content.picword) content.picword.allItems.forEach(it => addCandidate(it.word, it.emoji, it.sentence));
+  if(content.memorypairs) Object.values(content.memorypairs).forEach(tierData => (tierData.items||[]).forEach(it => addCandidate(it.word, it.emoji, it.sentence)));
+  if(content.picword) Object.values(content.picword).forEach(tierData => (tierData.items||[]).forEach(it => addCandidate(it.word, it.emoji, it.sentence)));
 
   WORD_BANK = Object.values(byWord);
 }
@@ -2611,7 +2636,7 @@ function getBaselineValue(moduleId, tierKey, fieldType, index, itemIndex){
       case 'spelling': case 'wordscramble':
         return (tier && tier[index] && tier[index].word) || '';
       case 'memorypairs': case 'picword':
-        return (data.allItems && data.allItems[index] && data.allItems[index].word) || '';
+        return (tier && tier.items && tier.items[index] && tier.items[index].word) || '';
       case 'buildsentence':
         return (tier && tier[index] && tier[index]._recordedSpoken) || '';
       default: return '';
@@ -2681,9 +2706,10 @@ function setBaselineValue(lessonId, moduleId, tierKey, fieldType, index, value, 
       break;
     }
     case 'memorypairs': case 'picword': {
-      if(!data.allItems) data.allItems = [];
-      if(!data.allItems[index]) data.allItems[index] = {};
-      data.allItems[index].word = value;
+      const t = ensureTier({ items:[] });
+      if(!t.items) t.items = [];
+      if(!t.items[index]) t.items[index] = {};
+      t.items[index].word = value;
       break;
     }
     case 'buildsentence': {
@@ -2933,50 +2959,31 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
       }]));
 
     case 'memorypairs':
-      // CORRECTED against the real shell example: the shell wants { bronze:{items:[...]},
-      // silver:{items:[...]}, gold:{items:[...]} } — plain per-tier item arrays. It does NOT
-      // read a shared allItems pool or a per-tier pairs-count/flipback config at all; its
-      // render() hardcodes `const PAIRS = 4` regardless of tier, and the real example lesson
-      // gives every tier the IDENTICAL full item list, letting that hardcoded draw-4 do the
-      // difficulty scaling implicitly. So: same full list into every tier, matching real
-      // behavior — NOT the { allItems, tiers:{pairs,flipback} } shape used previously, which
-      // doesn't correspond to anything the shell actually reads.
-      // KNOWN GAP: the authoring tool's tiers[t].pairs/flipback fields are consequently unused
-      // by the shell as it exists today — either the shell needs updating to honor them, or
-      // the authoring UI should stop implying they do anything, but that's a product decision,
-      // not something to silently paper over here.
-      return Object.fromEntries(TIER_ORDER.map((t,ti) => [t, {
-        items: data.allItems.map((it,i) => ({
-          word: it.word, emoji: it.emoji, image: it.image ?? null, sentence: it.sentence,
-          audioFile: audioFor(`shared.item${i}.word`, it.word),
-          sentenceAudioFile: it.sentence ? audioFor(`shared.item${i}.sentence`, it.sentence) : undefined,
+      // Per-tier pool, matching shell-v2 exactly: { pick, flipback, items }. The comment this
+      // replaced was itself a stale half-fix from an earlier session, written against an OLDER
+      // shell that hardcoded PAIRS=4 and ignored pick/flipback entirely — that's no longer true;
+      // shell-v2's memory-pairs renderer genuinely reads pick and flipback per tier now.
+      return Object.fromEntries(TIER_ORDER.map(t => [t, {
+        pick: data[t].pick, flipback: data[t].flipback,
+        items: data[t].items.map((it,i) => ({
+          word: it.word, emoji: it.emoji, image: it.image ?? null, sentence: it.sentence, tokens: it.tokens || [],
+          audioFile: audioFor(`${t}.item${i}.word`, it.word),
+          sentenceAudioFile: it.sentence ? audioFor(`${t}.item${i}.sentence`, it.sentence) : undefined,
         }))
       }]));
 
-    case 'picword': {
-      // Also corrected to the real per-tier { mode, items } shape (not allItems+tiers).
-      // 'mode' comes straight from the authoring tiers[t] config — that part was already right.
-      // KNOWN GAP: cloze-image mode in the real shell wants an items[].word that's the CLOZE
-      // ANSWER (e.g. the verb "runs" for "The dog ___ in the park."), which can legitimately
-      // differ from the item's base vocabulary word (e.g. "dog"). The authoring tool only
-      // stores one 'cloze' sentence field per item, with no separate answer-word field — so
-      // this assumes the vocab word IS the cloze answer (true for the Colors demo content,
-      // not guaranteed true in general). A real fix needs a clozeAnswer field added to the
-      // authoring UI, not a transformer workaround.
-      return Object.fromEntries(TIER_ORDER.map((t,ti) => {
-        const mode = data.tiers[t].mode;
-        const isCloze = mode === 'cloze-image';
-        return [t, {
-          mode,
-          items: data.allItems.map((it,i) => isCloze
-            ? { word: it.word, emoji: it.emoji, image: null, sentence: it.cloze || it.sentence,
-                audioFile: audioFor(`shared.item${i}.word`, it.word) }
-            : { word: it.word, emoji: it.emoji, image: null, sentence: it.sentence,
-                audioFile: audioFor(`shared.item${i}.word`, it.word) }
-          )
-        }];
-      }));
-    }
+    case 'picword':
+      // Per-tier pool, matching shell-v2 exactly: { pick, mode, items }. 'cloze' is just the
+      // answer word (e.g. "red"), NOT a full sentence — the comment this replaced had that
+      // backwards as a "known gap"; it's actually already correct here because the authoring
+      // UI's cloze/sentence fields were fixed to match (see blankPicWordData).
+      return Object.fromEntries(TIER_ORDER.map(t => [t, {
+        pick: data[t].pick, mode: data[t].mode,
+        items: data[t].items.map((it,i) => ({
+          word: it.word, emoji: it.emoji, sentence: it.sentence, cloze: it.cloze,
+          audioFile: audioFor(`${t}.item${i}.word`, it.word),
+        }))
+      }]));
 
     default:
       return null;
@@ -3053,10 +3060,10 @@ function extractSpeakableForTTS(lessonId){
         if(it.sentence) add(instId, `${t}.item${i}.sentence`, it.sentence);
       }));
     } else if(type === 'memorypairs' || type === 'picword'){
-      (data.allItems || []).forEach((it,i) => {
-        add(instId, `shared.item${i}.word`, it.word);
-        if(it.sentence) add(instId, `shared.item${i}.sentence`, it.sentence);
-      });
+      TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => {
+        add(instId, `${t}.item${i}.word`, it.word);
+        if(it.sentence) add(instId, `${t}.item${i}.sentence`, it.sentence);
+      }));
     } else if(type === 'buildsentence'){
       TIER_ORDER.forEach(t => (data[t] || []).forEach((it,i) => {
         const sentence = (it.tokens || []).map(tk => tk.text).join(' ');
@@ -3220,7 +3227,7 @@ function findMissingEmojiItems(moduleId, data){
   const type = instanceType(moduleId);
   const missing = [];
   if(type === 'memorypairs' || type === 'picword'){
-    (data.allItems || []).forEach(it => { if(!it.emoji) missing.push(it.word || '(unnamed)'); });
+    TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach(it => { if(!it.emoji) missing.push(it.word || '(unnamed)'); }));
   } else if(type === 'wordscramble' || type === 'spelling'){
     TIER_ORDER.forEach(t => {
       (data[t] || []).forEach(it => { if(!it.emoji) missing.push(it.word || '(unnamed)'); });
