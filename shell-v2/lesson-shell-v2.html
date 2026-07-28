@@ -177,6 +177,8 @@ html, body {
 .result-icon  { font-size: 64px; text-align: center; margin: 28px 0 14px; }
 .stars-row-v2 { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 28px 0 14px; min-height: 64px; }
 .stars-row-v2 img { width: 56px; height: 56px; }
+.stars-row-frame-v2 { display: flex; justify-content: center; align-items: center; gap: 3%; margin-bottom: 4%; min-height: 12cqw; }
+.stars-row-frame-v2 img { width: 10cqw; height: 10cqw; }
 .result-title { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 6px; }
 .result-score { font-size: 17px; color: var(--text-dim); text-align: center; margin-bottom: 28px; }
 .result-score span { color: var(--text); font-weight: 700; }
@@ -844,27 +846,26 @@ html, body {
 
   <div class="pos block-flowzone" id="module-container"></div>
 
-  <!-- Grammar-reinforcement overlay: only gap-fill & true-false use this -->
+  <!-- Shared overlay: toggles between per-question reinforcement and
+       tier-completion content, exactly like module-demos' overlay
+       (reinforceContent/completeContent) — never a separate screen. -->
   <div id="gr-overlay" class="gr-overlay">
-    <div style="font-size:3.5cqw;font-weight:600;color:#AED581;margin-bottom:4%;">correct!</div>
-    <div style="font-size:4cqw;line-height:2;margin-bottom:5%;" id="gr-sentence"></div>
-    <div id="gr-legend" style="margin-bottom:2%;"></div>
-    <button id="gr-continue-btn" class="gr-continue-btn">Continue</button>
+    <div id="gr-reinforce-content">
+      <div style="font-size:3.5cqw;font-weight:600;color:#AED581;margin-bottom:4%;">correct!</div>
+      <div style="font-size:4cqw;line-height:2;margin-bottom:5%;" id="gr-sentence"></div>
+      <div id="gr-legend" style="margin-bottom:2%;"></div>
+      <button id="gr-continue-btn" class="gr-continue-btn">Continue</button>
+    </div>
+    <div id="gr-complete-content" style="display:none;">
+      <div class="stars-row-frame-v2" id="stars-row"></div>
+      <div style="font-size:5cqw;color:#fff;font-weight:600;margin-bottom:2%;" id="result-title"></div>
+      <div style="font-size:3.6cqw;color:rgba(255,255,255,0.6);margin-bottom:2%;" id="result-score"></div>
+      <div style="font-size:3.4cqw;color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:6%;" id="result-msg"></div>
+      <button id="result-cta" class="gr-continue-btn"></button>
+    </div>
   </div>
 </div>
 </div>
-</div>
-
-<!-- ═══════════════════════════════════
-     SCREEN 3 — TIER RESULT
-════════════════════════════════════ -->
-<div id="screen-tier-result" class="screen">
-  <div class="stars-row-v2" id="stars-row"></div>
-  <h2 class="result-title"  id="result-title"></h2>
-  <p  class="result-score"  id="result-score"></p>
-  <p  class="result-msg"    id="result-msg"></p>
-  <button class="cta-btn"       id="result-cta"></button>
-  <button class="secondary-btn" id="result-secondary" style="display:none"></button>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -1662,6 +1663,8 @@ function startModule(moduleIndex, tier) {
   const container = document.getElementById('module-container');
   container.innerHTML = '';
   document.getElementById('gr-overlay').style.display = 'none';
+  document.getElementById('gr-reinforce-content').style.display = 'block';
+  document.getElementById('gr-complete-content').style.display = 'none';
 
   const renderer = MODULE_REGISTRY[mod.type];
   if (!renderer) {
@@ -1735,24 +1738,15 @@ function handleTierResult(moduleIndex, tier, score) {
   const tierName = cap(tier);
   const next     = nextTier(tier);
 
-  const stars   = pct === 100 ? 3 : pct >= 60 ? 2 : pct > 0 ? 1 : 0;
-  animateStarsReveal(stars);
-  document.getElementById('result-title').textContent = passed ? `${tierName} passed!` : `${tierName} — try again`;
-  document.getElementById('result-score').innerHTML   = pct === 100 ? 'Perfect!' : `${pct}% correct`;
-
   const ctaBtn = document.getElementById('result-cta');
-  const secBtn = document.getElementById('result-secondary');
-  secBtn.style.display = 'none';
 
   if (passed && next) {
-    // Unlock next tier
     document.getElementById('result-msg').innerHTML =
       `Great work! <strong>${cap(next)}</strong> is now unlocked.`;
     ctaBtn.textContent = `Try ${cap(next)} →`;
     ctaBtn.onclick = () => startModule(moduleIndex, next);
 
   } else if (passed && !next) {
-    // Gold passed → module complete
     state.results[moduleIndex].complete = true;
     const nextMod = moduleIndex + 1;
 
@@ -1769,14 +1763,23 @@ function handleTierResult(moduleIndex, tier, score) {
     }
 
   } else {
-    // Failed
     document.getElementById('result-msg').innerHTML =
       `You need <strong>${Math.round(PASS_THRESHOLD * 100)}%</strong> to unlock the next level. You can do it!`;
     ctaBtn.textContent = `↩ Try ${tierName} again`;
     ctaBtn.onclick = () => startModule(moduleIndex, tier);
   }
 
-  showScreen('screen-tier-result');
+  document.getElementById('result-title').textContent = passed ? `${tierName} passed!` : `${tierName} — try again`;
+  document.getElementById('result-score').innerHTML   = pct === 100 ? 'Perfect!' : `${pct}% correct`;
+
+  // Same overlay as per-question reinforcement, just swapped to the
+  // completion content — no screen navigation, matches the locked demo.
+  document.getElementById('gr-reinforce-content').style.display = 'none';
+  document.getElementById('gr-complete-content').style.display = 'block';
+  document.getElementById('gr-overlay').style.display = 'flex';
+
+  const stars = pct === 100 ? 3 : pct >= 60 ? 2 : pct > 0 ? 1 : 0;
+  animateStarsReveal(stars);
 }
 
 // ══════════════════════════════════════════════════
@@ -2130,7 +2133,7 @@ function showGrammarReinforce(tokens, plainSentence, onContinue) {
   };
 }
 function setGrammarReinforceLabel(correct) {
-  const label = document.querySelector('#gr-overlay > div:first-child');
+  const label = document.querySelector('#gr-reinforce-content > div:first-child');
   label.textContent = correct ? 'correct!' : 'not quite';
   label.style.color = correct ? '#AED581' : '#F48FB1';
 }
