@@ -2358,6 +2358,7 @@ const MODULE_REGISTRY = {
             selected = opt;
             const blank = container.querySelector('#gf-blank-slot');
             if (blank) { blank.textContent = opt; blank.style.color = c.color; }
+            sfx('tap');
           });
           pillRow.appendChild(btn);
         });
@@ -2438,6 +2439,7 @@ const MODULE_REGISTRY = {
           trueBtn.classList.toggle('selected', selectedChoice === true);
           falseBtn.classList.toggle('selected', selectedChoice === false);
           statusEl.textContent = '\u00A0';
+          sfx('tap');
         }
         trueBtn.addEventListener('click', () => selectChoice(true));
         falseBtn.addEventListener('click', () => selectChoice(false));
@@ -2649,6 +2651,7 @@ const MODULE_REGISTRY = {
           if (confirmed) return;
 
           if (btn.dataset.side === 'left') {
+            sfx('tap');
             selectedLeftBtn = (btn === selectedLeftBtn) ? null : btn;
             refreshAll();
             return;
@@ -2664,6 +2667,7 @@ const MODULE_REGISTRY = {
             rightUsed.delete(rightIdx);
             if (leftIdx === null || leftIdx === prevLeftIdx) {
               selectedLeftBtn = null;
+              sfx('tap');
               refreshAll();
               return;
             }
@@ -2677,6 +2681,7 @@ const MODULE_REGISTRY = {
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
           selectedLeftBtn = null;
+          sfx('tap');
           refreshAll();
         });
       });
@@ -2751,6 +2756,7 @@ const MODULE_REGISTRY = {
                 poolEl.querySelectorAll('.seq-item-v2').forEach(b => {
                   if (b.dataset.word === word) b.classList.remove('used');
                 });
+                sfx('tap');
                 renderSlots();
                 updateCheck();
               });
@@ -2775,6 +2781,7 @@ const MODULE_REGISTRY = {
             if (emptyIdx === -1) return;
             slots[emptyIdx] = word;
             btn.classList.add('used');
+            sfx('tap');
             renderSlots();
             updateCheck();
           });
@@ -3440,6 +3447,7 @@ const MODULE_REGISTRY = {
         if (si === -1) return;
         tile.used = true;
         slotData[si] = { letter: tile.letter, bankId: bi };
+        sfx('tap');
         refreshSlots(); refreshBank();
         if (slotData.indexOf(null) === -1) setTimeout(wsCheck, 200);
       }
@@ -3449,6 +3457,7 @@ const MODULE_REGISTRY = {
         if (!entry) return;
         bankData[entry.bankId].used = false;
         slotData[si] = null;
+        sfx('tap');
         refreshSlots(); refreshBank();
       }
 
@@ -3600,6 +3609,7 @@ const MODULE_REGISTRY = {
         if (si === -1) return;
         tile.used = true;
         slotData[si] = { letter: tile.letter, bankId: bi };
+        sfx('tap');
         spRefreshSlots(); spRefreshBank();
         if (slotData.indexOf(null) === -1) setTimeout(spCheckTiles, 200);
       }
@@ -3609,6 +3619,7 @@ const MODULE_REGISTRY = {
         if (!entry) return;
         bankData[entry.bankId].used = false;
         slotData[si] = null;
+        sfx('tap');
         spRefreshSlots(); spRefreshBank();
       }
       function spRefreshSlots() {
@@ -3885,6 +3896,7 @@ const MODULE_REGISTRY = {
             rightUsed.delete(rightIdx);
             if (leftIdx === null || leftIdx === prevLeftIdx) {
               selectedLeftBtn = null;
+              sfx('tap');
               refreshAll();
               return;
             }
@@ -3898,6 +3910,7 @@ const MODULE_REGISTRY = {
           pairings.set(leftIdx, rightIdx);
           rightUsed.set(rightIdx, leftIdx);
           selectedLeftBtn = null;
+          sfx('tap');
           refreshAll();
         });
       });
@@ -4000,6 +4013,7 @@ const MODULE_REGISTRY = {
         if (si === -1) return;
         tile.used = true;
         slotData[si] = { text: tile.text, role: tile.role, bankId: bi };
+        sfx('tap');
         refreshSlots(); refreshBank();
         if (slotData.indexOf(null) === -1) setTimeout(sbCheck, 200);
       }
@@ -4009,6 +4023,7 @@ const MODULE_REGISTRY = {
         if (!entry) return;
         bankData[entry.bankId].used = false;
         slotData[si] = null;
+        sfx('tap');
         refreshSlots(); refreshBank();
       }
 
