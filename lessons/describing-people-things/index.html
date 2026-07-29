@@ -1,0 +1,4884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Describing People & Things</title>
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #0D1B2A;
+  --surface:    #162436;
+  --surface2:   #1E3248;
+  --text:       #EEF2F7;
+  --text-dim:   #7A9BBF;
+  --accent:     #4FC3F7;
+  --bronze:     #CD7F32;
+  --bronze-bg:  rgba(205,127,50,0.15);
+  --silver:     #A0AEC0;
+  --silver-bg:  rgba(160,174,192,0.15);
+  --gold:       #FFD700;
+  --gold-bg:    rgba(255,215,0,0.12);
+  --pass:       #4CAF50;
+  --fail:       #EF5350;
+  --radius:     12px;
+  --radius-sm:  8px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  height: 100dvh;
+  overflow-y: auto;
+  padding: 28px 20px 32px;
+}
+.screen.active { display: flex; }
+
+/* ─── NAME PICKER ─────────────────────────── */
+
+.welcome-label {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.welcome-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.welcome-sub {
+  color: var(--text-dim);
+  font-size: 15px;
+  margin-bottom: 28px;
+}
+.name-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.name-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 18px 12px;
+  min-height: 60px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+.name-btn.selected {
+  border-color: var(--accent);
+  background: rgba(79,195,247,0.1);
+  color: var(--accent);
+}
+.start-btn {
+  background: var(--accent);
+  color: #0D1B2A;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 18px;
+  width: 100%;
+  cursor: pointer;
+  opacity: 0.25;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  margin-top: auto;
+}
+.start-btn.ready { opacity: 1; pointer-events: auto; }
+
+/* ─── MODULE SCREEN ──────────────────────── */
+
+.module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.student-name {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.tier-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.tier-badge.bronze { background: var(--bronze-bg); color: var(--bronze); }
+.tier-badge.silver { background: var(--silver-bg); color: var(--silver); }
+.tier-badge.gold   { background: var(--gold-bg);   color: var(--gold);   }
+
+.progress-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.pip {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface2);
+  transition: background 0.3s;
+}
+.pip.done    { background: var(--pass); }
+.pip.current { background: var(--accent); }
+
+.tier-track {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.tier-seg {
+  flex: 1;
+  padding: 9px 6px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.25;
+  transition: opacity 0.3s;
+}
+.tier-seg.bronze { background: var(--bronze-bg); color: var(--bronze); }
+.tier-seg.silver { background: var(--silver-bg); color: var(--silver); }
+.tier-seg.gold   { background: var(--gold-bg);   color: var(--gold);   }
+.tier-seg.active { opacity: 1; }
+.tier-seg.passed { opacity: 0.65; }
+.tier-seg.passed::after { content: ' ✓'; }
+
+#module-container { flex: 1; }
+
+/* ─── TIER RESULT SCREEN ─────────────────── */
+
+.result-icon  { font-size: 64px; text-align: center; margin: 28px 0 14px; }
+.stars-row-v2 { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 28px 0 14px; min-height: 64px; }
+.stars-row-v2 img { width: 56px; height: 56px; }
+.stars-row-frame-v2 { display: flex; justify-content: center; align-items: center; gap: 3%; margin-bottom: 4%; min-height: 12cqw; }
+.stars-row-frame-v2 img { width: 10cqw; height: 10cqw; }
+.result-title { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.result-score { font-size: 17px; color: var(--text-dim); text-align: center; margin-bottom: 28px; }
+.result-score span { color: var(--text); font-weight: 700; }
+.result-msg {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 15px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.result-msg strong { color: var(--text); }
+
+.cta-btn {
+  display: block; width: 100%;
+  background: var(--accent); color: #0D1B2A;
+  border: none; border-radius: var(--radius);
+  font-size: 18px; font-weight: 700;
+  padding: 18px; cursor: pointer;
+  text-align: center; margin-bottom: 12px;
+}
+.secondary-btn {
+  display: block; width: 100%;
+  background: var(--surface2); color: var(--text);
+  border: none; border-radius: var(--radius);
+  font-size: 16px; font-weight: 600;
+  padding: 16px; cursor: pointer; text-align: center;
+}
+
+/* ─── END SCREEN ─────────────────────────── */
+
+.end-header { text-align: center; padding: 16px 0 20px; }
+.end-trophy  { font-size: 56px; margin-bottom: 10px; }
+.end-name    { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+.end-total   { font-size: 15px; color: var(--text-dim); }
+.end-total span { color: var(--accent); font-weight: 700; }
+
+.summary-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+
+.summary-item {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.summary-item-label  { font-size: 15px; font-weight: 600; }
+.summary-item-detail { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+.summary-status {
+  font-size: 12px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+}
+.summary-status.complete   { background: rgba(76,175,80,0.15);  color: var(--pass); }
+.summary-status.incomplete { background: rgba(239,83,80,0.15);  color: var(--fail); }
+
+.retry-btn {
+  display: block; width: 100%;
+  background: transparent; color: var(--text);
+  border: 2px solid var(--fail); border-radius: var(--radius);
+  font-size: 16px; font-weight: 600;
+  padding: 16px; cursor: pointer; text-align: center; margin-bottom: 12px;
+}
+.done-btn {
+  display: block; width: 100%;
+  background: var(--pass); color: #fff;
+  border: none; border-radius: var(--radius);
+  font-size: 18px; font-weight: 700;
+  padding: 18px; cursor: pointer; text-align: center;
+}
+
+/* ─── MODULE: AUDIO UNDERSTANDING ──────────── */
+
+.module-title    { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.module-question { font-size: 15px; color: var(--text-dim); margin-bottom: 20px; }
+
+.listen-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%;
+  background: var(--surface2);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-size: 16px; font-weight: 700;
+  padding: 16px; cursor: pointer; margin-bottom: 20px;
+  transition: background 0.15s;
+}
+.listen-btn.playing { background: rgba(79,195,247,0.1); }
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.option-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 15px; font-weight: 500;
+  padding: 16px 12px; min-height: 64px;
+  cursor: pointer; text-align: center;
+  transition: border-color 0.15s, background 0.15s, opacity 0.25s;
+}
+.option-btn.correct { border-color: var(--pass); background: rgba(76,175,80,0.12); color: var(--pass); }
+.option-btn.wrong   { border-color: var(--fail); background: rgba(239,83,80,0.1);  color: var(--fail); }
+.option-btn:disabled { cursor: default; }
+.option-btn.locked  { opacity: 0; pointer-events: none; }
+
+.next-ex-btn {
+  display: block; width: 100%;
+  background: var(--accent); color: #0D1B2A;
+  border: none; border-radius: var(--radius);
+  font-size: 18px; font-weight: 700;
+  padding: 18px; cursor: pointer; margin-top: 20px;
+}
+
+/* ─── MODULE: GAP FILL ──────────────────────── */
+
+.sentence-display {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  font-size: 18px;
+  line-height: 2;
+  margin-bottom: 20px;
+}
+.blank-slot {
+  display: inline-block;
+  min-width: 80px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+  text-align: center;
+  padding: 0 6px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.word-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.word-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 15px; font-weight: 600;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.word-btn.selected { border-color: var(--accent); background: rgba(79,195,247,0.1); color: var(--accent); }
+.word-btn.correct  { border-color: var(--pass);   color: var(--pass); }
+.word-btn.wrong    { border-color: var(--fail);   color: var(--fail); }
+.word-btn:disabled { cursor: default; }
+
+/* ─── MODULE: TRUE / FALSE ──────────────────── */
+
+.tf-statement {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.tf-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.tf-btn {
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font-size: 19px; font-weight: 700;
+  padding: 24px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tf-btn.true-btn  { background: rgba(76,175,80,0.1);  color: var(--pass); border-color: var(--pass); }
+.tf-btn.false-btn { background: rgba(239,83,80,0.1);  color: var(--fail); border-color: var(--fail); }
+.tf-btn.highlight-correct { background: var(--pass);  color: #fff; border-color: var(--pass); }
+.tf-btn.highlight-wrong   { background: var(--fail);  color: #fff; border-color: var(--fail); }
+.tf-btn:disabled { cursor: default; opacity: 0.7; }
+
+/* ─── MODULE: WORD MATCH ────────────────────── */
+
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.match-col { display: flex; flex-direction: column; gap: 8px; }
+.match-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px; font-weight: 600;
+  padding: 12px 10px;
+  min-height: 54px;
+  cursor: pointer; text-align: center;
+  line-height: 1.3;
+  transition: all 0.15s;
+}
+.match-btn.selected   { border-color: var(--accent); background: rgba(79,195,247,0.1); color: var(--accent); }
+.match-btn.matched    { border-color: var(--pass);   background: rgba(76,175,80,0.12); color: var(--pass); pointer-events: none; }
+.match-btn.wrong-flash { border-color: var(--fail);  background: rgba(239,83,80,0.1); }
+.match-score {
+  font-size: 14px; color: var(--text-dim);
+  text-align: center; margin-bottom: 12px;
+}
+
+/* ─── MODULE: SEQUENCING ────────────────────── */
+
+.seq-prompt { font-size: 15px; color: var(--text-dim); margin-bottom: 14px; }
+.seq-slots  { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.seq-slot {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface2);
+  border: 2px dashed rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px; min-height: 50px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.seq-slot.filled  { border-style: solid; border-color: var(--accent); cursor: pointer; }
+.seq-slot.correct { border-color: var(--pass); background: rgba(76,175,80,0.1); }
+.seq-slot.wrong   { border-color: var(--fail); background: rgba(239,83,80,0.08); }
+.slot-num {
+  width: 24px; height: 24px; flex-shrink: 0;
+  background: var(--surface); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--text-dim);
+  transition: background 0.2s, color 0.2s;
+}
+.seq-slot.filled .slot-num { background: var(--accent); color: #0D1B2A; }
+.slot-text { font-size: 15px; font-weight: 600; }
+.seq-pool-label { font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.seq-pool  { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.seq-item {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px; font-weight: 600;
+  padding: 11px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.seq-item:active { background: var(--surface); }
+.seq-item.used   { opacity: 0.2; pointer-events: none; }
+
+/* ─── MODULE: AUDIO SPEAKING ────────────────── */
+
+.speak-target {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  font-size: 20px; font-weight: 700;
+  text-align: center; line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Three-button comparison row */
+.speak-trio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.trio-btn {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 16px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 80px;
+}
+.trio-btn .trio-icon  { font-size: 24px; line-height: 1; }
+.trio-btn .trio-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+
+/* Model button — accent blue */
+.trio-btn.model { border-color: var(--accent); color: var(--accent); }
+.trio-btn.model .trio-label { color: var(--accent); }
+.trio-btn.model.playing { background: rgba(79,195,247,0.1); }
+
+/* Playback button — purple, disabled until recorded */
+.trio-btn.playback { border-color: #AB47BC; color: #CE93D8; opacity: 0.3; pointer-events: none; }
+.trio-btn.playback .trio-label { color: #AB47BC; }
+.trio-btn.playback.ready { opacity: 1; pointer-events: auto; }
+.trio-btn.playback.playing { background: rgba(171,71,188,0.1); }
+
+/* Record button — red */
+.trio-btn.record { border-color: var(--fail); color: var(--fail); }
+.trio-btn.record .trio-label { color: var(--fail); }
+.trio-btn.record.recording {
+  background: rgba(239,83,80,0.1);
+  animation: pulse-record 1s ease-in-out infinite;
+}
+@keyframes pulse-record {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(239,83,80,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(239,83,80,0);   }
+}
+
+.speak-hint {
+  font-size: 13px; color: var(--text-dim);
+  text-align: center; margin-bottom: 20px;
+}
+
+/* Self-assess — appears after first recording */
+.assess-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.assess-btn {
+  border: 2px solid transparent; border-radius: var(--radius);
+  font-size: 16px; font-weight: 700; padding: 18px; cursor: pointer;
+  transition: all 0.15s;
+}
+.assess-yes { background: rgba(76,175,80,0.1); color: var(--pass); border-color: var(--pass); }
+.assess-no  { background: rgba(239,83,80,0.1); color: var(--fail); border-color: var(--fail); }
+.assess-btn.selected.assess-yes { background: var(--pass); color: #fff; }
+.assess-btn.selected.assess-no  { background: var(--fail); color: #fff; }
+.assess-btn:disabled { cursor: default; opacity: 0.5; }
+.no-mic-msg {
+  background: var(--surface2); border-radius: var(--radius-sm);
+  padding: 14px 16px; font-size: 14px; color: var(--text-dim);
+  text-align: center; margin-bottom: 14px; line-height: 1.6;
+}
+
+
+/* ─── NEW MODULE STYLES ──────────────────────── */
+.option-btn.selected {
+  border-color: var(--accent);
+  background: rgba(79,195,247,0.08);
+  color: var(--accent);
+}
+.module-game-label {
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SHELL V2 — Phone-frame chrome, adopted from module-demos.
+   This replaces the flat header/pips/tier-track for
+   screen-module. Modules only ever render into #module-container
+   (= .block-flowzone), never touch the frame chrome directly.
+   ═══════════════════════════════════════════════════════ */
+#screen-module.screen { padding: 0; align-items: center; justify-content: center; }
+.frame-wrap { width: min(400px, 100vw); max-height: 94vh; position: relative; container-type: inline-size; }
+.frame-wrap::before { content: ''; display: block; padding-top: 215%; }
+.app-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12.7cqw; }
+.layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; }
+.layer-scene { position: absolute; left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
+.frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
+
+.pos            { position: absolute; z-index: 2; }
+.block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
+.block-qlabel   { left: 13.08%; top: 15.3%; width: 75%;    height: 2.6%; display: flex; align-items: center; }
+.block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
+.block-flowzone { left: 13.00%; top: 24.99%; width: 75.08%; }
+
+.v2-badge { width: 9cqw; aspect-ratio: 1/1; border-radius: 50%; background: linear-gradient(90deg,#753A70,#A54D75); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 500; font-size: 3.6cqw; flex-shrink: 0; }
+.v2-header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+.v2-header-left { display: flex; align-items: center; gap: 2.5cqw; min-width: 0; }
+.v2-module-title { color: #fff; font-weight: 500; font-size: 3.9cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.v2-medal-icon { flex-shrink: 0; }
+.v2-medal-icon img { width: 6.5cqw; height: 6.5cqw; display: block; }
+.v2-qlabel { color: rgba(255,255,255,0.75); font-size: 3cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.6); justify-content: space-between; }
+.v2-prog-track { width: 100%; height: 100%; background: #202336; border-radius: 99px; overflow: hidden; }
+.v2-prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#705697,#9D6089); border-radius: 99px; transition: width .4s; }
+
+/* Grammar-reinforcement overlay — shared by gap-fill & true-false only */
+.gr-overlay {
+  display: none; position: absolute; inset: 0; z-index: 3;
+  background: rgba(10,8,20,0.9);
+  text-align: center; align-items: center; justify-content: center;
+  flex-direction: column; padding: 5%;
+}
+.gr-continue-btn {
+  padding: 3% 12%; border-radius: 999px; border: none;
+  background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%);
+  color: #fff; font-size: 4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+}
+
+/* Gap-fill (v2) */
+.gf-sentence { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 5% 6%; color: #fff; font-size: 4.4cqw; line-height: 1.5; text-align: center; margin: 0 0 6%; }
+.gf-blank { border-bottom: 2px solid rgba(255,255,255,0.5); padding: 0 1.5%; display: inline-block; min-width: 17%; white-space: nowrap; }
+.gf-pill-row { display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 7%; column-gap: 1.5%; margin-bottom: 6%; }
+.gf-pill { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08); border-radius: 12px; font-size: 3.5cqw; color: rgba(255,255,255,0.85); cursor: pointer; font-family: inherit; transition: transform .12s, background .15s, border-color .15s, color .15s; padding: 2.5% 2%; min-width: 0; }
+.gf-check-btn { display: block; margin: 0 auto 6%; padding: 3% 12%; border-radius: 999px; background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5); color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit; }
+.gf-check-btn:disabled { opacity: 0.5; pointer-events: none; }
+.gf-status { font-size: 3.2cqw; color: rgba(255,255,255,0.5); text-align: center; }
+
+/* True/false (v2) */
+.tf-statement-v2 { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 6% 6%; color: #fff; font-size: 4.6cqw; line-height: 1.5; text-align: center; margin-bottom: 6%; }
+.tf-buttons-v2 { display: flex; gap: 4%; margin-bottom: 6%; }
+.tf-btn-v2 { flex: 1; padding: 5% 2%; border-radius: 14px; font-size: 4cqw; font-weight: 600; cursor: pointer; font-family: inherit; border: 1.5px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
+.tf-btn-v2:disabled { pointer-events: none; }
+.tf-btn-v2.selected { border-color: #7052B4; background: rgba(112,82,180,0.18); color: #C9B8EA; }
+.tf-btn-v2.hl-correct { border-color: #8BC34A; background: rgba(139,195,74,0.15); color: #AED581; }
+.tf-btn-v2.hl-wrong { border-color: #E91E63; background: rgba(233,30,99,0.12); color: #F48FB1; }
+
+/* Picture & word (v2) */
+.iv-pips-row { display: flex; gap: 1.5%; margin-bottom: 5%; }
+.iv-pip { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); opacity: 0.5; transition: all .25s; }
+.iv-pip.current { opacity: 1; border-color: #7052B4; }
+.iv-pip.done { opacity: 1; border: none; background: #8BC34A; }
+.iv-visual { text-align: center; margin-bottom: 4%; }
+.iv-emoji { font-size: 15cqw; line-height: 1; }
+.iv-word { font-size: 6cqw; font-weight: 600; color: #fff; }
+.iv-instruction { font-size: 3cqw; color: rgba(255,255,255,0.4); margin-top: 2%; }
+.iv-sentence { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 5% 6%; color: #fff; font-size: 4cqw; line-height: 1.6; text-align: center; margin-bottom: 5%; }
+.iv-blank { display: inline-block; min-width: 20%; border-bottom: 2px solid #7052B4; color: #C9B8EA; font-weight: 600; }
+.iv-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4%; margin-bottom: 4%; }
+.iv-option-btn { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 4% 3%; color: rgba(255,255,255,0.85); font-size: 3.4cqw; font-family: inherit; cursor: pointer; transition: transform .12s, background .15s, border-color .15s, color .15s; display: flex; align-items: center; justify-content: center; text-align: center; }
+.iv-option-btn.emoji-opt { font-size: 8cqw; }
+.iv-option-btn.selected { border-color: #7052B4; background: rgba(112,82,180,0.18); color: #C9B8EA; }
+.iv-option-btn.correct { border-color: #8BC34A; background: rgba(139,195,74,0.15); color: #AED581; }
+.iv-option-btn.wrong { border-color: #E91E63; background: rgba(233,30,99,0.12); color: #F48FB1; }
+.iv-option-btn:disabled { pointer-events: none; }
+.iv-feedback { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 3%; }
+.iv-action-btn { display: none; margin: 0 auto; padding: 3% 12%; border-radius: 999px; background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5); color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit; }
+.iv-proceed-btn { display: none; margin: 0 auto; padding: 3% 12%; border-radius: 999px; border: none; background: linear-gradient(180deg,#3D30B7 0%,#7052B4 45%,#A45B8B 100%); color: #fff; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit; }
+
+/* Put in Order (v2) */
+.seq-prompt-v2 { color: #fff; font-size: 4cqw; text-align: center; margin-bottom: 5%; line-height: 1.4; }
+.seq-slots-v2 { display: flex; flex-direction: column; gap: 1.44cqw; margin-bottom: 5%; }
+.seq-slot-v2 {
+  display: flex; align-items: center; gap: 3%;
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 999px; padding: 1.6cqw 5%;
+  font-size: 3.4cqw; color: rgba(255,255,255,0.4);
+  transition: transform .12s, background .15s, border-color .15s, color .15s;
+}
+.slot-num-v2 { font-weight: 700; font-size: 3.8cqw; flex-shrink: 0; width: 6%; }
+.slot-text-v2 { color: rgba(255,255,255,0.85); line-height: 1.3; }
+.seq-pool-label-v2 { color: rgba(255,255,255,0.4); font-size: 3cqw; text-align: center; margin-bottom: 3%; }
+.seq-pool-v2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.44cqw; margin-bottom: 5%; }
+.seq-item-v2 {
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 4% 3%;
+  color: rgba(255,255,255,0.85); font-size: 3.4cqw; font-family: inherit;
+  cursor: pointer; transition: transform .12s, background .15s, border-color .15s, color .15s;
+  line-height: 1.3;
+}
+.seq-item-v2.used { opacity: 0.25; pointer-events: none; }
+
+/* Memory Pairs (v2) */
+.mp-qlabel-row { display: flex; justify-content: space-between; }
+.mp-pips-row-v2 { display: flex; gap: 1.5%; margin-bottom: 3%; }
+.mp-pip-v2 { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); opacity: 0.5; transition: all .25s; }
+.mp-pip-v2.current { opacity: 1; border-color: #7052B4; }
+.mp-pip-v2.done { opacity: 1; border: none; }
+.mp-card-grid-v2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; margin-bottom: 5%; }
+.mp-card-wrap-v2 { aspect-ratio: 1/1; cursor: pointer; }
+.mp-card-inner-v2 { width: 100%; height: 100%; position: relative; border-radius: 10px; }
+.mp-card-face-v2 { position: absolute; inset: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: opacity .25s ease, transform .25s ease; }
+.mp-card-back-v2 { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.2); font-size: 6.5cqw; opacity: 1; transform: scaleX(1); }
+.mp-card-front-v2 { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); flex-direction: column; gap: 3%; font-size: 4cqw; font-weight: 600; color: rgba(255,255,255,0.85); padding: 4%; text-align: center; opacity: 0; transform: scaleX(0); pointer-events: none; }
+.mp-card-inner-v2.flipped .mp-card-back-v2 { opacity: 0; transform: scaleX(0); }
+.mp-card-inner-v2.flipped .mp-card-front-v2 { opacity: 1; transform: scaleX(1); pointer-events: auto; }
+.mp-card-front-v2 .mp-emoji-v2 { font-size: 10.5cqw; line-height: 1; }
+.mp-status-v2 { min-height: 5cqw; text-align: center; font-size: 3.4cqw; color: rgba(255,255,255,0.5); margin-bottom: 3%; }
+
+/* Word Match (v2) */
+.wm-grid-v2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 3cqw; margin-bottom: 5%; }
+.wm-col-v2 { display: flex; flex-direction: column; gap: 1.44cqw; }
+.wm-btn-v2 {
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 4% 3%;
+  color: rgba(255,255,255,0.85); font-size: 3.4cqw; font-family: inherit;
+  cursor: pointer; transition: transform .12s, background .15s, border-color .15s, color .15s;
+  min-height: 0; line-height: 1.3;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.wm-encourage-v2 { text-align: center; font-size: 3.2cqw; color: #AED581; font-weight: 500; opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0; }
+.wm-nudge-v2 { text-align: center; font-size: 3.2cqw; color: #E8B44A; font-weight: 500; opacity: 0; transition: opacity .3s; margin-bottom: 3%; min-height: 0; }
+.wm-notquite-btn-v2 {
+  display: none; margin: 0 auto;
+  padding: 3% 12%; border-radius: 999px;
+  background: rgba(233,30,99,0.14); border: 1.5px solid rgba(233,30,99,0.4);
+  color: #F48FB1; font-size: 4.4cqw; font-weight: 500; font-family: inherit;
+  cursor: default; pointer-events: none;
+  align-items: center; justify-content: center;
+}
+
+/* Listen & Choose (v2) */
+.lc-question-v2 { color: #fff; font-size: 4.4cqw; text-align: center; margin-bottom: 5%; line-height: 1.4; }
+.lc-listen-btn-v2 {
+  display: flex; align-items: center; justify-content: center; gap: 3%;
+  margin: 0 auto 5%; padding: 3% 12%;
+  background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+  border-radius: 999px; color: #C9B8EA; font-size: 4cqw; font-weight: 500;
+  cursor: pointer; font-family: inherit; transition: background .15s;
+}
+.lc-listen-btn-v2.playing { background: rgba(112,82,180,0.28); }
+.lc-listen-icon-v2 { font-size: 4.5cqw; }
+.lc-hint-line-v2 { text-align: center; font-size: 3.2cqw; color: #E8B44A; min-height: 4cqw; margin-bottom: 3%; opacity: 0; transition: opacity .2s; }
+.lc-options-grid-v2 { display: grid; grid-template-columns: 1fr 1fr; row-gap: 1.44cqw; column-gap: 3cqw; margin-bottom: 5%; }
+.lc-option-btn-v2 {
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 4% 3%;
+  color: rgba(255,255,255,0.85); font-size: 3.4cqw; font-family: inherit;
+  cursor: pointer; text-align: center; line-height: 1.3;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .25s, transform .12s, border-color .15s, background .15s;
+}
+.lc-option-btn-v2.locked { opacity: 0.35; }
+
+/* Word Scramble (v2) */
+.ws-visual-v2 { text-align: center; margin-bottom: 5%; position: relative; }
+.ws-emoji-v2 { font-size: 15cqw; line-height: 1; }
+.ws-play-btn-v2 {
+  position: absolute; left: 0; top: 0;
+  background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+  border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
+  cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
+}
+.ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 3%; }
+.ws-slot-v2 {
+  width: 11cqw; height: 13cqw; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5cqw; font-weight: 700; color: #fff; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.ws-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; margin-bottom: 4%; }
+.ws-tile-v2 {
+  width: 11cqw; height: 13cqw; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  font-size: 5cqw; font-weight: 700; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-family: inherit; transition: opacity .2s;
+}
+.ws-tile-v2.used { opacity: 0; pointer-events: none; }
+.ws-feedback-v2 { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
+
+/* Spelling (v2) */
+.sp-visual-v2 { text-align: center; margin-bottom: 4%; }
+.sp-emoji-v2 { font-size: 13cqw; line-height: 1; margin-bottom: 2%; }
+.sp-listen-row-v2 { display: flex; align-items: center; justify-content: center; gap: 3%; }
+.sp-play-btn-v2 {
+  background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+  border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
+  cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sp-instruction-v2 { font-size: 3cqw; color: rgba(255,255,255,0.4); }
+.sp-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 3%; }
+.sp-slot-v2 {
+  width: 11cqw; height: 13cqw; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5cqw; font-weight: 700; color: #fff; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.sp-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; margin-bottom: 4%; }
+.sp-tile-v2 {
+  width: 11cqw; height: 13cqw; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  font-size: 5cqw; font-weight: 700; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-family: inherit; transition: opacity .2s;
+}
+.sp-tile-v2.used { opacity: 0; pointer-events: none; }
+.sp-input-v2 {
+  width: 100%; font-size: 5.5cqw; font-weight: 600; text-align: center;
+  padding: 4%; border-radius: 12px; letter-spacing: .08em;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  color: #fff; outline: none; margin-bottom: 4%; font-family: inherit;
+}
+.sp-check-btn-v2 {
+  display: none; margin: 0 auto 3%;
+  padding: 3% 12%; border-radius: 999px;
+  background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
+  color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit;
+}
+.sp-check-btn-v2:disabled { opacity: 0.4; pointer-events: none; }
+.sp-feedback-v2 { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
+
+/* Build a Sentence (v2) */
+.sb-prompt-v2 { color: rgba(255,255,255,0.5); font-size: 3.4cqw; text-align: center; margin-bottom: 4%; }
+.sb-slots-v2 { display: flex; gap: 2%; flex-wrap: wrap; justify-content: center; min-height: 12cqw; margin-bottom: 5%; }
+.sb-slot-v2 {
+  min-width: 11%; height: 10cqw; padding: 0 3%;
+  border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.6cqw; font-weight: 600; color: #fff; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.sb-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 10cqw; margin-bottom: 4%; }
+.sb-tile-v2 {
+  padding: 3% 4%; border-radius: 12px;
+  border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
+  font-size: 3.6cqw; font-weight: 600; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-family: inherit; transition: opacity .2s;
+}
+.sb-tile-v2.used { opacity: 0; pointer-events: none; }
+.sb-feedback-v2 { min-height: 5cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
+.sb-legend-v2 { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     DEBUG HARNESS — only shown with ?debug=1
+     Jumps straight to any module/tier, skipping the
+     name picker and linear tier progression.
+════════════════════════════════════ -->
+<div id="debug-harness" style="display:none; position:fixed; top:0; left:0; right:0; z-index:999; background:#0D1B2A; border-bottom:1px solid #1E3248; padding:10px 12px; gap:8px; flex-wrap:wrap; justify-content:center;">
+  <select id="debug-module-select" style="flex:1; min-width:160px; background:#0D1B2A; border:1.5px solid rgba(255,255,255,0.12); color:#fff; font-size:14px; padding:8px 10px; border-radius:8px; font-family:inherit;"></select>
+  <select id="debug-tier-select" style="background:#0D1B2A; border:1.5px solid rgba(255,255,255,0.12); color:#fff; font-size:14px; padding:8px 10px; border-radius:8px; font-family:inherit;">
+    <option value="bronze" style="background:#0D1B2A; color:#fff;">Bronze</option>
+    <option value="silver" style="background:#0D1B2A; color:#fff;">Silver</option>
+    <option value="gold" style="background:#0D1B2A; color:#fff;">Gold</option>
+  </select>
+</div>
+
+<!-- ═══════════════════════════════════
+     SCREEN 1 — NAME PICKER
+════════════════════════════════════ -->
+<div id="screen-name" class="screen active">
+  <p class="welcome-label">Describing People & Things</p>
+  <h1 class="welcome-title">Hello! 👋</h1>
+  <p class="welcome-sub">Tap your name to begin.</p>
+  <div class="name-grid" id="name-grid"></div>
+  <button class="start-btn" id="start-btn">Start →</button>
+</div>
+
+<!-- ═══════════════════════════════════
+     SCREEN 2 — MODULE
+════════════════════════════════════ -->
+<div id="screen-module" class="screen">
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="frame-mask"></div>
+  <div class="layer-scene"></div>
+
+  <div class="pos block-header">
+    <div class="v2-header-inner">
+      <div class="v2-header-left">
+        <div class="v2-badge" id="v2-badge"></div>
+        <span class="v2-module-title" id="v2-module-title"></span>
+      </div>
+      <div class="v2-medal-icon"><img id="v2-medal-img" src="assets/bronze.png" alt="tier medal"></div>
+    </div>
+  </div>
+
+  <div class="pos block-qlabel v2-qlabel" id="v2-qlabel"></div>
+
+  <div class="pos block-progress">
+    <div class="v2-prog-track"><div class="v2-prog-fill" id="v2-prog-fill"></div></div>
+  </div>
+
+  <div class="pos block-flowzone" id="module-container"></div>
+
+  <!-- Shared overlay: toggles between per-question reinforcement and
+       tier-completion content, exactly like module-demos' overlay
+       (reinforceContent/completeContent) — never a separate screen. -->
+  <div id="gr-overlay" class="gr-overlay">
+    <div id="gr-reinforce-content">
+      <div style="font-size:3.5cqw;font-weight:600;color:#AED581;margin-bottom:4%;">correct!</div>
+      <div style="font-size:4cqw;line-height:2;margin-bottom:5%;" id="gr-sentence"></div>
+      <div id="gr-legend" style="margin-bottom:2%;"></div>
+      <button id="gr-continue-btn" class="gr-continue-btn">Continue</button>
+    </div>
+    <div id="gr-complete-content" style="display:none;">
+      <div class="stars-row-frame-v2" id="stars-row"></div>
+      <div style="font-size:5cqw;color:#fff;font-weight:600;margin-bottom:2%;" id="result-title"></div>
+      <div style="font-size:3.6cqw;color:rgba(255,255,255,0.6);margin-bottom:2%;" id="result-score"></div>
+      <div style="font-size:3.4cqw;color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:6%;" id="result-msg"></div>
+      <button id="result-cta" class="gr-continue-btn"></button>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     REINFORCEMENT PANEL
+     Shared by image-vocab, memory-pairs,
+     word-scramble, spelling modules
+════════════════════════════════════ -->
+<div id="reinforce-panel" style="
+  position:fixed;bottom:0;left:0;right:0;
+  background:#0D1B2A;
+  border-top:1px solid #1E3248;
+  border-radius:20px 20px 0 0;
+  padding:1.5rem 1.5rem 2.25rem;
+  display:flex;flex-direction:column;align-items:center;gap:.75rem;
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  z-index:200;
+">
+  <div id="rp-em"   style="font-size:64px;line-height:1;"></div>
+  <div id="rp-word" style="font-size:28px;font-weight:600;color:#FFD700;letter-spacing:.03em;"></div>
+  <div id="rp-sent" style="font-size:15px;color:#7A9BBF;text-align:center;line-height:1.7;"></div>
+  <div style="width:100%;height:3px;background:#1E3248;border-radius:99px;overflow:hidden;margin-top:.25rem;">
+    <div id="rp-bar" style="height:100%;background:#FFD700;width:0%;border-radius:99px;transition:width linear;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SCREEN 4 — END SCREEN
+════════════════════════════════════ -->
+<div id="screen-end" class="screen">
+  <div class="end-header">
+    <div class="end-trophy">🏆</div>
+    <div class="end-name"  id="end-name"></div>
+    <div class="end-total" id="end-total"></div>
+  </div>
+  <div class="summary-list" id="summary-list"></div>
+  <button class="retry-btn" id="retry-btn" style="display:none">↩ Retry incomplete modules</button>
+  <button class="done-btn"  id="done-btn">✓ Done</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════════
+
+const STUDENTS       = ['Sophy','Davit','Sam','Nu','Tue','Yee','Lee Ga','Felix','Tin','Ken','Thai'];
+const PASS_THRESHOLD = 0.6; // 60% to pass a tier
+
+// ══════════════════════════════════════════════════
+//  LESSON DATA
+//  Each module: { id, type, label, data: { bronze, silver, gold } }
+//  Add / replace entries here to build the full lesson.
+// ══════════════════════════════════════════════════
+
+const LESSON = [
+  {
+    "id": "gapfill",
+    "type": "gap-fill",
+    "label": "Gap-fill",
+    "data": {
+      "bronze": {
+        "pick": 2,
+        "items": [
+          {
+            "sentence": "The giraffe is ___.",
+            "answer": "tall",
+            "options": [
+              "tall",
+              "short",
+              "fast",
+              "loud"
+            ],
+            "tokens": [
+              {
+                "t": "The giraffe",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "tall.",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "sentence": "The mouse is ___.",
+            "answer": "small",
+            "options": [
+              "small",
+              "big",
+              "tall",
+              "young"
+            ],
+            "tokens": [
+              {
+                "t": "The mouse",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "small",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "sentence": "My grandfather is ___.",
+            "answer": "old",
+            "options": [
+              "old",
+              "young",
+              "short",
+              "fast"
+            ],
+            "tokens": [
+              {
+                "t": "My grandfather",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "old",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "silver": {
+        "pick": 2,
+        "items": [
+          {
+            "sentence": "My brother is taller ___ me.",
+            "answer": "than",
+            "options": [
+              "than",
+              "because",
+              "and",
+              "but"
+            ],
+            "tokens": [
+              {
+                "t": "My brother",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "taller than me",
+                "r": null
+              }
+            ]
+          },
+          {
+            "sentence": "She is very smart ___ she studies every day.",
+            "answer": "because",
+            "options": [
+              "because",
+              "than",
+              "so",
+              "or"
+            ],
+            "tokens": [
+              {
+                "t": "She",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "very smart",
+                "r": "object"
+              },
+              {
+                "t": "because",
+                "r": "connector"
+              },
+              {
+                "t": "she studies every day",
+                "r": null
+              }
+            ]
+          },
+          {
+            "sentence": "He is stronger ___ his friend.",
+            "answer": "than",
+            "options": [
+              "than",
+              "so",
+              "because",
+              "or"
+            ],
+            "tokens": [
+              {
+                "t": "He",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "stronger than his friend",
+                "r": null
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "pick": 2,
+        "items": [
+          {
+            "sentence": "Although she is short, she is ___ at basketball.",
+            "answer": "amazing",
+            "options": [
+              "amazing",
+              "terrible",
+              "slow",
+              "quiet"
+            ],
+            "tokens": [
+              {
+                "t": "Although she is short",
+                "r": "connector"
+              },
+              {
+                "t": "she",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "amazing at basketball",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "sentence": "My teacher is patient because she ___ explains things twice.",
+            "answer": "always",
+            "options": [
+              "always",
+              "never",
+              "rarely",
+              "sometimes"
+            ],
+            "tokens": [
+              {
+                "t": "My teacher",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "patient",
+                "r": "object"
+              },
+              {
+                "t": "because",
+                "r": "connector"
+              },
+              {
+                "t": "she always explains things twice",
+                "r": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "truefalse",
+    "type": "true-false",
+    "label": "True / False",
+    "data": {
+      "bronze": {
+        "pick": 2,
+        "items": [
+          {
+            "statement": "An elephant is small.",
+            "answer": false,
+            "tokens": [
+              {
+                "t": "An elephant",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "small",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "statement": "The sun is hot.",
+            "answer": true,
+            "tokens": [
+              {
+                "t": "The sun",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "hot",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "statement": "A mouse is bigger than an elephant.",
+            "answer": false,
+            "tokens": [
+              {
+                "t": "A mouse",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "bigger than an elephant",
+                "r": null
+              }
+            ]
+          }
+        ]
+      },
+      "silver": {
+        "pick": 2,
+        "items": [
+          {
+            "statement": "A cheetah is faster than a turtle.",
+            "answer": true,
+            "tokens": [
+              {
+                "t": "A cheetah",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "faster than a turtle",
+                "r": null
+              }
+            ]
+          },
+          {
+            "statement": "A baby is older than a grandmother.",
+            "answer": false,
+            "tokens": [
+              {
+                "t": "A baby",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "older than a grandmother",
+                "r": null
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "pick": 2,
+        "items": [
+          {
+            "statement": "Although he is quiet, my father is not shy with his friends.",
+            "answer": true,
+            "tokens": [
+              {
+                "t": "Although he is quiet",
+                "r": "connector"
+              },
+              {
+                "t": "my father",
+                "r": "subject"
+              },
+              {
+                "t": "is not",
+                "r": "verb"
+              },
+              {
+                "t": "shy with his friends",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "statement": "A generous person never shares anything.",
+            "answer": false,
+            "tokens": [
+              {
+                "t": "A generous person",
+                "r": "subject"
+              },
+              {
+                "t": "never shares",
+                "r": "verb"
+              },
+              {
+                "t": "anything",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "wordmatch",
+    "type": "word-match",
+    "label": "Word Match",
+    "data": {
+      "bronze": {
+        "pick": 3,
+        "items": [
+          {
+            "left": "tall",
+            "right": "short"
+          },
+          {
+            "left": "big",
+            "right": "small"
+          },
+          {
+            "left": "happy",
+            "right": "sad"
+          }
+        ]
+      },
+      "silver": {
+        "pick": 4,
+        "items": [
+          {
+            "left": "fast",
+            "right": "slow"
+          },
+          {
+            "left": "young",
+            "right": "old"
+          },
+          {
+            "left": "strong",
+            "right": "weak"
+          },
+          {
+            "left": "loud",
+            "right": "quiet"
+          }
+        ]
+      },
+      "gold": {
+        "pick": 5,
+        "items": [
+          {
+            "left": "generous",
+            "right": "stingy"
+          },
+          {
+            "left": "patient",
+            "right": "impatient"
+          },
+          {
+            "left": "confident",
+            "right": "shy"
+          },
+          {
+            "left": "honest",
+            "right": "dishonest"
+          },
+          {
+            "left": "brave",
+            "right": "cowardly"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "memorypairs",
+    "type": "memory-pairs",
+    "label": "Memory Pairs",
+    "data": {
+      "bronze": {
+        "pick": 3,
+        "flipback": 1500,
+        "items": [
+          {
+            "word": "tall",
+            "emoji": "🦒",
+            "image": null,
+            "sentence": "The giraffe is tall.",
+            "tokens": [
+              {
+                "t": "The giraffe",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "tall",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "small",
+            "emoji": "🐭",
+            "image": null,
+            "sentence": "The mouse is small.",
+            "tokens": [
+              {
+                "t": "The mouse",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "small",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "happy",
+            "emoji": "😊",
+            "image": null,
+            "sentence": "She is happy today.",
+            "tokens": [
+              {
+                "t": "She",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "happy",
+                "r": "object"
+              },
+              {
+                "t": "today",
+                "r": "time"
+              }
+            ]
+          },
+          {
+            "word": "sad",
+            "emoji": "😢",
+            "image": null,
+            "sentence": "He feels sad.",
+            "tokens": [
+              {
+                "t": "He",
+                "r": "subject"
+              },
+              {
+                "t": "feels",
+                "r": "verb"
+              },
+              {
+                "t": "sad",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "silver": {
+        "pick": 4,
+        "flipback": 1200,
+        "items": [
+          {
+            "word": "strong",
+            "emoji": "💪",
+            "image": null,
+            "sentence": "He is very strong.",
+            "tokens": [
+              {
+                "t": "He",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "very strong",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "weak",
+            "emoji": "🥀",
+            "image": null,
+            "sentence": "The plant looks weak.",
+            "tokens": [
+              {
+                "t": "The plant",
+                "r": "subject"
+              },
+              {
+                "t": "looks",
+                "r": "verb"
+              },
+              {
+                "t": "weak",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "fast",
+            "emoji": "⚡",
+            "image": null,
+            "sentence": "The cheetah is fast.",
+            "tokens": [
+              {
+                "t": "The cheetah",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "fast",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "slow",
+            "emoji": "🐢",
+            "image": null,
+            "sentence": "The turtle is slow.",
+            "tokens": [
+              {
+                "t": "The turtle",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "slow",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "pick": 4,
+        "flipback": 900,
+        "items": [
+          {
+            "word": "generous",
+            "emoji": "🎁",
+            "image": null,
+            "sentence": "My aunt is generous with gifts.",
+            "tokens": [
+              {
+                "t": "My aunt",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "generous",
+                "r": "object"
+              },
+              {
+                "t": "with gifts",
+                "r": null
+              }
+            ]
+          },
+          {
+            "word": "patient",
+            "emoji": "⏳",
+            "image": null,
+            "sentence": "The teacher is very patient.",
+            "tokens": [
+              {
+                "t": "The teacher",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "very patient",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "confident",
+            "emoji": "🦁",
+            "image": null,
+            "sentence": "The lion looks confident.",
+            "tokens": [
+              {
+                "t": "The lion",
+                "r": "subject"
+              },
+              {
+                "t": "looks",
+                "r": "verb"
+              },
+              {
+                "t": "confident",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "honest",
+            "emoji": "🤝",
+            "image": null,
+            "sentence": "An honest person tells the truth.",
+            "tokens": [
+              {
+                "t": "An honest person",
+                "r": "subject"
+              },
+              {
+                "t": "tells",
+                "r": "verb"
+              },
+              {
+                "t": "the truth",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "listenchoose",
+    "type": "audio-understanding",
+    "label": "Listen & Choose",
+    "data": {
+      "bronze": {
+        "pick": 2,
+        "items": [
+          {
+            "audio": "What size is a mouse?",
+            "question": "What size is a mouse?",
+            "options": [
+              "small",
+              "big",
+              "tall",
+              "short"
+            ],
+            "answer": "small"
+          },
+          {
+            "audio": "How does a happy person feel?",
+            "question": "How does a happy person feel?",
+            "options": [
+              "happy",
+              "sad",
+              "angry",
+              "tired"
+            ],
+            "answer": "happy"
+          }
+        ]
+      },
+      "silver": {
+        "pick": 2,
+        "items": [
+          {
+            "audio": "Which animal is faster, a cheetah or a turtle?",
+            "question": "Which animal is faster, a cheetah or a turtle?",
+            "options": [
+              "cheetah",
+              "turtle",
+              "elephant",
+              "mouse"
+            ],
+            "answer": "cheetah"
+          },
+          {
+            "audio": "Who is older, a grandmother or a baby?",
+            "question": "Who is older, a grandmother or a baby?",
+            "options": [
+              "grandmother",
+              "baby",
+              "teacher",
+              "student"
+            ],
+            "answer": "grandmother"
+          }
+        ]
+      },
+      "gold": {
+        "pick": 2,
+        "items": [
+          {
+            "audio": "Why might someone say a teacher is patient?",
+            "question": "Why might someone say a teacher is patient?",
+            "options": [
+              "She explains twice",
+              "She shouts a lot",
+              "She is always late",
+              "She never helps"
+            ],
+            "answer": "She explains twice"
+          },
+          {
+            "audio": "What makes a person generous?",
+            "question": "What makes a person generous?",
+            "options": [
+              "Sharing with others",
+              "Keeping everything",
+              "Being loud",
+              "Running fast"
+            ],
+            "answer": "Sharing with others"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "putinorder",
+    "type": "sequencing",
+    "label": "Put in Order",
+    "data": {
+      "bronze": {
+        "pick": 1,
+        "items": [
+          {
+            "prompt": "Order these from smallest to biggest.",
+            "sequence": [
+              "ant",
+              "cat",
+              "elephant"
+            ],
+            "correct": [
+              "ant",
+              "cat",
+              "elephant"
+            ]
+          }
+        ]
+      },
+      "silver": {
+        "pick": 1,
+        "items": [
+          {
+            "prompt": "Order these from slowest to fastest.",
+            "sequence": [
+              "turtle",
+              "dog",
+              "cheetah"
+            ],
+            "correct": [
+              "turtle",
+              "dog",
+              "cheetah"
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "pick": 1,
+        "items": [
+          {
+            "prompt": "Order these personality words from calm to excited.",
+            "sequence": [
+              "quiet",
+              "friendly",
+              "energetic",
+              "wild"
+            ],
+            "correct": [
+              "quiet",
+              "friendly",
+              "energetic",
+              "wild"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "sayit",
+    "type": "audio-speaking",
+    "label": "Say It",
+    "data": {
+      "bronze": {
+        "pick": 2,
+        "items": [
+          {
+            "prompt": "Say a word that describes a giraffe.",
+            "target": "tall",
+            "keyWords": []
+          },
+          {
+            "prompt": "Say how you feel today.",
+            "target": "happy",
+            "keyWords": []
+          }
+        ]
+      },
+      "silver": {
+        "pick": 1,
+        "items": [
+          {
+            "prompt": "Describe your friend using 'because.'",
+            "target": "My friend is funny because she tells good jokes.",
+            "keyWords": []
+          }
+        ]
+      },
+      "gold": {
+        "pick": 1,
+        "items": [
+          {
+            "prompt": "Describe someone you admire and why.",
+            "target": "My grandmother is generous because she always helps people.",
+            "keyWords": []
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "picword",
+    "type": "image-vocab",
+    "label": "Picture & Word",
+    "data": {
+      "bronze": {
+        "pick": 2,
+        "mode": "word-to-image",
+        "items": [
+          {
+            "word": "tall",
+            "emoji": "🦒",
+            "sentence": "The giraffe is ___.",
+            "cloze": "tall"
+          },
+          {
+            "word": "small",
+            "emoji": "🐭",
+            "sentence": "The mouse is ___.",
+            "cloze": "small"
+          }
+        ]
+      },
+      "silver": {
+        "pick": 2,
+        "mode": "image-to-word",
+        "items": [
+          {
+            "word": "fast",
+            "emoji": "🐆",
+            "sentence": "The cheetah is ___.",
+            "cloze": "fast"
+          },
+          {
+            "word": "strong",
+            "emoji": "💪",
+            "sentence": "He is very ___.",
+            "cloze": "strong"
+          }
+        ]
+      },
+      "gold": {
+        "pick": 2,
+        "mode": "cloze-image",
+        "items": [
+          {
+            "word": "generous",
+            "emoji": "🎁",
+            "sentence": "My aunt is ___ with gifts.",
+            "cloze": "generous"
+          },
+          {
+            "word": "patient",
+            "emoji": "⏳",
+            "sentence": "The teacher is very ___.",
+            "cloze": "patient"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "wordscramble",
+    "type": "word-scramble",
+    "label": "Word Scramble",
+    "data": {
+      "bronze": {
+        "pick": 2,
+        "items": [
+          {
+            "word": "tall",
+            "emoji": "🦒",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "The giraffe",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "tall",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "happy",
+            "emoji": "😊",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "She",
+                "r": "subject"
+              },
+              {
+                "t": "feels",
+                "r": "verb"
+              },
+              {
+                "t": "happy",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "silver": {
+        "pick": 2,
+        "items": [
+          {
+            "word": "strong",
+            "emoji": "💪",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "He",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "very strong",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "quiet",
+            "emoji": "🤫",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "The library",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "quiet",
+                "r": "object"
+              },
+              {
+                "t": "today",
+                "r": "time"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "pick": 2,
+        "items": [
+          {
+            "word": "generous",
+            "emoji": "🎁",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "My aunt",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "generous",
+                "r": "object"
+              },
+              {
+                "t": "with gifts",
+                "r": null
+              }
+            ]
+          },
+          {
+            "word": "confident",
+            "emoji": "🦁",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "The lion",
+                "r": "subject"
+              },
+              {
+                "t": "looks",
+                "r": "verb"
+              },
+              {
+                "t": "confident",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "spelling",
+    "type": "spelling",
+    "label": "Spelling",
+    "data": {
+      "bronze": {
+        "pick": 2,
+        "items": [
+          {
+            "word": "tall",
+            "emoji": "🦒",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "The giraffe",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "tall",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "small",
+            "emoji": "🐭",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "The mouse",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "small",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "silver": {
+        "pick": 2,
+        "items": [
+          {
+            "word": "brave",
+            "emoji": "🦸",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "The firefighter",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "brave",
+                "r": "object"
+              }
+            ]
+          },
+          {
+            "word": "gentle",
+            "emoji": "🐑",
+            "sentence": "",
+            "tokens": [
+              {
+                "t": "My grandmother",
+                "r": "subject"
+              },
+              {
+                "t": "is",
+                "r": "verb"
+              },
+              {
+                "t": "gentle",
+                "r": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "pick": 2,
+        "items": [
+          {
+            "word": "trustworthy",
+            "emoji": "🤝",
+            "sentence": "",
+            "tokens": null
+          },
+          {
+            "word": "independent",
+            "emoji": "🦅",
+            "sentence": "",
+            "tokens": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "listenmatch",
+    "type": "audio-match",
+    "label": "Listen & Match",
+    "data": {
+      "bronze": {
+        "pick": 3,
+        "items": [
+          {
+            "left": "tall",
+            "right": "tall"
+          },
+          {
+            "left": "happy",
+            "right": "happy"
+          },
+          {
+            "left": "small",
+            "right": "small"
+          }
+        ]
+      },
+      "silver": {
+        "pick": 2,
+        "items": [
+          {
+            "left": "She is taller than her brother.",
+            "right": "She is taller than her brother."
+          },
+          {
+            "left": "He is faster than a turtle.",
+            "right": "He is faster than a turtle."
+          }
+        ]
+      },
+      "gold": {
+        "pick": 2,
+        "items": [
+          {
+            "left": "My teacher is patient because she explains things twice.",
+            "right": "My teacher is patient because she explains things twice."
+          },
+          {
+            "left": "A generous person shares what they have.",
+            "right": "A generous person shares what they have."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "buildsentence",
+    "type": "sentence-building",
+    "label": "Build a Sentence",
+    "data": {
+      "bronze": {
+        "pick": 2,
+        "items": [
+          {
+            "tokens": [
+              {
+                "text": "The",
+                "role": null
+              },
+              {
+                "text": "giraffe",
+                "role": "subject"
+              },
+              {
+                "text": "is",
+                "role": "verb"
+              },
+              {
+                "text": "tall",
+                "role": "object"
+              }
+            ]
+          },
+          {
+            "tokens": [
+              {
+                "text": "She",
+                "role": "subject"
+              },
+              {
+                "text": "is",
+                "role": "verb"
+              },
+              {
+                "text": "happy",
+                "role": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "silver": {
+        "pick": 1,
+        "items": [
+          {
+            "tokens": [
+              {
+                "text": "My",
+                "role": null
+              },
+              {
+                "text": "brother",
+                "role": "subject"
+              },
+              {
+                "text": "is",
+                "role": "verb"
+              },
+              {
+                "text": "taller",
+                "role": "object"
+              },
+              {
+                "text": "than",
+                "role": "connector"
+              },
+              {
+                "text": "me",
+                "role": null
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "pick": 1,
+        "items": [
+          {
+            "tokens": [
+              {
+                "text": "My",
+                "role": null
+              },
+              {
+                "text": "aunt",
+                "role": "subject"
+              },
+              {
+                "text": "is",
+                "role": "verb"
+              },
+              {
+                "text": "generous",
+                "role": "object"
+              },
+              {
+                "text": "because",
+                "role": "connector"
+              },
+              {
+                "text": "she always helps people",
+                "role": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+];
+
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+
+const state = {
+  student: null,
+  currentModuleIndex: 0,
+  currentTier: 'bronze',
+  results: buildResults()
+};
+
+function buildResults() {
+  return LESSON.map(() => ({
+    bronze:   { score: null, passed: false },
+    silver:   { score: null, passed: false },
+    gold:     { score: null, passed: false },
+    complete: false
+  }));
+}
+
+// ══════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════
+
+const TIERS = ['bronze','silver','gold'];
+const nextTier  = t => TIERS[TIERS.indexOf(t) + 1] || null;
+const cap       = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const el = document.getElementById(id);
+  el.style.display = 'flex';
+  el.classList.add('active');
+  el.scrollTop = 0;
+}
+
+// ══════════════════════════════════════════════════
+//  SCREEN 1 — NAME PICKER
+// ══════════════════════════════════════════════════
+
+const nameGrid = document.getElementById('name-grid');
+const startBtn = document.getElementById('start-btn');
+
+STUDENTS.forEach(name => {
+  const btn = document.createElement('button');
+  btn.className   = 'name-btn';
+  btn.textContent = name;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.student = name;
+    startBtn.classList.add('ready');
+  });
+  nameGrid.appendChild(btn);
+});
+
+startBtn.addEventListener('click', () => {
+  if (!state.student) return;
+  state.currentModuleIndex = 0;
+  state.currentTier = 'bronze';
+  state.results = buildResults();
+  startModule(0, 'bronze');
+});
+
+// ══════════════════════════════════════════════════
+//  SCREEN 2 — MODULE RUNNER
+// ══════════════════════════════════════════════════
+
+function startModule(moduleIndex, tier) {
+  state.currentModuleIndex = moduleIndex;
+  state.currentTier = tier;
+
+  const mod = LESSON[moduleIndex];
+
+  // v2 chrome: badge number + module title + tier-aware medal
+  document.getElementById('v2-badge').textContent = moduleIndex + 1;
+  document.getElementById('v2-module-title').textContent = mod.label;
+  document.getElementById('v2-medal-img').src = `assets/${tier}.png?v=2`;
+  document.getElementById('v2-medal-img').alt = `${cap(tier)} tier`;
+
+  // v2 chrome: student name + tier, shown in the qlabel slot
+  // qlabel text is now set per-module (short instruction or live question
+  // progress) inside each renderer — see MODULE_REGISTRY. Clear it here so
+  // stale text doesn't linger from the previous module.
+  document.getElementById('v2-qlabel').textContent = '';
+
+  // v2 chrome: overall lesson progress (modules fully complete / total)
+  const doneCount = state.results.filter(r => r.complete).length;
+  document.getElementById('v2-prog-fill').style.width = Math.round((doneCount / LESSON.length) * 100) + '%';
+
+  showScreen('screen-module');
+
+  // Render module
+  const container = document.getElementById('module-container');
+  container.innerHTML = '';
+  document.getElementById('gr-overlay').style.display = 'none';
+  document.getElementById('gr-reinforce-content').style.display = 'block';
+  document.getElementById('gr-complete-content').style.display = 'none';
+
+  const renderer = MODULE_REGISTRY[mod.type];
+  if (!renderer) {
+    container.innerHTML = `<p style="color:var(--text-dim);padding:32px 0;text-align:center">Module type "${mod.type}" not registered.</p>`;
+    return;
+  }
+
+  // Every module now uses a per-tier pool: { pick, items: [...], ...mode? }.
+  // No more shared-across-tiers special-casing needed (Nick's call: pools
+  // shouldn't be shared across tiers since difficulty differs per tier).
+  renderer.render(container, mod.data[tier], tier, score => {
+    handleTierResult(moduleIndex, tier, score);
+  });
+
+  // Illustration "slides down" to clear whatever height this module's
+  // content actually renders at, and stays live via MutationObserver for
+  // any later content change within the same module (multi-question
+  // sessions, retries, etc.) without each renderer needing to know about it.
+  watchModuleContentForSceneReposition();
+}
+
+// ══════════════════════════════════════════════════
+//  TIER RESULT HANDLER
+// ══════════════════════════════════════════════════
+
+// Ported verbatim from module-demos' finishTier()/dropStar() — stars pop
+// in one at a time (scale 0→1, opacity 0→1) with a tone each, then once
+// all are in, a completion chime plus a staggered brightness/glow shimmer
+// sweeps across all of them.
+function animateStarsReveal(starCount) {
+  const starsEl = document.getElementById('stars-row');
+  starsEl.innerHTML = '';
+  for (let s = 0; s < starCount; s++) {
+    const img = document.createElement('img');
+    img.src = 'assets/star.png';
+    img.alt = '';
+    img.style.opacity = '0';
+    img.style.transform = 'scale(0)';
+    starsEl.appendChild(img);
+  }
+  const allStarImgs = starsEl.querySelectorAll('img');
+  let i = 0;
+  function dropStar() {
+    if (i >= starCount) {
+      sfx('complete');
+      allStarImgs.forEach((img, si) => {
+        setTimeout(() => {
+          img.animate([
+            { filter: 'brightness(1) drop-shadow(0 0 0px rgba(240,174,99,0))' },
+            { filter: 'brightness(1.6) drop-shadow(0 0 10px rgba(240,174,99,0.9))' },
+            { filter: 'brightness(1) drop-shadow(0 0 0px rgba(240,174,99,0))' }
+          ], { duration: 500, easing: 'ease-in-out' });
+        }, si * 120);
+      });
+      return;
+    }
+    const img = allStarImgs[i];
+    img.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320, easing: 'ease-out', fill: 'forwards' });
+    sfx('star');
+    i++;
+    setTimeout(dropStar, 220);
+  }
+  dropStar();
+}
+
+function handleTierResult(moduleIndex, tier, score) {
+  const passed = score >= PASS_THRESHOLD;
+  state.results[moduleIndex][tier] = { score, passed };
+
+  const pct      = Math.round(score * 100);
+  const tierName = cap(tier);
+  const next     = nextTier(tier);
+
+  const ctaBtn = document.getElementById('result-cta');
+
+  if (passed && next) {
+    document.getElementById('result-msg').innerHTML =
+      `Great work! <strong>${cap(next)}</strong> is now unlocked.`;
+    ctaBtn.textContent = `Try ${cap(next)} →`;
+    ctaBtn.onclick = () => startModule(moduleIndex, next);
+
+  } else if (passed && !next) {
+    state.results[moduleIndex].complete = true;
+    const nextMod = moduleIndex + 1;
+
+    if (nextMod < LESSON.length) {
+      document.getElementById('result-msg').innerHTML =
+        `<strong>Module complete!</strong> Moving to the next exercise.`;
+      ctaBtn.textContent = 'Next module →';
+      ctaBtn.onclick = () => startModule(nextMod, 'bronze');
+    } else {
+      document.getElementById('result-msg').innerHTML =
+        `<strong>All done!</strong> You've completed every module.`;
+      ctaBtn.textContent = 'See my results →';
+      ctaBtn.onclick = () => showEndScreen();
+    }
+
+  } else {
+    document.getElementById('result-msg').innerHTML =
+      `You need <strong>${Math.round(PASS_THRESHOLD * 100)}%</strong> to unlock the next level. You can do it!`;
+    ctaBtn.textContent = `↩ Try ${tierName} again`;
+    ctaBtn.onclick = () => startModule(moduleIndex, tier);
+  }
+
+  document.getElementById('result-title').textContent = passed ? `${tierName} passed!` : `${tierName} — try again`;
+  document.getElementById('result-score').innerHTML   = pct === 100 ? 'Perfect!' : `${pct}% correct`;
+
+  // Same overlay as per-question reinforcement, just swapped to the
+  // completion content — no screen navigation, matches the locked demo.
+  document.getElementById('gr-reinforce-content').style.display = 'none';
+  document.getElementById('gr-complete-content').style.display = 'block';
+  document.getElementById('gr-overlay').style.display = 'flex';
+
+  const stars = pct === 100 ? 3 : pct >= 60 ? 2 : pct > 0 ? 1 : 0;
+  animateStarsReveal(stars);
+}
+
+// ══════════════════════════════════════════════════
+//  SCREEN 4 — END SCREEN
+// ══════════════════════════════════════════════════
+
+function showEndScreen() {
+  document.getElementById('end-name').textContent = state.student;
+
+  // Overall score: highest-tier score per module, averaged
+  let total = 0;
+  state.results.forEach(r => {
+    for (const t of ['gold','silver','bronze']) {
+      if (r[t].score !== null) { total += r[t].score; break; }
+    }
+  });
+  const overallPct = Math.round((total / LESSON.length) * 100);
+  document.getElementById('end-total').innerHTML = `Overall score: <span>${overallPct}%</span>`;
+
+  const summaryList = document.getElementById('summary-list');
+  summaryList.innerHTML = '';
+  let hasIncomplete = false;
+
+  LESSON.forEach((mod, i) => {
+    const r = state.results[i];
+    if (!r.complete) hasIncomplete = true;
+
+    let highestTier = null, highestScore = null;
+    for (const t of ['gold','silver','bronze']) {
+      if (r[t].score !== null) { highestTier = t; highestScore = r[t].score; break; }
+    }
+
+    const item = document.createElement('div');
+    item.className = 'summary-item';
+    item.innerHTML = `
+      <div>
+        <div class="summary-item-label">${mod.label}</div>
+        <div class="summary-item-detail">${
+          highestScore !== null
+            ? `${cap(highestTier)} · ${Math.round(highestScore * 100)}%`
+            : 'Not attempted'
+        }</div>
+      </div>
+      <div class="summary-status ${r.complete ? 'complete' : 'incomplete'}">
+        ${r.complete ? '✓ Done' : 'Retry'}
+      </div>
+    `;
+    summaryList.appendChild(item);
+  });
+
+  const retryBtn = document.getElementById('retry-btn');
+  retryBtn.style.display = hasIncomplete ? 'block' : 'none';
+  retryBtn.onclick = retryFailed;
+
+  document.getElementById('done-btn').onclick = () => {
+    resetAll();
+    showScreen('screen-name');
+  };
+
+  showScreen('screen-end');
+}
+
+function retryFailed() {
+  const idx = state.results.findIndex(r => !r.complete);
+  if (idx === -1) { showEndScreen(); return; }
+  const r = state.results[idx];
+  const tier = r.silver.passed ? 'gold' : r.bronze.passed ? 'silver' : 'bronze';
+  startModule(idx, tier);
+}
+
+function resetAll() {
+  state.student = null;
+  state.results = buildResults();
+  document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+  startBtn.classList.remove('ready');
+}
+
+// ══════════════════════════════════════════════════
+//  MODULE REGISTRY
+//  Contract: render(container, data, tier, onComplete)
+//  onComplete(score)  score = 0–1
+// ══════════════════════════════════════════════════
+
+// Render ID — incremented on every render call.
+// All async callbacks (onend, setTimeout) check this before acting
+// so stale callbacks from a previous render can never fire into a new one.
+let _audioRID = 0;
+
+// ══════════════════════════════════════════════════
+//  SHARED UTILITIES
+//  speak(), speakThenSentence(), safeShuffle(),
+//  showReinforcePanel() — used by new module types
+// ══════════════════════════════════════════════════
+
+const TTS = window.speechSynthesis || null;
+
+// ══════════════════════════════════════════════════
+//  SOUND EFFECTS — ported verbatim from module-demos/*.html.
+//  Every demo file has this exact same tone system (tap/star/complete),
+//  consistently, but none of it made it into the shell until now.
+// ══════════════════════════════════════════════════
+let _sfxCtx = null;
+function sfxUnlock() {
+  if (!_sfxCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) _sfxCtx = new AC();
+  }
+  if (_sfxCtx && _sfxCtx.state === 'suspended') _sfxCtx.resume();
+}
+function tone(freq, dur) {
+  sfxUnlock();
+  if (!_sfxCtx) return;
+  const o = _sfxCtx.createOscillator(), g = _sfxCtx.createGain();
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.15, _sfxCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, _sfxCtx.currentTime + dur);
+  o.connect(g); g.connect(_sfxCtx.destination);
+  o.start(); o.stop(_sfxCtx.currentTime + dur);
+}
+function sfx(name) {
+  if (name === 'tap') tone(600, 0.06);
+  if (name === 'star') tone(1000, 0.1);
+  if (name === 'complete') { tone(700, 0.1); setTimeout(() => tone(1050, 0.16), 110); }
+}
+
+const SPEAK_MOODS = {
+  neutral:   { rate:0.85, pitch:1.0,  volume:0.9 },
+  wrong:     { rate:0.80, pitch:0.9,  volume:0.8 },
+  celebrate: { rate:1.15, pitch:1.55, volume:1.0 },
+  slow:      { rate:0.80, pitch:1.0,  volume:0.9 },
+};
+
+// onEnd (optional) fires once playback genuinely finishes, whichever path
+// (audioFile or TTS) actually played. Added for modules that need to gate
+// an action on "audio has finished" (e.g. Listen & Choose unlocking
+// options only after the student has listened) — existing callers that
+// don't pass onEnd are unaffected.
+function speak(text, mood='neutral', delay=0, audioFile=null, onEnd=null) {
+  setTimeout(() => {
+    if (audioFile) {
+      const a = new Audio(audioFile);
+      a.onended = () => { if (onEnd) onEnd(); };
+      a.onerror = () => speakViaTTS(text, mood, onEnd); // missing/broken file — fall back, never go silent
+      a.play().catch(() => speakViaTTS(text, mood, onEnd));
+      return;
+    }
+    speakViaTTS(text, mood, onEnd);
+  }, delay);
+}
+
+function speakViaTTS(text, mood='neutral', onEnd=null) {
+  if (!TTS) { if (onEnd) onEnd(); return; }
+  TTS.cancel();
+  let u;
+  try { u = new SpeechSynthesisUtterance(text); } catch(e) { if (onEnd) onEnd(); return; }
+  const m = SPEAK_MOODS[mood];
+  u.rate = m.rate; u.pitch = m.pitch; u.volume = m.volume;
+  u.onend = () => { if (onEnd) onEnd(); };
+  TTS.speak(u);
+}
+
+function speakThenSentence(word, sentence, wordMood='celebrate', wordAudioFile=null, sentenceAudioFile=null) {
+  const playSentencePart = () => {
+    setTimeout(() => {
+      if (sentenceAudioFile) {
+        const a = new Audio(sentenceAudioFile);
+        a.onerror = () => speakViaTTS(sentence, 'neutral');
+        a.play().catch(() => speakViaTTS(sentence, 'neutral'));
+      } else {
+        speakViaTTS(sentence, 'neutral');
+      }
+    }, 400);
+  };
+
+  if (wordAudioFile) {
+    const wa = new Audio(wordAudioFile);
+    let done = false;
+    const advance = () => { if (done) return; done = true; playSentencePart(); };
+    wa.onended = advance;
+    wa.onerror = () => { done = true; speakWordThenSentenceViaTTS(word, sentence, wordMood); };
+    wa.play().catch(() => { done = true; speakWordThenSentenceViaTTS(word, sentence, wordMood); });
+    // No reliable duration fallback for a file we haven't loaded yet — onended covers the
+    // normal case; onerror/play() rejection covers the broken-file case.
+    return;
+  }
+  speakWordThenSentenceViaTTS(word, sentence, wordMood);
+}
+
+function speakWordThenSentenceViaTTS(word, sentence, wordMood='celebrate') {
+  if (!TTS) return;
+  TTS.cancel();
+  let wu;
+  try { wu = new SpeechSynthesisUtterance(word); } catch(e) { return; }
+  const wm = SPEAK_MOODS[wordMood];
+  wu.rate = wm.rate; wu.pitch = wm.pitch; wu.volume = wm.volume;
+  let done = false;
+  const playSentence = () => {
+    if (done) return; done = true;
+    setTimeout(() => {
+      if (!TTS) return;
+      let su;
+      try { su = new SpeechSynthesisUtterance(sentence); } catch(e) { return; }
+      const nm = SPEAK_MOODS['neutral'];
+      su.rate = nm.rate; su.pitch = nm.pitch; su.volume = nm.volume;
+      TTS.speak(su);
+    }, 400);
+  };
+  wu.onend = playSentence;
+  const fallback = Math.max(1200, (word.length / wu.rate) * 120) + 600;
+  setTimeout(playSentence, fallback);
+  TTS.speak(wu);
+}
+
+// Never returns a shuffled array that satisfies badFn (e.g. same order as input)
+function safeShuffle(arr, badFn, maxAttempts=20) {
+  const sh = a => [...a].sort(() => Math.random() - .5);
+  let result = sh(arr), attempts = 0;
+  while (badFn(result) && attempts++ < maxAttempts) result = sh(arr);
+  return result;
+}
+
+// Shared reinforcement panel — slides up, shows emoji/word/sentence, auto-closes
+const MIN_READ_MS   = 3500;
+const READ_PAUSE_MS = 1800;
+
+function showReinforcePanel(item, onClose) {
+  const plain = item.sentence.replace(/<[^>]+>/g, '');
+  const panel = document.getElementById('reinforce-panel');
+  const bar   = document.getElementById('rp-bar');
+
+  document.getElementById('rp-em').innerHTML = item.image
+    ? `<img src="${item.image}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;" alt="${item.word}">`
+    : item.emoji;
+  document.getElementById('rp-word').textContent = item.word;
+  document.getElementById('rp-sent').innerHTML   = item.sentence;
+
+  panel.style.transform = 'translateY(0)';
+
+  const wordMs  = Math.max(800,  (item.word.length / SPEAK_MOODS.celebrate.rate) * 120);
+  const sentMs  = Math.max(1500, (plain.length      / SPEAK_MOODS.neutral.rate)  * 60);
+  const panelMs = Math.max(MIN_READ_MS, wordMs + 400 + sentMs + READ_PAUSE_MS);
+
+  bar.style.transition = 'none'; bar.style.width = '0%';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    bar.style.transition = `width ${panelMs}ms linear`;
+    bar.style.width = '100%';
+  }));
+
+  speakThenSentence(item.word, plain, 'celebrate', item.audioFile, item.sentenceAudioFile);
+
+  setTimeout(() => {
+    panel.style.transform = 'translateY(100%)';
+    bar.style.transition = 'none'; bar.style.width = '0%';
+    if (onClose) onClose();
+  }, panelMs);
+}
+
+// ══════════════════════════════════════════════════
+//  SCENE REPOSITIONING — illustration "slides down" to clear content
+//  The frame uses a fixed aspect-ratio box (matching bg_and_border.png/
+//  frame_mask.png), so the illustration can't rely on normal document
+//  flow to avoid overlapping tall module content. Instead, after every
+//  content change, measure the flowzone's actual rendered bottom edge
+//  and move .layer-scene down to clear it. Its original design position
+//  (51.47%) is the floor — it never moves *up* past that. If content is
+//  tall enough to push the illustration mostly off-frame, fade it out
+//  rather than showing an awkward sliver.
+// ══════════════════════════════════════════════════
+const SCENE_DEFAULT_TOP = 51.47;
+let _sceneObserver = null;
+
+function repositionSceneLayer() {
+  const flowzone = document.getElementById('module-container');
+  const scene = document.querySelector('.layer-scene');
+  const appFrame = document.querySelector('.app-frame');
+  if (!flowzone || !scene || !appFrame) return;
+
+  const frameRect = appFrame.getBoundingClientRect();
+  const flowRect = flowzone.getBoundingClientRect();
+  if (frameRect.height === 0) return;
+
+  const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
+  const GAP_PCT = 2; // breathing room below content before the illustration starts
+  const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
+
+  scene.style.top = newTop + '%';
+  // Fade out once less than ~8% of the frame's height is left for it to show in
+  scene.style.opacity = (100 - newTop) < 8 ? '0' : '1';
+}
+
+function watchModuleContentForSceneReposition() {
+  const flowzone = document.getElementById('module-container');
+  if (!flowzone) return;
+  if (_sceneObserver) _sceneObserver.disconnect();
+  _sceneObserver = new MutationObserver(() => repositionSceneLayer());
+  _sceneObserver.observe(flowzone, { childList: true, subtree: true, characterData: true });
+  repositionSceneLayer();
+}
+
+// ══════════════════════════════════════════════════
+//  GRAMMAR-COLOR REINFORCEMENT — shared by gap-fill & true-false
+//  NEW in this shell (SHELL_MERGE_SPEC.md). Token fields are
+//  `t` (text) / `r` (role), matching the real published data shape —
+//  NOT `text`/`role` as seen in the standalone module-demos files.
+// ══════════════════════════════════════════════════
+const GRAMMAR_COLORS = {
+  subject: { bg: 'rgba(0,188,212,0.18)',  border: '#00BCD4', color: '#00BCD4' },
+  verb:    { bg: 'rgba(139,195,74,0.18)', border: '#8BC34A', color: '#8BC34A' },
+  object:  { bg: 'rgba(255,152,0,0.18)',  border: '#FF9800', color: '#FFB74D' },
+  place:   { bg: 'rgba(171,71,188,0.18)', border: '#AB47BC', color: '#CE93D8' },
+  time:    { bg: 'rgba(233,30,99,0.18)',  border: '#E91E63', color: '#F48FB1' }
+};
+const GRAMMAR_FADED = {
+  subject: { dot: '#1A6070', text: '#3A7A8A' },
+  verb:    { dot: '#3A5C22', text: '#4A7030' },
+  object:  { dot: '#6A4008', text: '#7A5010' },
+  place:   { dot: '#4A2058', text: '#5A3068' },
+  time:    { dot: '#6A1030', text: '#7A2040' }
+};
+function grammarSentence(tokens) {
+  return (tokens || []).map(tok => {
+    const c = GRAMMAR_COLORS[tok.r];
+    if (!c) return `<span style="color:#fff;">${tok.t}</span>`;
+    return `<span style="display:inline-block;background:${c.bg};border:1.5px solid ${c.border};color:${c.color};border-radius:999px;padding:0px 9px;margin:1px 2px;font-weight:600;font-size:.85em;line-height:1.6;">${tok.t}</span>`;
+  }).join(' ');
+}
+function grammarLegend(tokens) {
+  const ORDER = ['subject', 'verb', 'object', 'place', 'time'];
+  const present = {};
+  (tokens || []).forEach(tok => { present[tok.r] = true; });
+  const roles = ORDER.filter(r => present[r] && GRAMMAR_FADED[r]);
+  if (roles.length === 0) return '';
+  const pills = roles.map(role => {
+    const c = GRAMMAR_FADED[role];
+    return `<span style="display:inline-flex;align-items:center;gap:4px;color:${c.text};font-size:11px;font-weight:600;white-space:nowrap;"><span style="width:7px;height:7px;border-radius:50%;background:${c.dot};flex-shrink:0;"></span>${role.charAt(0).toUpperCase()+role.slice(1)}</span>`;
+  }).join('');
+  return `<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">${pills}</div>`;
+}
+// Shows the grammar-colored full sentence + speaks it, then calls onContinue
+// when the student taps Continue. Used only after a CORRECT answer.
+function showGrammarReinforce(tokens, plainSentence, onContinue) {
+  const overlay = document.getElementById('gr-overlay');
+  document.getElementById('gr-sentence').innerHTML = grammarSentence(tokens);
+  document.getElementById('gr-legend').innerHTML = grammarLegend(tokens);
+  overlay.style.display = 'flex';
+  speak(plainSentence, 'neutral', 200);
+  const btn = document.getElementById('gr-continue-btn');
+  btn.onclick = () => {
+    overlay.style.display = 'none';
+    onContinue();
+  };
+}
+function setGrammarReinforceLabel(correct) {
+  const label = document.querySelector('#gr-reinforce-content > div:first-child');
+  label.textContent = correct ? 'correct!' : 'not quite';
+  label.style.color = correct ? '#AED581' : '#F48FB1';
+}
+
+// Reuses the same #gr-overlay DOM as showGrammarReinforce, but with plain
+// text instead of grammar-colored tokens — for modules that just need a
+// simple "here's what was right" reveal, not a colored sentence breakdown.
+// No audio plays here by default (unlike showGrammarReinforce).
+function showPlainReinforce(correct, bodyText, onContinue) {
+  setGrammarReinforceLabel(correct);
+  document.getElementById('gr-sentence').innerHTML =
+    `<span style="color:rgba(255,255,255,0.8);font-size:.85em;">${bodyText}</span>`;
+  document.getElementById('gr-legend').innerHTML = '';
+  document.getElementById('gr-overlay').style.display = 'flex';
+  const btn = document.getElementById('gr-continue-btn');
+  btn.onclick = () => {
+    document.getElementById('gr-overlay').style.display = 'none';
+    onContinue();
+  };
+}
+
+const MODULE_REGISTRY = {
+
+  // ─────────────────────────────────────────────
+  //  LISTEN & CHOOSE
+  //  v2 design: pool-based { pick, items: [{audio, question, options,
+  //  answer}] }, separate pool per tier, multi-question session like every
+  //  other module now. Every tier requires listening before the options
+  //  unlock (the old bronze-only "unlock after 400ms regardless" safety
+  //  window is gone — the new design just requires a listen every time,
+  //  simpler and more consistent). Gold re-locks options on replay.
+  //  Tap an option to select it, then Check (not immediate-answer-on-tap).
+  // ─────────────────────────────────────────────
+  'audio-understanding': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const isBronze = tier === 'bronze';
+      const isGold = tier === 'gold';
+      let idx = 0, totalScore = 0;
+
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.18)',  color:'#4DD0E1' },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.18)', color:'#CE93D8' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.18)',  color:'#FFB74D' },
+        { border:'#E91E63', bg:'rgba(233,30,99,.18)',  color:'#F48FB1' }
+      ];
+
+      function renderQuestion() {
+        const { audio, question, options, answer } = session[idx];
+        let hasPlayed = false, playing = false, answered = false, optionsLive = false, selected = null;
+
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+
+        container.innerHTML = `
+          <p class="lc-question-v2">${question}</p>
+          <button class="lc-listen-btn-v2" id="lc-listen-btn">
+            <span class="lc-listen-icon-v2" id="lc-listen-icon">🔊</span>
+            <span id="lc-listen-label">Listen</span>
+          </button>
+          <p class="lc-hint-line-v2" id="lc-hint">&nbsp;</p>
+          <div class="lc-options-grid-v2" id="lc-options"></div>
+          <button id="gf-check-btn" class="gf-check-btn" style="display:none;">Check</button>
+        `;
+
+        const listenBtn = container.querySelector('#lc-listen-btn');
+        const listenIcon = container.querySelector('#lc-listen-icon');
+        const listenLabel = container.querySelector('#lc-listen-label');
+        const hintLine = container.querySelector('#lc-hint');
+        const optionsGrid = container.querySelector('#lc-options');
+        const checkBtn = container.querySelector('#gf-check-btn');
+
+        function showHint(msg) {
+          hintLine.textContent = msg;
+          hintLine.style.opacity = '1';
+          setTimeout(() => { hintLine.style.opacity = '0'; }, 1800);
+        }
+        function setGridLive(live) {
+          optionsLive = live;
+          optionsGrid.querySelectorAll('.lc-option-btn-v2').forEach(b => {
+            if (b.dataset.done) return;
+            b.classList.toggle('locked', !live);
+          });
+        }
+
+        options.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'lc-option-btn-v2 locked';
+          btn.textContent = opt;
+          const c = PALETTE[i % PALETTE.length];
+          btn.addEventListener('click', () => {
+            if (answered) return;
+            if (!optionsLive) { showHint('🔊 Listen first!'); return; }
+            if (selected === btn) {
+              btn.style.borderColor = ''; btn.style.background = ''; btn.style.color = '';
+              selected = null;
+              checkBtn.style.display = 'none';
+            } else {
+              if (selected) {
+                selected.style.borderColor = ''; selected.style.background = ''; selected.style.color = '';
+              }
+              selected = btn;
+              btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+              checkBtn.style.display = 'block';
+            }
+          });
+          optionsGrid.appendChild(btn);
+        });
+
+        setGridLive(false);
+
+        listenBtn.addEventListener('click', () => {
+          if (playing) return;
+          playing = true;
+          listenIcon.textContent = '⏸';
+          listenLabel.textContent = 'Playing…';
+          listenBtn.classList.add('playing');
+          if (isGold && hasPlayed) setGridLive(false); // gold: re-hide options on replay
+
+          const mood = isBronze ? 'slow' : 'neutral';
+          let done = false;
+          function onAudioEnd() {
+            if (done) return;
+            done = true;
+            playing = false; hasPlayed = true;
+            listenIcon.textContent = '🔊';
+            listenLabel.textContent = 'Listen';
+            listenBtn.classList.remove('playing');
+            setGridLive(true);
+          }
+          speak(audio, mood, 0, null, onAudioEnd);
+          // Fallback in case onEnd never fires (browser quirk) — estimate
+          // from text length, matching the demo's own safety margin.
+          const estMs = Math.max(1500, (audio.length / (isBronze ? 0.8 : 0.85)) * 65);
+          setTimeout(onAudioEnd, estMs + 2000);
+        });
+
+        checkBtn.addEventListener('click', () => {
+          if (!selected || answered) return;
+          answered = true;
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+          const correct = (selected.textContent === answer);
+          optionsGrid.querySelectorAll('.lc-option-btn-v2').forEach(b => { b.dataset.done = '1'; b.style.pointerEvents = 'none'; });
+          if (correct) totalScore++;
+          checkBtn.style.display = 'none';
+
+          setTimeout(() => {
+            const bodyText = correct ? `You heard: "${audio}"` : `The answer was: ${answer}`;
+            showPlainReinforce(correct, bodyText, () => {
+              idx++;
+              if (idx < session.length) renderQuestion();
+              else onComplete(totalScore / session.length);
+            });
+          }, 550);
+        });
+      }
+
+      renderQuestion();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  GAP FILL
+  //  One blank per question. Tap a word to fill it.
+  //  Tap the same word again to clear.
+  //  Check button confirms answer.
+  // ─────────────────────────────────────────────
+  'gap-fill': {
+    // v2 design: pool-based. Each tier is { pick, items: [...] } — a separate
+    // pool per tier (per Nick's decision: difficulty differs per tier, so
+    // pools shouldn't be shared across tiers). Draws `pick` items, runs each
+    // with retry-until-correct scoring (first-try=1, retry-then-correct=0.6),
+    // then averages across the session for the tier's overall score.
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0, totalScore = 0;
+
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.18)',  color:'#4DD0E1' },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.18)', color:'#CE93D8' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.18)',  color:'#FFB74D' },
+        { border:'#E91E63', bg:'rgba(233,30,99,.18)',  color:'#F48FB1' },
+        { border:'#8BC34A', bg:'rgba(139,195,74,.18)', color:'#AED581' }
+      ];
+
+      function renderQuestion() {
+        const { sentence, options, answer, tokens } = session[idx];
+        let selected = null, attemptedWrong = false, locked = false;
+
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+
+        container.innerHTML = `
+          <p class="gf-sentence" id="gf-sentence"></p>
+          <div class="gf-pill-row" id="gf-pill-row"></div>
+          <button id="gf-check-btn" class="gf-check-btn">Check</button>
+          <p class="gf-status" id="gf-status">&nbsp;</p>
+        `;
+
+        container.querySelector('#gf-sentence').innerHTML =
+          sentence.replace('___', '<span class="gf-blank" id="gf-blank-slot">&nbsp;</span>');
+
+        const pillRow  = container.querySelector('#gf-pill-row');
+        const checkBtn = container.querySelector('#gf-check-btn');
+        const statusEl = container.querySelector('#gf-status');
+
+        options.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'gf-pill';
+          btn.textContent = opt;
+          btn.dataset.word = opt;
+          const c = PALETTE[i % PALETTE.length];
+          btn.addEventListener('click', () => {
+            if (locked) return;
+            pillRow.querySelectorAll('.gf-pill').forEach(x => {
+              x.classList.remove('selected');
+              x.style.borderColor = ''; x.style.background = ''; x.style.color = '';
+            });
+            btn.classList.add('selected');
+            btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+            selected = opt;
+            const blank = container.querySelector('#gf-blank-slot');
+            if (blank) { blank.textContent = opt; blank.style.color = c.color; }
+          });
+          pillRow.appendChild(btn);
+        });
+
+        checkBtn.addEventListener('click', () => {
+          if (locked) return;
+          if (!selected) { statusEl.textContent = 'pick an option first'; return; }
+
+          if (selected === answer) {
+            locked = true;
+            checkBtn.disabled = true;
+            statusEl.textContent = attemptedWrong ? 'correct, nice recovery' : 'correct, first try';
+            const score = attemptedWrong ? 0.6 : 1;
+            totalScore += score;
+            const plain = (tokens || []).map(t => t.t).join(' ');
+            setTimeout(() => {
+              showGrammarReinforce(tokens, plain, () => {
+                idx++;
+                if (idx < session.length) renderQuestion();
+                else onComplete(totalScore / session.length);
+              });
+            }, 550);
+          } else {
+            attemptedWrong = true;
+            statusEl.textContent = 'not quite, try again';
+            const sel = pillRow.querySelector(`[data-word="${selected}"]`);
+            if (sel) sel.animate(
+              [{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}],
+              {duration:350}
+            );
+          }
+        });
+      }
+
+      renderQuestion();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  TRUE / FALSE
+  //  Statement shown. Two big buttons.
+  //  Tap one → immediate feedback, show correct.
+  // ─────────────────────────────────────────────
+  'true-false': {
+    // v2 design: pool-based, { pick, items: [...] } per tier, separate pool
+    // per tier. Tap True/False then Check, single attempt per question —
+    // grammar reinforcement shows either way, correct or wrong — then
+    // averages across the session for the tier's overall score.
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0, totalScore = 0;
+
+      function renderQuestion() {
+        const { statement, answer, tokens } = session[idx];
+        let selectedChoice = null;
+
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+
+        container.innerHTML = `
+          <div class="tf-statement-v2" id="tf-statement">${statement}</div>
+          <div class="tf-buttons-v2">
+            <button class="tf-btn-v2" id="tf-true-btn">✓ True</button>
+            <button class="tf-btn-v2" id="tf-false-btn">✗ False</button>
+          </div>
+          <button id="gf-check-btn" class="gf-check-btn">Check</button>
+          <p class="gf-status" id="tf-status">&nbsp;</p>
+        `;
+
+        const trueBtn  = container.querySelector('#tf-true-btn');
+        const falseBtn = container.querySelector('#tf-false-btn');
+        const checkBtn = container.querySelector('#gf-check-btn');
+        const statusEl = container.querySelector('#tf-status');
+
+        function selectChoice(choice) {
+          if (trueBtn.disabled) return;
+          selectedChoice = (selectedChoice === choice) ? null : choice;
+          trueBtn.classList.toggle('selected', selectedChoice === true);
+          falseBtn.classList.toggle('selected', selectedChoice === false);
+          statusEl.textContent = '\u00A0';
+        }
+        trueBtn.addEventListener('click', () => selectChoice(true));
+        falseBtn.addEventListener('click', () => selectChoice(false));
+
+        checkBtn.addEventListener('click', () => {
+          if (trueBtn.disabled) return;
+          if (selectedChoice === null) { statusEl.textContent = 'pick True or False first'; return; }
+
+          const correct = (selectedChoice === answer);
+          trueBtn.disabled = true;
+          falseBtn.disabled = true;
+          checkBtn.disabled = true;
+          if (correct) totalScore += 1;
+
+          const chosenBtn = selectedChoice ? trueBtn : falseBtn;
+          chosenBtn.classList.remove('selected');
+          chosenBtn.classList.add(correct ? 'hl-correct' : 'hl-wrong');
+          statusEl.textContent = correct ? 'correct!' : 'not quite right';
+
+          const plain = tokens && tokens.length ? tokens.map(t => t.t).join(' ') : statement;
+          setTimeout(() => {
+            setGrammarReinforceLabel(correct);
+            showGrammarReinforce(tokens, plain, () => {
+              idx++;
+              if (idx < session.length) renderQuestion();
+              else onComplete(totalScore / session.length);
+            });
+          }, 550);
+        });
+      }
+
+      renderQuestion();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  WORD MATCH
+  //  Tap a word on the left, then its match on the right.
+  //  Each matched pair gets a distinct colour from PALETTE.
+  //  Wrong → both flash red, deselect.
+  //  Score: 1.0 minus 0.1 per wrong attempt (floor 0.6).
+  // ─────────────────────────────────────────────
+  // ─────────────────────────────────────────────
+  //  WORD MATCH
+  //  v2 design: pool-based { pick, items: [{left,right}] }, separate pool
+  //  per tier. Free re-pairing model (not lock-on-first-click) — tap a left,
+  //  tap a right to assign it (unlinking any prior pairing on either side
+  //  first), reassign as much as you want. Only checks correctness once
+  //  every left has SOME right assigned; if not fully correct, shows
+  //  "Not quite yet" and lets you keep adjusting rather than penalizing.
+  //  Bronze-only nudge message on a wrong-but-complete-looking assignment.
+  //  Always full score on completion — this module requires eventual full
+  //  correctness to advance, not partial credit.
+  // ─────────────────────────────────────────────
+  'word-match': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const pairs = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const total = pairs.length;
+      const isBronze = (tier === 'bronze');
+
+      const PALETTE = [
+        { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' },
+        { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' },
+        { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' },
+        { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' },
+        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' }
+      ];
+      const pairColor = pairs.map((_, i) => PALETTE[i % PALETTE.length]);
+
+      document.getElementById('v2-qlabel').innerHTML =
+        `<span>Match the words.</span><span id="wm-score">0 of ${total} paired</span>`;
+
+      container.innerHTML = `
+        <div class="wm-grid-v2">
+          <div class="wm-col-v2" id="wm-left-col"></div>
+          <div class="wm-col-v2" id="wm-right-col"></div>
+        </div>
+        <p class="wm-encourage-v2" id="wm-encourage"></p>
+        <p class="wm-nudge-v2" id="wm-nudge"></p>
+        <button id="wm-notquite-btn" class="wm-notquite-btn-v2" disabled>Not quite yet</button>
+        <button id="wm-next-btn" class="iv-proceed-btn">Next →</button>
+      `;
+
+      const leftCol      = container.querySelector('#wm-left-col');
+      const rightCol     = container.querySelector('#wm-right-col');
+      const scoreLabel   = document.getElementById('wm-score');
+      const encourageEl  = container.querySelector('#wm-encourage');
+      const nudgeEl      = container.querySelector('#wm-nudge');
+      const notQuiteBtn  = container.querySelector('#wm-notquite-btn');
+      const nextBtn      = container.querySelector('#wm-next-btn');
+
+      let pairings = new Map();   // leftIdx -> rightIdx
+      let rightUsed = new Map();  // rightIdx -> leftIdx
+      let selectedLeftBtn = null;
+      let confirmed = false;
+
+      function styleLeft(btn) {
+        if (confirmed) return;
+        const idx = parseInt(btn.dataset.pairIdx);
+        const c = pairColor[idx];
+        const isSelected = (btn === selectedLeftBtn);
+        const isPaired = pairings.has(idx);
+        if (isSelected) {
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+          btn.style.boxShadow = `0 0 0 3px ${c.border}`;
+        } else if (isPaired) {
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+          btn.style.boxShadow = '';
+        } else {
+          btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.color = 'rgba(255,255,255,0.85)'; btn.style.boxShadow = '';
+        }
+      }
+      function styleRight(btn) {
+        if (confirmed) return;
+        const rightIdx = parseInt(btn.dataset.pairIdx);
+        if (rightUsed.has(rightIdx)) {
+          const c = pairColor[rightUsed.get(rightIdx)];
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+        } else {
+          btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.color = 'rgba(255,255,255,0.85)';
+        }
+      }
+      function checkAllCorrect() {
+        if (pairings.size !== total) return false;
+        for (const leftIdx of pairings.keys()) {
+          if (pairings.get(leftIdx) !== leftIdx) return false;
+        }
+        return true;
+      }
+      function refreshAll() {
+        container.querySelectorAll('.wm-btn-v2[data-side="left"]').forEach(styleLeft);
+        container.querySelectorAll('.wm-btn-v2[data-side="right"]').forEach(styleRight);
+
+        let correctSoFar = 0, wrongSoFar = 0;
+        pairings.forEach((rightIdx, leftIdx) => {
+          if (rightIdx === leftIdx) correctSoFar++; else wrongSoFar++;
+        });
+
+        if (pairings.size === total) {
+          if (checkAllCorrect()) {
+            confirmed = true;
+            scoreLabel.textContent = 'Good job!';
+            scoreLabel.style.color = '#AED581';
+            notQuiteBtn.style.display = 'none';
+            nudgeEl.style.opacity = '0';
+            encourageEl.style.opacity = '0';
+            nextBtn.style.display = 'flex';
+            nextBtn.onclick = () => onComplete(1);
+          } else {
+            scoreLabel.textContent = `${Math.min(pairings.size, total)} of ${total} paired`;
+            scoreLabel.style.color = '';
+            nextBtn.style.display = 'none';
+            notQuiteBtn.style.display = 'flex';
+            nudgeEl.style.opacity = '0';
+            encourageEl.style.opacity = '0';
+          }
+        } else {
+          scoreLabel.textContent = `${pairings.size} of ${total} paired`;
+          scoreLabel.style.color = '';
+          nextBtn.style.display = 'none';
+          notQuiteBtn.style.display = 'none';
+
+          // Bronze only: nudge the moment a wrong pairing exists, takes priority over encouragement
+          if (isBronze && wrongSoFar > 0) {
+            nudgeEl.textContent = 'Are you sure about that one?';
+            nudgeEl.style.opacity = '1';
+            encourageEl.style.opacity = '0';
+          } else {
+            nudgeEl.style.opacity = '0';
+            if (correctSoFar > 0) {
+              const ratio = correctSoFar / total;
+              encourageEl.textContent = ratio >= 0.66 ? 'Almost there!'
+                                       : ratio >= 0.34 ? 'Getting there!'
+                                       : 'Nice, keep going!';
+              encourageEl.style.opacity = '1';
+            } else {
+              encourageEl.style.opacity = '0';
+            }
+          }
+        }
+      }
+
+      const withIdx = pairs.map((p, i) => ({ left: p.left, right: p.right, pairIdx: i }));
+      const leftItems = safeShuffle(withIdx, () => false);
+      const rightItems = safeShuffle(withIdx, r => r.some((item, pos) => item.pairIdx === leftItems[pos].pairIdx));
+
+      leftItems.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className = 'wm-btn-v2';
+        btn.textContent = pair.left;
+        btn.dataset.side = 'left';
+        btn.dataset.pairIdx = pair.pairIdx;
+        leftCol.appendChild(btn);
+      });
+      rightItems.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className = 'wm-btn-v2';
+        btn.textContent = pair.right;
+        btn.dataset.side = 'right';
+        btn.dataset.pairIdx = pair.pairIdx;
+        rightCol.appendChild(btn);
+      });
+
+      container.querySelectorAll('.wm-btn-v2').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (confirmed) return;
+
+          if (btn.dataset.side === 'left') {
+            selectedLeftBtn = (btn === selectedLeftBtn) ? null : btn;
+            refreshAll();
+            return;
+          }
+
+          // Right button — always unlink any existing pairing first, then optionally re-pair
+          const rightIdx = parseInt(btn.dataset.pairIdx);
+          const leftIdx = selectedLeftBtn ? parseInt(selectedLeftBtn.dataset.pairIdx) : null;
+
+          if (rightUsed.has(rightIdx)) {
+            const prevLeftIdx = rightUsed.get(rightIdx);
+            pairings.delete(prevLeftIdx);
+            rightUsed.delete(rightIdx);
+            if (leftIdx === null || leftIdx === prevLeftIdx) {
+              selectedLeftBtn = null;
+              refreshAll();
+              return;
+            }
+          }
+          if (leftIdx === null) { refreshAll(); return; }
+
+          if (pairings.has(leftIdx)) {
+            rightUsed.delete(pairings.get(leftIdx));
+            pairings.delete(leftIdx);
+          }
+          pairings.set(leftIdx, rightIdx);
+          rightUsed.set(rightIdx, leftIdx);
+          selectedLeftBtn = null;
+          refreshAll();
+        });
+      });
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  SEQUENCING ("Put in Order")
+  //  v2 design: pool-based { pick, items: [{prompt, sequence, correct}] },
+  //  same standard as every other module. Each slot is colored by its
+  //  POSITION (1st, 2nd, 3rd...) using the same 5-color PALETTE as
+  //  gap-fill/word-match, not by which word occupies it — matches
+  //  put-in-order-demo.html exactly (SEQ_PALETTE there).
+  //  Items shown in pool. Tap to place into numbered slots.
+  //  Tap a filled slot to return item to pool.
+  //  Check button appears when all slots filled.
+  //  Score per question: correct positions / total. Averaged across the
+  //  `pick` questions drawn for the tier's session.
+  // ─────────────────────────────────────────────
+  'sequencing': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0, totalScore = 0;
+
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)',  text:'#00BCD4' },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)', text:'#CE93D8' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)',  text:'#FFB74D' },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)',  text:'#F48FB1' },
+        { border:'#8BC34A', bg:'rgba(139,195,74,.15)', text:'#AED581' }
+      ];
+
+      function renderQuestion() {
+        const { prompt, sequence, correct } = session[idx];
+        const slots = new Array(correct.length).fill(null);
+        let checked = false;
+
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+
+        container.innerHTML = `
+          <p class="seq-prompt-v2">${prompt}</p>
+          <div class="seq-slots-v2" id="seq-slots"></div>
+          <p class="seq-pool-label-v2">Tap to place ↓</p>
+          <div class="seq-pool-v2" id="seq-pool"></div>
+          <button id="gf-check-btn" class="gf-check-btn" style="display:none;">Check</button>
+          <button id="seq-next-btn" class="iv-proceed-btn">Next →</button>
+        `;
+
+        const slotsEl  = container.querySelector('#seq-slots');
+        const poolEl   = container.querySelector('#seq-pool');
+        const checkBtn = container.querySelector('#gf-check-btn');
+        const nextBtn  = container.querySelector('#seq-next-btn');
+
+        function renderSlots() {
+          slotsEl.innerHTML = '';
+          slots.forEach((val, i) => {
+            const c = PALETTE[i % PALETTE.length];
+            const slot = document.createElement('div');
+            slot.className = 'seq-slot-v2';
+            const numColor = val ? c.border : 'rgba(255,255,255,0.3)';
+            slot.innerHTML = `<div class="slot-num-v2" style="color:${numColor};">${i + 1}</div><div class="slot-text-v2">${val || ''}</div>`;
+
+            if (val && !checked) {
+              slot.style.borderColor = c.border;
+              slot.style.background = c.bg;
+              slot.querySelector('.slot-text-v2').style.color = c.text;
+              slot.style.cursor = 'pointer';
+              slot.addEventListener('click', () => {
+                const word = slots[i];
+                slots[i] = null;
+                poolEl.querySelectorAll('.seq-item-v2').forEach(b => {
+                  if (b.dataset.word === word) b.classList.remove('used');
+                });
+                renderSlots();
+                updateCheck();
+              });
+            }
+            slotsEl.appendChild(slot);
+          });
+        }
+
+        function updateCheck() {
+          checkBtn.style.display = slots.every(s => s !== null) ? 'block' : 'none';
+        }
+
+        const shuffled = [...sequence].sort(() => Math.random() - 0.5);
+        shuffled.forEach(word => {
+          const btn = document.createElement('button');
+          btn.className = 'seq-item-v2';
+          btn.textContent = word;
+          btn.dataset.word = word;
+          btn.addEventListener('click', () => {
+            if (btn.classList.contains('used') || checked) return;
+            const emptyIdx = slots.indexOf(null);
+            if (emptyIdx === -1) return;
+            slots[emptyIdx] = word;
+            btn.classList.add('used');
+            renderSlots();
+            updateCheck();
+          });
+          poolEl.appendChild(btn);
+        });
+
+        checkBtn.addEventListener('click', () => {
+          if (checked) return;
+          checked = true;
+          checkBtn.style.display = 'none';
+          poolEl.querySelectorAll('.seq-item-v2').forEach(b => b.style.pointerEvents = 'none');
+
+          let correctCount = 0;
+          slotsEl.querySelectorAll('.seq-slot-v2').forEach((slot, i) => {
+            const isCorrect = (slots[i] === correct[i]);
+            if (isCorrect) {
+              slot.style.borderColor = '#8BC34A';
+              slot.style.background = 'rgba(139,195,74,0.15)';
+              correctCount++;
+            } else {
+              slot.style.borderColor = '#E91E63';
+              slot.style.background = 'rgba(233,30,99,0.12)';
+              slot.querySelector('.slot-text-v2').innerHTML =
+                `<span style="text-decoration:line-through;opacity:0.5;">${slots[i]}</span> <span style="color:#AED581;margin-left:4px;">→ ${correct[i]}</span>`;
+            }
+          });
+
+          const score = correctCount / correct.length;
+          totalScore += score;
+          nextBtn.style.display = 'block';
+        });
+
+        nextBtn.addEventListener('click', () => {
+          idx++;
+          if (idx < session.length) renderQuestion();
+          else onComplete(totalScore / session.length);
+        });
+
+        renderSlots();
+      }
+
+      renderQuestion();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  AUDIO SPEAKING
+  //  Three-button compare mechanic:
+  //    [🔊 Model] — plays TTS (swap src for MP3 later)
+  //    [▶ You]   — plays back student's recording (unlocks after first record)
+  //    [🎤 Rec]  — records / re-records via MediaRecorder
+  //
+  //  Uses MediaRecorder API (works on iOS Safari 14.5+, Chrome, Firefox, Edge).
+  //  Falls back to model-only + self-assess if mic permission denied.
+  //  Scoring: self-assess only — student decides when they're happy.
+  // ─────────────────────────────────────────────
+  'audio-speaking': {
+    render(container, data, tier, onComplete) {
+      const { prompt, target } = data;
+      const isBronze = tier === 'bronze';
+
+      let modelPlaying   = false;
+      let modelAudio     = null;
+      let selfPlaying    = false;
+      let isRecording    = false;
+      let done           = false;
+      let recordingBlob  = null;
+      let selfAudio      = null;
+      let mediaRecorder  = null;
+      let stream         = null;
+
+      container.innerHTML = `
+        <p class="module-question">${prompt}</p>
+        <div class="speak-target">${target}</div>
+        <div class="speak-trio">
+          <button class="trio-btn model" id="model-btn">
+            <span class="trio-icon" id="model-icon">🔊</span>
+            <span class="trio-label">Model</span>
+          </button>
+          <button class="trio-btn playback" id="play-btn">
+            <span class="trio-icon" id="play-icon">▶</span>
+            <span class="trio-label">You</span>
+          </button>
+          <button class="trio-btn record" id="rec-btn">
+            <span class="trio-icon" id="rec-icon">🎤</span>
+            <span class="trio-label" id="rec-label">Record</span>
+          </button>
+        </div>
+        <p class="speak-hint" id="speak-hint">Hear the model, then record yourself.</p>
+        <div id="assess-wrap" style="display:none">
+          <div class="assess-btns">
+            <button class="assess-btn assess-yes" id="assess-yes">✓ That sounded right</button>
+            <button class="assess-btn assess-no"  id="assess-no">↩ I need more practice</button>
+          </div>
+        </div>
+        <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
+      `;
+
+      const modelBtn  = container.querySelector('#model-btn');
+      const modelIcon = container.querySelector('#model-icon');
+      const playBtn   = container.querySelector('#play-btn');
+      const playIcon  = container.querySelector('#play-icon');
+      const recBtn    = container.querySelector('#rec-btn');
+      const recIcon   = container.querySelector('#rec-icon');
+      const recLabel  = container.querySelector('#rec-label');
+      const hint      = container.querySelector('#speak-hint');
+      const assessWrap= container.querySelector('#assess-wrap');
+      const yesBtn    = container.querySelector('#assess-yes');
+      const noBtn     = container.querySelector('#assess-no');
+      const nextBtn   = container.querySelector('#next-btn');
+
+      // ── Model audio ─────────────────────────────
+      function finishModelPlayback() {
+        modelPlaying = false;
+        modelIcon.textContent = '🔊';
+        modelBtn.classList.remove('playing');
+      }
+
+      function playModel() {
+        if (modelPlaying) return;
+        stopSelf();
+        modelPlaying = true;
+        modelIcon.textContent = '⏸';
+        modelBtn.classList.add('playing');
+
+        if (data.audioFile) {
+          const a = new Audio(data.audioFile);
+          modelAudio = a;
+          a.onended = finishModelPlayback;
+          a.onerror = () => playModelViaSynthesis();
+          a.play().catch(() => playModelViaSynthesis());
+          return;
+        }
+        playModelViaSynthesis();
+      }
+
+      function playModelViaSynthesis() {
+        if (!TTS) { modelPlaying = false; return; }
+        TTS.cancel();
+        let u;
+        try { u = new SpeechSynthesisUtterance(target); }
+        catch(e) { modelPlaying = false; return; }
+        u.rate   = isBronze ? 0.8 : 0.85;
+        u.lang   = 'en-US';
+        u.onend  = finishModelPlayback;
+        TTS.speak(u);
+      }
+
+      modelBtn.addEventListener('click', () => {
+        if (modelPlaying) {
+          TTS && TTS.cancel();
+          if (modelAudio) { modelAudio.pause(); modelAudio.currentTime = 0; modelAudio = null; }
+          modelPlaying = false;
+          modelIcon.textContent = '🔊';
+          modelBtn.classList.remove('playing');
+        } else {
+          playModel();
+        }
+      });
+
+      // ── Self playback ──────────────────────────
+      function stopSelf() {
+        if (selfAudio) { selfAudio.pause(); selfAudio.currentTime = 0; }
+        selfPlaying = false;
+        playIcon.textContent = '▶';
+        playBtn.classList.remove('playing');
+      }
+
+      playBtn.addEventListener('click', () => {
+        if (!recordingBlob || isRecording || done) return;
+        if (selfPlaying) { stopSelf(); return; }
+
+        TTS && TTS.cancel();
+        modelPlaying = false;
+        modelIcon.textContent = '🔊';
+        modelBtn.classList.remove('playing');
+
+        selfPlaying = true;
+        playIcon.textContent = '⏸';
+        playBtn.classList.add('playing');
+
+        const url  = URL.createObjectURL(recordingBlob);
+        selfAudio  = new Audio(url);
+        selfAudio.play();
+        selfAudio.onended = () => {
+          stopSelf();
+          URL.revokeObjectURL(url);
+        };
+      });
+
+      // ── MediaRecorder ──────────────────────────
+      recBtn.addEventListener('click', async () => {
+        if (done) return;
+
+        if (isRecording) {
+          // Stop recording
+          mediaRecorder.stop();
+          return;
+        }
+
+        // Stop any playback first
+        stopSelf();
+        TTS && TTS.cancel();
+        modelPlaying = false;
+        modelIcon.textContent = '🔊';
+        modelBtn.classList.remove('playing');
+
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+          const mimeType = MediaRecorder.isTypeSupported('audio/webm')
+            ? 'audio/webm' : 'audio/mp4';
+
+          const chunks  = [];
+          mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+          mediaRecorder.ondataavailable = e => {
+            if (e.data.size > 0) chunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            // Release mic
+            stream.getTracks().forEach(t => t.stop());
+            isRecording = false;
+            recIcon.textContent  = '🎤';
+            recLabel.textContent = 'Re-record';
+            recBtn.classList.remove('recording');
+
+            recordingBlob = new Blob(chunks, { type: mimeType });
+
+            // Unlock playback button
+            playBtn.classList.add('ready');
+
+            // Show self-assess after first recording
+            assessWrap.style.display = 'block';
+            hint.textContent = 'Listen to both, then tap how it went.';
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recIcon.textContent  = '⏹';
+          recLabel.textContent = 'Stop';
+          recBtn.classList.add('recording');
+          hint.textContent = 'Recording… tap ⏹ to stop.';
+
+        } catch (err) {
+          // Mic permission denied or not available — fallback
+          showNoMicFallback();
+        }
+      });
+
+      // ── Self-assess ────────────────────────────
+      function lockAssess() {
+        done = true;
+        yesBtn.disabled = true;
+        noBtn.disabled  = true;
+        if (stream) stream.getTracks().forEach(t => t.stop());
+      }
+
+      yesBtn.addEventListener('click', () => {
+        if (done) return;
+        yesBtn.classList.add('selected');
+        lockAssess();
+        nextBtn.style.display = 'block';
+        nextBtn.onclick = () => onComplete(1);
+      });
+
+      noBtn.addEventListener('click', () => {
+        if (done) return;
+        noBtn.classList.add('selected');
+        lockAssess();
+        nextBtn.style.display = 'block';
+        nextBtn.onclick = () => onComplete(0);
+      });
+
+      // ── No-mic fallback ────────────────────────
+      function showNoMicFallback() {
+        recBtn.style.display  = 'none';
+        playBtn.style.display = 'none';
+        const msg = document.createElement('div');
+        msg.className   = 'no-mic-msg';
+        msg.textContent = 'Microphone not available. Listen to the model, say it aloud, then tap how it went.';
+        container.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
+        assessWrap.style.display = 'block';
+        hint.style.display = 'none';
+      }
+    }
+  },
+
+
+
+  // ─────────────────────────────────────────────
+  //  IMAGE VOCAB
+  //  Bronze: image → tap correct word
+  //  Silver: word  → tap correct image
+  //  Gold:   image + sentence blank → word bank
+  // ─────────────────────────────────────────────
+  'image-vocab': {
+    // "Picture & Word" module — kept as 'image-vocab' to match the real
+    // production `type` field; SHELL_MERGE_SPEC's "picture-word" is a
+    // descriptive name, not the actual data-contract key.
+    // v2 design: separate pool PER TIER — { pick, mode, items: [...] } —
+    // per Nick's decision that difficulty (and content) shouldn't be shared
+    // across tiers. `cloze` is just the answer word (e.g. "runs"), not a
+    // full sentence — `sentence` already contains the ___ blank.
+    render(container, data, tier, onComplete) {
+      const { pick, mode, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0, score = 0, locked = false, selected = null;
+
+      function pips() {
+        return session.map((_, i) =>
+          `<div class="iv-pip${i<idx?' done':i===idx?' current':''}"></div>`
+        ).join('');
+      }
+
+      function renderQuestion() {
+        locked = false; selected = null;
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+        container.innerHTML = `
+          <div class="iv-pips-row" id="iv-pips"></div>
+          <div id="iv-content"></div>
+          <p class="iv-feedback" id="iv-feedback"></p>
+          <button id="iv-check-btn" class="iv-action-btn">Check →</button>
+          <button id="iv-next-btn" class="iv-proceed-btn">Next →</button>
+        `;
+        container.querySelector('#iv-pips').innerHTML = pips();
+
+        const content  = container.querySelector('#iv-content');
+        const checkBtn = container.querySelector('#iv-check-btn');
+        const nextBtn  = container.querySelector('#iv-next-btn');
+        const item = session[idx];
+        let spokenWord;
+
+        if (mode === 'image-to-word') {
+          const pool = safeShuffle(items.filter(i => i.word !== item.word), () => false).slice(0, 2);
+          const opts = safeShuffle([item, ...pool], r => r[0].word === item.word);
+          content.innerHTML = `
+            <div class="iv-visual"><div class="iv-emoji">${item.emoji}</div><p class="iv-instruction">Tap the correct word</p></div>
+            <div class="iv-options-grid">${opts.map(o => `<button class="iv-option-btn" data-val="${o.word}" data-ans="${item.word}">${o.word}</button>`).join('')}</div>
+          `;
+          spokenWord = item.word;
+        } else if (mode === 'word-to-image') {
+          const pool = safeShuffle(items.filter(i => i.emoji !== item.emoji), () => false).slice(0, 2);
+          const opts = safeShuffle([item, ...pool], r => r[0].emoji === item.emoji);
+          content.innerHTML = `
+            <div class="iv-visual"><div class="iv-word">${item.word}</div><p class="iv-instruction">Tap the correct picture</p></div>
+            <div class="iv-options-grid">${opts.map(o => `<button class="iv-option-btn emoji-opt" data-val="${o.emoji}" data-ans="${item.emoji}">${o.emoji}</button>`).join('')}</div>
+          `;
+          spokenWord = item.word;
+        } else {
+          // cloze-image: `sentence` already has ___, `cloze` is the answer word
+          const pool = safeShuffle(items.filter(i => i.cloze !== item.cloze), () => false).slice(0, 3);
+          const opts = safeShuffle([item, ...pool], r => r[0].cloze === item.cloze);
+          content.innerHTML = `
+            <div class="iv-visual"><div class="iv-emoji" style="font-size:9cqw;">${item.emoji}</div></div>
+            <div class="iv-sentence">${item.sentence.replace('___', '<span class="iv-blank" id="iv-blank">___</span>')}</div>
+            <div class="iv-options-grid">${opts.map(o => `<button class="iv-option-btn" data-val="${o.cloze}" data-ans="${item.cloze}">${o.cloze}</button>`).join('')}</div>
+          `;
+          spokenWord = item.cloze;
+        }
+        speak(spokenWord, 'neutral', 300);
+
+        content.querySelectorAll('.iv-option-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (locked) return;
+            content.querySelectorAll('.iv-option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selected = { val: btn.dataset.val, ans: btn.dataset.ans };
+            const blank = content.querySelector('#iv-blank');
+            if (blank && mode === 'cloze-image') blank.textContent = btn.dataset.val;
+            checkBtn.style.display = 'block';
+          });
+        });
+
+        checkBtn.addEventListener('click', () => {
+          if (!selected || locked) return;
+          locked = true;
+          const ok = selected.val === selected.ans;
+          if (ok) score++;
+          const feedback = container.querySelector('#iv-feedback');
+          feedback.textContent = ok ? '✓ Correct!' : '✗ See the right answer';
+          feedback.style.color = ok ? '#AED581' : '#F48FB1';
+          checkBtn.style.display = 'none';
+          content.querySelectorAll('.iv-option-btn').forEach(b => {
+            b.disabled = true;
+            if (b.dataset.val === b.dataset.ans) b.classList.add('correct');
+            else if (b.dataset.val === selected.val && !ok) b.classList.add('wrong');
+            else b.classList.remove('selected');
+          });
+          const blank = content.querySelector('#iv-blank');
+          if (blank) blank.textContent = selected.ans;
+          speak(spokenWord, ok ? 'celebrate' : 'wrong');
+          if (mode === 'cloze-image') {
+            const fullSentence = item.sentence.replace('___', selected.ans);
+            speak(fullSentence, ok ? 'celebrate' : 'neutral', 900);
+          }
+          nextBtn.style.display = 'block';
+        });
+
+        nextBtn.addEventListener('click', () => {
+          idx++;
+          if (idx < session.length) renderQuestion();
+          else onComplete(score / session.length);
+        });
+      }
+
+      renderQuestion();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  MEMORY PAIRS
+  //  v2 design: per-tier pool { pick, flipback(ms), items }, separate pool
+  //  per tier (not shared across tiers — same standardization as every
+  //  other module now). `pick` pairs drawn, image card + word card each.
+  //  Flip two, find the match. Cards colored by pair via PALETTE on match,
+  //  matching Put in Order/Gap-fill's shared palette convention.
+  //  Audio rule (confirmed with Nick): every flip says its word immediately,
+  //  EXCEPT the 2nd flip is silent if it matches the 1st (already just
+  //  heard it). On mismatch, both cards' audio already played at flip-time.
+  //  On match: grammar-color sentence reinforcement (shared with
+  //  gap-fill/true-false), not the generic word/emoji panel.
+  // ─────────────────────────────────────────────
+  'memory-pairs': {
+    render(container, data, tier, onComplete) {
+      const { pick, flipback, items } = data;
+      const PAIRS = Math.min(pick, items.length);
+      const picked = safeShuffle(items, ()=>false).slice(0, PAIRS);
+      const deckSrc = [
+        ...picked.map((it,i)=>({...it, kind:'image', pid:i})),
+        ...picked.map((it,i)=>({...it, kind:'word',  pid:i})),
+      ];
+      const deck = safeShuffle(deckSrc, r => {
+        for (let i=0;i<r.length-1;i++) if(r[i].pid===r[i+1].pid) return true;
+        return false;
+      });
+
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)'  },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)'  },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)'  },
+        { border:'#8BC34A', bg:'rgba(139,195,74,.15)' }
+      ];
+
+      let flipped=[], matched=0, flips=0, cardLocked=false;
+
+      document.getElementById('v2-qlabel').innerHTML =
+        `<span>Find the pairs</span><span>Flips: <span id="mp-flips">0</span></span>`;
+
+      container.innerHTML = `
+        <div class="mp-pips-row-v2" id="mp-pips"></div>
+        <div class="mp-card-grid-v2" id="mp-grid"></div>
+        <p class="mp-status-v2" id="mp-msg">&nbsp;</p>
+      `;
+
+      const pipsEl = container.querySelector('#mp-pips');
+      picked.forEach((_, i) => {
+        const c = PALETTE[i % PALETTE.length];
+        const pip = document.createElement('div');
+        pip.className = 'mp-pip-v2';
+        pip.id = `mp-pip-${i}`;
+        pip.style.background = c.bg;
+        pip.style.borderColor = c.border;
+        pipsEl.appendChild(pip);
+      });
+
+      const gridEl = container.querySelector('#mp-grid');
+      deck.forEach((card, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'mp-card-wrap-v2';
+        wrap.id = `mp-cw-${i}`;
+        wrap.innerHTML = `
+          <div class="mp-card-inner-v2" id="mp-ci-${i}">
+            <div class="mp-card-face-v2 mp-card-back-v2">?</div>
+            <div class="mp-card-face-v2 mp-card-front-v2" id="mp-cf-${i}">
+              ${card.kind === 'image'
+                ? (card.image
+                    ? `<img src="${card.image}" alt="${card.word}" style="width:70%;height:70%;object-fit:cover;border-radius:8px;">`
+                    : `<span class="mp-emoji-v2">${card.emoji}</span>`)
+                : `<span>${card.word}</span>`}
+            </div>
+          </div>`;
+        wrap.addEventListener('click', () => mpFlip(i));
+        gridEl.appendChild(wrap);
+      });
+
+      function mpFlip(i) {
+        if (cardLocked) return;
+        const cw = document.getElementById(`mp-cw-${i}`);
+        const ci = document.getElementById(`mp-ci-${i}`);
+        if (!cw || cw.dataset.done || cw.dataset.flipped) return;
+        cw.dataset.flipped = '1';
+        ci.classList.add('flipped');
+
+        if (flipped.length === 0) {
+          // First card of the pair — always say it.
+          speak(deck[i].word, 'neutral', 0, deck[i].audioFile);
+        } else {
+          // Second card — only say it if it's NOT a match with the first;
+          // a match means it's the same word we just said a second ago.
+          const first = deck[flipped[0]];
+          const second = deck[i];
+          const isMatch = first.pid === second.pid && first.kind !== second.kind;
+          if (!isMatch) speak(second.word, 'neutral', 0, second.audioFile);
+        }
+
+        flips++;
+        document.getElementById('mp-flips').textContent = flips;
+        flipped.push(i);
+        if (flipped.length === 2) { cardLocked = true; setTimeout(mpCheck, 500); }
+      }
+
+      function mpCheck() {
+        const [a, b] = flipped;
+        const ca = deck[a], cb = deck[b];
+        const isMatch = ca.pid === cb.pid && ca.kind !== cb.kind;
+        if (isMatch) {
+          matched++;
+          const c = PALETTE[ca.pid % PALETTE.length];
+          ['mp-cf-'+a,'mp-cf-'+b].forEach(id=>{
+            const el=document.getElementById(id);
+            if(el){el.style.background=c.bg;el.style.borderColor=c.border;}
+          });
+          document.getElementById(`mp-cw-${a}`).dataset.done='1';
+          document.getElementById(`mp-cw-${b}`).dataset.done='1';
+          const pip=document.getElementById(`mp-pip-${ca.pid}`);
+          if(pip){pip.classList.add('done');pip.style.background=c.border;}
+          flipped=[];
+
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+          showGrammarReinforce(ca.tokens, ca.sentence, () => {
+            cardLocked = false;
+            if (matched === PAIRS) {
+              setTimeout(()=>onComplete(matched/PAIRS), 400);
+            }
+          });
+        } else {
+          const ciA=document.getElementById(`mp-ci-${a}`);
+          const ciB=document.getElementById(`mp-ci-${b}`);
+          if(ciA){ciA.style.boxShadow='0 0 0 2px #E91E63';}
+          if(ciB){ciB.style.boxShadow='0 0 0 2px #E91E63';}
+          // No audio here — both cards already said their word at flip-time
+          // (see mpFlip). Playing again here would just repeat them.
+          setTimeout(()=>{
+            if(ciA){ciA.classList.remove('flipped');ciA.style.boxShadow='';}
+            if(ciB){ciB.classList.remove('flipped');ciB.style.boxShadow='';}
+            delete document.getElementById(`mp-cw-${a}`).dataset.flipped;
+            delete document.getElementById(`mp-cw-${b}`).dataset.flipped;
+            flipped=[]; cardLocked=false;
+          }, flipback || 1100);
+        }
+      }
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  WORD SCRAMBLE
+  //  v2 design: pool-based { pick, items: [{word,emoji,tokens}] },
+  //  separate pool per tier. Tap scrambled letter tiles into slots; tap a
+  //  filled slot to remove. Manual play button only — no auto-announce on
+  //  question load, matching the locked demo (word-scramble-demo.html).
+  //  Each question gets one color from PALETTE (not per-letter), cycling
+  //  across the session.
+  //  Audio (confirmed with Nick): correct → word once, then the sentence
+  //  (not word-word-sentence). Wrong → word once, then silent retry (not
+  //  twice). Grammar-color sentence reinforcement on correct via
+  //  showGrammarReinforce, same as gap-fill/true-false/memory-pairs.
+  // ─────────────────────────────────────────────
+  'word-scramble': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      let idx = 0, score = 0, slotData = [], bankData = [], wsLocked = false;
+
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)' },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)' },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)' }
+      ];
+      function itemColor() { return PALETTE[idx % PALETTE.length]; }
+
+      function pips() {
+        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+
+      function load() {
+        wsLocked = false;
+        const item = session[idx];
+        const letters = item.word.toUpperCase().split('');
+        slotData = letters.map(() => null);
+        const wordUp = item.word.toUpperCase();
+        bankData = safeShuffle(letters, r => r.join('') === wordUp).map((l, i) => ({ letter: l, id: i, used: false }));
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+        draw();
+      }
+
+      function draw() {
+        const item = session[idx];
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="ws-pips"></div>
+          <div class="ws-visual-v2">
+            <div class="ws-emoji-v2">${item.emoji}</div>
+            <button class="ws-play-btn-v2" id="ws-play-btn">🔊</button>
+          </div>
+          <div class="ws-slots-v2" id="ws-slots"></div>
+          <div class="ws-bank-v2" id="ws-bank"></div>
+          <p class="ws-feedback-v2" id="ws-fb">&nbsp;</p>
+        `;
+        container.querySelector('#ws-pips').innerHTML = pips();
+
+        const wsSlots = container.querySelector('#ws-slots');
+        slotData.forEach((_, si) => {
+          const d = document.createElement('div');
+          d.className = 'ws-slot-v2';
+          d.id = `ws-s-${si}`;
+          d.addEventListener('click', () => wsRemove(si));
+          wsSlots.appendChild(d);
+        });
+
+        const wsBank = container.querySelector('#ws-bank');
+        bankData.forEach((t, bi) => {
+          const b = document.createElement('button');
+          b.className = 'ws-tile-v2';
+          b.id = `ws-t-${bi}`;
+          b.textContent = t.letter;
+          b.addEventListener('click', () => wsTap(bi));
+          wsBank.appendChild(b);
+        });
+
+        container.querySelector('#ws-play-btn').addEventListener('click', () => {
+          speak(item.word, 'neutral');
+        });
+
+        refreshSlots(); refreshBank();
+      }
+
+      function refreshSlots() {
+        const c = itemColor();
+        slotData.forEach((entry, si) => {
+          const el = document.getElementById(`ws-s-${si}`);
+          if (!el) return;
+          el.textContent = entry ? entry.letter : '';
+          el.style.borderColor = entry ? c.border : 'rgba(255,255,255,0.08)';
+          el.style.background = entry ? c.bg : 'rgba(255,255,255,0.05)';
+          el.style.color = entry ? c.border : '#fff';
+        });
+      }
+      function refreshBank() {
+        bankData.forEach((t, bi) => {
+          const el = document.getElementById(`ws-t-${bi}`);
+          if (el) el.classList.toggle('used', t.used);
+        });
+      }
+
+      function wsTap(bi) {
+        if (wsLocked) return;
+        const tile = bankData[bi];
+        if (tile.used) return;
+        const si = slotData.indexOf(null);
+        if (si === -1) return;
+        tile.used = true;
+        slotData[si] = { letter: tile.letter, bankId: bi };
+        refreshSlots(); refreshBank();
+        if (slotData.indexOf(null) === -1) setTimeout(wsCheck, 200);
+      }
+      function wsRemove(si) {
+        if (wsLocked) return;
+        const entry = slotData[si];
+        if (!entry) return;
+        bankData[entry.bankId].used = false;
+        slotData[si] = null;
+        refreshSlots(); refreshBank();
+      }
+
+      function wsCheck() {
+        const item = session[idx];
+        const attempt = slotData.map(e => e.letter).join('').toLowerCase();
+        const ok = attempt === item.word.toLowerCase();
+        wsLocked = true;
+        const c = itemColor();
+        const fb = document.getElementById('ws-fb');
+
+        slotData.forEach((_, si) => {
+          const el = document.getElementById(`ws-s-${si}`);
+          if (el) {
+            el.style.borderColor = ok ? c.border : '#E91E63';
+            el.style.background = ok ? c.bg : 'rgba(233,30,99,0.12)';
+            el.style.color = ok ? c.border : '#F48FB1';
+          }
+        });
+
+        if (ok) {
+          score++;
+          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
+          speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel, not repeated here
+          setTimeout(() => {
+            const plainSentence = item.tokens.map(t => t.t).join(' ');
+            showGrammarReinforce(item.tokens, plainSentence, () => {
+              idx++;
+              if (idx < session.length) load();
+              else onComplete(score / session.length);
+            });
+          }, 500);
+        } else {
+          if (fb) { fb.textContent = `✗ The word is: ${item.word}`; fb.style.color = '#F48FB1'; }
+          speak(item.word, 'wrong'); // word once, then silent retry — no second play
+          setTimeout(() => {
+            slotData = slotData.map(() => null);
+            bankData.forEach(t => t.used = false);
+            wsLocked = false;
+            refreshSlots(); refreshBank();
+            if (fb) { fb.textContent = 'Try again!'; fb.style.color = 'rgba(255,255,255,0.4)'; }
+          }, 1500);
+        }
+      }
+
+      load();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  SPELLING
+  //  v2 design: pool-based { pick, items: [{word,emoji,tokens}] }, separate
+  //  pool per tier. Bronze: image + tap tiles. Silver: audio-only + tap
+  //  tiles. Gold: audio-only + free typing (no letter bank at all — this
+  //  is the genuine skill difference from Word Scramble: production
+  //  spelling from memory, not anagram-solving). tokens can be null
+  //  (library/hospital) — falls back to just the word for reinforcement.
+  //  Manual play button only — no auto-announce, matching Word Scramble.
+  //  Audio: correct → word once, then sentence. Wrong → word once, silent
+  //  retry. Same rule Nick confirmed for Word Scramble.
+  // ─────────────────────────────────────────────
+  'spelling': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      let idx = 0, score = 0, spLocked = false, retypeMode = false;
+      let slotData = [], bankData = [];
+
+      function pips() {
+        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+
+      function load() {
+        spLocked = false; retypeMode = false;
+        const item = session[idx];
+        const letters = item.word.toUpperCase().split('');
+        slotData = letters.map(() => null);
+        const wordUp = item.word.toUpperCase();
+        bankData = safeShuffle(letters, r => r.join('') === wordUp).map((l, i) => ({ letter: l, id: i, used: false }));
+
+        const showImage = tier === 'bronze';
+        const isTile = tier !== 'gold';
+        const instruction = tier === 'bronze' ? 'Tap the letters to spell the word'
+                           : tier === 'silver' ? 'Listen and spell what you hear'
+                           : 'Listen and type the word';
+
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="sp-pips"></div>
+          <div class="sp-visual-v2">
+            ${showImage ? `<div class="sp-emoji-v2">${item.emoji}</div>` : ''}
+            <div class="sp-listen-row-v2">
+              <button class="sp-play-btn-v2" id="sp-play-btn">🔊</button>
+              <span class="sp-instruction-v2">${instruction}</span>
+            </div>
+          </div>
+          ${isTile ? `
+          <div class="sp-slots-v2" id="sp-slots"></div>
+          <div class="sp-bank-v2" id="sp-bank"></div>
+          ` : `
+          <input id="sp-input" class="sp-input-v2" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Type the word…">
+          <button id="sp-chk" class="sp-check-btn-v2" disabled>Check →</button>
+          `}
+          <p class="sp-feedback-v2" id="sp-fb">&nbsp;</p>
+        `;
+        container.querySelector('#sp-pips').innerHTML = pips();
+
+        container.querySelector('#sp-play-btn').addEventListener('click', () => speak(item.word, 'neutral'));
+
+        if (isTile) {
+          const slotsEl = container.querySelector('#sp-slots');
+          slotData.forEach((_, si) => {
+            const d = document.createElement('div');
+            d.className = 'sp-slot-v2';
+            d.id = `sp-s-${si}`;
+            d.addEventListener('click', () => spRemove(si));
+            slotsEl.appendChild(d);
+          });
+          const bankEl = container.querySelector('#sp-bank');
+          bankData.forEach((t, bi) => {
+            const b = document.createElement('button');
+            b.className = 'sp-tile-v2';
+            b.id = `sp-t-${bi}`;
+            b.textContent = t.letter;
+            b.addEventListener('click', () => spTap(bi));
+            bankEl.appendChild(b);
+          });
+          spRefreshSlots(); spRefreshBank();
+        } else {
+          const inp = container.querySelector('#sp-input');
+          const chk = container.querySelector('#sp-chk');
+          inp.addEventListener('input', () => {
+            chk.style.display = 'block';
+            chk.disabled = inp.value.trim().length === 0;
+            chk.style.opacity = inp.value.trim().length ? '1' : '.4';
+          });
+          inp.addEventListener('keydown', e => { if (e.key === 'Enter') spCheckType(); });
+          chk.addEventListener('click', spCheckType);
+          setTimeout(() => inp.focus(), 200);
+        }
+      }
+
+      function spTap(bi) {
+        if (spLocked) return;
+        const tile = bankData[bi];
+        if (tile.used) return;
+        const si = slotData.indexOf(null);
+        if (si === -1) return;
+        tile.used = true;
+        slotData[si] = { letter: tile.letter, bankId: bi };
+        spRefreshSlots(); spRefreshBank();
+        if (slotData.indexOf(null) === -1) setTimeout(spCheckTiles, 200);
+      }
+      function spRemove(si) {
+        if (spLocked) return;
+        const entry = slotData[si];
+        if (!entry) return;
+        bankData[entry.bankId].used = false;
+        slotData[si] = null;
+        spRefreshSlots(); spRefreshBank();
+      }
+      function spRefreshSlots() {
+        slotData.forEach((entry, si) => {
+          const el = document.getElementById(`sp-s-${si}`);
+          if (!el) return;
+          el.textContent = entry ? entry.letter : '';
+          el.style.borderColor = entry ? '#7052B4' : 'rgba(255,255,255,0.08)';
+          el.style.background = entry ? 'rgba(112,82,180,0.15)' : 'rgba(255,255,255,0.05)';
+        });
+      }
+      function spRefreshBank() {
+        bankData.forEach((t, bi) => {
+          const el = document.getElementById(`sp-t-${bi}`);
+          if (el) el.classList.toggle('used', t.used);
+        });
+      }
+
+      function reinforceThenAdvance(item) {
+        const plainSentence = item.tokens ? item.tokens.map(t => t.t).join(' ') : item.word;
+        showGrammarReinforce(item.tokens, plainSentence, () => {
+          idx++;
+          if (idx < session.length) load();
+          else onComplete(score / session.length);
+        });
+      }
+
+      function spCheckTiles() {
+        const item = session[idx];
+        const attempt = slotData.map(e => e.letter).join('').toLowerCase();
+        const ok = attempt === item.word.toLowerCase();
+        spLocked = true;
+        const fb = document.getElementById('sp-fb');
+        slotData.forEach((_, si) => {
+          const el = document.getElementById(`sp-s-${si}`);
+          if (el) {
+            el.style.borderColor = ok ? '#8BC34A' : '#E91E63';
+            el.style.background = ok ? 'rgba(139,195,74,0.15)' : 'rgba(233,30,99,0.12)';
+          }
+        });
+        if (ok) {
+          score++;
+          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
+          speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel
+          setTimeout(() => reinforceThenAdvance(item), 500);
+        } else {
+          if (fb) { fb.textContent = `✗ The word is: ${item.word}`; fb.style.color = '#F48FB1'; }
+          speak(item.word, 'wrong'); // word once, then silent retry
+          setTimeout(() => {
+            slotData = slotData.map(() => null);
+            bankData.forEach(t => t.used = false);
+            spLocked = false;
+            spRefreshSlots(); spRefreshBank();
+            if (fb) { fb.textContent = 'Try again!'; fb.style.color = 'rgba(255,255,255,0.4)'; }
+          }, 1500);
+        }
+      }
+
+      function spCheckType() {
+        if (spLocked) return;
+        const item = session[idx];
+        const inp = document.getElementById('sp-input');
+        if (!inp || !inp.value.trim()) return;
+        const attempt = inp.value.trim().toLowerCase();
+        const ok = attempt === item.word.toLowerCase();
+        spLocked = true;
+        const fb = document.getElementById('sp-fb');
+        inp.style.borderColor = ok ? '#8BC34A' : '#E91E63';
+        inp.style.background = ok ? 'rgba(139,195,74,0.08)' : 'rgba(233,30,99,0.08)';
+        const chk = document.getElementById('sp-chk');
+        if (chk) chk.style.display = 'none';
+
+        if (ok) {
+          if (!retypeMode) score++;
+          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
+          speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel
+          setTimeout(() => reinforceThenAdvance(item), 500);
+        } else {
+          if (fb) { fb.textContent = `✗ The word is: ${item.word} — now type it correctly`; fb.style.color = '#F48FB1'; }
+          speak(item.word, 'wrong'); // word once, then silent retry
+          setTimeout(() => {
+            retypeMode = true; spLocked = false;
+            inp.value = ''; inp.style.borderColor = 'rgba(255,255,255,0.08)';
+            inp.style.background = 'rgba(255,255,255,0.05)';
+            inp.placeholder = 'Type the correct word…'; inp.focus();
+            if (chk) { chk.style.display = 'block'; chk.disabled = true; chk.style.opacity = '.4'; }
+            if (fb) { fb.textContent = `Type: ${item.word}`; fb.style.color = '#C9B8EA'; }
+          }, 1600);
+        }
+      }
+
+      load();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  LISTEN & MATCH
+  //  v2 design: pool-based { pick, items: [{left,right}] } — same shape
+  //  and free-pairing engine as Word Match, confirmed identical in the
+  //  locked demo (listen-match-demo.html). Only real difference: left
+  //  buttons show a 🔊 icon and play audio on every tap (unlimited
+  //  replay) instead of showing text. left always equals right in the
+  //  data — it's an audio-echo match, not a translation pair.
+  // ─────────────────────────────────────────────
+  'audio-match': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const pairs = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const total = pairs.length;
+      const isBronze = (tier === 'bronze');
+
+      const PALETTE = [
+        { border: '#00BCD4', bg: 'rgba(0,188,212,0.15)',  color: '#00BCD4' },
+        { border: '#AB47BC', bg: 'rgba(171,71,188,0.15)', color: '#CE93D8' },
+        { border: '#FF9800', bg: 'rgba(255,152,0,0.15)',  color: '#FFB74D' },
+        { border: '#E91E63', bg: 'rgba(233,30,99,0.15)',  color: '#F48FB1' },
+        { border: '#8BC34A', bg: 'rgba(139,195,74,0.15)', color: '#AED581' }
+      ];
+      const pairColor = pairs.map((_, i) => PALETTE[i % PALETTE.length]);
+
+      document.getElementById('v2-qlabel').innerHTML =
+        `<span>Tap 🔊 to listen, then match.</span><span id="am-score">0 of ${total} paired</span>`;
+
+      container.innerHTML = `
+        <div class="wm-grid-v2">
+          <div class="wm-col-v2" id="am-left-col"></div>
+          <div class="wm-col-v2" id="am-right-col"></div>
+        </div>
+        <p class="wm-encourage-v2" id="am-encourage"></p>
+        <p class="wm-nudge-v2" id="am-nudge"></p>
+        <button id="am-notquite-btn" class="wm-notquite-btn-v2" disabled>Not quite yet</button>
+        <button id="am-next-btn" class="iv-proceed-btn">Next →</button>
+      `;
+
+      const leftCol      = container.querySelector('#am-left-col');
+      const rightCol     = container.querySelector('#am-right-col');
+      const scoreLabel   = document.getElementById('am-score');
+      const encourageEl  = container.querySelector('#am-encourage');
+      const nudgeEl      = container.querySelector('#am-nudge');
+      const notQuiteBtn  = container.querySelector('#am-notquite-btn');
+      const nextBtn      = container.querySelector('#am-next-btn');
+
+      let pairings = new Map();
+      let rightUsed = new Map();
+      let selectedLeftBtn = null;
+      let confirmed = false;
+
+      function styleLeft(btn) {
+        if (confirmed) return;
+        const idx = parseInt(btn.dataset.pairIdx);
+        const c = pairColor[idx];
+        const isSelected = (btn === selectedLeftBtn);
+        const isPaired = pairings.has(idx);
+        if (isSelected) {
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+          btn.style.boxShadow = `0 0 0 3px ${c.border}`;
+        } else if (isPaired) {
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+          btn.style.boxShadow = '';
+        } else {
+          btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.color = 'rgba(255,255,255,0.85)'; btn.style.boxShadow = '';
+        }
+      }
+      function styleRight(btn) {
+        if (confirmed) return;
+        const rightIdx = parseInt(btn.dataset.pairIdx);
+        if (rightUsed.has(rightIdx)) {
+          const c = pairColor[rightUsed.get(rightIdx)];
+          btn.style.borderColor = c.border; btn.style.background = c.bg; btn.style.color = c.color;
+        } else {
+          btn.style.borderColor = 'rgba(255,255,255,0.08)'; btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.color = 'rgba(255,255,255,0.85)';
+        }
+      }
+      function checkAllCorrect() {
+        if (pairings.size !== total) return false;
+        for (const leftIdx of pairings.keys()) {
+          if (pairings.get(leftIdx) !== leftIdx) return false;
+        }
+        return true;
+      }
+      function refreshAll() {
+        container.querySelectorAll('.wm-btn-v2[data-side="left"]').forEach(styleLeft);
+        container.querySelectorAll('.wm-btn-v2[data-side="right"]').forEach(styleRight);
+
+        let correctSoFar = 0, wrongSoFar = 0;
+        pairings.forEach((rightIdx, leftIdx) => {
+          if (rightIdx === leftIdx) correctSoFar++; else wrongSoFar++;
+        });
+
+        if (pairings.size === total) {
+          if (checkAllCorrect()) {
+            confirmed = true;
+            scoreLabel.textContent = 'Good job!';
+            scoreLabel.style.color = '#AED581';
+            notQuiteBtn.style.display = 'none';
+            nudgeEl.style.opacity = '0';
+            encourageEl.style.opacity = '0';
+            nextBtn.style.display = 'flex';
+            nextBtn.onclick = () => onComplete(1);
+          } else {
+            scoreLabel.textContent = `${Math.min(pairings.size, total)} of ${total} paired`;
+            scoreLabel.style.color = '';
+            nextBtn.style.display = 'none';
+            notQuiteBtn.style.display = 'flex';
+            nudgeEl.style.opacity = '0';
+            encourageEl.style.opacity = '0';
+          }
+        } else {
+          scoreLabel.textContent = `${pairings.size} of ${total} paired`;
+          scoreLabel.style.color = '';
+          nextBtn.style.display = 'none';
+          notQuiteBtn.style.display = 'none';
+
+          if (isBronze && wrongSoFar > 0) {
+            nudgeEl.textContent = 'Are you sure about that one?';
+            nudgeEl.style.opacity = '1';
+            encourageEl.style.opacity = '0';
+          } else {
+            nudgeEl.style.opacity = '0';
+            if (correctSoFar > 0) {
+              const ratio = correctSoFar / total;
+              encourageEl.textContent = ratio >= 0.66 ? 'Almost there!'
+                                       : ratio >= 0.34 ? 'Getting there!'
+                                       : 'Nice, keep going!';
+              encourageEl.style.opacity = '1';
+            } else {
+              encourageEl.style.opacity = '0';
+            }
+          }
+        }
+      }
+
+      const withIdx = pairs.map((p, i) => ({ left: p.left, right: p.right, pairIdx: i }));
+      const leftItems = safeShuffle(withIdx, () => false);
+      const rightItems = safeShuffle(withIdx, r => r.some((item, pos) => item.pairIdx === leftItems[pos].pairIdx));
+
+      leftItems.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className = 'wm-btn-v2';
+        btn.innerHTML = '🔊';
+        btn.dataset.side = 'left';
+        btn.dataset.pairIdx = pair.pairIdx;
+        btn.dataset.audio = pair.left;
+        leftCol.appendChild(btn);
+      });
+      rightItems.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className = 'wm-btn-v2';
+        btn.textContent = pair.right;
+        btn.dataset.side = 'right';
+        btn.dataset.pairIdx = pair.pairIdx;
+        rightCol.appendChild(btn);
+      });
+
+      container.querySelectorAll('.wm-btn-v2').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (confirmed) return;
+
+          if (btn.dataset.side === 'left') {
+            speak(btn.dataset.audio, 'neutral'); // unlimited replay — plays every tap, matched or not
+            selectedLeftBtn = (btn === selectedLeftBtn) ? null : btn;
+            refreshAll();
+            return;
+          }
+
+          const rightIdx = parseInt(btn.dataset.pairIdx);
+          const leftIdx = selectedLeftBtn ? parseInt(selectedLeftBtn.dataset.pairIdx) : null;
+
+          if (rightUsed.has(rightIdx)) {
+            const prevLeftIdx = rightUsed.get(rightIdx);
+            pairings.delete(prevLeftIdx);
+            rightUsed.delete(rightIdx);
+            if (leftIdx === null || leftIdx === prevLeftIdx) {
+              selectedLeftBtn = null;
+              refreshAll();
+              return;
+            }
+          }
+          if (leftIdx === null) { refreshAll(); return; }
+
+          if (pairings.has(leftIdx)) {
+            rightUsed.delete(pairings.get(leftIdx));
+            pairings.delete(leftIdx);
+          }
+          pairings.set(leftIdx, rightIdx);
+          rightUsed.set(rightIdx, leftIdx);
+          selectedLeftBtn = null;
+          refreshAll();
+        });
+      });
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  SENTENCE BUILDING
+  //  v2 design: pool-based { pick, items: [{tokens}] }, separate pool per
+  //  tier. Word-tile version of Word Scramble: tap tiles from the bank
+  //  into ordered slots, auto-check on last slot filled, reset on wrong.
+  //  On correct: tiles recolour by grammar role IN PLACE (subject/verb/
+  //  object/place/time; everything else neutral) and a legend + the full
+  //  sentence play — no separate overlay here, deliberately different
+  //  from every other module's reinforcement pattern, matching the
+  //  locked demo exactly. Audio was already correct in the old renderer
+  //  (single speak on each outcome, no per-tap bug) — kept as-is.
+  // ─────────────────────────────────────────────
+  'sentence-building': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      let idx = 0, score = 0, sbLocked = false;
+      let slotData = [], bankData = [];
+
+      const ROLE_COLOR = { subject:'#00BCD4', verb:'#8BC34A', object:'#FF9800', place:'#AB47BC', time:'#E91E63' };
+      const roleColor = role => ROLE_COLOR[role] || null;
+
+      function pips() {
+        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+      function sentenceText(tokens) {
+        return tokens.map(t => t.text).join(' ');
+      }
+
+      function load() {
+        sbLocked = false;
+        const item = session[idx];
+        slotData = item.tokens.map(() => null);
+        const withId = item.tokens.map((t, i) => ({ ...t, id: i }));
+        bankData = safeShuffle(withId, r => r.every((t, i) => t.text === item.tokens[i].text))
+          .map(t => ({ ...t, used: false }));
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+        draw();
+      }
+
+      function draw() {
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="sb-pips"></div>
+          <p class="sb-prompt-v2">Put the words in order.</p>
+          <div class="sb-slots-v2" id="sb-slots"></div>
+          <div class="sb-bank-v2" id="sb-bank"></div>
+          <div class="sb-feedback-v2" id="sb-fb">&nbsp;</div>
+          <button class="iv-proceed-btn" id="sb-next-btn">Next →</button>
+        `;
+        container.querySelector('#sb-pips').innerHTML = pips();
+
+        const slotsEl = container.querySelector('#sb-slots');
+        slotData.forEach((_, si) => {
+          const d = document.createElement('div');
+          d.className = 'sb-slot-v2';
+          d.id = `sb-s-${si}`;
+          d.addEventListener('click', () => sbRemove(si));
+          slotsEl.appendChild(d);
+        });
+        const bankEl = container.querySelector('#sb-bank');
+        bankData.forEach((t, bi) => {
+          const b = document.createElement('button');
+          b.className = 'sb-tile-v2';
+          b.id = `sb-t-${bi}`;
+          b.textContent = t.text;
+          b.addEventListener('click', () => sbTap(bi));
+          bankEl.appendChild(b);
+        });
+        refreshSlots(); refreshBank();
+      }
+
+      function refreshSlots() {
+        slotData.forEach((entry, si) => {
+          const el = document.getElementById(`sb-s-${si}`);
+          if (!el) return;
+          el.textContent = entry ? entry.text : '';
+          el.style.borderColor = entry ? '#7052B4' : 'rgba(255,255,255,0.08)';
+          el.style.background = entry ? 'rgba(112,82,180,0.15)' : 'rgba(255,255,255,0.05)';
+          el.style.color = '#fff';
+        });
+      }
+      function refreshBank() {
+        bankData.forEach((t, bi) => {
+          const el = document.getElementById(`sb-t-${bi}`);
+          if (el) el.classList.toggle('used', t.used);
+        });
+      }
+
+      function sbTap(bi) {
+        if (sbLocked) return;
+        const tile = bankData[bi];
+        if (tile.used) return;
+        const si = slotData.indexOf(null);
+        if (si === -1) return;
+        tile.used = true;
+        slotData[si] = { text: tile.text, role: tile.role, bankId: bi };
+        refreshSlots(); refreshBank();
+        if (slotData.indexOf(null) === -1) setTimeout(sbCheck, 200);
+      }
+      function sbRemove(si) {
+        if (sbLocked) return;
+        const entry = slotData[si];
+        if (!entry) return;
+        bankData[entry.bankId].used = false;
+        slotData[si] = null;
+        refreshSlots(); refreshBank();
+      }
+
+      function sbCheck() {
+        const item = session[idx];
+        const ok = slotData.every((e, i) => e.text === item.tokens[i].text);
+        sbLocked = true;
+        const fb = document.getElementById('sb-fb');
+        const nextBtn = document.getElementById('sb-next-btn');
+
+        if (ok) {
+          score++;
+          slotData.forEach((entry, si) => {
+            const el = document.getElementById(`sb-s-${si}`);
+            if (!el) return;
+            const c = roleColor(entry.role);
+            el.style.borderColor = c || 'rgba(255,255,255,0.3)';
+            el.style.background = c ? c + '26' : 'rgba(255,255,255,0.06)';
+            el.style.color = c || 'rgba(255,255,255,0.6)';
+          });
+          // Reuse the shared grammarLegend helper — remap text/role to t/r
+          // since this module's tokens use different field names than the
+          // gap-fill/true-false grammar-token convention.
+          const legendTokens = item.tokens.map(t => ({ t: t.text, r: t.role }));
+          fb.innerHTML = `<div class="sb-legend-v2">${grammarLegend(legendTokens)}</div>`;
+          speak(sentenceText(item.tokens), 'celebrate');
+          nextBtn.style.display = 'block';
+          nextBtn.onclick = () => {
+            idx++;
+            if (idx < session.length) load();
+            else onComplete(score / session.length);
+          };
+        } else {
+          slotData.forEach((_, si) => {
+            const el = document.getElementById(`sb-s-${si}`);
+            if (el) { el.style.borderColor = '#E91E63'; el.style.background = 'rgba(233,30,99,0.1)'; }
+          });
+          fb.textContent = '✗ Not quite — listen and try again';
+          fb.style.color = '#F48FB1';
+          speak(sentenceText(item.tokens), 'wrong'); // deliberately speaks even on wrong here, matches locked demo
+          setTimeout(() => {
+            slotData = slotData.map(() => null);
+            bankData.forEach(t => t.used = false);
+            sbLocked = false;
+            refreshSlots(); refreshBank();
+            fb.textContent = 'Try again!';
+            fb.style.color = 'rgba(255,255,255,0.4)';
+          }, 1600);
+        }
+      }
+
+      load();
+    }
+  },
+
+};
+
+
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+
+showScreen('screen-name');
+
+// ══════════════════════════════════════════════════
+//  DEBUG HARNESS — ?debug=1
+//  Skips the name picker/linear tier flow so any
+//  module + tier can be jumped to directly, the same
+//  way module-demos/test-harness.html works for the
+//  standalone demo files.
+// ══════════════════════════════════════════════════
+(function initDebugHarness() {
+  if (new URLSearchParams(location.search).get('debug') !== '1') return;
+
+  document.getElementById('debug-harness').style.display = 'flex';
+  document.querySelectorAll('.screen').forEach(s => s.style.paddingTop = '54px');
+
+  const moduleSelect = document.getElementById('debug-module-select');
+  const tierSelect = document.getElementById('debug-tier-select');
+
+  LESSON.forEach((mod, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${i + 1}. ${mod.label} (${mod.type})`;
+    opt.style.background = '#0D1B2A';
+    opt.style.color = '#fff';
+    moduleSelect.appendChild(opt);
+  });
+
+  // Auto-pick the first student so audio/name display works without
+  // clicking through the name picker.
+  state.student = STUDENTS[0];
+  state.results = buildResults();
+
+  function jump() {
+    startModule(Number(moduleSelect.value), tierSelect.value);
+  }
+  moduleSelect.addEventListener('change', jump);
+  tierSelect.addEventListener('change', jump);
+
+  // Read initial state from URL if provided (?module=<index>&tier=bronze)
+  const params = new URLSearchParams(location.search);
+  const initialModule = params.get('module');
+  const initialTier = params.get('tier');
+  if (initialModule !== null && LESSON[initialModule]) moduleSelect.value = initialModule;
+  if (initialTier) tierSelect.value = initialTier;
+
+  jump();
+})();
+</script>
+</body>
+</html>
