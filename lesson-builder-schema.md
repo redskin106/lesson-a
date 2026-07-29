@@ -1,5 +1,8 @@
 # Lesson Builder — Content Schema Reference
-_Pulled directly from the live repo's 12 module demos, July 2026. This is the backbone the builder's authoring forms, draft store, and publish step all need to agree on._
+_Pulled directly from the live repo's 12 module demos, July 2026. Updated against the real, final
+`lesson-shell-v2.html` and the Lesson Builder's completed pool conversion. This is the backbone
+the builder's authoring forms, draft store, and publish step all now actually agree on — not a
+target state, the current one._
 
 ---
 
@@ -33,7 +36,7 @@ Used by: **all 12 modules**, as of this decision.
 
 ## Shared sub-structures (used across many modules)
 
-**`tokens` (grammar-tagged sentence)** — array of `{ text, role }`. `role` is one of `subject | verb | object | place | time | connector | null`. Only the first five have defined colors in `GRAMMAR_COLORS`; `connector` and `null` render as plain white text. **Builder implication**: the token editor needs a role-picker per chunk, defaulting to "no color" — this is effectively a small structured sentence-builder UI in its own right, reusable across every module type that has `tokens`.
+**`tokens` (grammar-tagged sentence)** — **two different field-naming conventions exist, module-dependent, easy to trip over**: Gap-fill, True/False, Memory Pairs, Picture & Word, Word Scramble, and Spelling all use `{ t: string, r: role }` (short names). Build a Sentence alone uses `{ text: string, role: role }` (long names) — its chips are individually draggable in the live module, unlike the others where tokens get merged into phrases, and the field naming was never reconciled between the two systems. `role` is one of `subject | verb | object | place | time | connector | null`. Only the first five have defined colors in `GRAMMAR_COLORS`; `connector` and `null` render as plain white text (`spelling`'s gold-tier `library`/`hospital` items use `tokens: null` entirely — the reinforcement falls back to speaking just the word). **Builder implication**: the token editor needs a role-picker per chunk, defaulting to "no color" — this is effectively a small structured sentence-builder UI in its own right, reusable across every module type that has `tokens`, but the authoring tool needs to know which field-naming convention to emit for which module type.
 
 **Icon/image field** — currently **emoji characters** (e.g. `'🐕'`), not image file references, in Picture & Word, Word Scramble, and Spelling. This is the main thing to flag for your "replace icons with images" goal: today there's no image asset per vocabulary item at all in most modules — illustration is a single per-lesson scene image (`school_scene.png`), separate from per-item icons. If you want teachers to swap a per-word icon for a custom image, that's a **new field**, not an edit to an existing one — worth deciding whether it stays emoji-first with optional image override, or fully switches to an image reference (which then needs to flow into the "publish pushes assets to every module folder" step we discussed).
 
@@ -59,10 +62,11 @@ questions drawn for the session.
 
 ### 3. Word Match
 ```
-tier: { pick: number, pairs: [ { left: string, right: string } ] }
+tier: { pick: number, items: [ { left: string, right: string } ] }
 ```
-Pool size grows per tier in the sample (3 → 4 → 5 pairs) but nothing enforces that — needs an
-explicit `pick` field like every other module now, rather than just drawing the whole pool.
+Confirmed working in `lesson-shell-v2.html` — free re-pairing model (tap a left, tap a right,
+reassign freely until fully correct; not lock-on-first-click). `pick` is now a real, teacher-set
+number field in the authoring UI, not just drawn implicitly from pool size.
 
 ### 4. Memory Pairs
 ```
@@ -78,10 +82,9 @@ module with an explicit (currently unused) `image: null` field already sitting n
 ```
 tier: { pick: number, items: [ { audio: string (text-to-speak), question: string, options: string[], answer: string } ] }
 ```
-**Not yet merged into `lesson-shell-v2.html`** — still the old fixed-1-item-per-tier shape live
-today. Should follow the same pool standard as everything else once its turn comes. `audio` is
-the literal text passed to TTS — a natural ElevenLabs hook point (generate once, cache, reuse
-instead of live TTS).
+Confirmed working in `lesson-shell-v2.html`. Every tier requires listening before options unlock
+(no tier-specific exception, unlike the old pre-merge design). `audio` is the literal text passed
+to `speak()` — a natural ElevenLabs hook point (generate once, cache, reuse instead of live TTS).
 
 ### 6. Put in Order
 ```
@@ -97,9 +100,8 @@ the shuffled/display order, `correct` is the target order — same strings, diff
 ```
 tier: { pick: number, items: [ { prompt: string, target: string (word or sentence to speak) } ] }
 ```
-**Not yet merged into `lesson-shell-v2.html`** — still the old fixed-1-item-per-tier shape live
-today. Should follow the same pool standard once its turn comes. Another direct ElevenLabs hook
-(model/reference audio for the target).
+Confirmed working in `lesson-shell-v2.html`. Another direct ElevenLabs hook (model/reference
+audio for the target).
 
 ### 8. Picture & Word
 ```
@@ -112,21 +114,35 @@ module — each tier keeps its own `mode` plus its own `items`, and `pick` (was 
 
 ### 9. Word Scramble
 ```
-tier: { pick: number, items: [ { word: string, emoji: string, sentence?: string, clozeWord?: string, tokens: TokenArray } ] }
+tier: { pick: number, items: [ { word: string, emoji: string, tokens: TokenArray } ] }
 ```
-Separate pool per tier (this was already the pattern here — no reversal needed, unlike Memory Pairs/Picture & Word). Needs an explicit `pick` field added like every other module now. `sentence`/`clozeWord` are inconsistently present — only some items have them.
+Separate pool per tier (already the pattern, no reversal needed). No `sentence` field on the
+item itself — the sentence shown on a correct answer is derived from `tokens` (`tokens.map(t =>
+t.t).join(' ')`), not authored separately. Audio rule, confirmed with Nick: word once on
+completion (not per-letter-tap, not repeated), then the derived sentence — never both the word
+and a separately-authored sentence.
 
 ### 10. Spelling
 ```
-tier: { pick: number, name: string, items: [ { word: string, emoji?: string, tokens: TokenArray|null } ] }
+tier: { pick: number, items: [ { word: string, emoji?: string, tokens: TokenArray|null } ] }
 ```
-Separate pool per tier (already the pattern, needs explicit `pick` added). Note `emoji` and `tokens` are both sometimes omitted/null (gold tier examples have `tokens: null`) — the builder should treat these as optional, not required, fields.
+Separate pool per tier (already the pattern). No tier-level `name` field. `tokens` is genuinely
+nullable — gold-tier `library`/`hospital` items have `tokens: null`, and the reinforcement
+correctly falls back to speaking just the word when that happens. Three real interaction modes
+depending on tier: bronze shows the image + tap-tiles, silver drops the image but keeps
+tap-tiles, gold drops both — free typing from memory, no letter bank at all. That's a genuine
+skill difference from Word Scramble (production spelling vs. anagram-solving), not a duplicate
+module — confirmed and discussed directly with Nick.
 
 ### 11. Listen & Match
 ```
-tier: { pick: number, pairs: [ { left: string, right: string } ] }
+tier: { pick: number, items: [ { left: string, right: string } ] }
 ```
-Same shape as Word Match, needs the same explicit `pick` field added. In every sample pair `left === right` (matching identical spoken/written text, not a translation-style pair). Worth confirming with you whether `left`/`right` are ever meant to differ here, or if it's always an audio-echo match — that affects whether the builder form should have one text field or two.
+Same shape and engine as Word Match — confirmed identical in the locked demo, reuses its
+free-pairing code directly rather than a separate implementation. **Resolved, was previously an
+open question**: `left === right` always, by design — this is an audio-echo match (hear it, tap
+the matching written text), not a translation-style pair. The left button plays audio on every
+tap (unlimited replay); tapping it does not itself count as a pairing action.
 
 ### 12. Build a Sentence
 ```
@@ -139,7 +155,7 @@ Separate pool per tier (already the pattern, needs explicit `pick` added). This 
 ## Cross-module inconsistencies worth resolving before building the schema formally
 
 1. ~~**Shared pool vs. per-tier pool** isn't consistent — Memory Pairs and Picture & Word share one pool across tiers; Word Scramble, Spelling, and Build a Sentence each give every tier its own separate pool. The builder needs to support both patterns per module type (this is a property of the *module type*, not something a teacher should have to configure per lesson).~~ **Resolved**: every module now uses a separate pool per tier, no exceptions. Memory Pairs and Picture & Word were the two that needed reversing; everything else already matched.
-2. **Optional field inconsistency** (Spelling's `tokens: null`, `emoji` missing in silver/gold) suggests these fields were sometimes skipped rather than deliberately omitted. Worth deciding: should the builder *require* tokens/emoji everywhere for consistency, or keep them genuinely optional per module type?
+2. **Optional field handling**: Spelling's `tokens: null` (library/hospital) and inconsistent `emoji` presence are deliberate, not oversights — confirmed working, with the reinforcement falling back gracefully (just the word, no sentence) when `tokens` is absent. Resolved as: these stay genuinely optional per module type, not required everywhere.
 3. **Icon representation** is emoji-only right now — no image field is actually used anywhere yet (Memory Pairs' `image: null` is unused scaffolding). Any "replace icon with custom image" feature is new ground, not a retrofit.
 
 ---
