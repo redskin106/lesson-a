@@ -1901,6 +1901,8 @@ function tone(freq, dur) {
 }
 function sfx(name) {
   if (name === 'tap') tone(600, 0.06);
+  if (name === 'correct') { tone(880, 0.12); setTimeout(() => tone(1180, 0.14), 90); }
+  if (name === 'wrong') tone(350, 0.22);
   if (name === 'star') tone(1000, 0.1);
   if (name === 'complete') { tone(700, 0.1); setTimeout(() => tone(1050, 0.16), 110); }
 }
@@ -2370,6 +2372,7 @@ const MODULE_REGISTRY = {
           if (selected === answer) {
             locked = true;
             checkBtn.disabled = true;
+            sfx('correct');
             statusEl.textContent = attemptedWrong ? 'correct, nice recovery' : 'correct, first try';
             const score = attemptedWrong ? 0.6 : 1;
             totalScore += score;
@@ -2383,6 +2386,7 @@ const MODULE_REGISTRY = {
             }, 550);
           } else {
             attemptedWrong = true;
+            sfx('wrong');
             statusEl.textContent = 'not quite, try again';
             const sel = pillRow.querySelector(`[data-word="${selected}"]`);
             if (sel) sel.animate(
@@ -2584,6 +2588,7 @@ const MODULE_REGISTRY = {
         if (pairings.size === total) {
           if (checkAllCorrect()) {
             confirmed = true;
+            sfx('correct');
             scoreLabel.textContent = 'Good job!';
             scoreLabel.style.color = '#AED581';
             notQuiteBtn.style.display = 'none';
@@ -2592,6 +2597,7 @@ const MODULE_REGISTRY = {
             nextBtn.style.display = 'flex';
             nextBtn.onclick = () => onComplete(1);
           } else {
+            sfx('wrong');
             scoreLabel.textContent = `${Math.min(pairings.size, total)} of ${total} paired`;
             scoreLabel.style.color = '';
             nextBtn.style.display = 'none';
@@ -3814,6 +3820,7 @@ const MODULE_REGISTRY = {
         if (pairings.size === total) {
           if (checkAllCorrect()) {
             confirmed = true;
+            sfx('correct');
             scoreLabel.textContent = 'Good job!';
             scoreLabel.style.color = '#AED581';
             notQuiteBtn.style.display = 'none';
@@ -3822,6 +3829,7 @@ const MODULE_REGISTRY = {
             nextBtn.style.display = 'flex';
             nextBtn.onclick = () => onComplete(1);
           } else {
+            sfx('wrong');
             scoreLabel.textContent = `${Math.min(pairings.size, total)} of ${total} paired`;
             scoreLabel.style.color = '';
             nextBtn.style.display = 'none';
