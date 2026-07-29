@@ -591,6 +591,196 @@ function seedColorsContent(lesson){
   return content;
 }
 
+function seedDescribingContent(){
+  return {
+    gapfill: {
+      bronze: { pick:2, items:[
+        { sentence:'The giraffe is ___.', answer:'tall', options:['tall','short','fast','loud'],
+          tokens:[{t:'The giraffe',r:'subject'},{t:'is',r:'verb'},{t:'tall',r:'object'}] },
+        { sentence:'The mouse is ___.', answer:'small', options:['small','big','tall','young'],
+          tokens:[{t:'The mouse',r:'subject'},{t:'is',r:'verb'},{t:'small',r:'object'}] },
+        { sentence:'My grandfather is ___.', answer:'old', options:['old','young','short','fast'],
+          tokens:[{t:'My grandfather',r:'subject'},{t:'is',r:'verb'},{t:'old',r:'object'}] },
+      ]},
+      silver: { pick:2, items:[
+        { sentence:'My brother is taller ___ me.', answer:'than', options:['than','because','and','but'],
+          tokens:[{t:'My brother',r:'subject'},{t:'is',r:'verb'},{t:'taller than me',r:null}] },
+        { sentence:'She is very smart ___ she studies every day.', answer:'because', options:['because','than','so','or'],
+          tokens:[{t:'She',r:'subject'},{t:'is',r:'verb'},{t:'very smart',r:'object'},{t:'because',r:'connector'},{t:'she studies every day',r:null}] },
+        { sentence:'He is stronger ___ his friend.', answer:'than', options:['than','so','because','or'],
+          tokens:[{t:'He',r:'subject'},{t:'is',r:'verb'},{t:'stronger than his friend',r:null}] },
+      ]},
+      gold: { pick:2, items:[
+        { sentence:'Although she is short, she is ___ at basketball.', answer:'amazing', options:['amazing','terrible','slow','quiet'],
+          tokens:[{t:'Although she is short',r:'connector'},{t:'she',r:'subject'},{t:'is',r:'verb'},{t:'amazing at basketball',r:'object'}] },
+        { sentence:'My teacher is patient because she ___ explains things twice.', answer:'always', options:['always','never','rarely','sometimes'],
+          tokens:[{t:'My teacher',r:'subject'},{t:'is',r:'verb'},{t:'patient',r:'object'},{t:'because',r:'connector'},{t:'she always explains things twice',r:null}] },
+      ]},
+    },
+    truefalse: {
+      bronze: { pick:2, items:[
+        { statement:'An elephant is small.', answer:false,
+          tokens:[{t:'An elephant',r:'subject'},{t:'is',r:'verb'},{t:'small',r:'object'}] },
+        { statement:'The sun is hot.', answer:true,
+          tokens:[{t:'The sun',r:'subject'},{t:'is',r:'verb'},{t:'hot',r:'object'}] },
+        { statement:'A mouse is bigger than an elephant.', answer:false,
+          tokens:[{t:'A mouse',r:'subject'},{t:'is',r:'verb'},{t:'bigger than an elephant',r:null}] },
+      ]},
+      silver: { pick:2, items:[
+        { statement:'A cheetah is faster than a turtle.', answer:true,
+          tokens:[{t:'A cheetah',r:'subject'},{t:'is',r:'verb'},{t:'faster than a turtle',r:null}] },
+        { statement:'A baby is older than a grandmother.', answer:false,
+          tokens:[{t:'A baby',r:'subject'},{t:'is',r:'verb'},{t:'older than a grandmother',r:null}] },
+      ]},
+      gold: { pick:2, items:[
+        { statement:'Although he is quiet, my father is not shy with his friends.', answer:true,
+          tokens:[{t:'Although he is quiet',r:'connector'},{t:'my father',r:'subject'},{t:'is not',r:'verb'},{t:'shy with his friends',r:'object'}] },
+        { statement:'A generous person never shares anything.', answer:false,
+          tokens:[{t:'A generous person',r:'subject'},{t:'never shares',r:'verb'},{t:'anything',r:'object'}] },
+      ]},
+    },
+    wordmatch: {
+      bronze: { pick:3, items:[ {left:'tall',right:'short'}, {left:'big',right:'small'}, {left:'happy',right:'sad'} ]},
+      silver: { pick:4, items:[ {left:'fast',right:'slow'}, {left:'young',right:'old'}, {left:'strong',right:'weak'}, {left:'loud',right:'quiet'} ]},
+      gold: { pick:5, items:[ {left:'generous',right:'stingy'}, {left:'patient',right:'impatient'}, {left:'confident',right:'shy'}, {left:'honest',right:'dishonest'}, {left:'brave',right:'cowardly'} ]},
+    },
+    memorypairs: {
+      bronze: { pick:3, flipback:1500, items:[
+        { word:'tall', emoji:'🦒', image:null, sentence:'The giraffe is tall.',
+          tokens:[{t:'The giraffe',r:'subject'},{t:'is',r:'verb'},{t:'tall',r:'object'}] },
+        { word:'small', emoji:'🐭', image:null, sentence:'The mouse is small.',
+          tokens:[{t:'The mouse',r:'subject'},{t:'is',r:'verb'},{t:'small',r:'object'}] },
+        { word:'happy', emoji:'😊', image:null, sentence:'She is happy today.',
+          tokens:[{t:'She',r:'subject'},{t:'is',r:'verb'},{t:'happy',r:'object'},{t:'today',r:'time'}] },
+        { word:'sad', emoji:'😢', image:null, sentence:'He feels sad.',
+          tokens:[{t:'He',r:'subject'},{t:'feels',r:'verb'},{t:'sad',r:'object'}] },
+      ]},
+      silver: { pick:4, flipback:1200, items:[
+        { word:'strong', emoji:'💪', image:null, sentence:'He is very strong.',
+          tokens:[{t:'He',r:'subject'},{t:'is',r:'verb'},{t:'very strong',r:'object'}] },
+        { word:'weak', emoji:'🥀', image:null, sentence:'The plant looks weak.',
+          tokens:[{t:'The plant',r:'subject'},{t:'looks',r:'verb'},{t:'weak',r:'object'}] },
+        { word:'fast', emoji:'⚡', image:null, sentence:'The cheetah is fast.',
+          tokens:[{t:'The cheetah',r:'subject'},{t:'is',r:'verb'},{t:'fast',r:'object'}] },
+        { word:'slow', emoji:'🐢', image:null, sentence:'The turtle is slow.',
+          tokens:[{t:'The turtle',r:'subject'},{t:'is',r:'verb'},{t:'slow',r:'object'}] },
+      ]},
+      gold: { pick:4, flipback:900, items:[
+        { word:'generous', emoji:'🎁', image:null, sentence:'My aunt is generous with gifts.',
+          tokens:[{t:'My aunt',r:'subject'},{t:'is',r:'verb'},{t:'generous',r:'object'},{t:'with gifts',r:null}] },
+        { word:'patient', emoji:'⏳', image:null, sentence:'The teacher is very patient.',
+          tokens:[{t:'The teacher',r:'subject'},{t:'is',r:'verb'},{t:'very patient',r:'object'}] },
+        { word:'confident', emoji:'🦁', image:null, sentence:'The lion looks confident.',
+          tokens:[{t:'The lion',r:'subject'},{t:'looks',r:'verb'},{t:'confident',r:'object'}] },
+        { word:'honest', emoji:'🤝', image:null, sentence:'An honest person tells the truth.',
+          tokens:[{t:'An honest person',r:'subject'},{t:'tells',r:'verb'},{t:'the truth',r:'object'}] },
+      ]},
+    },
+    listenchoose: {
+      bronze: { pick:2, items:[
+        { audio:'What size is a mouse?', question:'What size is a mouse?', options:['small','big','tall','short'], answer:'small' },
+        { audio:'How does a happy person feel?', question:'How does a happy person feel?', options:['happy','sad','angry','tired'], answer:'happy' },
+      ]},
+      silver: { pick:2, items:[
+        { audio:'Which animal is faster, a cheetah or a turtle?', question:'Which animal is faster, a cheetah or a turtle?', options:['cheetah','turtle','elephant','mouse'], answer:'cheetah' },
+        { audio:'Who is older, a grandmother or a baby?', question:'Who is older, a grandmother or a baby?', options:['grandmother','baby','teacher','student'], answer:'grandmother' },
+      ]},
+      gold: { pick:2, items:[
+        { audio:'Why might someone say a teacher is patient?', question:'Why might someone say a teacher is patient?', options:['She explains twice','She shouts a lot','She is always late','She never helps'], answer:'She explains twice' },
+        { audio:'What makes a person generous?', question:'What makes a person generous?', options:['Sharing with others','Keeping everything','Being loud','Running fast'], answer:'Sharing with others' },
+      ]},
+    },
+    putinorder: {
+      bronze: { pick:1, items:[
+        { prompt:'Order these from smallest to biggest.', items:['ant','cat','elephant'] },
+      ]},
+      silver: { pick:1, items:[
+        { prompt:'Order these from slowest to fastest.', items:['turtle','dog','cheetah'] },
+      ]},
+      gold: { pick:1, items:[
+        { prompt:'Order these personality words from calm to excited.', items:['quiet','friendly','energetic','wild'] },
+      ]},
+    },
+    sayit: {
+      bronze: { pick:2, items:[
+        { prompt:'Say a word that describes a giraffe.', target:'tall' },
+        { prompt:'Say how you feel today.', target:'happy' },
+      ]},
+      silver: { pick:1, items:[
+        { prompt:"Describe your friend using 'because.'", target:'My friend is funny because she tells good jokes.' },
+      ]},
+      gold: { pick:1, items:[
+        { prompt:'Describe someone you admire and why.', target:'My grandmother is generous because she always helps people.' },
+      ]},
+    },
+    picword: {
+      bronze: { pick:2, mode:'word-to-image', items:[
+        { word:'tall', emoji:'🦒', sentence:'The giraffe is ___.', cloze:'tall' },
+        { word:'small', emoji:'🐭', sentence:'The mouse is ___.', cloze:'small' },
+      ]},
+      silver: { pick:2, mode:'image-to-word', items:[
+        { word:'fast', emoji:'🐆', sentence:'The cheetah is ___.', cloze:'fast' },
+        { word:'strong', emoji:'💪', sentence:'He is very ___.', cloze:'strong' },
+      ]},
+      gold: { pick:2, mode:'cloze-image', items:[
+        { word:'generous', emoji:'🎁', sentence:'My aunt is ___ with gifts.', cloze:'generous' },
+        { word:'patient', emoji:'⏳', sentence:'The teacher is very ___.', cloze:'patient' },
+      ]},
+    },
+    wordscramble: {
+      bronze: { pick:2, items:[
+        { word:'tall', emoji:'🦒', tokens:[{t:'The giraffe',r:'subject'},{t:'is',r:'verb'},{t:'tall',r:'object'}] },
+        { word:'happy', emoji:'😊', tokens:[{t:'She',r:'subject'},{t:'feels',r:'verb'},{t:'happy',r:'object'}] },
+      ]},
+      silver: { pick:2, items:[
+        { word:'strong', emoji:'💪', tokens:[{t:'He',r:'subject'},{t:'is',r:'verb'},{t:'very strong',r:'object'}] },
+        { word:'quiet', emoji:'🤫', tokens:[{t:'The library',r:'subject'},{t:'is',r:'verb'},{t:'quiet',r:'object'},{t:'today',r:'time'}] },
+      ]},
+      gold: { pick:2, items:[
+        { word:'generous', emoji:'🎁', tokens:[{t:'My aunt',r:'subject'},{t:'is',r:'verb'},{t:'generous',r:'object'},{t:'with gifts',r:null}] },
+        { word:'confident', emoji:'🦁', tokens:[{t:'The lion',r:'subject'},{t:'looks',r:'verb'},{t:'confident',r:'object'}] },
+      ]},
+    },
+    spelling: {
+      bronze: { pick:2, items:[
+        { word:'tall', emoji:'🦒', tokens:[{t:'The giraffe',r:'subject'},{t:'is',r:'verb'},{t:'tall',r:'object'}] },
+        { word:'small', emoji:'🐭', tokens:[{t:'The mouse',r:'subject'},{t:'is',r:'verb'},{t:'small',r:'object'}] },
+      ]},
+      silver: { pick:2, items:[
+        { word:'brave', emoji:'🦸', tokens:[{t:'The firefighter',r:'subject'},{t:'is',r:'verb'},{t:'brave',r:'object'}] },
+        { word:'gentle', emoji:'🐑', tokens:[{t:'My grandmother',r:'subject'},{t:'is',r:'verb'},{t:'gentle',r:'object'}] },
+      ]},
+      gold: { pick:2, items:[
+        { word:'trustworthy', emoji:'🤝', tokens:null },
+        { word:'independent', emoji:'🦅', tokens:null },
+      ]},
+    },
+    listenmatch: {
+      bronze: { pick:3, items:[ {left:'tall',right:'tall'}, {left:'happy',right:'happy'}, {left:'small',right:'small'} ]},
+      silver: { pick:2, items:[
+        { left:'She is taller than her brother.', right:'She is taller than her brother.' },
+        { left:'He is faster than a turtle.', right:'He is faster than a turtle.' },
+      ]},
+      gold: { pick:2, items:[
+        { left:'My teacher is patient because she explains things twice.', right:'My teacher is patient because she explains things twice.' },
+        { left:'A generous person shares what they have.', right:'A generous person shares what they have.' },
+      ]},
+    },
+    buildsentence: {
+      bronze: { pick:2, items:[
+        { tokens:[{text:'The',role:null},{text:'giraffe',role:'subject'},{text:'is',role:'verb'},{text:'tall',role:'object'}] },
+        { tokens:[{text:'She',role:'subject'},{text:'is',role:'verb'},{text:'happy',role:'object'}] },
+      ]},
+      silver: { pick:1, items:[
+        { tokens:[{text:'My',role:null},{text:'brother',role:'subject'},{text:'is',role:'verb'},{text:'taller',role:'object'},{text:'than',role:'connector'},{text:'me',role:null}] },
+      ]},
+      gold: { pick:1, items:[
+        { tokens:[{text:'My',role:null},{text:'aunt',role:'subject'},{text:'is',role:'verb'},{text:'generous',role:'object'},{text:'because',role:'connector'},{text:'she always helps people',role:null}] },
+      ]},
+    },
+  };
+}
+
 function ensureLessonContent(lessonId){
   if(LESSON_CONTENT[lessonId]) return;
   const lesson = LESSONS.find(l => l.id === lessonId);
@@ -600,6 +790,8 @@ function ensureLessonContent(lessonId){
     content.spelling = FOOD_COURT_SPELLING;
   } else if(lessonId === 'colors' && lesson){
     content = seedColorsContent(lesson);
+  } else if(lessonId === 'describing-people-things'){
+    content = seedDescribingContent();
   }
   // Any module in this lesson's list that wasn't explicitly seeded above still needs SOME data,
   // or opening that module's screen crashes trying to read undefined. Fill the gaps with blanks —
@@ -2003,6 +2195,10 @@ const LESSONS = [
     editedBy:'Nick', editedAgo:'just now',
     modules:['gapfill','truefalse','wordmatch','memorypairs','listenchoose','putinorder','sayit','picword','wordscramble','spelling','listenmatch','buildsentence'],
     audioIssues:0, notes:'Keep every example concrete — a real object per color (apple=red, sky=blue). Gold should reason about WHY, not just name the color.' },
+  { id:'describing-people-things', name:'Describing People & Things', theme:'Adjectives, comparisons, personality — a student-suggested topic', status:'draft',
+    editedBy:'Nick', editedAgo:'just now',
+    modules:['gapfill','truefalse','wordmatch','memorypairs','listenchoose','putinorder','sayit','picword','wordscramble','spelling','listenmatch','buildsentence'],
+    audioIssues:0, notes:'Full 12-module test lesson, pre-filled for the end-to-end publish test. Bronze = basic adjectives (tall/short/happy/sad), Silver = comparisons ("taller than"), Gold = personality + reasoning ("generous because she always helps").' },
   { id:'food-court', name:'Food Court Basics', theme:'Ordering food, real transactions', status:'draft',
     editedBy:'Nick', editedAgo:'2 min ago', modules:['gapfill','spelling','wordmatch'], audioIssues:2 },
   { id:'weekend-errands', name:'Weekend Errands', theme:'Convenience store & delivery apps', status:'published',
