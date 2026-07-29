@@ -1,63 +1,57 @@
 # Shell Merge Specification — module-by-module, fully verified
 
-> **Update, post-merge decision**: every module is now standardized to a per-tier pool —
-> `tier: { pick: number, items: [...] }`, with `pick` configurable per lesson/module rather than
-> a hardcoded constant. This reverses what this doc originally said for **memory-pairs** and
-> **picture-word** (shared `allItems` pool across tiers) — those two are now separate-pool-per-tier
-> like everything else. It also means **gap-fill** and **true-false** are no longer single-fixed-item
-> modules — both are pool-based now too, confirmed working in `lesson-shell-v2.html`. See
-> `lesson-builder-schema.md` for the full corrected per-module shapes. The table below is kept for
-> the audio-capability findings, which are still accurate, but the "Real data contract" column for
-> gap-fill, true-false, memory-pairs, and picture-word is superseded — check the schema doc instead.
+> **STATUS: COMPLETE.** All 12 modules are merged into `lesson-shell-v2.html`, the Lesson
+> Builder's `transformModuleForPublish` and `extractSpeakableForTTS` both output/read the
+> correct shapes for every module (verified directly against the real shell code, not assumed),
+> and `SHELL_TEMPLATE` inside `lesson-builder.html` has been swapped from the old pre-merge
+> shell to the real, current `lesson-shell-v2.html`. This document is kept as a historical
+> record of the merge process and the audio-capability findings, which remain accurate. The
+> per-module table below reflects the *final*, confirmed-correct shapes — not the original
+> pre-merge assumptions.
+>
+> **Two entries in the original version of this table were wrong and have been corrected below**,
+> found during a post-completion audit rather than during the merge itself:
+> - **listen-match**: the table used to say the correct fields were `{audio, text}` — that was
+>   backwards. The real shell (`audio-match` renderer) destructures `{pick, items}` where each
+>   item is `{left, right}`, identical to word-match's engine (it reuses word-match's free-pairing
+>   code verbatim). The Lesson Builder's transform was fixed to match.
+> - **put-in-order**: the correct shape is `{prompt, sequence, correct}`, not `{prompt, items,
+>   correct}` — `sequence` is the display order (which the shell re-shuffles itself at runtime
+>   regardless of what's given), `correct` is the target order. The Lesson Builder only needs the
+>   teacher-authored correct order; `sequence` gets synthesized as a copy of it at publish time.
 
-Every row below was confirmed by reading the actual file in `module-demos/`, not assumed.
-"Transform status" tells you exactly what the Lesson Builder's `transformModuleForPublish`
-needs, once this module gets merged into the new shell and that shell replaces the live one.
+Every row below was confirmed by reading the actual file — either `module-demos/` during the
+original merge, or `lesson-shell-v2.html` directly during the post-completion audit.
 
-| Module | Real data contract | Audio? | Transform status |
+| Module | Real data contract (final, per `lesson-shell-v2.html`) | Audio? | Status |
 |---|---|---|---|
-| **gap-fill** | `{sentence, options, answer, tokens}` per tier | **NEW** — `showReinforce()` speaks the full sentence on success | Shape already correct. **Add to audio-capable list** (currently excluded — was correct for the old shell, wrong once merged) |
-| **true-false** | `{statement, answer, tokens}` per tier | **NEW** — same `showReinforce(correct)` pattern | Shape already correct. **Add to audio-capable list.** Confirm exact trigger (correct only, or also wrong?) when integrating |
-| **word-match** | `{pairs:[{left,right}]}` per tier | No — confirmed, no `speak()` anywhere | No change. Stays excluded from audio |
-| **memory-pairs** | ~~`{allItems:[...], tiers:[{name,pairs,flipback}]}` — shared pool~~ **SUPERSEDED**: now `tier: {pick, flipback, items:[...]}` — separate pool per tier, see `lesson-builder-schema.md` | Yes | **Needs fixing** — current transform wrongly uses per-tier item lists, but the fix target itself changed: don't revert to the old shared `allItems`/`tiers` shape, build the new per-tier-pool shape instead |
-| **listen-choose** | `{tier, audio, question, options, answer}` flat per tier | Yes — core feature | Already correct, no change |
-| **put-in-order** | `{prompt, items, correct}` per tier | No — confirmed | No change |
-| **say-it** | `{tier, prompt, target}` (+ optional `keyWords`, not exercised in this demo's test data) | Yes — core feature | Already correct, no change |
-| **picture-word** | ~~`{allItems:[...], tiers:[{mode}]}`~~ **SUPERSEDED**: now `tier: {pick, mode, items:[...]}` — separate pool per tier, see `lesson-builder-schema.md` | Yes | **Needs fixing** — same per-tier-pool rebuild as memory-pairs, PLUS `cloze` field meaning is currently wrong in the transform (treated as a full sentence, should be just the answer word) — confirmed and already fixed in `lesson-shell-v2.html`'s own test data |
-| **word-scramble** | `{items:[{word,emoji,image,sentence}]}` per tier | Yes | Already correct, no change |
-| **spelling** | `{items:[{word,emoji,image,sentence}]}` per tier | Yes | Already correct, no change (sentence field made unconditional earlier this session to prevent a crash) |
-| **listen-match** | `{pairs:[{audio,text}]}` per tier | Yes — core feature | Already correct, no change (fixed from wrong `left`/`right` fields earlier this session) |
-| **build-sentence** | `{items:[{tokens:[{text,role}]}]}` per tier | Yes | Already correct, no change |
+| **gap-fill** | `tier: {pick, items:[{sentence, options, answer, tokens}]}` | Yes — `showGrammarReinforce()` speaks the full sentence on every correct answer | Merged, transform correct, audio-capable — done |
+| **true-false** | `tier: {pick, items:[{statement, answer, tokens}]}` | Yes — same `showGrammarReinforce()`, fires on both correct and wrong (unlike gap-fill, which only fires on correct) | Merged, transform correct, audio-capable — done |
+| **word-match** | `tier: {pick, items:[{left, right}]}` | No — confirmed, no `speak()` anywhere in the renderer | Merged, transform correct, correctly excluded from audio — done |
+| **memory-pairs** | `tier: {pick, flipback, items:[{word, emoji, image, sentence, tokens}]}` — separate pool per tier | Yes | Merged, transform correct — done |
+| **listen-choose** | `tier: {pick, items:[{audio, question, options, answer}]}` | Yes — core feature | Merged, transform correct — done |
+| **put-in-order** | `tier: {pick, items:[{prompt, sequence, correct}]}` | No — confirmed | Merged, transform correct, correctly excluded from audio — done |
+| **say-it** | `tier: {pick, items:[{prompt, target, keyWords?}]}` | Yes — core feature | Merged, transform correct — done |
+| **picture-word** (`image-vocab`) | `tier: {pick, mode, items:[{word, emoji, sentence, cloze}]}` — separate pool per tier. `cloze` is just the answer word (e.g. "runs"), not a full sentence | Yes | Merged, transform correct — done |
+| **word-scramble** | `tier: {pick, items:[{word, emoji, sentence, tokens}]}` | Yes | Merged, transform correct — done |
+| **spelling** | `tier: {pick, items:[{word, emoji, sentence, tokens}]}` | Yes | Merged, transform correct — done |
+| **listen-match** (`audio-match`) | `tier: {pick, items:[{left, right}]}` — same shape/engine as word-match | Yes — core feature | Merged, transform correct — done |
+| **build-sentence** | `tier: {pick, items:[{tokens:[{text, role}]}]}` | Yes | Merged, transform correct — done |
 
-## What this means concretely for the merge
+## What's genuinely still open
 
-**Only 2 of 12 modules need a transform fix**: memory-pairs and picture-word. Everything else in
-the Lesson Builder's `transformModuleForPublish` already matches the real, confirmed contract —
-don't touch what isn't broken.
+- **An end-to-end publish test** — the whole chain (author → publish → real standalone file
+  opened and played) has never been verified as one continuous flow. Everything above has been
+  tested piece by piece. See `PROJECT_STATUS.md` section 0 for the current framing of this.
+- **`bronze.png` and `gold.png`** — still worth double-checking these exist in every module's
+  `assets/` folder before assuming tier-medal art is fully in place; this was flagged during the
+  original merge and the resolution ("Nick will locate it") was noted but not independently
+  re-verified since.
 
-**2 of 12 modules need adding to the audio-capable set** once (and only once) the new shell
-replaces the old live one: gap-fill and true-false. Do this in the same commit as the shell
-swap, not before — the currently-live shell genuinely has no audio for these, so extracting
-audio for them today would generate lines that can't play yet.
+## Standing regression coverage
 
-**2 of 12 modules confirmed to have zero audio capability, in both old and new designs**:
-put-in-order and word-match. Never add these to the audio-capable set.
-
-## Known blocker, not yet resolved
-
-`bronze.png` and `gold.png` don't exist anywhere in the repo — confirmed via direct HTTP check
-against every module's `assets/` folder. Every demo file hardcodes `silver.png` regardless of
-tier (these are fixed single-tier snapshots, not live tier-switchers). Real bronze/gold artwork
-needs to exist before a genuinely tier-aware merge is complete — worth surfacing to Nick early
-in the new conversation rather than discovering it mid-build.
-
-## Suggested build order for the new conversation
-
-1. Gap-fill, True/False, Picture & Word — the originally agreed first trio (deliberately mixed
-   difficulty: simplest, audio-but-simple-shape, hardest-shape).
-2. Get Nick's review on those three before continuing.
-3. Remaining 9, same process.
-4. Only once all 12 are merged and tested: swap the Lesson Builder's `SHELL_TEMPLATE`, fix the
-   2 transform cases, add gap-fill/true-false to the audio-capable set — all together, since
-   they're only correct as a set once the new shell is what's actually live.
-5. Re-run `run_all.js` (the regression suite) after every step, not just at the end.
+`run_all.js` (in the repo root) plus per-module ad-hoc Playwright tests built during the merge
+cover: full multi-question sessions for every pool-based module, the free-pairing engine (Word
+Match/Listen & Match), tier completion + star animation, the shared reinforcement overlay, tap
+sfx call sites, and the Lesson Builder's pool editors + transform output for all 12 modules.
+Re-run before trusting any future change.
