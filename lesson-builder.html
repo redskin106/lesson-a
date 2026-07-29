@@ -2870,10 +2870,9 @@ const SHELL_TYPE_MAP = {
 // pushedAudioIds: Set of ids (from lessons/{lessonId}/manifest.json, status==='pushed') that
 // the TTS tool has actually generated and pushed real audio for. Ids here use the exact same
 // '{moduleId}.{tier}.{field}' scheme as extractSpeakableForTTS() — that's what makes the match
-// work at all. Only 9 module types are confirmed to have real audio playback in the shell ever
-// get an audioFile attached; truefalse/putinorder/wordmatch never will (unverified against
-// shell-v2 though — see extractSpeakableForTTS note). gapfill WAS in this excluded list but is
-// confirmed wrong — it has a real audio call site (reinforcement panel), fixed.
+// work at all. 10 module types are confirmed to have real audio playback in the shell ever
+// get an audioFile attached; putinorder/wordmatch never will (re-verified directly against
+// shell-v2's render() functions — genuinely no speak() calls in either one).
 // Same algorithm as the TTS tool's slugForFilename() — MUST stay identical, since both sides
 // independently construct the same file path: the TTS tool when it pushes the mp3, this
 // transform when it writes the shell's audioFile reference. 'id' (used in pushedAudioIds
@@ -3101,15 +3100,15 @@ function extractSpeakableForTTS(lessonId){
 
     if(type === 'listenchoose'){
       // Only 'audio' is ever fed to the shell's speak() here — 'question' is on-screen text only.
-      TIER_ORDER.forEach(t => add(instId, `${t}.audio`, data[t] && data[t].audio));
+      TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => add(instId, `${t}.item${i}.audio`, it.audio)));
     } else if(type === 'sayit'){
       // Only 'target' drives playModel() — 'prompt' is on-screen instruction text only.
-      TIER_ORDER.forEach(t => add(instId, `${t}.target`, data[t] && data[t].target));
+      TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => add(instId, `${t}.item${i}.target`, it.target)));
     } else if(type === 'listenmatch'){
       // left === right by design for this module (an audio-echo match) — left alone is enough.
-      TIER_ORDER.forEach(t => (data[t] || []).forEach((p,i) => add(instId, `${t}.pair${i}`, p.left)));
+      TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((p,i) => add(instId, `${t}.item${i}.left`, p.left)));
     } else if(type === 'spelling' || type === 'wordscramble'){
-      TIER_ORDER.forEach(t => (data[t] || []).forEach((it,i) => {
+      TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => {
         add(instId, `${t}.item${i}.word`, it.word);
         if(it.sentence) add(instId, `${t}.item${i}.sentence`, it.sentence);
       }));
@@ -3119,7 +3118,7 @@ function extractSpeakableForTTS(lessonId){
         if(it.sentence) add(instId, `${t}.item${i}.sentence`, it.sentence);
       }));
     } else if(type === 'buildsentence'){
-      TIER_ORDER.forEach(t => (data[t] || []).forEach((it,i) => {
+      TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => {
         const sentence = (it.tokens || []).map(tk => tk.text).join(' ');
         add(instId, `${t}.item${i}.sentence`, sentence);
       }));
@@ -3127,19 +3126,25 @@ function extractSpeakableForTTS(lessonId){
       // CORRECTED: the old comment below claimed gapfill has no audio call site at all —
       // true against the OLD shell (lesson-shell-v1_3.html), false against shell-v2. Gap-fill's
       // reinforcement panel (showGrammarReinforce) genuinely speaks the sentence with the blank
-      // filled in, on every correct answer. truefalse/putinorder/wordmatch below are NOT yet
-      // re-verified against shell-v2 the same way — that stale claim may be wrong for them too,
-      // this only fixes the one we've actually confirmed.
+      // filled in, on every correct answer.
       TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => {
         const filled = it.answer && it.sentence && it.sentence.includes('___') ? it.sentence.replace('___', it.answer) : it.sentence;
         add(instId, `${t}.item${i}.sentence`, filled);
       }));
+    } else if(type === 'truefalse'){
+      // CORRECTED, same bug as gapfill above: true-false's renderer calls showGrammarReinforce
+      // on every answer (correct or wrong — that module always shows the reinforcement, unlike
+      // gapfill which only does on correct), which genuinely speaks the statement. Re-verified
+      // directly against shell-v2's 'true-false' render() — putinorder and wordmatch were also
+      // re-checked the same way and are genuinely silent, unlike this one.
+      TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => {
+        add(instId, `${t}.item${i}.statement`, it.statement);
+      }));
     }
-    // 'truefalse', 'putinorder' and 'wordmatch' still skipped here — this was originally verified
-    // directly against every module's render() function in lesson-shell-v1_3.html, but that
-    // verification is now STALE (shell-v2 replaced that file entirely, and gapfill above turned
-    // out to be wrong under the same claim). Needs re-checking against shell-v2 before trusting,
-    // not silently carried forward.
+    // 'putinorder' and 'wordmatch' skipped here — re-verified directly against shell-v2's actual
+    // render() functions (not just carried forward from the old lesson-shell-v1_3.html claim):
+    // neither one calls speak() or any reinforcement helper anywhere. Confirmed silent, not just
+    // assumed.
   });
 
   return items;
@@ -3159,7 +3164,7 @@ function exportForTTSTool(){
   }));
   const manifest = { lesson: lesson.id, assets };
   const json = JSON.stringify(manifest, null, 2);
-  const NO_AUDIO_TYPES = ['truefalse','putinorder','wordmatch']; // gapfill removed — confirmed it DOES have a real audio call site in shell-v2 (see extractSpeakableForTTS); the other three are unverified against shell-v2, not confirmed silent
+  const NO_AUDIO_TYPES = ['putinorder','wordmatch']; // gapfill and truefalse both removed — both confirmed to have real audio call sites in shell-v2; putinorder/wordmatch re-verified as genuinely silent
   const skipped = lesson.modules.filter(m => NO_AUDIO_TYPES.includes(instanceType(m)));
 
   document.getElementById('modalRoot').innerHTML = `
@@ -3284,7 +3289,7 @@ function findMissingEmojiItems(moduleId, data){
     TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach(it => { if(!it.emoji) missing.push(it.word || '(unnamed)'); }));
   } else if(type === 'wordscramble' || type === 'spelling'){
     TIER_ORDER.forEach(t => {
-      (data[t] || []).forEach(it => { if(!it.emoji) missing.push(it.word || '(unnamed)'); });
+      (data[t] && data[t].items || []).forEach(it => { if(!it.emoji) missing.push(it.word || '(unnamed)'); });
     });
   }
   return missing;
@@ -3678,8 +3683,9 @@ async function ghStep_readAudioManifest(lessonId){
 }
 
 // Ground-truth version of the old LIVE_FLAGS-based check — diffs the lesson's actual speakable
-// lines (extractSpeakableForTTS, which excludes truefalse/putinorder/wordmatch — unverified
-// against shell-v2, not confirmed silent; gapfill was wrongly excluded here too, now fixed)
+// lines (extractSpeakableForTTS, which excludes putinorder/wordmatch — re-verified as genuinely
+// silent, not just carried forward from a stale claim; gapfill and truefalse were both wrongly
+// excluded here too, now fixed)
 // GitHub credentials to check for real; if none are set, returns null so the caller can decide
 // how to degrade rather than silently lying with a fake "all clear".
 async function getFullAudioStatusForLesson(lessonId){
