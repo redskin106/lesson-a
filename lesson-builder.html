@@ -3813,6 +3813,18 @@ function buildPublishedLessonHTML(lessonId, pushedAudioIds){
   html = html.replace('<title>EFL Lesson</title>', `<title>${lesson.name}</title>`);
   html = html.replace('<p class="welcome-label">EFL Lesson</p>', `<p class="welcome-label">${lesson.name}</p>`);
 
+  // Real bug, found by Nick actually testing a published lesson: SHELL_TEMPLATE's own asset
+  // references ('assets/bg_and_border.png', 'assets/star.png', etc.) are bare relative paths that
+  // correctly resolve when the file lives at shell-v2/lesson-shell-v2.html (one folder deep from
+  // the images at shell-v2/assets/). A PUBLISHED lesson lives at lessons/{id}/index.html — two
+  // folders deep — so those same bare paths silently resolved to the wrong, nonexistent location
+  // (lessons/{id}/assets/...) and every image failed to load. Rewriting to an absolute,
+  // publish-depth-independent path using the real repo name.
+  const [, repoName] = (GH_CREDS.repo || '').split('/');
+  if(repoName){
+    html = html.replace(/(['"`])assets\//g, `$1/${repoName}/shell-v2/assets/`);
+  }
+
   return html;
 }
 
