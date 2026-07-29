@@ -542,9 +542,9 @@ html, body {
 .frame-wrap { width: min(400px, 100vw); max-height: 94vh; position: relative; container-type: inline-size; }
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12.7cqw; }
-.layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; }
-.layer-scene { position: absolute; left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
-.frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
+.layer-bg    { position: absolute; inset: 0; background-image: url('/lesson-a/shell-v2/assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; }
+.layer-scene { position: absolute; left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%; background-image: url('/lesson-a/shell-v2/assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
+.frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('/lesson-a/shell-v2/assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
 
 .pos            { position: absolute; z-index: 2; }
 .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
@@ -834,7 +834,7 @@ html, body {
         <div class="v2-badge" id="v2-badge"></div>
         <span class="v2-module-title" id="v2-module-title"></span>
       </div>
-      <div class="v2-medal-icon"><img id="v2-medal-img" src="assets/bronze.png" alt="tier medal"></div>
+      <div class="v2-medal-icon"><img id="v2-medal-img" src="/lesson-a/shell-v2/assets/bronze.png" alt="tier medal"></div>
     </div>
   </div>
 
@@ -2404,7 +2404,7 @@ function startModule(moduleIndex, tier) {
   // v2 chrome: badge number + module title + tier-aware medal
   document.getElementById('v2-badge').textContent = moduleIndex + 1;
   document.getElementById('v2-module-title').textContent = mod.label;
-  document.getElementById('v2-medal-img').src = `assets/${tier}.png?v=2`;
+  document.getElementById('v2-medal-img').src = `/lesson-a/shell-v2/assets/${tier}.png?v=2`;
   document.getElementById('v2-medal-img').alt = `${cap(tier)} tier`;
 
   // v2 chrome: student name + tier, shown in the qlabel slot
@@ -2459,7 +2459,7 @@ function animateStarsReveal(starCount) {
   starsEl.innerHTML = '';
   for (let s = 0; s < starCount; s++) {
     const img = document.createElement('img');
-    img.src = 'assets/star.png';
+    img.src = '/lesson-a/shell-v2/assets/star.png';
     img.alt = '';
     img.style.opacity = '0';
     img.style.transform = 'scale(0)';
