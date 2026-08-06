@@ -510,6 +510,19 @@ html, body {
 .assess-btn.selected.assess-yes { background: var(--pass); color: #fff; }
 .assess-btn.selected.assess-no  { background: var(--fail); color: #fff; }
 .assess-btn:disabled { cursor: default; opacity: 0.5; }
+.compare-card {
+  background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 4% 5%; margin-bottom: 5%;
+  display: flex; align-items: center; gap: 4%;
+}
+.compare-play-btn {
+  width: 11cqw; height: 11cqw; border-radius: 50%; flex-shrink: 0;
+  background: rgba(112,82,180,0.18); border: 1.5px solid rgba(112,82,180,0.55);
+  display: flex; align-items: center; justify-content: center; font-size: 4cqw; color: #C9B8EA; cursor: pointer;
+}
+.compare-text { flex: 1; min-width: 0; }
+.compare-title { font-size: 3.1cqw; color: #fff; font-weight: 600; margin-bottom: 2%; }
+.compare-sub { font-size: 2.7cqw; color: var(--text-dim); }
 .no-mic-msg {
   background: var(--surface2); border-radius: var(--radius-sm);
   padding: 14px 16px; font-size: 14px; color: var(--text-dim);
@@ -920,6 +933,10 @@ const PASS_THRESHOLD = 0.6; // 60% to pass a tier
 //  Add / replace entries here to build the full lesson.
 // ══════════════════════════════════════════════════
 
+// Swapped at publish time alongside LESSON — scopes recordings/tierResults
+// so two different lessons never collide in the same student's local storage.
+const LESSON_ID = 'lesson-shell-v2-debug';
+
 const LESSON = [
   {
     id: 'mod-1',
@@ -1269,26 +1286,24 @@ const LESSON = [
   },
 
   // ── AUDIO SPEAKING ────────────────────────────────
+  // v2: per-tier pool, { pick, items: [{prompt,target,keyWords}] }. This
+  // module's test data was missed during the original merge — kept the
+  // pre-merge single-item shape while the renderer above (and the Lesson
+  // Builder's authoring side) were already pool-based. Fixed together.
   {
     id: 'mod-8',
     type: 'audio-speaking',
     label: 'Say It',
     data: {
-      bronze: {
-        prompt: 'Say this word:',
-        target: 'water',
-        keyWords: ['water']
-      },
-      silver: {
-        prompt: 'Say this sentence:',
-        target: 'I eat breakfast before school.',
-        keyWords: ['eat', 'breakfast', 'school']
-      },
-      gold: {
-        prompt: 'Say this sentence:',
-        target: 'We visit our grandparents on the weekend because we miss them.',
-        keyWords: ['visit', 'grandparents', 'weekend', 'miss']
-      }
+      bronze: { pick: 1, items: [
+        { prompt: 'Say this word:', target: 'water', keyWords: ['water'] },
+      ]},
+      silver: { pick: 1, items: [
+        { prompt: 'Say this sentence:', target: 'I eat breakfast before school.', keyWords: ['eat', 'breakfast', 'school'] },
+      ]},
+      gold: { pick: 1, items: [
+        { prompt: 'Say this sentence:', target: 'We visit our grandparents on the weekend because we miss them.', keyWords: ['visit', 'grandparents', 'weekend', 'miss'] },
+      ]}
     }
   },
 
@@ -1568,6 +1583,105 @@ const LESSON = [
 //  STATE
 // ══════════════════════════════════════════════════
 
+// ══════════════════════════════════════════════════
+//  LOCAL PROGRESS DATABASE
+//  One IndexedDB shared by every module that needs to remember something
+//  across sessions, keyed by student name first (handles shared classroom
+//  devices — a student only sees their own data as long as they pick their
+//  own name). Three stores:
+//    - recordings:    Say It self-eval audio, last 3 attempts per exercise
+//    - tierResults:   pass/fail + score history, powers the future student
+//                      progress dashboard and lets returning students keep
+//                      their unlocked tiers instead of starting over
+//    - wordExposure:  reserved for future spaced-repetition vocabulary
+//                      tracking — created now, empty, so adding it later
+//                      never needs an IndexedDB version-bump migration
+// ══════════════════════════════════════════════════
+const PROGRESS_DB_NAME = 'efl-progress';
+const PROGRESS_DB_VERSION = 1;
+let _progressDBPromise = null;
+
+function openProgressDB() {
+  if (_progressDBPromise) return _progressDBPromise;
+  _progressDBPromise = new Promise((resolve, reject) => {
+    const req = indexedDB.open(PROGRESS_DB_NAME, PROGRESS_DB_VERSION);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains('recordings'))   db.createObjectStore('recordings',   { keyPath: 'key' });
+      if (!db.objectStoreNames.contains('tierResults'))   db.createObjectStore('tierResults',   { keyPath: 'key' });
+      if (!db.objectStoreNames.contains('wordExposure'))   db.createObjectStore('wordExposure',   { keyPath: 'key' });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  return _progressDBPromise;
+}
+
+function _idbGet(storeName, key) {
+  return openProgressDB().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readonly');
+    const req = tx.objectStore(storeName).get(key);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  })).catch(() => null); // local storage is a nice-to-have, never block the lesson on it failing
+}
+function _idbPut(storeName, value) {
+  return openProgressDB().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    tx.objectStore(storeName).put(value);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  })).catch(() => {}); // same — a failed save shouldn't interrupt the student
+}
+function _idbGetAllForStudent(storeName, studentPrefix) {
+  return openProgressDB().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readonly');
+    const req = tx.objectStore(storeName).getAll();
+    req.onsuccess = () => resolve((req.result || []).filter(r => r.key.startsWith(studentPrefix)));
+    req.onerror = () => reject(req.error);
+  })).catch(() => []);
+}
+
+function recordingKey(student, moduleIndex, tier, itemIndex) {
+  return `${student}::${LESSON_ID}::${moduleIndex}::${tier}::${itemIndex}`;
+}
+async function saveRecording(student, moduleIndex, tier, itemIndex, blob) {
+  const key = recordingKey(student, moduleIndex, tier, itemIndex);
+  const existing = await _idbGet('recordings', key);
+  const attempts = (existing && existing.attempts) || [];
+  attempts.push({ timestamp: Date.now(), blob });
+  while (attempts.length > 3) attempts.shift(); // keep the last 3 only
+  await _idbPut('recordings', { key, attempts });
+  return attempts;
+}
+async function getRecordings(student, moduleIndex, tier, itemIndex) {
+  const rec = await _idbGet('recordings', recordingKey(student, moduleIndex, tier, itemIndex));
+  return (rec && rec.attempts) || [];
+}
+
+function tierResultKey(student, moduleIndex, tier) {
+  return `${student}::${LESSON_ID}::${moduleIndex}::${tier}`;
+}
+async function saveTierResult(student, moduleIndex, tier, score, passed) {
+  const key = tierResultKey(student, moduleIndex, tier);
+  await _idbPut('tierResults', { key, student, moduleIndex, tier, score, passed, updatedAt: Date.now() });
+}
+async function getTierResultsForStudent(student) {
+  return _idbGetAllForStudent('tierResults', `${student}::${LESSON_ID}::`);
+}
+
+function timeAgo(timestamp) {
+  const diffMs = Date.now() - timestamp;
+  const mins = Math.round(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins} minute${mins===1?'':'s'} ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours} hour${hours===1?'':'s'} ago`;
+  const days = Math.round(hours / 24);
+  if (days === 1) return 'yesterday';
+  return `${days} days ago`;
+}
+
 const state = {
   student: null,
   currentModuleIndex: 0,
@@ -1623,11 +1737,25 @@ STUDENTS.forEach(name => {
   nameGrid.appendChild(btn);
 });
 
-startBtn.addEventListener('click', () => {
+startBtn.addEventListener('click', async () => {
   if (!state.student) return;
   state.currentModuleIndex = 0;
   state.currentTier = 'bronze';
   state.results = buildResults();
+
+  // Restore this student's real pass/fail + score history from previous
+  // sessions. Doesn't change where the lesson starts (still module 0,
+  // bronze) — that's a separate "resume where you left off" UX decision,
+  // not assumed here. This just means state.results is honest from the
+  // first render instead of quietly pretending prior sessions never
+  // happened, which matters for anything downstream that reads it.
+  const priorResults = await getTierResultsForStudent(state.student);
+  priorResults.forEach(r => {
+    if (state.results[r.moduleIndex]) {
+      state.results[r.moduleIndex][r.tier] = { score: r.score, passed: r.passed };
+    }
+  });
+
   startModule(0, 'bronze');
 });
 
@@ -1733,6 +1861,7 @@ function animateStarsReveal(starCount) {
 function handleTierResult(moduleIndex, tier, score) {
   const passed = score >= PASS_THRESHOLD;
   state.results[moduleIndex][tier] = { score, passed };
+  if (state.student) saveTierResult(state.student, moduleIndex, tier, score, passed);
 
   const pct      = Math.round(score * 100);
   const tierName = cap(tier);
@@ -2834,11 +2963,25 @@ const MODULE_REGISTRY = {
   },
 
   // ─────────────────────────────────────────────
-  //  AUDIO SPEAKING
+  //  AUDIO SPEAKING ("Say It")
+  //  v2 design: pool-based, { pick, items: [{prompt,target,keyWords}] } per
+  //  tier — this module was missed during the original 12-module shell
+  //  merge (it kept its pre-merge single-item shape while the Lesson
+  //  Builder's authoring side was already pool-based), found and fixed here.
+  //
   //  Three-button compare mechanic:
   //    [🔊 Model] — plays TTS (swap src for MP3 later)
   //    [▶ You]   — plays back student's recording (unlocks after first record)
   //    [🎤 Rec]  — records / re-records via MediaRecorder
+  //
+  //  Recordings persist to the local progress database (last 3 kept per
+  //  exercise, keyed by student — see saveRecording/getRecordings). This is
+  //  a self-evaluation tool, not a teacher-review tool: nothing leaves the
+  //  device unless the student actively shares it. When a prior attempt
+  //  exists, a compare card appears after the fresh recording (never
+  //  before — nothing to compare on a genuine first try), and the
+  //  self-assess wording shifts from "sounded right" (checking against the
+  //  model) to "sounded better" (checking growth against yourself).
   //
   //  Uses MediaRecorder API (works on iOS Safari 14.5+, Chrome, Firefox, Edge).
   //  Falls back to model-only + self-assess if mic permission denied.
@@ -2846,234 +2989,306 @@ const MODULE_REGISTRY = {
   // ─────────────────────────────────────────────
   'audio-speaking': {
     render(container, data, tier, onComplete) {
-      const { prompt, target } = data;
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
       const isBronze = tier === 'bronze';
+      let idx = 0, totalScore = 0;
 
-      let modelPlaying   = false;
-      let modelAudio     = null;
-      let selfPlaying    = false;
-      let isRecording    = false;
-      let done           = false;
-      let recordingBlob  = null;
-      let selfAudio      = null;
-      let mediaRecorder  = null;
-      let stream         = null;
+      function renderQuestion() {
+        const { prompt, target, audioFile } = session[idx];
+        const moduleIndex = state.currentModuleIndex;
 
-      container.innerHTML = `
-        <p class="module-question">${prompt}</p>
-        <div class="speak-target">${target}</div>
-        <div class="speak-trio">
-          <button class="trio-btn model" id="model-btn">
-            <span class="trio-icon" id="model-icon">🔊</span>
-            <span class="trio-label">Model</span>
-          </button>
-          <button class="trio-btn playback" id="play-btn">
-            <span class="trio-icon" id="play-icon">▶</span>
-            <span class="trio-label">You</span>
-          </button>
-          <button class="trio-btn record" id="rec-btn">
-            <span class="trio-icon" id="rec-icon">🎤</span>
-            <span class="trio-label" id="rec-label">Record</span>
-          </button>
-        </div>
-        <p class="speak-hint" id="speak-hint">Hear the model, then record yourself.</p>
-        <div id="assess-wrap" style="display:none">
-          <div class="assess-btns">
-            <button class="assess-btn assess-yes" id="assess-yes">✓ That sounded right</button>
-            <button class="assess-btn assess-no"  id="assess-no">↩ I need more practice</button>
+        let modelPlaying   = false;
+        let modelAudio     = null;
+        let selfPlaying    = false;
+        let isRecording    = false;
+        let done           = false;
+        let recordingBlob  = null;
+        let selfAudio      = null;
+        let mediaRecorder  = null;
+        let stream         = null;
+        let priorAttempts  = []; // fetched async below — attempts saved before this visit
+
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+
+        container.innerHTML = `
+          <p class="module-question">${prompt}</p>
+          <div class="speak-target">${target}</div>
+          <div class="speak-trio">
+            <button class="trio-btn model" id="model-btn">
+              <span class="trio-icon" id="model-icon">🔊</span>
+              <span class="trio-label">Model</span>
+            </button>
+            <button class="trio-btn playback" id="play-btn">
+              <span class="trio-icon" id="play-icon">▶</span>
+              <span class="trio-label">You</span>
+            </button>
+            <button class="trio-btn record" id="rec-btn">
+              <span class="trio-icon" id="rec-icon">🎤</span>
+              <span class="trio-label" id="rec-label">Record</span>
+            </button>
           </div>
-        </div>
-        <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
-      `;
+          <p class="speak-hint" id="speak-hint">Hear the model, then record yourself.</p>
+          <div class="compare-card" id="compare-card" style="display:none;">
+            <div class="compare-play-btn" id="compare-play-btn">▶</div>
+            <div class="compare-text">
+              <div class="compare-title">Compare with your last try</div>
+              <div class="compare-sub" id="compare-sub"></div>
+            </div>
+          </div>
+          <div id="assess-wrap" style="display:none">
+            <div class="assess-btns">
+              <button class="assess-btn assess-yes" id="assess-yes">✓ That sounded right</button>
+              <button class="assess-btn assess-no"  id="assess-no">↩ I need more practice</button>
+            </div>
+          </div>
+          <button class="next-ex-btn" id="next-btn" style="display:none">Next →</button>
+        `;
 
-      const modelBtn  = container.querySelector('#model-btn');
-      const modelIcon = container.querySelector('#model-icon');
-      const playBtn   = container.querySelector('#play-btn');
-      const playIcon  = container.querySelector('#play-icon');
-      const recBtn    = container.querySelector('#rec-btn');
-      const recIcon   = container.querySelector('#rec-icon');
-      const recLabel  = container.querySelector('#rec-label');
-      const hint      = container.querySelector('#speak-hint');
-      const assessWrap= container.querySelector('#assess-wrap');
-      const yesBtn    = container.querySelector('#assess-yes');
-      const noBtn     = container.querySelector('#assess-no');
-      const nextBtn   = container.querySelector('#next-btn');
+        const modelBtn    = container.querySelector('#model-btn');
+        const modelIcon   = container.querySelector('#model-icon');
+        const playBtn     = container.querySelector('#play-btn');
+        const playIcon    = container.querySelector('#play-icon');
+        const recBtn      = container.querySelector('#rec-btn');
+        const recIcon     = container.querySelector('#rec-icon');
+        const recLabel    = container.querySelector('#rec-label');
+        const hint        = container.querySelector('#speak-hint');
+        const compareCard = container.querySelector('#compare-card');
+        const compareSub  = container.querySelector('#compare-sub');
+        const comparePlayBtn = container.querySelector('#compare-play-btn');
+        const assessWrap  = container.querySelector('#assess-wrap');
+        const yesBtn      = container.querySelector('#assess-yes');
+        const noBtn       = container.querySelector('#assess-no');
+        const nextBtn     = container.querySelector('#next-btn');
 
-      // ── Model audio ─────────────────────────────
-      function finishModelPlayback() {
-        modelPlaying = false;
-        modelIcon.textContent = '🔊';
-        modelBtn.classList.remove('playing');
-      }
-
-      function playModel() {
-        if (modelPlaying) return;
-        stopSelf();
-        modelPlaying = true;
-        modelIcon.textContent = '⏸';
-        modelBtn.classList.add('playing');
-
-        if (data.audioFile) {
-          const a = new Audio(data.audioFile);
-          modelAudio = a;
-          a.onended = finishModelPlayback;
-          a.onerror = () => playModelViaSynthesis();
-          a.play().catch(() => playModelViaSynthesis());
-          return;
+        // Fetch prior attempts for this exact exercise, before any new
+        // recording happens this visit — used both to know whether the
+        // compare card has something to show, and for the self-assess
+        // wording. Fire-and-forget: never blocks the question rendering.
+        if (state.student) {
+          getRecordings(state.student, moduleIndex, tier, idx).then(attempts => {
+            priorAttempts = attempts;
+          });
         }
-        playModelViaSynthesis();
-      }
 
-      function playModelViaSynthesis() {
-        if (!TTS) { modelPlaying = false; return; }
-        TTS.cancel();
-        let u;
-        try { u = new SpeechSynthesisUtterance(target); }
-        catch(e) { modelPlaying = false; return; }
-        u.rate   = isBronze ? 0.8 : 0.85;
-        u.lang   = 'en-US';
-        u.onend  = finishModelPlayback;
-        TTS.speak(u);
-      }
-
-      modelBtn.addEventListener('click', () => {
-        if (modelPlaying) {
-          TTS && TTS.cancel();
-          if (modelAudio) { modelAudio.pause(); modelAudio.currentTime = 0; modelAudio = null; }
+        // ── Model audio ─────────────────────────────
+        function finishModelPlayback() {
           modelPlaying = false;
           modelIcon.textContent = '🔊';
           modelBtn.classList.remove('playing');
-        } else {
-          playModel();
         }
-      });
 
-      // ── Self playback ──────────────────────────
-      function stopSelf() {
-        if (selfAudio) { selfAudio.pause(); selfAudio.currentTime = 0; }
-        selfPlaying = false;
-        playIcon.textContent = '▶';
-        playBtn.classList.remove('playing');
-      }
-
-      playBtn.addEventListener('click', () => {
-        if (!recordingBlob || isRecording || done) return;
-        if (selfPlaying) { stopSelf(); return; }
-
-        TTS && TTS.cancel();
-        modelPlaying = false;
-        modelIcon.textContent = '🔊';
-        modelBtn.classList.remove('playing');
-
-        selfPlaying = true;
-        playIcon.textContent = '⏸';
-        playBtn.classList.add('playing');
-
-        const url  = URL.createObjectURL(recordingBlob);
-        selfAudio  = new Audio(url);
-        selfAudio.play();
-        selfAudio.onended = () => {
+        function playModel() {
+          if (modelPlaying) return;
           stopSelf();
-          URL.revokeObjectURL(url);
-        };
-      });
+          modelPlaying = true;
+          modelIcon.textContent = '⏸';
+          modelBtn.classList.add('playing');
 
-      // ── MediaRecorder ──────────────────────────
-      recBtn.addEventListener('click', async () => {
-        if (done) return;
-
-        if (isRecording) {
-          // Stop recording
-          mediaRecorder.stop();
-          return;
+          if (audioFile) {
+            const a = new Audio(audioFile);
+            modelAudio = a;
+            a.onended = finishModelPlayback;
+            a.onerror = () => playModelViaSynthesis();
+            a.play().catch(() => playModelViaSynthesis());
+            return;
+          }
+          playModelViaSynthesis();
         }
 
-        // Stop any playback first
-        stopSelf();
-        TTS && TTS.cancel();
-        modelPlaying = false;
-        modelIcon.textContent = '🔊';
-        modelBtn.classList.remove('playing');
-
-        try {
-          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-          const mimeType = MediaRecorder.isTypeSupported('audio/webm')
-            ? 'audio/webm' : 'audio/mp4';
-
-          const chunks  = [];
-          mediaRecorder = new MediaRecorder(stream, { mimeType });
-
-          mediaRecorder.ondataavailable = e => {
-            if (e.data.size > 0) chunks.push(e.data);
-          };
-
-          mediaRecorder.onstop = () => {
-            // Release mic
-            stream.getTracks().forEach(t => t.stop());
-            isRecording = false;
-            recIcon.textContent  = '🎤';
-            recLabel.textContent = 'Re-record';
-            recBtn.classList.remove('recording');
-
-            recordingBlob = new Blob(chunks, { type: mimeType });
-
-            // Unlock playback button
-            playBtn.classList.add('ready');
-
-            // Show self-assess after first recording
-            assessWrap.style.display = 'block';
-            hint.textContent = 'Listen to both, then tap how it went.';
-          };
-
-          mediaRecorder.start();
-          isRecording = true;
-          recIcon.textContent  = '⏹';
-          recLabel.textContent = 'Stop';
-          recBtn.classList.add('recording');
-          hint.textContent = 'Recording… tap ⏹ to stop.';
-
-        } catch (err) {
-          // Mic permission denied or not available — fallback
-          showNoMicFallback();
+        function playModelViaSynthesis() {
+          if (!TTS) { modelPlaying = false; return; }
+          TTS.cancel();
+          let u;
+          try { u = new SpeechSynthesisUtterance(target); }
+          catch(e) { modelPlaying = false; return; }
+          u.rate   = isBronze ? 0.8 : 0.85;
+          u.lang   = 'en-US';
+          u.onend  = finishModelPlayback;
+          TTS.speak(u);
         }
-      });
 
-      // ── Self-assess ────────────────────────────
-      function lockAssess() {
-        done = true;
-        yesBtn.disabled = true;
-        noBtn.disabled  = true;
-        if (stream) stream.getTracks().forEach(t => t.stop());
+        modelBtn.addEventListener('click', () => {
+          if (modelPlaying) {
+            TTS && TTS.cancel();
+            if (modelAudio) { modelAudio.pause(); modelAudio.currentTime = 0; modelAudio = null; }
+            modelPlaying = false;
+            modelIcon.textContent = '🔊';
+            modelBtn.classList.remove('playing');
+          } else {
+            playModel();
+          }
+        });
+
+        // ── Self playback ──────────────────────────
+        function stopSelf() {
+          if (selfAudio) { selfAudio.pause(); selfAudio.currentTime = 0; }
+          selfPlaying = false;
+          playIcon.textContent = '▶';
+          playBtn.classList.remove('playing');
+        }
+
+        playBtn.addEventListener('click', () => {
+          if (!recordingBlob || isRecording || done) return;
+          if (selfPlaying) { stopSelf(); return; }
+
+          TTS && TTS.cancel();
+          modelPlaying = false;
+          modelIcon.textContent = '🔊';
+          modelBtn.classList.remove('playing');
+
+          selfPlaying = true;
+          playIcon.textContent = '⏸';
+          playBtn.classList.add('playing');
+
+          const url  = URL.createObjectURL(recordingBlob);
+          selfAudio  = new Audio(url);
+          const resetSelfBtn = () => { stopSelf(); URL.revokeObjectURL(url); };
+          selfAudio.onended = resetSelfBtn;
+          selfAudio.onerror = resetSelfBtn; // same fix as the compare button — never leave "You" stuck on pause
+          selfAudio.play().catch(resetSelfBtn);
+        });
+
+        // ── Compare-with-last-try playback ─────────
+        let comparePlaying = false;
+        comparePlayBtn.addEventListener('click', () => {
+          if (comparePlaying || !priorAttempts.length) return;
+          const lastAttempt = priorAttempts[priorAttempts.length - 1];
+          TTS && TTS.cancel();
+          stopSelf();
+          comparePlaying = true;
+          comparePlayBtn.textContent = '⏸';
+          const url = URL.createObjectURL(lastAttempt.blob);
+          const audio = new Audio(url);
+          const resetCompareBtn = () => {
+            comparePlaying = false;
+            comparePlayBtn.textContent = '▶';
+            URL.revokeObjectURL(url);
+          };
+          audio.onended = resetCompareBtn;
+          audio.onerror = resetCompareBtn; // a failed/corrupt recording shouldn't leave the button stuck on pause forever
+          audio.play().catch(resetCompareBtn);
+        });
+
+        // ── MediaRecorder ──────────────────────────
+        recBtn.addEventListener('click', async () => {
+          if (done) return;
+
+          if (isRecording) {
+            mediaRecorder.stop();
+            return;
+          }
+
+          stopSelf();
+          TTS && TTS.cancel();
+          modelPlaying = false;
+          modelIcon.textContent = '🔊';
+          modelBtn.classList.remove('playing');
+
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm')
+              ? 'audio/webm' : 'audio/mp4';
+
+            const chunks  = [];
+            mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+            mediaRecorder.ondataavailable = e => {
+              if (e.data.size > 0) chunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+              stream.getTracks().forEach(t => t.stop());
+              isRecording = false;
+              recIcon.textContent  = '🎤';
+              recLabel.textContent = 'Re-record';
+              recBtn.classList.remove('recording');
+
+              recordingBlob = new Blob(chunks, { type: mimeType });
+              playBtn.classList.add('ready');
+
+              // The wording here depends on whether there was already a
+              // prior attempt BEFORE this one — checking against the model
+              // ("sounded right") is a different question from checking
+              // growth against yourself ("sounded better"), and only the
+              // second one makes sense once there's something to compare.
+              const hadPriorBeforeThisRecording = priorAttempts.length > 0;
+              yesBtn.textContent = hadPriorBeforeThisRecording ? '✓ That sounded better' : '✓ That sounded right';
+
+              if (state.student) {
+                saveRecording(state.student, moduleIndex, tier, idx, recordingBlob).then(() => {
+                  // Compare card only appears once the fresh recording is
+                  // actually saved AND a real prior attempt existed —
+                  // never on a genuine first try, matching the design.
+                  if (hadPriorBeforeThisRecording) {
+                    const lastAttempt = priorAttempts[priorAttempts.length - 1];
+                    compareSub.textContent = `Recorded ${timeAgo(lastAttempt.timestamp)}`;
+                    compareCard.style.display = 'flex';
+                  }
+                });
+              }
+
+              assessWrap.style.display = 'block';
+              hint.textContent = 'Listen to both, then tap how it went.';
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            recIcon.textContent  = '⏹';
+            recLabel.textContent = 'Stop';
+            recBtn.classList.add('recording');
+            hint.textContent = 'Recording… tap ⏹ to stop.';
+
+          } catch (err) {
+            showNoMicFallback();
+          }
+        });
+
+        // ── Self-assess ────────────────────────────
+        function lockAssess() {
+          done = true;
+          yesBtn.disabled = true;
+          noBtn.disabled  = true;
+          if (stream) stream.getTracks().forEach(t => t.stop());
+        }
+        function advance(score) {
+          totalScore += score;
+          idx++;
+          if (idx < session.length) renderQuestion();
+          else onComplete(totalScore / session.length);
+        }
+
+        yesBtn.addEventListener('click', () => {
+          if (done) return;
+          yesBtn.classList.add('selected');
+          lockAssess();
+          nextBtn.style.display = 'block';
+          nextBtn.onclick = () => advance(1);
+        });
+
+        noBtn.addEventListener('click', () => {
+          if (done) return;
+          noBtn.classList.add('selected');
+          lockAssess();
+          nextBtn.style.display = 'block';
+          nextBtn.onclick = () => advance(0);
+        });
+
+        // ── No-mic fallback ────────────────────────
+        function showNoMicFallback() {
+          recBtn.style.display  = 'none';
+          playBtn.style.display = 'none';
+          const msg = document.createElement('div');
+          msg.className   = 'no-mic-msg';
+          msg.textContent = 'Microphone not available. Listen to the model, say it aloud, then tap how it went.';
+          container.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
+          assessWrap.style.display = 'block';
+          hint.style.display = 'none';
+        }
       }
 
-      yesBtn.addEventListener('click', () => {
-        if (done) return;
-        yesBtn.classList.add('selected');
-        lockAssess();
-        nextBtn.style.display = 'block';
-        nextBtn.onclick = () => onComplete(1);
-      });
-
-      noBtn.addEventListener('click', () => {
-        if (done) return;
-        noBtn.classList.add('selected');
-        lockAssess();
-        nextBtn.style.display = 'block';
-        nextBtn.onclick = () => onComplete(0);
-      });
-
-      // ── No-mic fallback ────────────────────────
-      function showNoMicFallback() {
-        recBtn.style.display  = 'none';
-        playBtn.style.display = 'none';
-        const msg = document.createElement('div');
-        msg.className   = 'no-mic-msg';
-        msg.textContent = 'Microphone not available. Listen to the model, say it aloud, then tap how it went.';
-        container.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
-        assessWrap.style.display = 'block';
-        hint.style.display = 'none';
-      }
+      renderQuestion();
     }
   },
 
