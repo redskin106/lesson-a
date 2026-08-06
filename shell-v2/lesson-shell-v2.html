@@ -1603,6 +1603,18 @@ let _progressDBPromise = null;
 
 function openProgressDB() {
   if (_progressDBPromise) return _progressDBPromise;
+
+  // Ask the browser for stronger persistence guarantees on this data — by
+  // default, storage is "best-effort" and browsers (Safari on iOS
+  // especially) can evict it under storage pressure, in Private Browsing,
+  // or after a period of disuse. This doesn't force anything and the grant
+  // outcome is deliberately ignored here (fire-and-forget, never awaited)
+  // — recordings/progress still work either way, this just lowers the odds
+  // of silent data loss. Guarded so it can never throw on an older browser.
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(() => {});
+  }
+
   _progressDBPromise = new Promise((resolve, reject) => {
     const req = indexedDB.open(PROGRESS_DB_NAME, PROGRESS_DB_VERSION);
     req.onupgradeneeded = () => {
