@@ -2539,6 +2539,8 @@ const MODULE_REGISTRY = {
           container.querySelector('#gf-dot-2'),
           container.querySelector('#gf-dot-3')];
 
+        let letterHintIndex = null; // chosen once, first time hintLevel reaches 3 — stays stable after that
+
         function markPillWrong(word) {
           const pill = pillRow.querySelector(`[data-word="${word}"]`);
           if (pill) pill.classList.add('eliminated');
@@ -2547,7 +2549,13 @@ const MODULE_REGISTRY = {
         // Crosses out one wrong option the student hasn't already ruled out
         // — real, actionable narrowing, instead of a grammar-role label
         // that's equally true of every option and tells them nothing.
+        // Deliberately never eliminates down to a single live option: research
+        // on hint systems (bottom-out hints should be a genuine last resort,
+        // not an early rung) backs keeping at least 2 real choices standing,
+        // so some real retrieval effort survives even at max hint level.
         function eliminateOneMore() {
+          const liveCount = options.length - wrongOptions.size;
+          if (liveCount <= 2) return null;
           const candidates = options.filter(o => o !== answer && !wrongOptions.has(o));
           if (candidates.length === 0) return null;
           const pick = candidates[0];
@@ -2561,7 +2569,8 @@ const MODULE_REGISTRY = {
           if (!blank) return;
           blank.classList.toggle('hint-glow', hintLevel >= 1);
           if (hintLevel === 3) {
-            const revealed = answer[0] + '_'.repeat(Math.max(1, answer.length - 1));
+            if (letterHintIndex === null) letterHintIndex = Math.floor(Math.random() * answer.length);
+            const revealed = answer.split('').map((ch, i) => i === letterHintIndex ? ch : '_').join('');
             blank.innerHTML = `<span class="gf-hint-placeholder">${revealed}</span>`;
           } else if (!selected) {
             blank.innerHTML = '&nbsp;';
@@ -2641,8 +2650,8 @@ const MODULE_REGISTRY = {
               1: 'Not quite — look at the highlighted blank.',
               2: eliminatedWord ? `Hint: "${eliminatedWord}" isn't it either.` : 'Not quite — try again.',
               3: eliminatedWord
-                  ? `Almost — "${eliminatedWord}" is out too, and it starts with "${answer[0]}".`
-                  : `Almost — it starts with "${answer[0]}".`,
+                  ? `Almost — "${eliminatedWord}" is out too, and one letter is revealed in the blank.`
+                  : 'Almost — one letter is revealed in the blank.',
             };
             statusEl.textContent = messages[hintLevel];
             updateHintVisuals();
