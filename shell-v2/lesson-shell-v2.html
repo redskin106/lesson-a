@@ -2586,13 +2586,16 @@ const MODULE_REGISTRY = {
         // Crosses out one wrong option the student hasn't already ruled out
         // — real, actionable narrowing, instead of a grammar-role label
         // that's equally true of every option and tells them nothing.
-        // Deliberately never eliminates down to a single live option: research
-        // on hint systems (bottom-out hints should be a genuine last resort,
-        // not an early rung) backs keeping at least 2 real choices standing,
-        // so some real retrieval effort survives even at max hint level.
-        function eliminateOneMore() {
+        // `respectFloor` protects against a PREMATURE full-solve (used at
+        // level 2's fallback) — never eliminate down to 1 live option there,
+        // some real retrieval effort should survive that early. Level 3 is
+        // the genuine last resort after two real reasoning hints already
+        // happened, so it's allowed to fully resolve if the pool is small
+        // enough that nothing partial is left to reveal — that's not a
+        // shortcut, it's what "last resort" is supposed to mean.
+        function eliminateOneMore(respectFloor) {
           const liveCount = options.length - wrongOptions.size;
-          if (liveCount <= 2) return null;
+          if (respectFloor && liveCount <= 2) return null;
           const candidates = options.filter(o => o !== answer && !wrongOptions.has(o));
           if (candidates.length === 0) return null;
           const pick = candidates[0];
@@ -2692,14 +2695,16 @@ const MODULE_REGISTRY = {
               } else if (!usedElimination) {
                 // No second real clue exists for this sentence (short item) —
                 // fall back to elimination here instead of showing nothing new.
-                eliminatedWord = eliminateOneMore();
+                // Still a "middle rung" moment, so the floor still applies.
+                eliminatedWord = eliminateOneMore(true);
                 if (eliminatedWord) usedElimination = true;
               }
             } else if (hintLevel === 3 && !usedElimination) {
               // Only spend the elimination budget here if level 2 didn't
               // already use it via the fallback above — exactly one
               // elimination total across the whole ladder, never two.
-              eliminatedWord = eliminateOneMore();
+              // No floor here — this is the genuine last resort.
+              eliminatedWord = eliminateOneMore(false);
               if (eliminatedWord) usedElimination = true;
             }
 
