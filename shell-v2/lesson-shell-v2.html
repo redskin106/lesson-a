@@ -612,6 +612,14 @@ html, body {
   0%, 100% { box-shadow: 0 4px 0 -2px rgba(255,183,77,0.25); }
   50%      { box-shadow: 0 4px 0 -2px rgba(255,183,77,0.6); }
 }
+.gf-context-clue {
+  color: var(--accent); font-weight: 600; border-radius: 4px; padding: 0 2px;
+  animation: gf-context-pulse 1.1s ease-in-out infinite;
+}
+@keyframes gf-context-pulse {
+  0%, 100% { background: rgba(79,195,247,0.12); }
+  50%      { background: rgba(79,195,247,0.32); }
+}
 .gf-hint-placeholder { color: rgba(255,183,77,0.85); font-weight: 600; }
 .gf-hint-row { display: flex; align-items: center; justify-content: center; gap: 1.5%; margin-bottom: 3%; font-size: 2.7cqw; color: rgba(255,255,255,0.4); }
 .gf-hint-dot { width: 1.6cqw; height: 1.6cqw; border-radius: 50%; background: rgba(255,255,255,0.12); transition: background .2s; }
@@ -2505,11 +2513,30 @@ const MODULE_REGISTRY = {
       ];
       const SCORE_BY_HINT_LEVEL = { 0: 1, 1: 2/3, 2: 1/3, 3: 1/3 };
       const STARS_BY_HINT_LEVEL = { 0: 3, 1: 2, 2: 1, 3: 1 };
+      const CONTEXT_ROLE_PRIORITY = ['object', 'time', 'place', 'subject', 'connector', 'verb'];
+
+      // Finds a real clue already sitting in the sentence — whichever role
+      // the answer itself ISN'T, picked by how much context it usually
+      // carries (object/time/place tend to be more informative than a bare
+      // subject or connector). Needs no new authored content since it
+      // reuses the grammar tokens every gap-fill item already has.
+      function findContextClue(answer, tokens) {
+        if (!tokens || !tokens.length) return null;
+        const answerToken = tokens.find(t => t.t.split(/\s+/).includes(answer));
+        const candidates = tokens.filter(t => t !== answerToken && t.t && t.t.trim());
+        if (!candidates.length) return null;
+        for (const role of CONTEXT_ROLE_PRIORITY) {
+          const match = candidates.find(t => t.r === role);
+          if (match) return match.t;
+        }
+        return candidates[0].t;
+      }
 
       function renderQuestion() {
         const { sentence, options, answer, tokens } = session[idx];
         let selected = null, hintLevel = 0, locked = false;
         const wrongOptions = new Set(); // confirmed wrong this question — tried by the student OR eliminated by a hint
+        const contextClue = findContextClue(answer, tokens);
 
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
@@ -2527,8 +2554,14 @@ const MODULE_REGISTRY = {
           <button class="gf-reflect-btn" id="gf-reflect-btn">I see it now 👍 — continue</button>
         `;
 
-        container.querySelector('#gf-sentence').innerHTML =
-          sentence.replace('___', '<span class="gf-blank" id="gf-blank-slot">&nbsp;</span>');
+        function renderSentence(showContextGlow) {
+          let html = sentence.replace('___', '<span class="gf-blank" id="gf-blank-slot">&nbsp;</span>');
+          if (showContextGlow && contextClue && html.includes(contextClue)) {
+            html = html.replace(contextClue, `<span class="gf-context-clue">${contextClue}</span>`);
+          }
+          container.querySelector('#gf-sentence').innerHTML = html;
+        }
+        renderSentence(false);
 
         const pillRow    = container.querySelector('#gf-pill-row');
         const checkBtn   = container.querySelector('#gf-check-btn');
@@ -2565,7 +2598,8 @@ const MODULE_REGISTRY = {
         }
 
         function updateHintVisuals() {
-          const blank = container.querySelector('#gf-blank-slot');
+          if (hintLevel === 1) renderSentence(true); // first wrong attempt only — adds the context-clue glow
+          const blank = container.querySelector('#gf-blank-slot'); // re-query fresh in case renderSentence just rebuilt it
           if (!blank) return;
           blank.classList.toggle('hint-glow', hintLevel >= 1);
           if (hintLevel === 3) {
@@ -2647,7 +2681,7 @@ const MODULE_REGISTRY = {
             }
 
             const messages = {
-              1: 'Not quite — look at the highlighted blank.',
+              1: contextClue ? 'Not quite — look at the highlighted word for a clue.' : 'Not quite — look at the highlighted blank.',
               2: eliminatedWord ? `Hint: "${eliminatedWord}" isn't it either.` : 'Not quite — try again.',
               3: eliminatedWord
                   ? `Almost — "${eliminatedWord}" is out too, and one letter is revealed in the blank.`
