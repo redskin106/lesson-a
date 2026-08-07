@@ -602,6 +602,27 @@ html, body {
 .gf-check-btn { display: block; margin: 0 auto 6%; padding: 3% 12%; border-radius: 999px; background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5); color: #C9B8EA; font-size: 4.4cqw; font-weight: 500; cursor: pointer; font-family: inherit; }
 .gf-check-btn:disabled { opacity: 0.5; pointer-events: none; }
 .gf-status { font-size: 3.2cqw; color: rgba(255,255,255,0.5); text-align: center; }
+.gf-blank.hint-glow {
+  border-bottom-color: #FFB74D;
+  box-shadow: 0 4px 0 -2px rgba(255,183,77,0.35);
+  animation: gf-hint-pulse 1.1s ease-in-out infinite;
+}
+@keyframes gf-hint-pulse {
+  0%, 100% { box-shadow: 0 4px 0 -2px rgba(255,183,77,0.25); }
+  50%      { box-shadow: 0 4px 0 -2px rgba(255,183,77,0.6); }
+}
+.gf-hint-placeholder { color: rgba(255,183,77,0.85); font-weight: 600; }
+.gf-hint-row { display: flex; align-items: center; justify-content: center; gap: 1.5%; margin-bottom: 3%; font-size: 2.7cqw; color: rgba(255,255,255,0.4); }
+.gf-hint-dot { width: 1.6cqw; height: 1.6cqw; border-radius: 50%; background: rgba(255,255,255,0.12); transition: background .2s; }
+.gf-hint-dot.used { background: #FFB74D; }
+.gf-reflect-btn {
+  display: none; margin: 3% auto 0; padding: 2.5% 6%;
+  background: rgba(139,195,74,0.14); border: 1.5px solid rgba(139,195,74,0.5);
+  border-radius: 999px; color: #AED581; font-size: 3.1cqw; font-weight: 500;
+  cursor: pointer; font-family: inherit;
+}
+.gf-reflect-btn.show { display: block; }
+.gf-reflect-btn:disabled { opacity: 0.6; pointer-events: none; }
 
 /* True/false (v2) */
 .tf-statement-v2 { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 6% 6%; color: #fff; font-size: 4.6cqw; line-height: 1.5; text-align: center; margin-bottom: 6%; }
@@ -2454,9 +2475,21 @@ const MODULE_REGISTRY = {
   'gap-fill': {
     // v2 design: pool-based. Each tier is { pick, items: [...] } — a separate
     // pool per tier (per Nick's decision: difficulty differs per tier, so
-    // pools shouldn't be shared across tiers). Draws `pick` items, runs each
-    // with retry-until-correct scoring (first-try=1, retry-then-correct=0.6),
-    // then averages across the session for the tier's overall score.
+    // pools shouldn't be shared across tiers). Draws `pick` items.
+    //
+    // PILOT: Fading Hint Ladder (ported from hint-ladder-demo.html, this is
+    // the first module to get it — replaces the old binary retry scoring).
+    // hintLevel (0-3) only ever moves on a wrong attempt, resets each new
+    // question: 1 = glow only, no text; 2 = category hint ("it's a verb");
+    // 3 = first-letter hint. Stars this question: 0 hints=3, 1=2, 2+=1 —
+    // mapped to a 0-1 score (1, 2/3, 1/3) that now drives the tier average
+    // in place of the old first-try=1/retry=0.6 model. A Reflect pause only
+    // appears when a hint was actually needed — a student who got it right
+    // immediately keeps the same fast pace as before, unslowed.
+    // Category hints fall back to the answer's grammar role (from tokens)
+    // since there's no dedicated per-item hint-category field yet — real
+    // authored categories ("it's a food word") would read richer than
+    // "it's an object," but this needs no new content to work today.
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
       const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
@@ -2469,26 +2502,62 @@ const MODULE_REGISTRY = {
         { border:'#E91E63', bg:'rgba(233,30,99,.18)',  color:'#F48FB1' },
         { border:'#8BC34A', bg:'rgba(139,195,74,.18)', color:'#AED581' }
       ];
+      const SCORE_BY_HINT_LEVEL = { 0: 1, 1: 2/3, 2: 1/3, 3: 1/3 };
+      const STARS_BY_HINT_LEVEL = { 0: 3, 1: 2, 2: 1, 3: 1 };
+
+      function categoryHintFor(answer, tokens) {
+        const match = (tokens || []).find(t => t.t.split(/\s+/).includes(answer));
+        const role = match && match.r;
+        const roleLabel = { subject:'subject', verb:'verb', object:'object', place:'place word', time:'time word' }[role];
+        return roleLabel ? `a ${roleLabel}` : 'a missing word';
+      }
 
       function renderQuestion() {
         const { sentence, options, answer, tokens } = session[idx];
-        let selected = null, attemptedWrong = false, locked = false;
+        let selected = null, hintLevel = 0, locked = false;
 
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
         container.innerHTML = `
           <p class="gf-sentence" id="gf-sentence"></p>
+          <div class="gf-hint-row" id="gf-hint-row">
+            <span>hints</span>
+            <div class="gf-hint-dot" id="gf-dot-1"></div>
+            <div class="gf-hint-dot" id="gf-dot-2"></div>
+            <div class="gf-hint-dot" id="gf-dot-3"></div>
+          </div>
           <div class="gf-pill-row" id="gf-pill-row"></div>
           <button id="gf-check-btn" class="gf-check-btn">Check</button>
           <p class="gf-status" id="gf-status">&nbsp;</p>
+          <button class="gf-reflect-btn" id="gf-reflect-btn">I see it now 👍 — continue</button>
         `;
 
         container.querySelector('#gf-sentence').innerHTML =
           sentence.replace('___', '<span class="gf-blank" id="gf-blank-slot">&nbsp;</span>');
 
-        const pillRow  = container.querySelector('#gf-pill-row');
-        const checkBtn = container.querySelector('#gf-check-btn');
-        const statusEl = container.querySelector('#gf-status');
+        const pillRow    = container.querySelector('#gf-pill-row');
+        const checkBtn   = container.querySelector('#gf-check-btn');
+        const statusEl   = container.querySelector('#gf-status');
+        const reflectBtn = container.querySelector('#gf-reflect-btn');
+        const dots       = [null,
+          container.querySelector('#gf-dot-1'),
+          container.querySelector('#gf-dot-2'),
+          container.querySelector('#gf-dot-3')];
+
+        function updateHintVisuals() {
+          const blank = container.querySelector('#gf-blank-slot');
+          if (!blank) return;
+          blank.classList.toggle('hint-glow', hintLevel >= 1);
+          if (hintLevel === 2) {
+            blank.innerHTML = `<span class="gf-hint-placeholder">${categoryHintFor(answer, tokens)}</span>`;
+          } else if (hintLevel === 3) {
+            const revealed = answer[0] + '_'.repeat(Math.max(1, answer.length - 1));
+            blank.innerHTML = `<span class="gf-hint-placeholder">${revealed}</span>`;
+          } else if (!selected) {
+            blank.innerHTML = '&nbsp;';
+          }
+          for (let i = 1; i <= 3; i++) dots[i].classList.toggle('used', hintLevel >= i);
+        }
 
         options.forEach((opt, i) => {
           const btn = document.createElement('button');
@@ -2520,21 +2589,43 @@ const MODULE_REGISTRY = {
             locked = true;
             checkBtn.disabled = true;
             sfx('correct');
-            statusEl.textContent = attemptedWrong ? 'correct, nice recovery' : 'correct, first try';
-            const score = attemptedWrong ? 0.6 : 1;
+            const score = SCORE_BY_HINT_LEVEL[hintLevel];
+            const stars = STARS_BY_HINT_LEVEL[hintLevel];
             totalScore += score;
-            const plain = (tokens || []).map(t => t.t).join(' ');
-            setTimeout(() => {
+            statusEl.textContent = `correct! ${'⭐'.repeat(stars)}${'✩'.repeat(3 - stars)}`;
+
+            const proceed = () => {
+              const plain = (tokens || []).map(t => t.t).join(' ');
               showGrammarReinforce(tokens, plain, () => {
                 idx++;
                 if (idx < session.length) renderQuestion();
                 else onComplete(totalScore / session.length);
               });
-            }, 550);
+            };
+
+            if (hintLevel > 0) {
+              // A hint was actually needed this time — worth a real pause,
+              // not just the usual fast handoff. A student who got it right
+              // immediately never sees this and keeps the old pace exactly.
+              reflectBtn.classList.add('show');
+              reflectBtn.addEventListener('click', () => {
+                reflectBtn.disabled = true;
+                reflectBtn.textContent = 'Nice — that sticks better than just moving on ✓';
+                setTimeout(proceed, 500);
+              }, { once: true });
+            } else {
+              setTimeout(proceed, 550);
+            }
           } else {
-            attemptedWrong = true;
+            hintLevel = Math.min(hintLevel + 1, 3);
             sfx('wrong');
-            statusEl.textContent = 'not quite, try again';
+            const messages = {
+              1: 'Not quite — look at the highlighted blank.',
+              2: `Hint: it's ${categoryHintFor(answer, tokens)}.`,
+              3: `Almost — it starts with "${answer[0]}".`,
+            };
+            statusEl.textContent = messages[hintLevel];
+            updateHintVisuals();
             const sel = pillRow.querySelector(`[data-word="${selected}"]`);
             if (sel) sel.animate(
               [{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}],
