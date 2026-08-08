@@ -329,6 +329,7 @@ const MODULES = [
   {id:'spelling', name:'Spelling', pool:true, built:true},
   {id:'listenmatch', name:'Listen & Match', pool:true, built:true},
   {id:'buildsentence', name:'Build a Sentence', pool:true, built:true},
+  {id:'pyramid', name:'Description Pyramid', pool:true, built:true},
 ];
 
 // ==========================================================================
@@ -437,12 +438,27 @@ function blankWordScrambleData(){
 function blankBuildSentenceData(){
   return blankPoolWithPick(4); // each pool item is just { tokens: [...] }
 }
+function blankPyramidData(){
+  const blankItem = (withL2, withL3) => ({
+    emoji: '',
+    full_sentence_audio: null,
+    l1: { options:['',''], answer:'' },
+    l2: withL2 ? [{ label:'', options:['',''], answer:'' }] : [],
+    l3: withL3 ? { tiles:[], because_mode:'typed' } : { tiles:[], because_mode:'typed' },
+  });
+  return {
+    bronze: { pick:1, items:[blankItem(false, false)] },
+    silver: { pick:1, items:[blankItem(true, false)] },
+    gold:   { pick:1, items:[blankItem(true, true)] },
+  };
+}
 
 const BLANK_DATA_BY_MODULE = {
   gapfill: blankGapfillData, spelling: blankSpellingData, truefalse: blankTrueFalseData,
   wordmatch: blankPairsData, listenmatch: blankPairsData, memorypairs: blankMemoryPairsData,
   listenchoose: blankListenChooseData, putinorder: blankPutInOrderData, sayit: blankSayItData,
   picword: blankPicWordData, wordscramble: blankWordScrambleData, buildsentence: blankBuildSentenceData,
+  pyramid: blankPyramidData,
 };
 
 // ---- "Colors Around Us" — real seed content across every module type, used to test the whole tool end to end ----
@@ -840,6 +856,7 @@ let currentTier = 'bronze';
 let compareMode = false;
 let gfExpandedIndex = 0; // which pool item's full editor (sentence/options/tags) is open
 let tfExpandedIndex = 0; // same, for true-false's statement pool
+let dpExpandedIndex = 0; // same, for the description-pyramid pool
 
 // ══════════════════════════════════════════════════
 //  VOCABULARY CONSISTENCY CHECKER
@@ -997,6 +1014,17 @@ function isTierFilled(moduleId, tier, dataOverride){
         return data[tier].items.length>=2 && data[tier].items.every(it=>it.word);
       case 'picword':
         return data[tier].items.length>=1 && data[tier].items.every(it=>it.word && it.cloze);
+      case 'pyramid': {
+        const d = data[tier];
+        if(!d.items.length) return false;
+        return d.items.every(it => {
+          if(!it.l1 || !it.l1.answer || !it.l1.options || it.l1.options.length < 2) return false;
+          if(tier === 'bronze') return true;
+          if(!it.l2 || it.l2.length < 1 || !it.l2.every(g => g.label && g.answer && g.options && g.options.length >= 2)) return false;
+          if(tier === 'silver') return true;
+          return !!it.l3 && !!it.l3.because_mode; // l3.tiles can be empty — free-type alone is valid
+        });
+      }
       default: return false;
     }
   }catch(e){ return false; }
@@ -1152,13 +1180,13 @@ function copyFromBronze(){
 }
 
 function selectModule(id){
-  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0;
+  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0; dpExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   document.getElementById('crumbMod').textContent = instanceLabel(id);
   renderSidebar(); renderTierTabs(); renderMain();
 }
 function selectTier(t){
-  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0;
+  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0; dpExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   renderTierTabs(); renderMain();
 }
@@ -1268,11 +1296,183 @@ function renderMain(){
     renderSharedPoolForm(currentModule);
   } else if(instanceType(currentModule)==='buildsentence'){
     renderBuildSentenceForm();
+  } else if(instanceType(currentModule)==='pyramid'){
+    renderPyramidForm(currentModule);
   } else {
     editView.innerHTML = `<div class="card stub-card"><b>${mod.name} — not mocked up in this prototype</b>Same sidebar, tier tabs, save/publish, and preview pane would wrap around this module's own form — following whichever shape it uses (fixed 3-item or pooled).</div>`;
   }
 
   if(currentModule !== 'gapfill') renderPreview();
+}
+
+// ---- Description Pyramid ----
+function renderPyramidForm(moduleId){
+  const editView = document.getElementById('editView');
+  const tierData = md(moduleId)[currentTier];
+  const items = tierData.items;
+  if(dpExpandedIndex >= items.length) dpExpandedIndex = Math.max(0, items.length - 1);
+  const it = items[dpExpandedIndex];
+  const showL2 = currentTier !== 'bronze';
+  const showL3 = currentTier === 'gold';
+
+  function optionsRow(labelText, options, answer, onOptionsInput, onAnswerChange){
+    const optId = `dp-opts-${Math.random().toString(36).slice(2,8)}`;
+    return `
+      <div class="field" style="margin-top:10px;">
+        <label style="font-size:12px;color:var(--text-lo);">${labelText} — comma-separated options</label>
+        <input type="text" value="${(options||[]).join(', ')}" onchange="${onOptionsInput}" style="margin-top:4px;">
+        <div class="hint" style="font-size:11px;color:var(--text-lo);margin-top:2px;">Press Tab or click away to update the answer list below.</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Correct answer</label>
+        <select style="margin-top:4px;" onchange="${onAnswerChange}">
+          <option value="">— pick —</option>
+          ${(options||[]).filter(o=>o).map(o=>`<option value="${o}" ${o===answer?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>`;
+  }
+
+  editView.innerHTML = `
+    <div class="card">
+      <div class="pool-header">
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — description items</div>
+        <div class="pool-count">${items.length} in pool</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Items drawn this session (pick)</label>
+        <input type="number" min="1" max="${Math.max(1,items.length)}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="dpSetPick('${moduleId}',this.value)">
+      </div>
+    </div>
+    <div id="dpItemList">
+      ${items.map((item,i)=>`
+        <div class="card">
+          ${i===dpExpandedIndex ? `
+            <div class="pool-header">
+              <div class="card-label" style="margin-bottom:0;">Item ${i+1}</div>
+              ${items.length>1 ? `<span class="del" onclick="dpRemoveItem('${moduleId}',${i})">✕ remove</span>` : ''}
+            </div>
+            <div class="field" style="margin-top:10px;display:flex;gap:12px;align-items:flex-start;">
+              <button class="emoji-field-btn ${item.emoji?'':'empty'}" onclick="openEmojiPicker(function(e){ dpUpdateField('${moduleId}',${i},'emoji',e); })">${item.emoji || '?'}</button>
+              <div style="flex:1;">
+                <label style="font-size:12px;color:var(--text-lo);">Full sentence audio</label>
+                <div class="row-inline" style="margin-top:4px;">
+                  <span class="hint" style="font-size:12px;color:var(--text-lo);">${item.full_sentence_audio ? 'Audio set — regenerate after editing the sentence below' : 'Generated at publish time from the assembled sentence'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-label" style="margin-top:16px;">Level 1 — category (${it===item?'':''}the noun, single tile)</div>
+            ${optionsRow('L1 options', item.l1.options, item.l1.answer,
+              `dpUpdateL1Options('${moduleId}',${i},this.value)`,
+              `dpSetL1Answer('${moduleId}',${i},this.value)`)}
+
+            ${showL2 ? `
+              <div class="card-label" style="margin-top:20px;">Level 2 — observable attributes <span style="font-weight:400;text-transform:none;letter-spacing:0;">groups unlock in this order</span></div>
+              ${(item.l2||[]).map((group,gi)=>`
+                <div class="pool-item" style="flex-direction:column;align-items:stretch;gap:6px;padding:10px;">
+                  <div class="row-inline">
+                    <input type="text" placeholder="group label (e.g. size, colour)" value="${group.label}" oninput="dpUpdateL2Label('${moduleId}',${i},${gi},this.value)">
+                    ${(item.l2.length>1) ? `<span class="del" onclick="dpRemoveL2Group('${moduleId}',${i},${gi})">✕</span>` : ''}
+                  </div>
+                  ${optionsRow('Group options', group.options, group.answer,
+                    `dpUpdateL2Options('${moduleId}',${i},${gi},this.value)`,
+                    `dpSetL2Answer('${moduleId}',${i},${gi},this.value)`)}
+                </div>`).join('')}
+              <div class="add-link" onclick="dpAddL2Group('${moduleId}',${i})">+ add attribute group</div>
+            ` : `<div class="hint" style="color:var(--text-lo);margin-top:12px;">Level 2 isn't used on Bronze — switch to Silver or Gold to edit it.</div>`}
+
+            ${showL3 ? `
+              <div class="card-label" style="margin-top:20px;">Level 3 — detail / opinion / sensation <span style="font-weight:400;text-transform:none;letter-spacing:0;">no wrong answer — any tile or typed text is accepted</span></div>
+              <div class="field" style="margin-top:8px;">
+                <label style="font-size:12px;color:var(--text-lo);">Tile options — comma-separated</label>
+                <input type="text" value="${(item.l3.tiles||[]).join(', ')}" oninput="dpUpdateL3Tiles('${moduleId}',${i},this.value)" style="margin-top:4px;">
+              </div>
+              <div class="field" style="margin-top:10px;">
+                <label style="font-size:12px;color:var(--text-lo);">"Because" clause</label>
+                <select style="margin-top:4px;" onchange="dpSetBecauseMode('${moduleId}',${i},this.value)">
+                  <option value="typed" ${item.l3.because_mode==='typed'?'selected':''}>Typed by the student</option>
+                  <option value="say-it" ${item.l3.because_mode==='say-it'?'selected':''}>Spoken only (Say It)</option>
+                </select>
+              </div>
+            ` : currentTier==='silver' ? `<div class="hint" style="color:var(--text-lo);margin-top:12px;">Level 3 isn't used on Silver — switch to Gold to edit it.</div>` : ''}
+          ` : `
+            <div class="pool-header" style="cursor:pointer;" onclick="dpExpandedIndex=${i};renderMain();">
+              <div class="card-label" style="margin-bottom:0;">${item.emoji || '❔'} Item ${i+1} — ${item.l1.answer || '(no answer set yet)'}</div>
+              ${items.length>1 ? `<span class="del" onclick="event.stopPropagation();dpRemoveItem('${moduleId}',${i})">✕ remove</span>` : ''}
+            </div>
+          `}
+        </div>`).join('')}
+    </div>
+    <div class="add-link" onclick="dpAddItem('${moduleId}')">+ add item to pool</div>
+  `;
+}
+
+function dpSetPick(moduleId, val){
+  const tierData = md(moduleId)[currentTier];
+  tierData.pick = Math.max(1, Math.min(parseInt(val)||1, tierData.items.length));
+  scheduleSave(); updatePreviewLive();
+}
+function dpAddItem(moduleId){
+  const tierData = md(moduleId)[currentTier];
+  tierData.items.push({
+    emoji:'', full_sentence_audio:null,
+    l1:{ options:['',''], answer:'' },
+    l2: currentTier==='bronze' ? [] : [{ label:'', options:['',''], answer:'' }],
+    l3: currentTier==='gold' ? { tiles:[], because_mode:'typed' } : { tiles:[], because_mode:'typed' },
+  });
+  dpExpandedIndex = tierData.items.length - 1;
+  renderMain(); renderSidebar();
+}
+function dpRemoveItem(moduleId, i){
+  const tierData = md(moduleId)[currentTier];
+  if(tierData.items.length<=1) return;
+  tierData.items.splice(i,1);
+  tierData.pick = Math.min(tierData.pick, tierData.items.length);
+  if(dpExpandedIndex>=tierData.items.length) dpExpandedIndex = tierData.items.length-1;
+  renderMain(); renderSidebar();
+}
+function dpUpdateField(moduleId, i, field, val){
+  md(moduleId)[currentTier].items[i][field] = val;
+  scheduleSave(); renderMain(); updatePreviewLive();
+}
+function dpUpdateL1Options(moduleId, i, val){
+  md(moduleId)[currentTier].items[i].l1.options = val.split(',').map(s=>s.trim()).filter(s=>s || true);
+  scheduleSave(); renderMain(); updatePreviewLive();
+}
+function dpSetL1Answer(moduleId, i, val){
+  md(moduleId)[currentTier].items[i].l1.answer = val;
+  scheduleSave(); renderMain(); updatePreviewLive();
+}
+function dpUpdateL2Label(moduleId, i, gi, val){
+  md(moduleId)[currentTier].items[i].l2[gi].label = val;
+  scheduleSave(); updatePreviewLive();
+}
+function dpUpdateL2Options(moduleId, i, gi, val){
+  md(moduleId)[currentTier].items[i].l2[gi].options = val.split(',').map(s=>s.trim()).filter(s=>s || true);
+  scheduleSave(); renderMain(); updatePreviewLive();
+}
+function dpSetL2Answer(moduleId, i, gi, val){
+  md(moduleId)[currentTier].items[i].l2[gi].answer = val;
+  scheduleSave(); renderMain(); updatePreviewLive();
+}
+function dpAddL2Group(moduleId, i){
+  md(moduleId)[currentTier].items[i].l2.push({ label:'', options:['',''], answer:'' });
+  renderMain();
+}
+function dpRemoveL2Group(moduleId, i, gi){
+  const item = md(moduleId)[currentTier].items[i];
+  if(item.l2.length<=1) return;
+  item.l2.splice(gi,1);
+  renderMain();
+}
+function dpUpdateL3Tiles(moduleId, i, val){
+  md(moduleId)[currentTier].items[i].l3.tiles = val.split(',').map(s=>s.trim()).filter(s=>s);
+  scheduleSave(); updatePreviewLive();
+}
+function dpSetBecauseMode(moduleId, i, val){
+  md(moduleId)[currentTier].items[i].l3.because_mode = val;
+  scheduleSave(); updatePreviewLive();
 }
 
 // ---- Word + emoji pool (Spelling, Word Scramble) ----
@@ -2448,6 +2648,7 @@ const MODULE_CATALOG = [
   {id:'spelling', name:'Spelling', desc:'Type a word correctly from a prompt'},
   {id:'listenmatch', name:'Listen & Match', desc:'Hear audio, match to the right pair'},
   {id:'buildsentence', name:'Build a Sentence', desc:'Assemble tagged word chunks'},
+  {id:'pyramid', name:'Description Pyramid', desc:'Scaffolded three-level description builder'},
 ];
 
 // Cambridge English Young Learners (Pre-A1 Starters / A1 Movers / A2 Flyers) word
@@ -3334,6 +3535,7 @@ const SHELL_TYPE_MAP = {
   buildsentence: 'sentence-building',
   memorypairs:   'memory-pairs',
   picword:       'image-vocab',
+  pyramid:       'description-pyramid',
 };
 
 // pushedAudioIds: Set of ids (from lessons/{lessonId}/manifest.json, status==='pushed') that
@@ -3402,6 +3604,29 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
           prompt: it.prompt, target: it.target, keyWords: it.keyWords || [],
           audioFile: audioFor(`${t}.item${i}.target`, it.target),
         }))
+      }]));
+
+    case 'pyramid':
+      // full_sentence_audio is generated from the AUTHORED correct answers
+      // (l1.answer + each l2 group's answer, plus the first l3 tile if one
+      // exists) — the canonical completion sentence, since the actual
+      // assembled sentence a student reaches depends on which tile they
+      // pick at runtime. Doubles as Say It's model audio on completion —
+      // one file, two uses, per spec, no separate asset needed.
+      return Object.fromEntries(TIER_ORDER.map(t => [t, {
+        pick: data[t].pick,
+        items: data[t].items.map((it,i) => {
+          const l2Words = (it.l2 || []).map(g => g.answer).filter(Boolean);
+          const l3Word = (it.l3 && it.l3.tiles && it.l3.tiles[0]) || '';
+          const canonicalSentence = `It's a ${[...l2Words, it.l1.answer].filter(Boolean).join(' ')}${l3Word ? ' ' + l3Word : ''}.`;
+          return {
+            emoji: it.emoji,
+            l1: { options: it.l1.options, answer: it.l1.answer },
+            l2: (it.l2 || []).map(g => ({ label: g.label, options: g.options, answer: g.answer })),
+            l3: { tiles: (it.l3 && it.l3.tiles) || [], because_mode: (it.l3 && it.l3.because_mode) || 'typed' },
+            full_sentence_audio: audioFor(`${t}.item${i}.fullsentence`, canonicalSentence),
+          };
+        })
       }]));
 
     case 'putinorder':
@@ -3573,6 +3798,16 @@ function extractSpeakableForTTS(lessonId){
     } else if(type === 'sayit'){
       // Only 'target' drives playModel() — 'prompt' is on-screen instruction text only.
       TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => add(instId, `${t}.item${i}.target`, it.target)));
+    } else if(type === 'pyramid'){
+      // Same canonical-sentence construction as transformModuleForPublish's
+      // audioFor() key — must match exactly or the "already generated"
+      // check silently fails to find a real match.
+      TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((it,i) => {
+        const l2Words = (it.l2 || []).map(g => g.answer).filter(Boolean);
+        const l3Word = (it.l3 && it.l3.tiles && it.l3.tiles[0]) || '';
+        const canonicalSentence = `It's a ${[...l2Words, it.l1.answer].filter(Boolean).join(' ')}${l3Word ? ' ' + l3Word : ''}.`;
+        add(instId, `${t}.item${i}.fullsentence`, canonicalSentence);
+      }));
     } else if(type === 'listenmatch'){
       // left === right by design for this module (an audio-echo match) — left alone is enough.
       TIER_ORDER.forEach(t => (data[t] && data[t].items || []).forEach((p,i) => add(instId, `${t}.item${i}.left`, p.left)));
