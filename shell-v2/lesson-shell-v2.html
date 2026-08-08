@@ -529,6 +529,79 @@ html, body {
 .compare-text { flex: 1; min-width: 0; }
 .compare-title { font-size: 3.1cqw; color: #fff; font-weight: 600; margin-bottom: 2%; }
 .compare-sub { font-size: 2.7cqw; color: var(--text-dim); }
+/* ── Description Pyramid ─────────────────────────── */
+.dp-mascot-wrap { display:flex; justify-content:center; margin-bottom:4%; }
+.dp-mascot { font-size:11cqw; line-height:1; transition:transform .25s ease; }
+.dp-mascot.bump { animation: dp-mascot-bump .4s ease; }
+@keyframes dp-mascot-bump { 0%,100%{transform:scale(1);} 50%{transform:scale(1.25);} }
+
+.dp-pyramid { display:flex; flex-direction:column; gap:2.5%; margin-bottom:4%; }
+.dp-block {
+  border-radius:12px; padding:4% 5%; position:relative;
+  border:1.5px solid transparent; transition: all .3s ease;
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:1.5%;
+  min-height:60px; font-size:16px;
+}
+.dp-block-l1 { margin:0 15%; }
+.dp-block-l2 { margin:0 7%; }
+.dp-block-l3 { margin:0; }
+
+.dp-block.locked { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.06); opacity:0.4; color:var(--text-dim); }
+.dp-block.locked .dp-lock-icon { display:inline; }
+.dp-block .dp-lock-icon { display:none; font-size:4cqw; }
+
+.dp-block.active { animation: dp-block-pulse 1.6s ease-in-out infinite; cursor:default; }
+@keyframes dp-block-pulse {
+  0%,100% { box-shadow: 0 0 0 0 var(--dp-glow, rgba(0,188,212,0.35)); }
+  50%     { box-shadow: 0 0 0 6px var(--dp-glow, rgba(0,188,212,0)); }
+}
+.dp-block-l1.active { background:rgba(0,188,212,0.14); border-color:#00BCD4; --dp-glow: rgba(0,188,212,0.35); }
+.dp-block-l2.active { background:rgba(255,152,0,0.14); border-color:#FF9800; --dp-glow: rgba(255,152,0,0.35); }
+.dp-block-l3.active { background:rgba(255,215,0,0.14); border-color:#FFD700; --dp-glow: rgba(255,215,0,0.35); }
+
+.dp-block.complete { border-width:1.5px; }
+.dp-block-l1.complete { background:rgba(0,188,212,0.2); border-color:#00BCD4; }
+.dp-block-l2.complete { background:rgba(255,152,0,0.16); border-color:#FF9800; }
+.dp-block-l3.complete { background:rgba(255,215,0,0.16); border-color:#FFD700; }
+.dp-check-icon { position:absolute; top:6%; right:4%; font-size:3.6cqw; color:#4CAF50; display:none; }
+.dp-block.complete .dp-check-icon { display:block; }
+
+.dp-block-icon { font-size:5cqw; margin-right:1%; }
+.dp-block-label { font-size:3.4cqw; font-weight:600; color:#fff; }
+.dp-block-answer { font-size:3.4cqw; font-weight:700; }
+
+.dp-tile-row { display:flex; gap:2%; overflow-x:auto; padding:2% 1%; margin-bottom:4%; scrollbar-width:none; }
+.dp-tile-row::-webkit-scrollbar { display:none; }
+.dp-tile {
+  flex-shrink:0; background:rgba(255,255,255,0.05); border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:10px; padding:3% 4.5%; font-size:3.5cqw; color:rgba(255,255,255,0.85);
+  cursor:pointer; font-family:inherit; white-space:nowrap; transition:.15s;
+}
+.dp-tile.selected { color:#0D1B2A; font-weight:700; }
+.dp-group-label { font-size:2.8cqw; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:1.5%; padding-left:1%; }
+
+.dp-l3-free-input {
+  width:100%; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:10px; padding:3% 4%; color:var(--text-hi); font-size:3.4cqw; font-family:inherit;
+  margin-bottom:3%; box-sizing:border-box;
+}
+.dp-because-label { font-size:2.9cqw; color:var(--text-dim); margin:3% 0 1.5%; }
+.dp-sayit-only-note { font-size:2.9cqw; color:var(--text-dim); font-style:italic; margin-bottom:3%; }
+
+.dp-sentence-strip {
+  position:sticky; bottom:0; background:rgba(13,27,42,0.92); backdrop-filter:blur(6px);
+  border-top:1px solid rgba(255,255,255,0.08); border-radius:12px 12px 0 0;
+  padding:3% 4%; display:flex; flex-wrap:wrap; gap:1.5%; align-items:center; min-height:10cqw;
+}
+.dp-strip-pill { padding:1.5% 3%; border-radius:999px; font-size:3.2cqw; font-weight:600; }
+.dp-strip-pill.l1 { background:rgba(0,188,212,0.2); color:#4DD0E1; }
+.dp-strip-pill.l2-size { background:rgba(255,152,0,0.2); color:#FFB74D; }
+.dp-strip-pill.l2-shape { background:rgba(171,71,188,0.2); color:#CE93D8; }
+.dp-strip-pill.l2-dynamic { color:#0D1B2A; }
+.dp-strip-pill.l3 { background:rgba(255,215,0,0.2); color:#FFE082; }
+.dp-strip-plain { font-size:3.2cqw; color:var(--text-dim); }
+
+.dp-check-btn { display:block; width:100%; }
 .no-mic-msg {
   background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.08); border-radius: 10px;
   padding: 4% 4%; font-size: 3.2cqw; color: var(--text-dim);
@@ -1613,6 +1686,50 @@ const LESSON = [
       }
     }
   },
+
+  // ── DESCRIPTION PYRAMID ────────────────────────────
+  {
+    id: 'mod-9',
+    type: 'description-pyramid',
+    label: 'Describe It',
+    data: {
+      bronze: { pick: 1, items: [
+        {
+          emoji: '👜',
+          full_sentence_audio: null,
+          l1: { options: ['bag', 'box', 'bottle', 'book'], answer: 'bag' },
+          l2: [],
+          l3: { tiles: [], because_mode: 'typed' }
+        }
+      ]},
+      silver: { pick: 1, items: [
+        {
+          emoji: '👜',
+          full_sentence_audio: null,
+          l1: { options: ['bag', 'box', 'bottle', 'book'], answer: 'bag' },
+          l2: [
+            { label: 'size',   options: ['big', 'small', 'long', 'short'], answer: 'small' },
+            { label: 'shape',  options: ['round', 'flat', 'square', 'long'], answer: 'flat' },
+            { label: 'colour', options: ['red', 'blue', 'black', 'brown'], answer: 'red' }
+          ],
+          l3: { tiles: [], because_mode: 'typed' }
+        }
+      ]},
+      gold: { pick: 1, items: [
+        {
+          emoji: '👜',
+          full_sentence_audio: null,
+          l1: { options: ['bag', 'box', 'bottle', 'book'], answer: 'bag' },
+          l2: [
+            { label: 'size',   options: ['big', 'small', 'long', 'short'], answer: 'small' },
+            { label: 'shape',  options: ['round', 'flat', 'square', 'long'], answer: 'flat' },
+            { label: 'colour', options: ['red', 'blue', 'black', 'brown'], answer: 'red' }
+          ],
+          l3: { tiles: ['with a zip', 'with a handle', 'looks old', 'looks new'], because_mode: 'typed' }
+        }
+      ]}
+    }
+  },
 ];
 
 // ══════════════════════════════════════════════════
@@ -2332,6 +2449,316 @@ function showPlainReinforce(correct, bodyText, onContinue) {
     document.getElementById('gr-overlay').style.display = 'none';
     onContinue();
   };
+}
+
+// Shared recording interaction — record/model/compare/self-assess, with the
+// same IndexedDB persistence and before/after compare card everywhere it's
+// used. Extracted so the standalone Say It module and Description Pyramid's
+// chained "Now you say it" step are the SAME code, not two copies that can
+// drift apart over time. `onDone` receives { assessed: true, correct: bool }
+// on a real self-assessment, or { assessed: false } if skipped (only
+// possible when opts.allowSkip is true — the standalone module never allows
+// skipping, but Description Pyramid's Say It step is explicitly optional).
+function renderSayItInteraction(container, opts, onDone) {
+  const { prompt, target, audioFile, moduleIndex, tier, recordingItemIndex, isBronze, allowSkip } = opts;
+
+  let modelPlaying   = false;
+  let modelAudio     = null;
+  let selfPlaying    = false;
+  let isRecording    = false;
+  let done           = false;
+  let recordingBlob  = null;
+  let selfAudio      = null;
+  let mediaRecorder  = null;
+  let stream         = null;
+  let priorAttempts  = [];
+
+  container.innerHTML = `
+    ${prompt ? `<p class="module-question">${prompt}</p>` : ''}
+    <div class="speak-target">${target}</div>
+    <div class="speak-trio">
+      <button class="trio-btn model" id="model-btn">
+        <span class="trio-icon" id="model-icon">🔊</span>
+        <span class="trio-label">Model</span>
+      </button>
+      <button class="trio-btn playback" id="play-btn">
+        <span class="trio-icon" id="play-icon">▶</span>
+        <span class="trio-label">You</span>
+      </button>
+      <button class="trio-btn record" id="rec-btn">
+        <span class="trio-icon" id="rec-icon">🎤</span>
+        <span class="trio-label" id="rec-label">Record</span>
+      </button>
+    </div>
+    <p class="speak-hint" id="speak-hint">Hear the model, then record yourself.</p>
+    <div class="compare-card" id="compare-card" style="display:none;">
+      <div class="compare-play-btn" id="compare-play-btn">▶</div>
+      <div class="compare-text">
+        <div class="compare-title">Compare with your last try</div>
+        <div class="compare-sub" id="compare-sub"></div>
+      </div>
+    </div>
+    <div id="assess-wrap" style="display:none">
+      <div class="assess-btns">
+        <button class="assess-btn assess-yes" id="assess-yes">✓ That sounded right</button>
+        <button class="assess-btn assess-no"  id="assess-no">↩ I need more practice</button>
+      </div>
+      <button class="share-link" id="share-btn">📤 Share this recording</button>
+    </div>
+    ${allowSkip ? `<button class="share-link" id="skip-sayit-btn" style="margin-top:2%;">Skip this step →</button>` : ''}
+    <button class="iv-proceed-btn" id="next-btn">Next →</button>
+  `;
+
+  const modelBtn    = container.querySelector('#model-btn');
+  const modelIcon   = container.querySelector('#model-icon');
+  const playBtn     = container.querySelector('#play-btn');
+  const playIcon    = container.querySelector('#play-icon');
+  const recBtn      = container.querySelector('#rec-btn');
+  const recIcon     = container.querySelector('#rec-icon');
+  const recLabel    = container.querySelector('#rec-label');
+  const hint        = container.querySelector('#speak-hint');
+  const compareCard = container.querySelector('#compare-card');
+  const compareSub  = container.querySelector('#compare-sub');
+  const comparePlayBtn = container.querySelector('#compare-play-btn');
+  const assessWrap  = container.querySelector('#assess-wrap');
+  const yesBtn      = container.querySelector('#assess-yes');
+  const noBtn       = container.querySelector('#assess-no');
+  const nextBtn     = container.querySelector('#next-btn');
+  const shareBtn    = container.querySelector('#share-btn');
+  const skipBtn     = container.querySelector('#skip-sayit-btn');
+
+  if (state.student) {
+    getRecordings(state.student, moduleIndex, tier, recordingItemIndex).then(attempts => {
+      priorAttempts = attempts;
+    });
+  }
+
+  function finishModelPlayback() {
+    modelPlaying = false;
+    modelIcon.textContent = '🔊';
+    modelBtn.classList.remove('playing');
+  }
+
+  function playModel() {
+    if (modelPlaying) return;
+    stopSelf();
+    modelPlaying = true;
+    modelIcon.textContent = '⏸';
+    modelBtn.classList.add('playing');
+
+    if (audioFile) {
+      const a = new Audio(audioFile);
+      modelAudio = a;
+      a.onended = finishModelPlayback;
+      a.onerror = () => playModelViaSynthesis();
+      a.play().catch(() => playModelViaSynthesis());
+      return;
+    }
+    playModelViaSynthesis();
+  }
+
+  function playModelViaSynthesis() {
+    if (!TTS) { modelPlaying = false; return; }
+    TTS.cancel();
+    let u;
+    try { u = new SpeechSynthesisUtterance(target); }
+    catch(e) { modelPlaying = false; return; }
+    u.rate   = isBronze ? 0.8 : 0.85;
+    u.lang   = 'en-US';
+    u.onend  = finishModelPlayback;
+    TTS.speak(u);
+  }
+
+  modelBtn.addEventListener('click', () => {
+    if (modelPlaying) {
+      TTS && TTS.cancel();
+      if (modelAudio) { modelAudio.pause(); modelAudio.currentTime = 0; modelAudio = null; }
+      modelPlaying = false;
+      modelIcon.textContent = '🔊';
+      modelBtn.classList.remove('playing');
+    } else {
+      playModel();
+    }
+  });
+
+  function stopSelf() {
+    if (selfAudio) { selfAudio.pause(); selfAudio.currentTime = 0; }
+    selfPlaying = false;
+    playIcon.textContent = '▶';
+    playBtn.classList.remove('playing');
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (!recordingBlob || isRecording || done) return;
+    if (selfPlaying) { stopSelf(); return; }
+
+    TTS && TTS.cancel();
+    modelPlaying = false;
+    modelIcon.textContent = '🔊';
+    modelBtn.classList.remove('playing');
+
+    selfPlaying = true;
+    playIcon.textContent = '⏸';
+    playBtn.classList.add('playing');
+
+    const url  = URL.createObjectURL(recordingBlob);
+    selfAudio  = new Audio(url);
+    const resetSelfBtn = () => { stopSelf(); URL.revokeObjectURL(url); };
+    selfAudio.onended = resetSelfBtn;
+    selfAudio.onerror = resetSelfBtn;
+    selfAudio.play().catch(resetSelfBtn);
+  });
+
+  let comparePlaying = false;
+  comparePlayBtn.addEventListener('click', () => {
+    if (comparePlaying || !priorAttempts.length) return;
+    const lastAttempt = priorAttempts[priorAttempts.length - 1];
+    TTS && TTS.cancel();
+    stopSelf();
+    comparePlaying = true;
+    comparePlayBtn.textContent = '⏸';
+    const url = URL.createObjectURL(lastAttempt.blob);
+    const audio = new Audio(url);
+    const resetCompareBtn = () => {
+      comparePlaying = false;
+      comparePlayBtn.textContent = '▶';
+      URL.revokeObjectURL(url);
+    };
+    audio.onended = resetCompareBtn;
+    audio.onerror = resetCompareBtn;
+    audio.play().catch(resetCompareBtn);
+  });
+
+  recBtn.addEventListener('click', async () => {
+    if (done) return;
+
+    if (isRecording) {
+      mediaRecorder.stop();
+      return;
+    }
+
+    stopSelf();
+    TTS && TTS.cancel();
+    modelPlaying = false;
+    modelIcon.textContent = '🔊';
+    modelBtn.classList.remove('playing');
+
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm')
+        ? 'audio/webm' : 'audio/mp4';
+
+      const chunks  = [];
+      mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        isRecording = false;
+        recIcon.textContent  = '🎤';
+        recLabel.textContent = 'Re-record';
+        recBtn.classList.remove('recording');
+
+        recordingBlob = new Blob(chunks, { type: mimeType });
+        playBtn.classList.add('ready');
+
+        const hadPriorBeforeThisRecording = priorAttempts.length > 0;
+        yesBtn.textContent = hadPriorBeforeThisRecording ? '✓ That sounded better' : '✓ That sounded right';
+
+        if (state.student) {
+          saveRecording(state.student, moduleIndex, tier, recordingItemIndex, recordingBlob).then(() => {
+            if (hadPriorBeforeThisRecording) {
+              const lastAttempt = priorAttempts[priorAttempts.length - 1];
+              compareSub.textContent = `Recorded ${timeAgo(lastAttempt.timestamp)}`;
+              compareCard.style.display = 'flex';
+            }
+          });
+        }
+
+        assessWrap.style.display = 'block';
+        if (skipBtn) skipBtn.style.display = 'none'; // once they've recorded, skip no longer makes sense
+        hint.textContent = 'Listen to both, then tap how it went.';
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+      recIcon.textContent  = '⏹';
+      recLabel.textContent = 'Stop';
+      recBtn.classList.add('recording');
+      hint.textContent = 'Recording… tap ⏹ to stop.';
+
+    } catch (err) {
+      showNoMicFallback();
+    }
+  });
+
+  shareBtn.addEventListener('click', async () => {
+    if (!recordingBlob) return;
+    const ext = recordingBlob.type.includes('mp4') ? 'm4a' : 'webm';
+    const file = new File([recordingBlob], `say-it-${Date.now()}.${ext}`, { type: recordingBlob.type });
+
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'My recording', text: target });
+      } catch (e) {}
+      return;
+    }
+
+    const url = URL.createObjectURL(recordingBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `say-it-recording.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  function lockAssess() {
+    done = true;
+    yesBtn.disabled = true;
+    noBtn.disabled  = true;
+    if (stream) stream.getTracks().forEach(t => t.stop());
+  }
+
+  yesBtn.addEventListener('click', () => {
+    if (done) return;
+    yesBtn.classList.add('selected');
+    lockAssess();
+    nextBtn.style.display = 'block';
+    nextBtn.onclick = () => onDone({ assessed: true, correct: true });
+  });
+
+  noBtn.addEventListener('click', () => {
+    if (done) return;
+    noBtn.classList.add('selected');
+    lockAssess();
+    nextBtn.style.display = 'block';
+    nextBtn.onclick = () => onDone({ assessed: true, correct: false });
+  });
+
+  if (skipBtn) {
+    skipBtn.addEventListener('click', () => {
+      if (done) return;
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      onDone({ assessed: false });
+    });
+  }
+
+  function showNoMicFallback() {
+    recBtn.style.display  = 'none';
+    playBtn.style.display = 'none';
+    shareBtn.style.display = 'none';
+    if (skipBtn) skipBtn.style.display = 'none';
+    const msg = document.createElement('div');
+    msg.className   = 'no-mic-msg';
+    msg.textContent = 'Microphone not available. Listen to the model, say it aloud, then tap how it went.';
+    container.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
+    assessWrap.style.display = 'block';
+    hint.style.display = 'none';
+  }
 }
 
 const MODULE_REGISTRY = {
@@ -3198,325 +3625,20 @@ const MODULE_REGISTRY = {
 
       function renderQuestion() {
         const { prompt, target, audioFile } = session[idx];
-        const moduleIndex = state.currentModuleIndex;
-
-        let modelPlaying   = false;
-        let modelAudio     = null;
-        let selfPlaying    = false;
-        let isRecording    = false;
-        let done           = false;
-        let recordingBlob  = null;
-        let selfAudio      = null;
-        let mediaRecorder  = null;
-        let stream         = null;
-        let priorAttempts  = []; // fetched async below — attempts saved before this visit
-
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
-        container.innerHTML = `
-          <p class="module-question">${prompt}</p>
-          <div class="speak-target">${target}</div>
-          <div class="speak-trio">
-            <button class="trio-btn model" id="model-btn">
-              <span class="trio-icon" id="model-icon">🔊</span>
-              <span class="trio-label">Model</span>
-            </button>
-            <button class="trio-btn playback" id="play-btn">
-              <span class="trio-icon" id="play-icon">▶</span>
-              <span class="trio-label">You</span>
-            </button>
-            <button class="trio-btn record" id="rec-btn">
-              <span class="trio-icon" id="rec-icon">🎤</span>
-              <span class="trio-label" id="rec-label">Record</span>
-            </button>
-          </div>
-          <p class="speak-hint" id="speak-hint">Hear the model, then record yourself.</p>
-          <div class="compare-card" id="compare-card" style="display:none;">
-            <div class="compare-play-btn" id="compare-play-btn">▶</div>
-            <div class="compare-text">
-              <div class="compare-title">Compare with your last try</div>
-              <div class="compare-sub" id="compare-sub"></div>
-            </div>
-          </div>
-          <div id="assess-wrap" style="display:none">
-            <div class="assess-btns">
-              <button class="assess-btn assess-yes" id="assess-yes">✓ That sounded right</button>
-              <button class="assess-btn assess-no"  id="assess-no">↩ I need more practice</button>
-            </div>
-            <button class="share-link" id="share-btn">📤 Share this recording</button>
-          </div>
-          <button class="iv-proceed-btn" id="next-btn">Next →</button>
-        `;
-
-        const modelBtn    = container.querySelector('#model-btn');
-        const modelIcon   = container.querySelector('#model-icon');
-        const playBtn     = container.querySelector('#play-btn');
-        const playIcon    = container.querySelector('#play-icon');
-        const recBtn      = container.querySelector('#rec-btn');
-        const recIcon     = container.querySelector('#rec-icon');
-        const recLabel    = container.querySelector('#rec-label');
-        const hint        = container.querySelector('#speak-hint');
-        const compareCard = container.querySelector('#compare-card');
-        const compareSub  = container.querySelector('#compare-sub');
-        const comparePlayBtn = container.querySelector('#compare-play-btn');
-        const assessWrap  = container.querySelector('#assess-wrap');
-        const yesBtn      = container.querySelector('#assess-yes');
-        const noBtn       = container.querySelector('#assess-no');
-        const nextBtn     = container.querySelector('#next-btn');
-        const shareBtn    = container.querySelector('#share-btn');
-
-        // Fetch prior attempts for this exact exercise, before any new
-        // recording happens this visit — used both to know whether the
-        // compare card has something to show, and for the self-assess
-        // wording. Fire-and-forget: never blocks the question rendering.
-        if (state.student) {
-          getRecordings(state.student, moduleIndex, tier, idx).then(attempts => {
-            priorAttempts = attempts;
-          });
-        }
-
-        // ── Model audio ─────────────────────────────
-        function finishModelPlayback() {
-          modelPlaying = false;
-          modelIcon.textContent = '🔊';
-          modelBtn.classList.remove('playing');
-        }
-
-        function playModel() {
-          if (modelPlaying) return;
-          stopSelf();
-          modelPlaying = true;
-          modelIcon.textContent = '⏸';
-          modelBtn.classList.add('playing');
-
-          if (audioFile) {
-            const a = new Audio(audioFile);
-            modelAudio = a;
-            a.onended = finishModelPlayback;
-            a.onerror = () => playModelViaSynthesis();
-            a.play().catch(() => playModelViaSynthesis());
-            return;
-          }
-          playModelViaSynthesis();
-        }
-
-        function playModelViaSynthesis() {
-          if (!TTS) { modelPlaying = false; return; }
-          TTS.cancel();
-          let u;
-          try { u = new SpeechSynthesisUtterance(target); }
-          catch(e) { modelPlaying = false; return; }
-          u.rate   = isBronze ? 0.8 : 0.85;
-          u.lang   = 'en-US';
-          u.onend  = finishModelPlayback;
-          TTS.speak(u);
-        }
-
-        modelBtn.addEventListener('click', () => {
-          if (modelPlaying) {
-            TTS && TTS.cancel();
-            if (modelAudio) { modelAudio.pause(); modelAudio.currentTime = 0; modelAudio = null; }
-            modelPlaying = false;
-            modelIcon.textContent = '🔊';
-            modelBtn.classList.remove('playing');
-          } else {
-            playModel();
-          }
-        });
-
-        // ── Self playback ──────────────────────────
-        function stopSelf() {
-          if (selfAudio) { selfAudio.pause(); selfAudio.currentTime = 0; }
-          selfPlaying = false;
-          playIcon.textContent = '▶';
-          playBtn.classList.remove('playing');
-        }
-
-        playBtn.addEventListener('click', () => {
-          if (!recordingBlob || isRecording || done) return;
-          if (selfPlaying) { stopSelf(); return; }
-
-          TTS && TTS.cancel();
-          modelPlaying = false;
-          modelIcon.textContent = '🔊';
-          modelBtn.classList.remove('playing');
-
-          selfPlaying = true;
-          playIcon.textContent = '⏸';
-          playBtn.classList.add('playing');
-
-          const url  = URL.createObjectURL(recordingBlob);
-          selfAudio  = new Audio(url);
-          const resetSelfBtn = () => { stopSelf(); URL.revokeObjectURL(url); };
-          selfAudio.onended = resetSelfBtn;
-          selfAudio.onerror = resetSelfBtn; // same fix as the compare button — never leave "You" stuck on pause
-          selfAudio.play().catch(resetSelfBtn);
-        });
-
-        // ── Compare-with-last-try playback ─────────
-        let comparePlaying = false;
-        comparePlayBtn.addEventListener('click', () => {
-          if (comparePlaying || !priorAttempts.length) return;
-          const lastAttempt = priorAttempts[priorAttempts.length - 1];
-          TTS && TTS.cancel();
-          stopSelf();
-          comparePlaying = true;
-          comparePlayBtn.textContent = '⏸';
-          const url = URL.createObjectURL(lastAttempt.blob);
-          const audio = new Audio(url);
-          const resetCompareBtn = () => {
-            comparePlaying = false;
-            comparePlayBtn.textContent = '▶';
-            URL.revokeObjectURL(url);
-          };
-          audio.onended = resetCompareBtn;
-          audio.onerror = resetCompareBtn; // a failed/corrupt recording shouldn't leave the button stuck on pause forever
-          audio.play().catch(resetCompareBtn);
-        });
-
-        // ── MediaRecorder ──────────────────────────
-        recBtn.addEventListener('click', async () => {
-          if (done) return;
-
-          if (isRecording) {
-            mediaRecorder.stop();
-            return;
-          }
-
-          stopSelf();
-          TTS && TTS.cancel();
-          modelPlaying = false;
-          modelIcon.textContent = '🔊';
-          modelBtn.classList.remove('playing');
-
-          try {
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-            const mimeType = MediaRecorder.isTypeSupported('audio/webm')
-              ? 'audio/webm' : 'audio/mp4';
-
-            const chunks  = [];
-            mediaRecorder = new MediaRecorder(stream, { mimeType });
-
-            mediaRecorder.ondataavailable = e => {
-              if (e.data.size > 0) chunks.push(e.data);
-            };
-
-            mediaRecorder.onstop = () => {
-              stream.getTracks().forEach(t => t.stop());
-              isRecording = false;
-              recIcon.textContent  = '🎤';
-              recLabel.textContent = 'Re-record';
-              recBtn.classList.remove('recording');
-
-              recordingBlob = new Blob(chunks, { type: mimeType });
-              playBtn.classList.add('ready');
-
-              // The wording here depends on whether there was already a
-              // prior attempt BEFORE this one — checking against the model
-              // ("sounded right") is a different question from checking
-              // growth against yourself ("sounded better"), and only the
-              // second one makes sense once there's something to compare.
-              const hadPriorBeforeThisRecording = priorAttempts.length > 0;
-              yesBtn.textContent = hadPriorBeforeThisRecording ? '✓ That sounded better' : '✓ That sounded right';
-
-              if (state.student) {
-                saveRecording(state.student, moduleIndex, tier, idx, recordingBlob).then(() => {
-                  // Compare card only appears once the fresh recording is
-                  // actually saved AND a real prior attempt existed —
-                  // never on a genuine first try, matching the design.
-                  if (hadPriorBeforeThisRecording) {
-                    const lastAttempt = priorAttempts[priorAttempts.length - 1];
-                    compareSub.textContent = `Recorded ${timeAgo(lastAttempt.timestamp)}`;
-                    compareCard.style.display = 'flex';
-                  }
-                });
-              }
-
-              assessWrap.style.display = 'block';
-              hint.textContent = 'Listen to both, then tap how it went.';
-            };
-
-            mediaRecorder.start();
-            isRecording = true;
-            recIcon.textContent  = '⏹';
-            recLabel.textContent = 'Stop';
-            recBtn.classList.add('recording');
-            hint.textContent = 'Recording… tap ⏹ to stop.';
-
-          } catch (err) {
-            showNoMicFallback();
-          }
-        });
-
-        // ── Share (optional — no server, student's own choice) ──────
-        shareBtn.addEventListener('click', async () => {
-          if (!recordingBlob) return;
-          const ext = recordingBlob.type.includes('mp4') ? 'm4a' : 'webm';
-          const file = new File([recordingBlob], `say-it-${Date.now()}.${ext}`, { type: recordingBlob.type });
-
-          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-              await navigator.share({ files: [file], title: 'My recording', text: target });
-            } catch (e) {
-              // User backed out of the share sheet, or the OS declined — not
-              // an error worth surfacing, they can just tap it again.
-            }
-            return;
-          }
-
-          // No native share support (most desktop browsers) — fall back to
-          // a plain download so the student can still send it themselves.
-          const url = URL.createObjectURL(recordingBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `say-it-recording.${ext}`;
-          a.click();
-          URL.revokeObjectURL(url);
-        });
-
-        // ── Self-assess ────────────────────────────
-        function lockAssess() {
-          done = true;
-          yesBtn.disabled = true;
-          noBtn.disabled  = true;
-          if (stream) stream.getTracks().forEach(t => t.stop());
-        }
-        function advance(score) {
-          totalScore += score;
+        renderSayItInteraction(container, {
+          prompt, target, audioFile, isBronze,
+          moduleIndex: state.currentModuleIndex,
+          tier,
+          recordingItemIndex: idx,
+          allowSkip: false, // the standalone module always requires an assessment — only the pyramid's chained step is skippable
+        }, (result) => {
+          totalScore += result.correct ? 1 : 0;
           idx++;
           if (idx < session.length) renderQuestion();
           else onComplete(totalScore / session.length);
-        }
-
-        yesBtn.addEventListener('click', () => {
-          if (done) return;
-          yesBtn.classList.add('selected');
-          lockAssess();
-          nextBtn.style.display = 'block';
-          nextBtn.onclick = () => advance(1);
         });
-
-        noBtn.addEventListener('click', () => {
-          if (done) return;
-          noBtn.classList.add('selected');
-          lockAssess();
-          nextBtn.style.display = 'block';
-          nextBtn.onclick = () => advance(0);
-        });
-
-        // ── No-mic fallback ────────────────────────
-        function showNoMicFallback() {
-          recBtn.style.display  = 'none';
-          playBtn.style.display = 'none';
-          shareBtn.style.display = 'none';
-          const msg = document.createElement('div');
-          msg.className   = 'no-mic-msg';
-          msg.textContent = 'Microphone not available. Listen to the model, say it aloud, then tap how it went.';
-          container.querySelector('.speak-trio').insertAdjacentElement('afterend', msg);
-          assessWrap.style.display = 'block';
-          hint.style.display = 'none';
-        }
       }
 
       renderQuestion();
@@ -4530,6 +4652,281 @@ const MODULE_REGISTRY = {
       }
 
       load();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  DESCRIPTION PYRAMID
+  //  Three-level scaffolded description: L1 category (one tile) → L2
+  //  observable attributes (ordered groups, sequential unlock) → L3 detail/
+  //  opinion/sensation (hybrid tile+free-type, no wrong answer). Tier gates
+  //  which levels exist at all: bronze=L1, silver=L1+L2, gold=all three —
+  //  the pyramid visually grows as the tier grows, that growth IS the
+  //  feedback mechanism. On completion, chains into the same Say It
+  //  recorder/persistence/compare-card used everywhere else (optional,
+  //  skippable, never affects the star score either way).
+  'description-pyramid': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const requiredLevels = tier === 'bronze' ? ['l1'] : tier === 'silver' ? ['l1','l2'] : ['l1','l2','l3'];
+      let idx = 0, totalStars = 0;
+
+      const COLOR_WORD_MAP = {
+        red:'#EF5350', blue:'#42A5F5', yellow:'#FFEE58', green:'#66BB6A',
+        black:'#616161', white:'#F5F5F5', pink:'#F48FB1', brown:'#8D6E63',
+        orange:'#FFA726', purple:'#AB47BC', gray:'#BDBDBD', grey:'#BDBDBD',
+        gold:'#FFD700', silver:'#B0BEC5'
+      };
+      function dynamicColorFor(word){ return COLOR_WORD_MAP[(word||'').toLowerCase()] || '#9575CD'; }
+      function isColourGroup(label){ return /colour|color/i.test(label || ''); }
+
+      function renderItem() {
+        const item = session[idx];
+        let l1Answer = null;
+        let l2Answers = []; // parallel to item.l2, undefined until that group is locked in
+        let l2GroupIndex = 0;
+        let l3TileAnswer = null;
+        let l3BecauseText = '';
+        let currentLevel = 'l1'; // 'l1' | 'l2' | 'l3' | 'done'
+
+        document.getElementById('v2-qlabel').textContent = `Item ${idx + 1} of ${session.length}`;
+
+        function setMascot(reaction) {
+          const el = container.querySelector('#dp-mascot');
+          if (!el) return;
+          const map = { start:'🙂', l1:'👀', l2:'😮', l3:'🎉' };
+          el.textContent = map[reaction] || '🙂';
+          el.classList.remove('bump');
+          void el.offsetWidth; // restart the animation
+          el.classList.add('bump');
+        }
+
+        function buildStripHtml() {
+          const pills = [`<span class="dp-strip-plain">It's a</span>`];
+          if (l2Answers.length) {
+            item.l2.forEach((group, i) => {
+              if (l2Answers[i] === undefined) return;
+              if (isColourGroup(group.label)) {
+                pills.push(`<span class="dp-strip-pill l2-dynamic" style="background:${dynamicColorFor(l2Answers[i])};">${l2Answers[i]}</span>`);
+              } else {
+                const cls = i % 2 === 0 ? 'l2-size' : 'l2-shape';
+                pills.push(`<span class="dp-strip-pill ${cls}">${l2Answers[i]}</span>`);
+              }
+            });
+          }
+          if (l1Answer) pills.push(`<span class="dp-strip-pill l1">${l1Answer}</span>`);
+          if (l3TileAnswer) pills.push(`<span class="dp-strip-pill l3">${l3TileAnswer}</span>`);
+          return pills.join(' ');
+        }
+        function updateStrip() {
+          const el = container.querySelector('#dp-strip');
+          if (el) el.innerHTML = buildStripHtml();
+        }
+
+        function levelStateClass(level) {
+          if (!requiredLevels.includes(level)) return 'locked'; // this tier never unlocks it
+          if (level === currentLevel) return 'active';
+          const order = ['l1','l2','l3'];
+          return order.indexOf(level) < order.indexOf(currentLevel) || currentLevel === 'done' ? 'complete' : 'locked';
+        }
+
+        function renderPyramid() {
+          const l1State = levelStateClass('l1');
+          const l2State = levelStateClass('l2');
+          const l3State = levelStateClass('l3');
+          container.querySelector('#dp-pyramid').innerHTML = `
+            <div class="dp-block dp-block-l1 ${l1State}">
+              <span class="dp-lock-icon">🔒</span>
+              <span class="dp-block-icon">👁️</span>
+              <span class="dp-block-label">${l1State === 'complete' ? l1Answer : 'What is it?'}</span>
+              <span class="dp-check-icon">✓</span>
+            </div>
+            <div class="dp-block dp-block-l2 ${l2State}">
+              <span class="dp-lock-icon">🔒</span>
+              <span class="dp-block-icon">📏🎨</span>
+              <span class="dp-block-label">${l2State === 'complete' ? l2Answers.join(' · ') : 'What does it look like?'}</span>
+              <span class="dp-check-icon">✓</span>
+            </div>
+            <div class="dp-block dp-block-l3 ${l3State}">
+              <span class="dp-lock-icon">🔒</span>
+              <span class="dp-block-icon">⭐</span>
+              <span class="dp-block-label">${l3State === 'complete' ? (l3TileAnswer || 'noted') : 'What makes it special?'}</span>
+              <span class="dp-check-icon">✓</span>
+            </div>`;
+        }
+
+        function renderActiveZone() {
+          const zone = container.querySelector('#dp-active-zone');
+          if (currentLevel === 'l1') {
+            zone.innerHTML = `<div class="dp-tile-row" id="dp-tiles"></div>`;
+            const row = zone.querySelector('#dp-tiles');
+            item.l1.options.forEach(opt => {
+              const btn = document.createElement('button');
+              btn.className = 'dp-tile';
+              btn.textContent = opt;
+              btn.addEventListener('click', () => {
+                if (opt !== item.l1.answer) {
+                  sfx('wrong');
+                  btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}], {duration:250});
+                  return;
+                }
+                sfx('correct');
+                l1Answer = opt;
+                btn.classList.add('selected');
+                btn.style.background = '#00BCD4'; btn.style.borderColor = '#00BCD4';
+                updateStrip();
+                setMascot('l1');
+                currentLevel = requiredLevels.includes('l2') ? 'l2' : 'done';
+                setTimeout(() => { renderPyramid(); renderActiveZone(); if (currentLevel === 'done') finishPyramid(); }, 450);
+              });
+              row.appendChild(btn);
+            });
+          } else if (currentLevel === 'l2') {
+            const group = item.l2[l2GroupIndex];
+            zone.innerHTML = `
+              <div class="dp-group-label">${group.label}</div>
+              <div class="dp-tile-row" id="dp-tiles"></div>`;
+            const row = zone.querySelector('#dp-tiles');
+            const isColour = isColourGroup(group.label);
+            group.options.forEach(opt => {
+              const btn = document.createElement('button');
+              btn.className = 'dp-tile';
+              btn.textContent = opt;
+              btn.addEventListener('click', () => {
+                if (opt !== group.answer) {
+                  sfx('wrong');
+                  btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}], {duration:250});
+                  return;
+                }
+                sfx('correct');
+                l2Answers[l2GroupIndex] = opt;
+                btn.classList.add('selected');
+                const c = isColour ? dynamicColorFor(opt) : (l2GroupIndex % 2 === 0 ? '#FF9800' : '#AB47BC');
+                btn.style.background = c; btn.style.borderColor = c;
+                updateStrip();
+                l2GroupIndex++;
+                if (l2GroupIndex < item.l2.length) {
+                  setTimeout(renderActiveZone, 400);
+                } else {
+                  setMascot('l2');
+                  currentLevel = requiredLevels.includes('l3') ? 'l3' : 'done';
+                  setTimeout(() => { renderPyramid(); renderActiveZone(); if (currentLevel === 'done') finishPyramid(); }, 450);
+                }
+              });
+              row.appendChild(btn);
+            });
+          } else if (currentLevel === 'l3') {
+            const becauseMode = item.l3.because_mode || 'typed';
+            zone.innerHTML = `
+              <div class="dp-tile-row" id="dp-tiles"></div>
+              <input type="text" class="dp-l3-free-input" id="dp-l3-free" placeholder="…or type your own">
+              ${becauseMode === 'typed'
+                ? `<div class="dp-because-label">Why? (optional)</div><input type="text" class="dp-l3-free-input" id="dp-because-input" placeholder="because it…">`
+                : `<div class="dp-sayit-only-note">You'll say why out loud in a moment.</div>`}
+              <button class="iv-proceed-btn dp-check-btn" id="dp-l3-continue" style="display:none;">Continue →</button>`;
+            const row = zone.querySelector('#dp-tiles');
+            (item.l3.tiles || []).forEach(opt => {
+              const btn = document.createElement('button');
+              btn.className = 'dp-tile';
+              btn.textContent = opt;
+              btn.addEventListener('click', () => {
+                row.querySelectorAll('.dp-tile').forEach(b => { b.classList.remove('selected'); b.style.background=''; b.style.borderColor=''; });
+                btn.classList.add('selected');
+                btn.style.background = '#FFD700'; btn.style.borderColor = '#FFD700';
+                l3TileAnswer = opt;
+                freeInput.value = '';
+                updateStrip();
+                continueBtn.style.display = 'block';
+              });
+              row.appendChild(btn);
+            });
+            const freeInput = zone.querySelector('#dp-l3-free');
+            const continueBtn = zone.querySelector('#dp-l3-continue');
+            freeInput.addEventListener('input', () => {
+              if (!freeInput.value.trim()) return;
+              row.querySelectorAll('.dp-tile').forEach(b => { b.classList.remove('selected'); b.style.background=''; b.style.borderColor=''; });
+              l3TileAnswer = freeInput.value.trim();
+              updateStrip();
+              continueBtn.style.display = 'block';
+            });
+            const becauseInput = zone.querySelector('#dp-because-input');
+            if (becauseInput) {
+              becauseInput.addEventListener('input', () => { l3BecauseText = becauseInput.value.trim(); });
+            }
+            continueBtn.addEventListener('click', () => {
+              sfx('correct');
+              setMascot('l3');
+              currentLevel = 'done';
+              renderPyramid();
+              finishPyramid();
+            });
+          }
+        }
+
+        function starsForThisItem() {
+          // Deepest level actually reached determines the star count — tier
+          // gating means every completed item naturally maxes its tier's
+          // ceiling (bronze can only ever reach 1, silver 2, gold 3), which
+          // is the point: more pyramid unlocked = more stars possible.
+          if (requiredLevels.includes('l3')) return 3;
+          if (requiredLevels.includes('l2')) return 2;
+          return 1;
+        }
+        const maxStarsPerItem = requiredLevels.includes('l3') ? 3 : requiredLevels.includes('l2') ? 2 : 1;
+
+        function finishPyramid() {
+          const stars = starsForThisItem();
+          totalStars += stars;
+
+          setTimeout(() => {
+            const plain = buildStripHtml().replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+            const fullSentence = l3BecauseText
+              ? `${plain}. I think it's special because ${l3BecauseText}.`
+              : `${plain}.`;
+
+            container.innerHTML = `
+              <div class="dp-mascot-wrap"><span class="dp-mascot bump" id="dp-mascot">🎉</span></div>
+              <p class="module-question" style="text-align:center;">Nice work! Now you say it:</p>
+              <div id="dp-sayit-zone"></div>
+            `;
+
+            if (item.full_sentence_audio) {
+              const a = new Audio(item.full_sentence_audio);
+              a.play().catch(() => {});
+            }
+
+            renderSayItInteraction(container.querySelector('#dp-sayit-zone'), {
+              prompt: null,
+              target: fullSentence,
+              audioFile: item.full_sentence_audio,
+              isBronze: tier === 'bronze',
+              moduleIndex: state.currentModuleIndex,
+              tier,
+              recordingItemIndex: idx,
+              allowSkip: true, // Say It is optional here — must never penalize skipping
+            }, () => {
+              // Stars already locked in from the pyramid itself — Say It
+              // (attempted or skipped) never changes the score, per spec.
+              idx++;
+              if (idx < session.length) renderItem();
+              else onComplete(Math.min(1, totalStars / (session.length * maxStarsPerItem)));
+            });
+          }, 700); // let the pyramid's own gold-glow settle before handing off
+        }
+
+        container.innerHTML = `
+          <div class="dp-mascot-wrap"><span class="dp-mascot" id="dp-mascot">🙂</span></div>
+          <div class="dp-pyramid" id="dp-pyramid"></div>
+          <div id="dp-active-zone"></div>
+          <div class="dp-sentence-strip" id="dp-strip"></div>
+        `;
+        renderPyramid();
+        renderActiveZone();
+        updateStrip();
+      }
+
+      renderItem();
     }
   },
 
