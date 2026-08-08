@@ -281,6 +281,8 @@
   .asset-row{ background:var(--glass); border:1px solid var(--glass-brd); border-radius:14px; padding:16px 18px; margin-bottom:10px; display:flex; align-items:center; gap:16px;}
   .asset-slot-group{ margin-bottom:20px; }
   .asset-slot-title{ font-size:13px; font-weight:600; color:var(--text-hi); margin-bottom:8px; }
+  .asset-dims{ font-size:11px; color:#93C5FD; margin-top:3px; }
+  .asset-dims-inline{ font-weight:400; text-transform:none; letter-spacing:0; font-size:11.5px; color:#93C5FD; margin-left:8px; }
   .asset-row.pending{ border-color:rgba(255,183,77,0.5); background:rgba(255,183,77,0.05);}
   .asset-thumb{ width:44px; height:44px; border-radius:9px; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
   .asset-info{ flex:1; min-width:0;}
@@ -3038,10 +3040,12 @@ function renderModal(){
 // Fixed UI chrome — kept single-version, shared identically across every
 // module. Varying these per exercise would look inconsistent rather than
 // contextual, unlike background/scene (see IMAGE_VARIANT_SLOTS below).
+// Dimensions below are read directly from the real, currently-live files —
+// not estimated — so the reminder is trustworthy.
 const FIXED_ASSETS = [
-  { id:'silver', file:'silver.png', label:'Tier medal (silver)', icon:'🥈', version:1, pending:false },
-  { id:'star', file:'star.png', label:'Star reveal icon', icon:'⭐', version:1, pending:false },
-  { id:'frame_mask', file:'frame_mask.png', label:'Corner-radius mask', icon:'🔲', version:1, pending:false },
+  { id:'silver', file:'silver.png', label:'Tier medal (silver)', icon:'🥈', version:1, pending:false, dims:'346 × 346px' },
+  { id:'star', file:'star.png', label:'Star reveal icon', icon:'⭐', version:1, pending:false, dims:'358 × 344px' },
+  { id:'frame_mask', file:'frame_mask.png', label:'Corner-radius mask', icon:'🔲', version:1, pending:false, dims:'1200 × 2580px' },
 ];
 
 // Background + scene can each have multiple variants (e.g. a food-court
@@ -3053,6 +3057,7 @@ const IMAGE_VARIANT_SLOTS = {
   background: {
     label: 'Background & border frame',
     icon: '🖼️',
+    dims: '1200 × 2580px',
     variants: [
       { id:'default', file:'assets/bg_and_border.png', label:'Default (purple/blue)' },
     ],
@@ -3060,6 +3065,7 @@ const IMAGE_VARIANT_SLOTS = {
   scene: {
     label: 'Scene illustration',
     icon: '🏫',
+    dims: '1138 × 1097px',
     variants: [
       { id:'default', file:'assets/school_scene.png', label:'Classroom' },
     ],
@@ -3086,6 +3092,7 @@ function renderAssetsView(){
           <div class="asset-info">
             <div class="asset-file">${a.file} <span style="color:var(--text-lo);font-weight:400;">v${a.version}</span></div>
             <div class="asset-label">${a.label} · used by all 12 modules</div>
+            <div class="asset-dims">📐 ${a.dims}</div>
           </div>
           <div class="asset-status ${a.pending?'pending':'synced'}">${a.pending ? '⚠ pending push' : '✓ in sync'}</div>
           <div class="asset-actions">
@@ -3102,7 +3109,7 @@ function renderAssetsView(){
       <div class="shared-pool-note">📌 New artwork still needs a one-time manual upload straight into the GitHub repo — the only step that can't happen from inside this tool. <b>Once it's uploaded, though, it's done for good</b> — naming it as a variant here makes it assignable to any module in any lesson from then on, live-previewable, no further uploads needed for that file.</div>
       ${Object.entries(IMAGE_VARIANT_SLOTS).map(([slotId, slot]) => `
         <div class="asset-slot-group">
-          <div class="asset-slot-title">${slot.icon} ${slot.label}</div>
+          <div class="asset-slot-title">${slot.icon} ${slot.label} <span class="asset-dims-inline">📐 upload new variants at ${slot.dims} — the frame is built for this exact ratio, anything else will stretch or crop oddly</span></div>
           ${slot.variants.map(v => `
             <div class="asset-row">
               <div class="asset-thumb">${slot.icon}</div>
@@ -3127,14 +3134,15 @@ function mockUploadAsset(assetId){
 }
 
 function openAddVariantPrompt(slotId){
-  const label = window.prompt('Name this variant (e.g. "Food Court"):');
+  const slot = IMAGE_VARIANT_SLOTS[slotId];
+  const label = window.prompt(`Name this variant (e.g. "Food Court"):\n\nUpload the artwork at ${slot.dims} — that's the exact size the frame is built for.`);
   if(!label || !label.trim()) return;
   const id = label.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
   const slug = label.trim().toLowerCase().replace(/[^a-z0-9]+/g,'_');
-  const defaultFile = IMAGE_VARIANT_SLOTS[slotId].variants[0].file;
+  const defaultFile = slot.variants[0].file;
   const ext = defaultFile.split('.').pop();
   const dir = defaultFile.split('/').slice(0,-1).join('/');
-  IMAGE_VARIANT_SLOTS[slotId].variants.push({
+  slot.variants.push({
     id, label: label.trim(), file: `${dir}/${slug}.${ext}`,
   });
   renderAssetsView();
