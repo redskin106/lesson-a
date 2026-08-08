@@ -302,9 +302,6 @@
   <div class="top-nav-tabs">
     <div class="top-nav-tab active" id="navDashboard" onclick="showGlobalView('dashboard')">Dashboard</div>
     <div class="top-nav-tab" id="navEditor" onclick="showGlobalView('editor')">Lesson Editor</div>
-    <div class="top-nav-tab" id="navAudio" onclick="showGlobalView('audio')">
-      Audio Polish <span class="nav-badge" id="navAudioBadge">0</span>
-    </div>
     <div class="top-nav-tab" id="navAssets" onclick="showGlobalView('assets')">
       Assets <span class="nav-badge" id="navAssetsBadge">0</span>
     </div>
@@ -313,7 +310,6 @@
 
 <div id="dashboardView"></div>
 <div class="app" id="editorApp" style="display:none;"></div>
-<div id="audioPolishView" style="display:none;"></div>
 <div id="assetsView" style="display:none;"></div>
 <div id="modalRoot"></div>
 
@@ -2690,11 +2686,9 @@ function renderPreview(){
 function showGlobalView(view){
   document.getElementById('dashboardView').style.display = view==='dashboard' ? 'block' : 'none';
   document.getElementById('editorApp').style.display = view==='editor' ? 'grid' : 'none';
-  document.getElementById('audioPolishView').style.display = view==='audio' ? 'block' : 'none';
   document.getElementById('assetsView').style.display = view==='assets' ? 'block' : 'none';
   document.getElementById('navDashboard').classList.toggle('active', view==='dashboard');
   document.getElementById('navEditor').classList.toggle('active', view==='editor');
-  document.getElementById('navAudio').classList.toggle('active', view==='audio');
   document.getElementById('navAssets').classList.toggle('active', view==='assets');
   if(view==='dashboard') renderDashboard();
   if(view==='assets') renderAssetsView();
@@ -3158,94 +3152,22 @@ function removeImageVariant(slotId, variantId){
   scheduleSave();
 }
 
-const AUDIO_BACKLOG = [
-  { id:'seed-spill', text:'spill', persona:'Teaching', state:'never',
-    usages:[{lesson:'Food Court Basics', module:'Gap-fill', tier:'Bronze', status:'draft'}] },
-  { id:'seed-spill-sentence', text:'I spill coke every day.', persona:'Teaching', state:'never',
-    usages:[{lesson:'Food Court Basics', module:'Gap-fill', tier:'Bronze', status:'draft'}] },
-  { id:'seed-convenience', text:'convenience store', persona:'Teaching', state:'draft',
-    usages:[
-      {lesson:'Food Court Basics', module:'Spelling', tier:'Gold', status:'published'},
-      {lesson:'Weekend Errands', module:'Word Match', tier:'Silver', status:'published'}
-    ]},
-  { id:'seed-water', text:'water', persona:'Teaching', state:'draft',
-    usages:[
-      {lesson:'Food Court Basics', module:'Gap-fill', tier:'Bronze', status:'published'},
-      {lesson:'Food Court Basics', module:'Spelling', tier:'Bronze', status:'published'},
-      {lesson:'Healthy Habits', module:'Say It', tier:'Bronze', status:'published'}
-    ]},
-  { id:'seed-celebration', text:'Great job, you did it!', persona:'Celebration', state:'draft',
-    usages:[{lesson:'Food Court Basics', module:'Reward screen', tier:'—', status:'published'}] },
-];
-
-function backlogVisible(includeDrafts){
-  const liveItems = Object.entries(LIVE_FLAGS).map(([key, f]) => ({
-    source:'live', key, text: f.text, spokenText: f.spokenText || f.text, persona: 'Teaching', state: 'never',
-    lessonId: f.lessonId, tierKey: f.tierKey, fieldType: f.fieldType, optionIndex: f.optionIndex, moduleId: f.moduleId,
-    usages: [{ lesson: f.lesson, module: f.module, tier: f.tier, status: 'draft' }]
-  }));
-  const seeded = AUDIO_BACKLOG
-    .filter(item => includeDrafts || item.usages.some(u => u.status === 'published'))
-    .map(item => ({ ...item, source:'seeded', key:item.id, spokenText: item.text }));
-  return [...liveItems, ...seeded]; // edits you just made always surface immediately, regardless of the filter
+// Real per-lesson audio status check — replaces the old cross-lesson "Audio
+// Polish" tab (which mixed live-edit tracking with fake seeded demo data).
+// This checks ONE lesson's actual speakable content against what's genuinely
+// been pushed to lessons/{id}/manifest.json, no mock data involved.
+async function checkAudioStatusForLesson(lessonId){
+  const speakable = extractSpeakableForTTS(lessonId);
+  let pushed;
+  try {
+    pushed = await fetchPushedAudioIds(lessonId);
+  } catch(e) {
+    pushed = new Set(); // network/parse failure — fail safe to "nothing confirmed pushed" rather than block the check
+  }
+  const needsAudio = speakable.filter(item => !pushed.has(item.id));
+  return { total: speakable.length, needsAudio, readyCount: speakable.length - needsAudio.length };
 }
 
-let lastRenderedBacklog = [];
-
-function renderAudioPolish(){
-  const includeDrafts = document.getElementById('apIncludeDrafts') ? document.getElementById('apIncludeDrafts').checked : false;
-  const visible = backlogVisible(includeDrafts);
-  lastRenderedBacklog = visible;
-  document.getElementById('navAudioBadge').textContent = backlogVisible(false).length;
-
-  const rows = visible.map((item, i) => `
-    <div class="ap-row">
-      <div class="ap-row-top">
-        <div class="ap-icon">🔊</div>
-        <div class="ap-text">
-          <div class="ap-text-main">"${item.text}"</div>
-          <div class="ap-meta">
-            <span class="ap-persona">${item.persona} voice</span>
-            <span>used in ${item.usages.length} place${item.usages.length>1?'s':''}</span>
-          </div>
-        </div>
-        <div class="ap-state ${item.state}">${item.state === 'never' ? 'no audio yet' : 'draft (live TTS)'}</div>
-        <div class="ap-actions">
-          <button class="btn" style="font-size:11.5px;padding:6px 12px;" onclick="playDraftTTS(lastRenderedBacklog[${i}].spokenText)">▶ Play draft</button>
-          <button class="btn primary" style="font-size:11.5px;padding:6px 12px;" onclick="openAudioGeneratorFromBacklog(${i})">Generate</button>
-        </div>
-      </div>
-      <div class="ap-usage-toggle" onclick="toggleUsages(${i})">▾ show ${item.usages.length} usage${item.usages.length>1?'s':''}</div>
-      <div class="ap-usages" id="apUsages${i}">
-        ${item.usages.map(u => `<div class="ap-usage-item">${u.lesson} → ${u.module} ${u.tier !== '—' ? '('+u.tier+')' : ''} <span class="ub">${u.status}</span></div>`).join('')}
-      </div>
-    </div>`).join('');
-
-  document.getElementById('audioPolishView').innerHTML = `
-    <div class="ap-wrap">
-      <div class="ap-head">
-        <div>
-          <div class="ap-title">Audio Polish</div>
-          <div class="ap-sub">Fields still using draft browser TTS instead of final ElevenLabs audio. Fixing one entry here updates every lesson that shares it.</div>
-        </div>
-        <button class="btn primary ap-bulk" onclick="generateAllBacklog()">Generate all (${visible.length})</button>
-      </div>
-      <label class="ap-filter">
-        <input type="checkbox" id="apIncludeDrafts" ${includeDrafts?'checked':''} onchange="renderAudioPolish()">
-        Include lessons that aren't published yet
-      </label>
-      ${rows || '<div class="ap-sub" style="padding:30px 0;text-align:center;">Nothing needs polish right now 🎉</div>'}
-    </div>`;
-}
-
-function toggleUsages(i){
-  document.getElementById('apUsages'+i).classList.toggle('open');
-}
-
-function generateAllBacklog(){
-  // Simple mockup version: resolve every currently visible item immediately, no per-item preview
-  [...lastRenderedBacklog].forEach(item => resolveAudioContext(item));
-}
 
 // ---- Inline "Generate audio" flow (Option C: works from any icon, always visible in Audio Polish too) ----
 let audioModalContext = null;
@@ -3286,15 +3208,6 @@ function openOptionAudioModalFromIcon(iconEl){
   openAudioGenerator({
     source:'live', key: buildFlagKey('gapfill',currentTier,'option',i,gfExpandedIndex), text, persona:'Teaching',
     lessonId: currentLessonId, tierKey: currentTier, fieldType: 'option', optionIndex: i, moduleId:'gapfill', itemIndex: gfExpandedIndex
-  });
-}
-
-function openAudioGeneratorFromBacklog(i){
-  const item = lastRenderedBacklog[i];
-  if(!item) return;
-  openAudioGenerator({
-    source:item.source, key:item.key, text:item.text, spokenText:item.spokenText, persona:item.persona,
-    lessonId:item.lessonId, tierKey:item.tierKey, fieldType:item.fieldType, optionIndex:item.optionIndex, moduleId:item.moduleId
   });
 }
 
@@ -3597,7 +3510,6 @@ function syncSpeakableField(moduleId, fieldType, index, liveText, iconEl, answer
   } else {
     delete LIVE_FLAGS[key];
   }
-  renderAudioPolish();
   return needs;
 }
 
@@ -3630,11 +3542,7 @@ function resolveAudioContext(ctx, opts){
       registerGlobalAudio(ctx.spokenText || ctx.text, ctx.persona, lessonName);
     }
     if(ctx.lessonId === currentLessonId) renderMain(); // refresh whatever's currently on screen so its icon reflects the resolution
-  } else if(ctx.source === 'seeded'){
-    const idx = AUDIO_BACKLOG.findIndex(x => x.id === ctx.key);
-    if(idx > -1) AUDIO_BACKLOG.splice(idx, 1);
   }
-  renderAudioPolish();
 }
 
 // ==========================================================================================
@@ -4202,6 +4110,42 @@ let publishLessonId = null;
 // persisted snapshot, lives only in this JS object until the tab closes.
 // ==========================================================================
 const GH_CREDS = { token: '', repo: 'redskin106/lesson-a', branch: 'main' };
+
+function openAudioStatusModal(){
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  document.getElementById('modalRoot').innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal" style="width:480px;">
+        <div class="modal-head"><div class="modal-title">🔊 Audio status — ${lesson.name}</div><div class="modal-close" onclick="closeModal()">✕</div></div>
+        <div id="audioStatusBody" style="text-align:left;padding:8px 0;color:var(--text-lo);font-size:13px;">Checking manifest.json on GitHub…</div>
+        <div class="modal-actions">
+          <button class="btn" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>`;
+
+  checkAudioStatusForLesson(currentLessonId).then(status => {
+    const body = document.getElementById('audioStatusBody');
+    if(!body) return; // modal was closed before this resolved
+    if(status.total === 0){
+      body.innerHTML = `This lesson has nothing that needs spoken audio yet — add some content first.`;
+      return;
+    }
+    const listHtml = status.needsAudio.slice(0, 20).map(item => `
+      <div style="padding:6px 0;border-bottom:1px solid var(--glass-brd);">"${item.text}"</div>`).join('');
+    const overflow = status.needsAudio.length > 20 ? `<div style="padding-top:6px;color:var(--text-lo);">…and ${status.needsAudio.length - 20} more</div>` : '';
+    body.innerHTML = `
+      <div style="margin-bottom:10px;"><b style="color:var(--text-hi);">${status.readyCount} of ${status.total}</b> fields have real generated audio pushed.</div>
+      ${status.needsAudio.length === 0
+        ? `<div style="color:#4ADE80;">✓ Everything's covered — nothing still needs generating.</div>`
+        : `<div style="margin-bottom:6px;">Still needs audio:</div>${listHtml}${overflow}
+           <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--glass-brd);">Use <b>🎙️ Export for TTS tool</b> to generate all of these at once.</div>`}
+    `;
+  }).catch(err => {
+    const body = document.getElementById('audioStatusBody');
+    if(body) body.innerHTML = `Couldn't check the manifest (${err.message}). This usually means GitHub credentials aren't set, or this lesson hasn't been published yet.`;
+  });
+}
 
 function openGitHubCredsModal(){
   document.getElementById('modalRoot').innerHTML = `
@@ -4881,6 +4825,7 @@ function renderEditorShell(){
           <button class="btn" onclick="exportCurrentLesson()">Export lesson</button>
           <button class="btn" onclick="previewProductionJSON()" title="See the exact shape the shell would receive">🔍 Preview production JSON</button>
           <button class="btn" onclick="exportForTTSTool()" title="Generate a manifest the TTS tool can import directly">🎙️ Export for TTS tool</button>
+          <button class="btn" onclick="openAudioStatusModal()" title="Check which fields in this lesson still need real generated audio">🔊 Check audio status</button>
           <button class="btn" id="ghCredsBtn" onclick="openGitHubCredsModal()" title="${GH_CREDS.token ? 'Connected to '+GH_CREDS.repo : 'GitHub credentials for publishing — required before Publish can push for real'}">${GH_CREDS.token ? '🔑 GitHub ✓' : '🔑 GitHub'}</button>
           <button class="btn primary" onclick="openPublishModal()">Publish lesson</button>
         </div>
@@ -4908,7 +4853,6 @@ function renderEditorShell(){
 const restoredDraft = loadPersistedState();
 seedWordBankFromColors(); // no-ops if a restored draft already seeded the bank
 renderEditorShell();
-renderAudioPolish();
 renderDashboard();
 showGlobalView('dashboard');
 
