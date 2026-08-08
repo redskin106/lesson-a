@@ -1950,6 +1950,19 @@ function startModule(moduleIndex, tier) {
   const doneCount = state.results.filter(r => r.complete).length;
   document.getElementById('v2-prog-fill').style.width = Math.round((doneCount / LESSON.length) * 100) + '%';
 
+  // v2 chrome: per-module background/scene image variant — lets a lesson
+  // give a specific exercise more visual context (e.g. a food-court scene
+  // for an ordering-food module) instead of every module sharing the same
+  // fixed illustration. Falls back to the default CSS-defined images when a
+  // module doesn't specify one, so every already-published lesson keeps
+  // working exactly as before with zero changes needed.
+  const bgLayer = document.querySelector('.layer-bg');
+  const sceneLayer = document.querySelector('.layer-scene');
+  bgLayer.style.backgroundImage = (mod.imageVariant && mod.imageVariant.background)
+    ? `url('${mod.imageVariant.background}')` : '';
+  sceneLayer.style.backgroundImage = (mod.imageVariant && mod.imageVariant.scene)
+    ? `url('${mod.imageVariant.scene}')` : '';
+
   showScreen('screen-module');
 
   // Render module
