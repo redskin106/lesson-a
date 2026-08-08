@@ -4666,7 +4666,7 @@ function collectPersistedState(){
     WORD_BANK,
     wordBankSeeded,
     bankIdCounter,
-    SHARED_ASSETS: SHARED_ASSETS.map(a => ({ id:a.id, version:a.version, pending:a.pending })),
+    FIXED_ASSETS: FIXED_ASSETS.map(a => ({ id:a.id, version:a.version, pending:a.pending })),
     currentLessonId,
     currentModule,
     currentTier,
@@ -4713,7 +4713,7 @@ function loadPersistedState(){
   try{ saved = JSON.parse(raw); } catch(e){ console.error('Saved draft was corrupt, ignoring it:', e); return false; }
   if(!saved || saved.schemaVersion !== 1) return false;
 
-  // LESSONS / LESSON_CONTENT / AUDIO_RECORDED / SHARED_ASSETS are declared
+  // LESSONS / LESSON_CONTENT / AUDIO_RECORDED / FIXED_ASSETS are declared
   // `const` — restore by mutating in place rather than reassigning.
   LESSONS.length = 0;
   (saved.LESSONS || []).forEach(l => LESSONS.push(l));
@@ -4728,8 +4728,8 @@ function loadPersistedState(){
   wordBankSeeded = !!saved.wordBankSeeded;
   bankIdCounter = saved.bankIdCounter || 1;
 
-  (saved.SHARED_ASSETS || []).forEach(sa => {
-    const asset = SHARED_ASSETS.find(a => a.id === sa.id);
+  (saved.FIXED_ASSETS || saved.SHARED_ASSETS || []).forEach(sa => {
+    const asset = FIXED_ASSETS.find(a => a.id === sa.id);
     if(asset){ asset.version = sa.version; asset.pending = sa.pending; }
   });
 
