@@ -70,6 +70,22 @@
   .mod-item.active .mod-num{ color:var(--violet); }
   .mod-pool-tag{ margin-left:auto; font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(139,92,246,0.15); color:#C4B5FD;}
   .mod-stub-tag{ margin-left:auto; font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(255,255,255,0.06); color:var(--text-lo);}
+  .vocab-item{ font-weight:500; }
+  .vocab-issue-badge{ margin-left:auto; font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:999px; background:rgba(245,158,11,0.18); color:#FBBF24; }
+  .mod-item.active .vocab-issue-badge{ background:rgba(245,158,11,0.28); }
+  .mod-list-divider{ height:1px; background:var(--glass-brd); margin:6px 4px; }
+  .vocab-reminder-banner{ display:flex; align-items:center; gap:12px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.35); border-radius:10px; padding:12px 16px; margin-bottom:14px; font-size:13px; color:#FBBF24; }
+  .vocab-reminder-banner b{ color:#FDE68A; }
+  .vocab-reminder-banner button{ margin-left:auto; flex-shrink:0; }
+  .vocab-tier-pool{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 16px; min-height:32px; padding:10px; background:var(--glass); border-radius:10px; border:1px dashed var(--glass-brd); }
+  .vocab-word-chip{ display:flex; align-items:center; gap:6px; background:rgba(139,92,246,0.16); border:1px solid rgba(139,92,246,0.4); color:#DDD6FE; padding:4px 10px; border-radius:999px; font-size:12.5px; }
+  .vocab-word-chip .del{ cursor:pointer; opacity:0.6; }
+  .vocab-word-chip .del:hover{ opacity:1; }
+  .vocab-issue-row{ display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:8px; font-size:12.5px; margin-bottom:4px; }
+  .vocab-issue-row.mismatch{ background:rgba(239,68,68,0.1); color:#FCA5A5; }
+  .vocab-issue-row.warning{ background:rgba(245,158,11,0.1); color:#FCD34D; }
+  .vocab-module-group{ margin-bottom:16px; }
+  .vocab-module-title{ font-size:12px; font-weight:600; color:var(--text-mid); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em; }
 
   .main{ padding:22px 26px; overflow-y:auto; }
   .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
@@ -825,6 +841,141 @@ let compareMode = false;
 let gfExpandedIndex = 0; // which pool item's full editor (sentence/options/tags) is open
 let tfExpandedIndex = 0; // same, for true-false's statement pool
 
+// ══════════════════════════════════════════════════
+//  VOCABULARY CONSISTENCY CHECKER
+//  Keeps the digital shell's vocabulary in sync with the classroom lesson —
+//  every module's core content word must match the lesson's declared target
+//  vocabulary for that tier (hard mismatch if not); supporting/distractor
+//  words are checked against the real Cambridge word list for the tier's
+//  CEFR level instead, since those are allowed to vary (soft warning only).
+// ══════════════════════════════════════════════════
+
+// Pulls the "core content word(s)" out of one pool item, per module type.
+// Word-based modules return a single word to check exactly. Sentence-based
+// modules (no single clean content-word field) return { sentenceText } —
+// checked more loosely: passes if ANY target word appears anywhere in it.
+function extractContentWords(moduleId, item){
+  const type = instanceType(moduleId);
+  switch(type){
+    case 'gapfill':        return { words: [item.answer] };
+    case 'listenchoose':   return { words: [item.answer] };
+    case 'wordmatch':      return { words: [item.left, item.right] };
+    case 'listenmatch':    return { words: [item.left] }; // left===right always
+    case 'memorypairs':    return { words: [item.word] };
+    case 'picword':        return { words: [item.word] };
+    case 'wordscramble':   return { words: [item.word] };
+    case 'spelling':       return { words: [item.word] };
+    case 'truefalse':      return { sentenceText: item.statement };
+    case 'sayit':          return { sentenceText: `${item.prompt} ${item.target}` };
+    case 'putinorder':     return { sentenceText: `${item.prompt} ${(item.items||[]).join(' ')}` };
+    case 'buildsentence':  return { sentenceText: (item.tokens||[]).map(t=>t.text).join(' ') };
+    default:                return { words: [] };
+  }
+}
+
+function normalizeWord(w){
+  return (w||'').toString().toLowerCase().replace(/[^a-z' -]/g,'').trim();
+}
+
+// Checks one tier of one module against the lesson's declared target
+// vocabulary + the Cambridge list for that tier's CEFR level. Returns
+// { mismatches: [...], warnings: [...] } — mismatches are real problems
+// (a content word isn't in the declared list), warnings are informational
+// (a supporting word isn't on the Cambridge list for this level, allowed
+// but worth knowing).
+function checkVocabularyForModuleTier(lesson, moduleId, tier, data){
+  const target = (lesson.targetVocabulary && lesson.targetVocabulary[tier]) || [];
+  const targetSet = new Set(target.map(normalizeWord));
+  const cambridgeLevel = CAMBRIDGE_LEVEL_FOR_TIER[tier];
+  const levelOrder = { preA1:0, a1:1, a2:2 };
+  const maxLevel = levelOrder[cambridgeLevel];
+
+  const mismatches = [];
+  const warnings = [];
+  const items = (data && data[tier] && data[tier].items) || [];
+
+  items.forEach((item, i) => {
+    const extracted = extractContentWords(moduleId, item);
+
+    if(extracted.sentenceText !== undefined){
+      // Sentence-based module — soft check only: does ANY target word appear
+      // somewhere in the text? No target list yet = nothing to check against.
+      if(target.length === 0) return;
+      const text = normalizeWord(extracted.sentenceText.toLowerCase());
+      const hasAnyTarget = target.some(w => text.includes(normalizeWord(w)));
+      if(!hasAnyTarget){
+        mismatches.push({ itemIndex:i, message:`Item ${i+1}: no target vocabulary word found in this content` });
+      }
+      return;
+    }
+
+    (extracted.words || []).forEach(rawWord => {
+      if(!rawWord) return;
+      const word = normalizeWord(rawWord);
+      if(!word) return;
+      if(target.length > 0 && !targetSet.has(word)){
+        // Hard mismatch — this IS a content word, and it's not on the declared list
+        mismatches.push({ itemIndex:i, word: rawWord, message:`Item ${i+1}: "${rawWord}" isn't in the declared ${tier} vocabulary` });
+      } else if(target.length === 0){
+        // No target list declared yet — fall back to a pure Cambridge-level check
+        const wordLevel = CAMBRIDGE_WORDLIST[word];
+        if(wordLevel === undefined){
+          warnings.push({ itemIndex:i, word: rawWord, message:`Item ${i+1}: "${rawWord}" isn't on the Cambridge word list at all` });
+        } else if(levelOrder[wordLevel] > maxLevel){
+          warnings.push({ itemIndex:i, word: rawWord, message:`Item ${i+1}: "${rawWord}" is Cambridge ${wordLevel}, above ${tier}'s ${cambridgeLevel} level` });
+        }
+      }
+    });
+  });
+
+  return { mismatches, warnings };
+}
+
+// Checks a supporting (non-content) word against the Cambridge list for a
+// tier's CEFR level — used for distractor options, connector words, etc.
+// that are allowed to differ from the target list as long as they're at
+// the right level.
+function checkSupportingWord(word, tier){
+  const norm = normalizeWord(word);
+  if(!norm) return null;
+  const cambridgeLevel = CAMBRIDGE_LEVEL_FOR_TIER[tier];
+  const levelOrder = { preA1:0, a1:1, a2:2 };
+  const wordLevel = CAMBRIDGE_WORDLIST[norm];
+  if(wordLevel === undefined) return { word, issue:'not-on-list' };
+  if(levelOrder[wordLevel] > levelOrder[cambridgeLevel]) return { word, issue:'above-level', actualLevel: wordLevel };
+  return null;
+}
+
+// Full lesson-level audit — every module, every tier. Used to power the
+// summary badge and the reminder banner for lessons with no declared
+// vocabulary yet.
+function auditLessonVocabulary(lessonId){
+  const lesson = LESSONS.find(l => l.id === lessonId);
+  if(!lesson) return null;
+  ensureLessonContent(lessonId);
+  const content = LESSON_CONTENT[lessonId];
+
+  const hasAnyTargetVocab = lesson.targetVocabulary &&
+    (lesson.targetVocabulary.bronze.length || lesson.targetVocabulary.silver.length || lesson.targetVocabulary.gold.length);
+
+  const results = {};
+  let totalMismatches = 0, totalWarnings = 0;
+
+  lesson.modules.forEach(moduleId => {
+    const data = content[moduleId];
+    if(!data) return;
+    results[moduleId] = {};
+    TIER_ORDER.forEach(tier => {
+      const r = checkVocabularyForModuleTier(lesson, moduleId, tier, data);
+      results[moduleId][tier] = r;
+      totalMismatches += r.mismatches.length;
+      totalWarnings += r.warnings.length;
+    });
+  });
+
+  return { hasAnyTargetVocab, results, totalMismatches, totalWarnings };
+}
+
 function isTierFilled(moduleId, tier, dataOverride){
   const data = dataOverride !== undefined ? dataOverride : md(moduleId);
   if(!data) return false;
@@ -854,6 +1005,16 @@ function isTierFilled(moduleId, tier, dataOverride){
 function renderSidebar(){
   const list = document.getElementById('modList');
   const lesson = LESSONS.find(l => l.id === currentLessonId);
+  const audit = lesson ? auditLessonVocabulary(currentLessonId) : null;
+  const vocabIssueCount = audit ? audit.totalMismatches + audit.totalWarnings : 0;
+
+  const vocabItem = `
+    <li class="mod-item vocab-item ${currentModule==='__vocabulary__'?'active':''}" onclick="selectVocabulary()">
+      <span class="mod-num">📖</span> Target Vocabulary
+      ${vocabIssueCount > 0 ? `<span class="vocab-issue-badge">${vocabIssueCount}</span>` : ''}
+    </li>
+    <li class="mod-list-divider"></li>`;
+
   // Preserve the order the teacher actually chose in the New Lesson wizard (lesson.modules),
   // not MODULES' fixed catalog order — reordering there was supposed to mean something.
   // Each entry is an instance id (bare type slug for the first of a type, 'type-2' etc for
@@ -861,14 +1022,104 @@ function renderSidebar(){
   const included = lesson
     ? lesson.modules.map(id => ({ id, name: instanceLabel(id) }))
     : MODULES.map(m => ({ id: m.id, name: m.name }));
-  list.innerHTML = included.map((m,i)=>{
+  list.innerHTML = vocabItem + included.map((m,i)=>{
     const dots = ['bronze','silver','gold'].map(t=>`<span class="dot ${isTierFilled(m.id,t)?'filled':''}" title="${t}"></span>`).join('');
+    const modIssues = audit && audit.results[m.id]
+      ? TIER_ORDER.reduce((sum,t) => sum + audit.results[m.id][t].mismatches.length + audit.results[m.id][t].warnings.length, 0)
+      : 0;
     return `
     <li class="mod-item ${m.id===currentModule?'active':''}" onclick="selectModule('${m.id}')">
       <span class="mod-num">${String(i+1).padStart(2,'0')}</span> ${m.name}
+      ${modIssues > 0 ? `<span class="vocab-issue-badge" title="${modIssues} vocabulary issue${modIssues===1?'':'s'}">${modIssues}</span>` : ''}
       <span class="mod-progress">${dots}</span>
     </li>`;
   }).join('');
+}
+
+function selectVocabulary(){
+  currentModule = '__vocabulary__';
+  compareMode = false;
+  document.getElementById('compareBtn').classList.remove('active');
+  document.getElementById('crumbMod').textContent = 'Target Vocabulary';
+  renderSidebar(); renderTierTabs(); renderMain();
+}
+
+function renderVocabularyEditor(){
+  const editView = document.getElementById('editView');
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  if(!lesson) return;
+  if(!lesson.targetVocabulary) lesson.targetVocabulary = { bronze:[], silver:[], gold:[] };
+
+  const hasAnyVocab = TIER_ORDER.some(t => lesson.targetVocabulary[t].length > 0);
+  const audit = auditLessonVocabulary(currentLessonId);
+  const cambridgeLevel = CAMBRIDGE_LEVEL_FOR_TIER[currentTier];
+  const cambridgeLabel = { preA1:'Pre-A1 Starters', a1:'A1 Movers', a2:'A2 Flyers' }[cambridgeLevel];
+
+  const reminderHtml = !hasAnyVocab ? `
+    <div class="vocab-reminder-banner">
+      <span>📖</span>
+      <span>No target vocabulary declared yet for <b>${lesson.name}</b>. Add the words you're actually teaching in the classroom lesson so this digital shell stays in sync with it — until then, checks fall back to a general Cambridge-level comparison only.</span>
+    </div>` : '';
+
+  const words = lesson.targetVocabulary[currentTier];
+  const wordsHtml = words.map((w,i) => `
+    <span class="vocab-word-chip">${w}<span class="del" onclick="removeVocabWord(${i})">✕</span></span>`).join('')
+    || '<span style="color:var(--text-lo);font-size:12.5px;">No words declared for this tier yet.</span>';
+
+  // Build the issues list for the current tier, grouped by module
+  let issuesHtml = '';
+  if(audit){
+    lesson.modules.forEach(moduleId => {
+      const r = audit.results[moduleId] && audit.results[moduleId][currentTier];
+      if(!r || (r.mismatches.length === 0 && r.warnings.length === 0)) return;
+      const label = instanceLabel(moduleId);
+      const rows = [
+        ...r.mismatches.map(m => `<div class="vocab-issue-row mismatch">⚠ ${m.message}</div>`),
+        ...r.warnings.map(w => `<div class="vocab-issue-row warning">ⓘ ${w.message}</div>`),
+      ].join('');
+      issuesHtml += `<div class="vocab-module-group"><div class="vocab-module-title">${label}</div>${rows}</div>`;
+    });
+  }
+  if(!issuesHtml){
+    issuesHtml = `<div style="color:var(--text-lo);font-size:12.5px;">No issues found for ${currentTier} — every module's content word matches the declared vocabulary${hasAnyVocab ? '' : ' (or, with no list declared, matches the Cambridge level)'}.</div>`;
+  }
+
+  editView.innerHTML = `
+    ${reminderHtml}
+    <div class="card">
+      <div class="card-label">${currentTier} target vocabulary <span style="font-weight:400;text-transform:none;letter-spacing:0;">the words this tier is actually teaching — should match the classroom lesson (Cambridge ${cambridgeLabel} level)</span></div>
+      <div class="vocab-tier-pool" id="vocabPool">${wordsHtml}</div>
+      <div class="field" style="display:flex;gap:8px;">
+        <input type="text" id="vocabWordInput" placeholder="add a word…" style="flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--glass-brd);border-radius:8px;padding:8px 12px;color:var(--text-hi);font-size:13px;">
+        <button class="btn" onclick="addVocabWord()">+ Add</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Vocabulary check — ${currentTier} <span style="font-weight:400;text-transform:none;letter-spacing:0;">red = content word doesn't match the declared list · yellow = supporting word worth a look</span></div>
+      ${issuesHtml}
+    </div>`;
+
+  const input = document.getElementById('vocabWordInput');
+  input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); addVocabWord(); } });
+}
+
+function addVocabWord(){
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  const input = document.getElementById('vocabWordInput');
+  const word = input.value.trim().toLowerCase();
+  if(!word) return;
+  if(!lesson.targetVocabulary[currentTier].includes(word)){
+    lesson.targetVocabulary[currentTier].push(word);
+  }
+  renderMain();
+  renderSidebar();
+}
+
+function removeVocabWord(index){
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  lesson.targetVocabulary[currentTier].splice(index, 1);
+  renderMain();
+  renderSidebar();
 }
 
 function renderTierTabs(){
@@ -881,7 +1132,7 @@ function renderTierTabs(){
   const copyBtn = document.getElementById('copyTierBtn');
   if(copyBtn){
     const isSharedPool = instanceType(currentModule) === 'memorypairs' || instanceType(currentModule) === 'picword';
-    if(currentTier === 'bronze' || compareMode){
+    if(currentTier === 'bronze' || compareMode || currentModule === '__vocabulary__'){
       copyBtn.style.display = 'none';
     } else {
       copyBtn.style.display = 'inline-block';
@@ -912,6 +1163,7 @@ function selectTier(t){
   renderTierTabs(); renderMain();
 }
 function toggleCompare(){
+  if(currentModule === '__vocabulary__') return;
   compareMode = !compareMode;
   document.getElementById('compareBtn').classList.toggle('active', compareMode);
   renderTierTabs(); renderMain();
@@ -924,6 +1176,14 @@ function tokenChips(tokens){
 function renderMain(){
   const editView = document.getElementById('editView');
   const compareView = document.getElementById('compareView');
+
+  if(currentModule === '__vocabulary__'){
+    editView.style.display = 'block';
+    compareView.style.display = 'none';
+    renderVocabularyEditor();
+    return;
+  }
+
   const mod = MODULES.find(m=>m.id===instanceType(currentModule));
 
   if(compareMode){
@@ -2190,21 +2450,34 @@ const MODULE_CATALOG = [
   {id:'buildsentence', name:'Build a Sentence', desc:'Assemble tagged word chunks'},
 ];
 
+// Cambridge English Young Learners (Pre-A1 Starters / A1 Movers / A2 Flyers) word
+// list, official 2025 edition — word -> level ('preA1'|'a1'|'a2'). Powers the
+// vocabulary-consistency checker: content words must match a lesson's declared
+// target vocabulary per tier; supporting/distractor words are checked against
+// this list for the right CEFR level instead, since those are allowed to vary.
+const CAMBRIDGE_WORDLIST = {"a":"preA1","about":"preA1","above":"a1","across":"a2","act":"a2","actor":"a2","actually":"a2","add":"preA1","address":"a1","adventure":"a2","afraid":"a1","after":"a1","afternoon":"preA1","again":"preA1","age":"a1","ago":"a2","agree":"a2","air":"a2","airport":"a2","alien":"preA1","all":"a1","all right":"a1","alone":"a2","along":"a1","alphabet":"preA1","already":"a2","also":"a2","always":"a1","amazing":"a2","ambulance":"a2","an":"preA1","and":"preA1","angry":"preA1","animal":"preA1","another":"a1","answer":"preA1","any":"a1","anyone":"a2","anything":"a2","anywhere":"a2","apartment":"preA1","app":"a1","appear":"a2","apple":"preA1","april":"a2","arm":"preA1","armchair":"preA1","around":"a1","arrive":"a2","art":"a2","artist":"a2","as":"a2","ask":"preA1","asleep":"a1","astronaut":"a2","at":"preA1","at the moment":"a2","august":"a2","aunt":"a1","autumn":"a2","awake":"a1","away":"a2","baby":"preA1","back":"a1","backpack":"a2","bad":"a1","badly":"a1","badminton":"preA1","bag":"preA1","balcony":"a1","ball":"preA1","balloon":"preA1","banana":"preA1","band":"a1","bandage":"a2","bank":"a2","baseball":"preA1","baseball cap":"preA1","basement":"a1","basketball":"preA1","bat":"a1","bath":"preA1","bathroom":"preA1","be":"preA1","be called":"a1","beach":"preA1","bean":"preA1","bear":"preA1","beard":"a1","beautiful":"preA1","because":"a1","bed":"preA1","bedroom":"preA1","bee":"preA1","beetle":"a2","before":"a1","begin":"a2","behind":"preA1","believe":"a2","below":"a1","belt":"a2","best":"a1","better":"a1","between":"preA1","bicycle":"a2","big":"preA1","bike":"preA1","bin":"a2","bird":"preA1","birthday":"preA1","biscuit":"a2","bit":"a2","black":"preA1","blanket":"a1","blonde":"a1","blue":"preA1","board":"preA1","board game":"preA1","boat":"preA1","body":"preA1","book":"preA1","bookcase":"preA1","bookshop":"preA1","boots":"preA1","bored":"a2","boring":"a1","borrow":"a2","both":"a1","bottle":"a1","bottom":"a1","bounce":"preA1","bowl":"a1","box":"preA1","boy":"preA1","bracelet":"a2","brave":"a1","bread":"preA1","break":"a1","breakfast":"preA1","bridge":"a2","brilliant":"a1","bring":"a1","broken":"a2","brother":"preA1","brown":"preA1","brush":"a2","build":"a1","building":"a1","burger":"preA1","burn":"a2","bus":"preA1","bus station":"a1","bus stop":"a1","business":"a2","busy":"a1","but":"preA1","butter":"a2","butterfly":"a2","buy":"a1","by":"a1","bye":"preA1","caf":"a1","cage":"a1","cake":"preA1","calendar":"a2","call":"a1","camel":"a2","camera":"preA1","camp":"a2","can":"preA1","candy":"preA1","car":"preA1","car park":"a1","card":"a2","careful":"a1","carrot":"preA1","carry":"a1","cartoon":"a2","castle":"a2","cat":"preA1","catch":"preA1","cave":"a2","cd":"a1","centre":"a1","century":"a2","cereal":"a2","chair":"preA1","change":"a1","channel":"a2","chat":"a2","cheap":"a2","cheese":"a1","chemist":"a2","chess":"a2","chicken":"preA1","child":"preA1","chips":"preA1","chocolate":"preA1","choose":"preA1","chopsticks":"a2","cinema":"a1","circle":"a1","circus":"a1","city":"a1","clap":"preA1","class":"preA1","classmate":"preA1","classroom":"preA1","clean":"preA1","clever":"a1","climb":"a1","clock":"preA1","close":"preA1","closed":"preA1","clothes":"preA1","cloud":"a1","cloudy":"a1","clown":"a1","club":"a2","coat":"a1","coconut":"preA1","coffee":"a1","cold":"a1","collect":"a2","college":"a2","colour":"preA1","comb":"a2","come":"preA1","comic":"a1","competition":"a2","complete":"preA1","computer":"preA1","concert":"a2","conversation":"a2","cook":"a1","cooker":"a2","cookie":"a2","cool":"preA1","corner":"a2","correct":"preA1","costume":"a2","cough":"a1","count":"preA1","country":"a1","countryside":"a1","cousin":"preA1","cow":"preA1","crayon":"preA1","creature":"a2","crocodile":"preA1","cross":"preA1","crown":"a2","cry":"a1","cup":"a1","cupboard":"preA1","curly":"a1","cushion":"a2","cut":"a2","cycle":"a2","dad":"preA1","dance":"a1","dangerous":"a1","dark":"a2","date":"a2","daughter":"a1","day":"preA1","december":"a2","decide":"a2","deep":"a2","delicious":"a2","dentist":"a1","desert":"a2","design":"a2","desk":"preA1","diary":"a2","dictionary":"a2","difference":"a1","different":"a1","difficult":"a1","dining room":"preA1","dinner":"preA1","dinosaur":"a2","dirty":"preA1","disappear":"a2","do":"preA1","doctor":"a1","dog":"preA1","doll":"preA1","dolphin":"a1","donkey":"preA1","door":"preA1","double":"preA1","down":"a1","downstairs":"a1","draw":"preA1","drawing":"preA1","dream":"a1","dress":"preA1","drink":"preA1","drive":"preA1","driver":"a1","drop":"a1","drum":"a2","dry":"a1","duck":"preA1","during":"a2","dvd":"a1","e-book":"a1","each":"a2","eagle":"a2","ear":"preA1","earache":"a1","early":"a2","earth":"a2","east":"a2","easy":"a1","eat":"preA1","egg":"preA1","elbow":"a2","elephant":"preA1","elevator":"a1","else":"a2","email":"a1","empty":"a2","end":"preA1","engine":"a2","engineer":"a2","english":"preA1","enjoy":"preA1","enormous":"a2","enough":"a2","entrance":"a2","envelope":"a2","environment":"a2","eraser":"preA1","evening":"preA1","ever":"a2","every":"a1","everyone":"a1","everything":"a1","everywhere":"a2","example":"preA1","excellent":"a2","excited":"a2","exciting":"a1","exit":"a2","expensive":"a2","explain":"a2","explore":"a2","extinct":"a2","eye":"preA1","face":"preA1","factory":"a2","fair":"a1","fall":"a1","family":"preA1","famous":"a1","far":"a2","farm":"a1","farmer":"a1","fast":"a2","fat":"a1","father":"preA1","favourite":"preA1","february":"a2","feed":"a1","feel":"a2","festival":"a2","field":"a1","film":"a1","find":"preA1","fine":"a1","finger":"a2","finish":"a2","fire":"a2","first":"a1","fish":"preA1","flag":"a2","flat":"preA1","floor":"preA1","flour":"a2","flower":"preA1","fly":"preA1","fog":"a2","food":"preA1","foot":"preA1","football":"preA1","for":"preA1","forest":"a1","forget":"a2","fork":"a2","friday":"a1","fridge":"a2","friend":"preA1","friendly":"a2","frightened":"a1","frog":"preA1","from":"preA1","front":"a2","fruit":"preA1","full":"a2","fun":"preA1","funfair":"a1","funny":"preA1","fur":"a2","future":"a2","game":"preA1","garden":"preA1","gate":"a2","geography":"a2","get":"preA1","giraffe":"preA1","girl":"preA1","give":"preA1","glass":"a1","glasses":"preA1","glove":"a2","glue":"a2","go":"preA1","goal":"a1","goat":"preA1","gold":"a2","golf":"a2","good":"preA1","granddaughter":"a1","grandfather":"preA1","grandma":"preA1","grandmother":"preA1","grandpa":"preA1","grandparent":"a1","grandson":"a1","grape":"preA1","grass":"a1","gray":"preA1","great":"preA1","green":"preA1","grey":"preA1","ground":"a1","group":"a2","grow":"a1","guitar":"preA1","gym":"a2","hair":"preA1","half":"a2","hall":"preA1","hand":"preA1","handbag":"preA1","happen":"a2","happy":"preA1","hard":"a2","hat":"preA1","hate":"a2","have":"preA1","he":"preA1","head":"preA1","headache":"a1","hear":"a2","heavy":"a2","helicopter":"preA1","helmet":"a1","help":"a1","her":"preA1","here":"preA1","hi":"preA1","hide":"a1","high":"a2","hill":"a2","him":"preA1","hippo":"preA1","his":"preA1","history":"a2","hit":"preA1","hobby":"preA1","hockey":"preA1","hold":"preA1","hole":"a2","holiday":"a1","home":"preA1","homework":"a1","honey":"a2","hop":"a1","hope":"a2","horrible":"a2","horse":"preA1","hospital":"a1","hot":"a1","hotel":"a2","hour":"a2","house":"preA1","how":"preA1","how long":"a2","huge":"a1","hundred":"a1","hungry":"a1","hurry":"a2","hurt":"a1","husband":"a2","i":"preA1","ice":"a1","ice cream":"preA1","idea":"a1","if":"a2","ill":"a1","important":"a2","improve":"a2","in":"preA1","information":"a2","insect":"a2","inside":"a1","instead":"a2","instrument":"a2","interested":"a2","interesting":"a2","internet":"a1","into":"a1","invent":"a2","invitation":"a2","invite":"a1","island":"a1","it":"preA1","jacket":"preA1","jam":"a2","january":"a2","jeans":"preA1","jellyfish":"preA1","job":"a2","join":"a2","journalist":"a2","journey":"a2","juice":"preA1","july":"a2","jump":"preA1","jungle":"a1","just":"a2","kangaroo":"a1","keep":"a2","key":"a2","keyboard":"preA1","kick":"preA1","kid":"preA1","kilometre":"a2","kind":"a1","king":"a2","kitchen":"preA1","kite":"preA1","kitten":"a1","kiwi":"preA1","knee":"a2","knife":"a2","know":"preA1","lake":"a1","lamp":"preA1","land":"a2","language":"a2","laptop":"a1","large":"a2","last":"a1","late":"a2","later":"a2","laugh":"a1","lazy":"a2","leaf":"a1","learn":"preA1","leave":"a2","left":"a2","leg":"preA1","lemon":"preA1","lemonade":"preA1","lesson":"preA1","let":"a2","letter":"preA1","library":"a1","lie":"a2","lift":"a1","light":"a2","like":"preA1","lime":"preA1","line":"preA1","lion":"a1","listen":"preA1","little":"a1","live":"preA1","living room":"preA1","lizard":"preA1","london":"a2","long":"preA1","look":"preA1","lorry":"preA1","lose":"a1","lot":"preA1","loud":"a1","love":"preA1","lovely":"a2","low":"a2","lucky":"a2","lunch":"preA1","machine":"a1","magazine":"a2","make":"preA1","man":"preA1","manager":"a2","mango":"preA1","many":"preA1","map":"a1","march":"a2","market":"a1","married":"a2","mat":"preA1","match":"a2","maths":"a2","matter":"a1","me":"preA1","meal":"a2","mean":"a1","meat":"preA1","meatballs":"preA1","mechanic":"a2","medicine":"a2","meet":"a2","meeting":"a2","member":"a2","message":"a1","metal":"a2","midday":"a2","middle":"a2","midnight":"a2","might":"a2","milk":"preA1","milkshake":"a1","million":"a2","mind":"a2","mine":"preA1","minute":"a2","mistake":"a1","mix":"a2","model":"a1","monday":"a1","money":"a2","monkey":"preA1","monster":"preA1","month":"a2","moon":"a1","more":"a1","morning":"preA1","most":"a1","mother":"preA1","motorbike":"preA1","motorway":"a2","mountain":"a1","mouse":"preA1","moustache":"a1","mouth":"preA1","move":"a1","movie":"a1","much":"a2","mum":"preA1","museum":"a2","music":"preA1","must":"a1","my":"preA1","name":"preA1","naughty":"a1","near":"a1","neck":"a1","necklace":"a2","need":"a1","nest":"a2","net":"a1","never":"a1","new":"preA1","news":"a2","newspaper":"a2","next":"a2","next to":"preA1","nice":"preA1","night":"preA1","no":"preA1","noise":"a1","noisy":"a2","noodles":"a1","north":"a2","nose":"preA1","not":"preA1","nothing":"a1","november":"a2","now":"preA1","nowhere":"a2","number":"preA1","nurse":"a1","o'clock":"a1","ocean":"a2","october":"a2","octopus":"a2","of":"preA1","office":"a2","often":"a1","oh":"preA1","ok":"preA1","old":"preA1","olives":"a2","on":"preA1","once":"a2","one":"preA1","onion":"preA1","online":"a2","only":"a1","open":"preA1","or":"preA1","orange":"preA1","other":"a2","our":"preA1","out":"a1","outside":"a1","oven":"a2","over":"a2","page":"preA1","paint":"preA1","painting":"preA1","pair":"a1","pajamas":"a2","pancake":"a1","panda":"a1","paper":"preA1","parent":"a1","park":"preA1","parrot":"a1","part":"preA1","party":"a1","passenger":"a2","past":"a2","pasta":"a1","path":"a2","pea":"preA1","pear":"preA1","pen":"preA1","pencil":"preA1","penguin":"a1","pepper":"a2","person":"preA1","pet":"preA1","phone":"preA1","photo":"preA1","photographer":"a2","piano":"preA1","picnic":"a1","picture":"preA1","pie":"preA1","piece":"a2","pilot":"a2","pineapple":"preA1","pink":"preA1","pirate":"a1","pizza":"a2","place":"a1","plane":"preA1","planet":"a2","plant":"a1","plastic":"a2","plate":"a1","platform":"a2","play":"preA1","player":"a1","playground":"preA1","please":"preA1","pocket":"a2","police officer":"a2","pond":"a2","pool":"a1","pop music":"a2","pop star":"a1","popular":"a2","post office":"a2","postcard":"a2","poster":"preA1","potato":"preA1","practice":"a1","prefer":"a2","prepare":"a2","present":"a1","pretty":"a1","prize":"a2","problem":"a2","programme":"a2","project":"a2","pull":"a2","puppy":"a1","purple":"preA1","push":"a2","put":"preA1","puzzle":"a2","pyjamas":"a2","pyramid":"a2","quarter":"a2","queen":"a2","question":"preA1","quick":"a1","quiet":"a1","quite":"a2","quiz":"a2","rabbit":"a1","race":"a2","radio":"preA1","railway":"a2","rain":"a1","rainbow":"a1","read":"preA1","ready":"a2","really":"preA1","red":"preA1","remember":"a2","repair":"a2","repeat":"a2","restaurant":"a2","rice":"preA1","rich":"a2","ride":"preA1","right":"preA1","ring":"a2","river":"a1","road":"a1","robot":"preA1","rock":"a1","rock music":"a2","rocket":"a2","roof":"a1","room":"preA1","rubber":"preA1","rucksack":"a2","rug":"preA1","ruler":"preA1","run":"preA1","sad":"preA1","safe":"a1","salad":"a1","salt":"a2","same":"a2","sand":"preA1","sandwich":"a1","saturday":"a1","sauce":"a1","sausage":"preA1","save":"a2","say":"preA1","scarf":"a1","scary":"preA1","school":"preA1","science":"a2","scissors":"a2","score":"a2","screen":"a2","sea":"preA1","search":"a2","seat":"a1","second":"a1","secret":"a2","see":"preA1","sell":"a2","send":"a1","sentence":"preA1","september":"a2","several":"a2","shall":"a1","shampoo":"a2","shape":"a1","shark":"a1","she":"preA1","sheep":"preA1","shelf":"a2","shell":"preA1","ship":"preA1","shirt":"preA1","shoe":"preA1","shop":"preA1","shopping":"a1","short":"preA1","shorts":"preA1","should":"a2","shoulder":"a1","shout":"a1","show":"preA1","shower":"a1","sick":"a1","silly":"preA1","silver":"a2","since":"a2","sing":"preA1","singer":"a2","sister":"preA1","sit":"preA1","skate":"a1","skateboard":"preA1","ski":"a2","skip":"a1","skirt":"preA1","sky":"a1","skyscraper":"a2","sledge":"a2","sleep":"preA1","slow":"a1","small":"preA1","smell":"a2","smile":"preA1","snack":"a2","snail":"a1","snake":"preA1","snow":"a1","so":"preA1","soap":"a2","soccer":"preA1","sock":"preA1","sofa":"preA1","some":"preA1","someone":"a1","something":"a1","sometimes":"a1","son":"a1","song":"preA1","soon":"a2","sore":"a2","sorry":"preA1","sound":"a2","soup":"a1","south":"a2","space":"a2","spaceship":"a2","speak":"a2","special":"a2","spell":"preA1","spend":"a2","spider":"preA1","spoon":"a2","sport":"preA1","spot":"a2","spring":"a2","square":"a1","stadium":"a2","stage":"a2","stairs":"a1","stamp":"a2","stand":"preA1","star":"a1","start":"preA1","station":"a1","stay":"a2","step":"a2","stomach":"a1","stone":"a2","stop":"preA1","store":"preA1","storm":"a2","story":"preA1","straight":"a1","strange":"a2","strawberry":"a2","stream":"a2","street":"preA1","stripe":"a2","strong":"a1","student":"a2","study":"a2","subject":"a2","sugar":"a2","suitcase":"a2","summer":"a2","sun":"preA1","sunday":"a1","sunglasses":"a2","sunny":"a1","supermarket":"a1","sure":"a2","surname":"a2","surprise":"a2","surprised":"a1","swan":"a2","sweater":"a1","sweet":"a1","sweets":"preA1","swim":"preA1","t-shirt":"preA1","table":"preA1","tablet":"preA1","tail":"preA1","take":"a1","talk":"preA1","tall":"a1","taste":"a2","taxi":"a2","tea":"a1","teach":"a1","teacher":"preA1","team":"a2","teddy":"preA1","telephone":"a2","television":"preA1","tell":"preA1","temperature":"a1","tennis":"preA1","tent":"a2","terrible":"a1","text":"a1","than":"a1","thank":"a2","that":"preA1","the":"preA1","theatre":"a2","their":"preA1","then":"preA1","there":"preA1","these":"preA1","they":"preA1","thin":"a1","thing":"preA1","think":"a1","third":"a1","thirsty":"a1","this":"preA1","those":"preA1","thousand":"a2","through":"a2","throw":"preA1","thursday":"a1","tick":"preA1","ticket":"a1","tidy":"a2","tiger":"preA1","time":"a2","timetable":"a2","tired":"a1","to":"preA1","today":"preA1","toe":"a2","together":"a2","tomato":"preA1","tomorrow":"a2","tonight":"a2","too":"preA1","tooth":"a1","toothache":"a1","top":"a1","torch":"a2","tortoise":"a2","touch":"a2","tour":"a2","towel":"a1","town":"a1","toy":"preA1","tractor":"a1","traffic":"a2","train":"preA1","trainers":"a2","travel":"a1","treasure":"a1","tree":"preA1","trip":"a1","trousers":"preA1","try":"preA1","tuesday":"a1","tune":"a2","turn":"a2","twice":"a2","umbrella":"a2","uncle":"a1","under":"preA1","understand":"preA1","uniform":"a2","university":"a2","until":"a2","up":"a1","upstairs":"a1","us":"preA1","use":"a2","usually":"a2","vegetable":"a1","very":"preA1","video":"a1","view":"a2","village":"a1","violin":"a2","visit":"a2","volleyball":"a2","wait":"a1","waiter":"a2","wake":"a1","walk":"preA1","wall":"preA1","want":"preA1","warm":"a2","wash":"a1","watch":"preA1","water":"preA1","waterfall":"a1","watermelon":"preA1","wave":"preA1","way":"a2","we":"preA1","weak":"a1","wear":"preA1","weather":"a1","website":"a1","wednesday":"a1","week":"a1","weekend":"a1","well":"preA1","west":"a2","wet":"a1","whale":"a1","what":"preA1","wheel":"a2","when":"a1","where":"preA1","which":"preA1","while":"a2","white":"preA1","who":"preA1","why":"a1","wife":"a2","wild":"a2","win":"a2","wind":"a1","window":"preA1","windy":"a1","wing":"a2","winner":"a2","winter":"a2","wish":"a2","with":"preA1","without":"a2","woman":"preA1","wonderful":"a2","wood":"a2","wool":"a2","word":"preA1","work":"a1","world":"a1","worried":"a2","would":"a1","write":"preA1","wrong":"a1","x-ray":"a2","year":"preA1","yellow":"preA1","yes":"preA1","yesterday":"a1","yet":"a2","yoghurt":"a2","you":"preA1","young":"preA1","your":"preA1","zebra":"preA1","zero":"a2","zoo":"preA1"};
+const CAMBRIDGE_LEVEL_FOR_TIER = { bronze: 'preA1', silver: 'a1', gold: 'a2' };
+
 const LESSONS = [
   { id:'colors', name:'Colors Around Us', theme:'Everyday colors, real objects', status:'draft',
     editedBy:'Nick', editedAgo:'just now',
     modules:['gapfill','truefalse','wordmatch','memorypairs','listenchoose','putinorder','sayit','picword','wordscramble','spelling','listenmatch','buildsentence'],
-    audioIssues:0, notes:'Keep every example concrete — a real object per color (apple=red, sky=blue). Gold should reason about WHY, not just name the color.' },
+    audioIssues:0, notes:'Keep every example concrete — a real object per color (apple=red, sky=blue). Gold should reason about WHY, not just name the color.',
+    targetVocabulary: { bronze:[], silver:[], gold:[] } },
   { id:'describing-people-things', name:'Describing People & Things', theme:'Adjectives, comparisons, personality — a student-suggested topic', status:'draft',
     editedBy:'Nick', editedAgo:'just now',
     modules:['gapfill','truefalse','wordmatch','memorypairs','listenchoose','putinorder','sayit','picword','wordscramble','spelling','listenmatch','buildsentence'],
-    audioIssues:0, notes:'Full 12-module test lesson, pre-filled for the end-to-end publish test. Bronze = basic adjectives (tall/short/happy/sad), Silver = comparisons ("taller than"), Gold = personality + reasoning ("generous because she always helps").' },
+    audioIssues:0, notes:'Full 12-module test lesson, pre-filled for the end-to-end publish test. Bronze = basic adjectives (tall/short/happy/sad), Silver = comparisons ("taller than"), Gold = personality + reasoning ("generous because she always helps").',
+    targetVocabulary: { bronze:[], silver:[], gold:[] } },
   { id:'food-court', name:'Food Court Basics', theme:'Ordering food, real transactions', status:'draft',
-    editedBy:'Nick', editedAgo:'2 min ago', modules:['gapfill','spelling','wordmatch'], audioIssues:2 },
+    editedBy:'Nick', editedAgo:'2 min ago', modules:['gapfill','spelling','wordmatch'], audioIssues:2,
+    targetVocabulary: { bronze:[], silver:[], gold:[] } },
   { id:'weekend-errands', name:'Weekend Errands', theme:'Convenience store & delivery apps', status:'published',
-    editedBy:'Sophy (TA)', editedAgo:'yesterday', modules:['wordmatch','listenmatch'], audioIssues:1 },
+    editedBy:'Sophy (TA)', editedAgo:'yesterday', modules:['wordmatch','listenmatch'], audioIssues:1,
+    targetVocabulary: { bronze:[], silver:[], gold:[] } },
   { id:'healthy-habits', name:'Healthy Habits', theme:'Daily routines & wellbeing', status:'published',
-    editedBy:'Nick', editedAgo:'4 days ago', modules:['sayit','truefalse','buildsentence'], audioIssues:0 },
+    editedBy:'Nick', editedAgo:'4 days ago', modules:['sayit','truefalse','buildsentence'], audioIssues:0,
+    targetVocabulary: { bronze:[], silver:[], gold:[] } },
 ];
 
 // ---- Global word bank — one entry per concept, shared across every lesson. ----
