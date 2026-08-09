@@ -717,6 +717,13 @@ html, body {
   0%, 100% { background: rgba(79,195,247,0.12); }
   50%      { background: rgba(79,195,247,0.32); }
 }
+.precheck-hint-btn {
+  display: block; margin: 0 auto 4%; padding: 2% 5%; background: rgba(79,195,247,0.1);
+  border: 1.5px solid rgba(79,195,247,0.4); border-radius: 999px; color: #4FC3F7;
+  font-size: 3cqw; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.precheck-hint-btn:disabled { opacity: 0.4; pointer-events: none; }
+.precheck-hint-eliminated { opacity: 0.3; text-decoration: line-through; pointer-events: none; }
 .gf-hint-placeholder { color: rgba(255,183,77,0.85); font-weight: 600; }
 .gf-hint-row { display: flex; align-items: center; justify-content: center; gap: 1.5%; margin-bottom: 3%; font-size: 2.7cqw; color: rgba(255,255,255,0.4); }
 .gf-hint-dot { width: 1.6cqw; height: 1.6cqw; border-radius: 50%; background: rgba(255,255,255,0.12); transition: background .2s; }
@@ -2846,6 +2853,28 @@ function renderSayItInteraction(container, opts, onDone) {
   }
 }
 
+const CONTEXT_ROLE_PRIORITY = ['object', 'time', 'place', 'subject', 'connector', 'verb'];
+
+// Finds a real clue already sitting in a sentence's grammar tokens —
+// whichever role the answer itself ISN'T, picked by how much context it
+// usually carries (object/time/place tend to be more informative than a
+// bare subject or connector). Needs no new authored content since it
+// reuses tokens every module already has for the reinforcement panel.
+// `answer` can be null (True/False has no single "answer word" — every
+// token is fair game). `exclude` lets a second, genuinely different clue
+// be found once the first has already been shown.
+function findContextClue(answer, tokens, exclude) {
+  if (!tokens || !tokens.length) return null;
+  const answerToken = answer ? tokens.find(t => t.t.split(/\s+/).includes(answer)) : null;
+  const candidates = tokens.filter(t => t !== answerToken && t.t && t.t.trim() && !(exclude || []).includes(t.t));
+  if (!candidates.length) return null;
+  for (const role of CONTEXT_ROLE_PRIORITY) {
+    const match = candidates.find(t => t.r === role);
+    if (match) return match.t;
+  }
+  return candidates[0].t;
+}
+
 const MODULE_REGISTRY = {
 
   // ─────────────────────────────────────────────
@@ -2875,11 +2904,12 @@ const MODULE_REGISTRY = {
 
       function renderQuestion() {
         const { audio, question, options, answer } = session[idx];
-        let hasPlayed = false, playing = false, answered = false, optionsLive = false, selected = null;
+        let hasPlayed = false, playing = false, answered = false, optionsLive = false, selected = null, hintUsed = false;
 
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
         container.innerHTML = `
+          <button class="precheck-hint-btn" id="lc-hint-btn" disabled>💡 Hint</button>
           <p class="lc-question-v2">${question}</p>
           <button class="lc-listen-btn-v2" id="lc-listen-btn">
             <span class="lc-listen-icon-v2" id="lc-listen-icon">🔊</span>
@@ -2896,6 +2926,21 @@ const MODULE_REGISTRY = {
         const hintLine = container.querySelector('#lc-hint');
         const optionsGrid = container.querySelector('#lc-options');
         const checkBtn = container.querySelector('#gf-check-btn');
+        const hintBtn = container.querySelector('#lc-hint-btn');
+
+        // Pre-check hint — no sentence/token context exists in this module
+        // (just audio + options), so elimination is the honest fit here,
+        // same reasoning as Picture & Word's image-to-word/word-to-image
+        // modes. Gated behind having listened at least once — a hint
+        // shouldn't let a student skip the actual listening step.
+        hintBtn.addEventListener('click', () => {
+          if (hintUsed || !hasPlayed) return;
+          hintUsed = true;
+          const wrongBtns = [...optionsGrid.querySelectorAll('.lc-option-btn-v2')].filter(b => b.textContent !== answer);
+          if (wrongBtns.length) { wrongBtns[0].classList.add('precheck-hint-eliminated'); }
+          hintBtn.disabled = true;
+          hintBtn.textContent = '💡 Hint used';
+        });
 
         function showHint(msg) {
           hintLine.textContent = msg;
@@ -2954,6 +2999,7 @@ const MODULE_REGISTRY = {
             listenLabel.textContent = 'Listen';
             listenBtn.classList.remove('playing');
             setGridLive(true);
+            if (!hintUsed) hintBtn.disabled = false;
           }
           speak(audio, mood, 0, null, onAudioEnd);
           // Fallback in case onEnd never fires (browser quirk) — estimate
@@ -3025,25 +3071,6 @@ const MODULE_REGISTRY = {
       ];
       const SCORE_BY_HINT_LEVEL = { 0: 1, 1: 2/3, 2: 1/3, 3: 1/3 };
       const STARS_BY_HINT_LEVEL = { 0: 3, 1: 2, 2: 1, 3: 1 };
-      const CONTEXT_ROLE_PRIORITY = ['object', 'time', 'place', 'subject', 'connector', 'verb'];
-
-      // Finds a real clue already sitting in the sentence — whichever role
-      // the answer itself ISN'T, picked by how much context it usually
-      // carries (object/time/place tend to be more informative than a bare
-      // subject or connector). Needs no new authored content since it
-      // reuses the grammar tokens every gap-fill item already has.
-      // `exclude` lets a second, genuinely different clue be found for level 2.
-      function findContextClue(answer, tokens, exclude) {
-        if (!tokens || !tokens.length) return null;
-        const answerToken = tokens.find(t => t.t.split(/\s+/).includes(answer));
-        const candidates = tokens.filter(t => t !== answerToken && t.t && t.t.trim() && !(exclude || []).includes(t.t));
-        if (!candidates.length) return null;
-        for (const role of CONTEXT_ROLE_PRIORITY) {
-          const match = candidates.find(t => t.r === role);
-          if (match) return match.t;
-        }
-        return candidates[0].t;
-      }
 
       function renderQuestion() {
         const { sentence, options, answer, tokens } = session[idx];
@@ -3262,10 +3289,12 @@ const MODULE_REGISTRY = {
       function renderQuestion() {
         const { statement, answer, tokens } = session[idx];
         let selectedChoice = null;
+        let hintUsed = false;
 
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
         container.innerHTML = `
+          <button class="precheck-hint-btn" id="tf-hint-btn">💡 Hint</button>
           <div class="tf-statement-v2" id="tf-statement">${statement}</div>
           <div class="tf-buttons-v2">
             <button class="tf-btn-v2" id="tf-true-btn">✓ True</button>
@@ -3279,6 +3308,26 @@ const MODULE_REGISTRY = {
         const falseBtn = container.querySelector('#tf-false-btn');
         const checkBtn = container.querySelector('#gf-check-btn');
         const statusEl = container.querySelector('#tf-status');
+        const hintBtn  = container.querySelector('#tf-hint-btn');
+
+        // Pre-check hint — a single, optional context-clue glow available
+        // before committing an answer, not an escalating ladder. True/False
+        // is a binary choice, so eliminating an option would just hand over
+        // the answer — this respects that instead of forcing a mismatched
+        // mechanic onto it.
+        if (!findContextClue(null, tokens)) hintBtn.style.display = 'none';
+        hintBtn.addEventListener('click', () => {
+          if (hintUsed) return;
+          hintUsed = true;
+          const clue = findContextClue(null, tokens);
+          if (!clue) return;
+          const statementEl = container.querySelector('#tf-statement');
+          if (statementEl.textContent.includes(clue)) {
+            statementEl.innerHTML = statementEl.textContent.replace(clue, `<span class="gf-context-clue">${clue}</span>`);
+          }
+          hintBtn.disabled = true;
+          hintBtn.textContent = '💡 Hint used';
+        });
 
         function selectChoice(choice) {
           if (trueBtn.disabled) return;
@@ -3775,6 +3824,21 @@ const MODULE_REGISTRY = {
         const item = session[idx];
         let spokenWord;
 
+        let hintUsed = false;
+        function addHintButton(onUse) {
+          const btn = document.createElement('button');
+          btn.className = 'precheck-hint-btn';
+          btn.textContent = '💡 Hint';
+          btn.addEventListener('click', () => {
+            if (hintUsed) return;
+            hintUsed = true;
+            onUse();
+            btn.disabled = true;
+            btn.textContent = '💡 Hint used';
+          }, { once: true });
+          content.insertAdjacentElement('afterbegin', btn);
+        }
+
         if (mode === 'image-to-word') {
           const pool = safeShuffle(items.filter(i => i.word !== item.word), () => false).slice(0, 2);
           const opts = safeShuffle([item, ...pool], r => r[0].word === item.word);
@@ -3783,6 +3847,12 @@ const MODULE_REGISTRY = {
             <div class="iv-options-grid">${opts.map(o => `<button class="iv-option-btn" data-val="${o.word}" data-ans="${item.word}">${o.word}</button>`).join('')}</div>
           `;
           spokenWord = item.word;
+          // No sentence context exists in this mode — elimination is the
+          // honest fit here, not a mismatched sentence-glow with nothing to point at.
+          addHintButton(() => {
+            const wrongBtns = [...content.querySelectorAll('.iv-option-btn')].filter(b => b.dataset.val !== item.word);
+            if (wrongBtns.length) { wrongBtns[0].classList.add('precheck-hint-eliminated'); wrongBtns[0].disabled = true; }
+          });
         } else if (mode === 'word-to-image') {
           const pool = safeShuffle(items.filter(i => i.emoji !== item.emoji), () => false).slice(0, 2);
           const opts = safeShuffle([item, ...pool], r => r[0].emoji === item.emoji);
@@ -3791,16 +3861,27 @@ const MODULE_REGISTRY = {
             <div class="iv-options-grid">${opts.map(o => `<button class="iv-option-btn emoji-opt" data-val="${o.emoji}" data-ans="${item.emoji}">${o.emoji}</button>`).join('')}</div>
           `;
           spokenWord = item.word;
+          addHintButton(() => {
+            const wrongBtns = [...content.querySelectorAll('.iv-option-btn')].filter(b => b.dataset.val !== item.emoji);
+            if (wrongBtns.length) { wrongBtns[0].classList.add('precheck-hint-eliminated'); wrongBtns[0].disabled = true; }
+          });
         } else {
           // cloze-image: `sentence` already has ___, `cloze` is the answer word
           const pool = safeShuffle(items.filter(i => i.cloze !== item.cloze), () => false).slice(0, 3);
           const opts = safeShuffle([item, ...pool], r => r[0].cloze === item.cloze);
           content.innerHTML = `
             <div class="iv-visual"><div class="iv-emoji" style="font-size:9cqw;">${item.emoji}</div></div>
-            <div class="iv-sentence">${item.sentence.replace('___', '<span class="iv-blank" id="iv-blank">___</span>')}</div>
+            <div class="iv-sentence" id="iv-sentence-text">${item.sentence.replace('___', '<span class="iv-blank" id="iv-blank">___</span>')}</div>
             <div class="iv-options-grid">${opts.map(o => `<button class="iv-option-btn" data-val="${o.cloze}" data-ans="${item.cloze}">${o.cloze}</button>`).join('')}</div>
           `;
           spokenWord = item.cloze;
+          // No per-token grammar data here, just a plain sentence string —
+          // glow the whole thing rather than pretending to isolate one word
+          // we have no role-tagging for.
+          addHintButton(() => {
+            const sentenceEl = container.querySelector('#iv-sentence-text');
+            if (sentenceEl) sentenceEl.classList.add('gf-blank', 'hint-glow');
+          });
         }
         speak(spokenWord, 'neutral', 300);
 
@@ -4042,8 +4123,10 @@ const MODULE_REGISTRY = {
 
       function draw() {
         const item = session[idx];
+        const hasClue = !!findContextClue(item.word, item.tokens);
         container.innerHTML = `
           <div class="mp-pips-row-v2" id="ws-pips"></div>
+          ${hasClue ? '<button class="precheck-hint-btn" id="ws-hint-btn">💡 Hint</button><p class="ws-feedback-v2" id="ws-clue" style="display:none;"></p>' : ''}
           <div class="ws-visual-v2">
             <div class="ws-emoji-v2">${item.emoji}</div>
             <button class="ws-play-btn-v2" id="ws-play-btn">🔊</button>
@@ -4053,6 +4136,18 @@ const MODULE_REGISTRY = {
           <p class="ws-feedback-v2" id="ws-fb">&nbsp;</p>
         `;
         container.querySelector('#ws-pips').innerHTML = pips();
+
+        if (hasClue) {
+          const hintBtn = container.querySelector('#ws-hint-btn');
+          hintBtn.addEventListener('click', () => {
+            const clue = findContextClue(item.word, item.tokens);
+            const clueEl = container.querySelector('#ws-clue');
+            clueEl.innerHTML = `Clue: <span class="gf-context-clue">${clue}</span>`;
+            clueEl.style.display = 'block';
+            hintBtn.disabled = true;
+            hintBtn.textContent = '💡 Hint used';
+          }, { once: true });
+        }
 
         const wsSlots = container.querySelector('#ws-slots');
         slotData.forEach((_, si) => {
@@ -4205,8 +4300,11 @@ const MODULE_REGISTRY = {
 
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
+        const hasClue = !!findContextClue(item.word, item.tokens);
+
         container.innerHTML = `
           <div class="mp-pips-row-v2" id="sp-pips"></div>
+          ${hasClue ? '<button class="precheck-hint-btn" id="sp-hint-btn">💡 Hint</button><p class="sp-feedback-v2" id="sp-clue" style="display:none;"></p>' : ''}
           <div class="sp-visual-v2">
             ${showImage ? `<div class="sp-emoji-v2">${item.emoji}</div>` : ''}
             <div class="sp-listen-row-v2">
@@ -4224,6 +4322,18 @@ const MODULE_REGISTRY = {
           <p class="sp-feedback-v2" id="sp-fb">&nbsp;</p>
         `;
         container.querySelector('#sp-pips').innerHTML = pips();
+
+        if (hasClue) {
+          const hintBtn = container.querySelector('#sp-hint-btn');
+          hintBtn.addEventListener('click', () => {
+            const clue = findContextClue(item.word, item.tokens);
+            const clueEl = container.querySelector('#sp-clue');
+            clueEl.innerHTML = `Clue: <span class="gf-context-clue">${clue}</span>`;
+            clueEl.style.display = 'block';
+            hintBtn.disabled = true;
+            hintBtn.textContent = '💡 Hint used';
+          }, { once: true });
+        }
 
         container.querySelector('#sp-play-btn').addEventListener('click', () => speak(item.word, 'neutral'));
 
