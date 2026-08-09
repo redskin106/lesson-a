@@ -588,6 +588,15 @@ html, body {
 .dp-because-label { font-size:2.9cqw; color:var(--text-dim); margin:3% 0 1.5%; }
 .dp-sayit-only-note { font-size:2.9cqw; color:var(--text-dim); font-style:italic; margin-bottom:3%; }
 
+/* ── Image-to-Feeling ─────────────────────────────── */
+.itf-stimulus {
+  width: 60%; aspect-ratio: 1/1; margin: 0 auto 5%; border-radius: 20px;
+  display: flex; align-items: center; justify-content: center; font-size: 14cqw;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.itf-stimulus-label { text-align: center; font-size: 3cqw; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5%; }
+.itf-prompt { text-align: center; font-size: 4.2cqw; font-weight: 600; color: #fff; margin-bottom: 5%; }
+
 .dp-sentence-strip {
   position:sticky; bottom:0; background:rgba(13,27,42,0.92); backdrop-filter:blur(6px);
   border-top:1px solid rgba(255,255,255,0.08); border-radius:12px 12px 0 0;
@@ -1727,6 +1736,33 @@ const LESSON = [
           ],
           l3: { tiles: ['with a zip', 'with a handle', 'looks old', 'looks new'], because_mode: 'typed' }
         }
+      ]}
+    }
+  },
+
+  // ── IMAGE-TO-FEELING ────────────────────────────────
+  // Uses the real, Cambridge-validated colour-feeling pairs from the
+  // curriculum spec (purple=exciting/mysterious, orange=warm/exciting,
+  // green=natural/quiet, grey=quiet/serious) — not invented content.
+  {
+    id: 'mod-10',
+    type: 'image-to-feeling',
+    label: 'How Does It Feel?',
+    data: {
+      bronze: { pick: 1, items: [
+        { stimulusType: 'colour', stimulusValue: '#F97316', stimulusLabel: 'orange',
+          mascotEmoji: '👽', mascotName: 'Zorp',
+          tiles: ['happy', 'excited', 'calm', 'scared'] },
+      ]},
+      silver: { pick: 1, items: [
+        { stimulusType: 'colour', stimulusValue: '#8B5CF6', stimulusLabel: 'purple',
+          mascotEmoji: '👽', mascotName: 'Zorp',
+          tiles: ['excited', 'curious', 'nervous', 'calm'] },
+      ]},
+      gold: { pick: 1, items: [
+        { stimulusType: 'colour', stimulusValue: '#6B7280', stimulusLabel: 'grey',
+          mascotEmoji: '👽', mascotName: 'Zorp',
+          tiles: ['quiet', 'serious', 'mysterious', 'peaceful'], because_mode: 'typed' },
       ]}
     }
   },
@@ -4937,6 +4973,136 @@ const MODULE_REGISTRY = {
         renderPyramid();
         renderActiveZone();
         updateStrip();
+      }
+
+      renderItem();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  IMAGE-TO-FEELING
+  //  Subjective response, genuinely no wrong answer — a safe-zone stimulus
+  //  (colour or emoji, never a person/face) is shown, and the question is
+  //  always mediated through the mascot ("How does [mascot] feel?"), never
+  //  asked of the student directly, per the Feelings-lesson design
+  //  constraint. Any tile the student picks is accepted immediately — this
+  //  module scores participation, not correctness. Bronze = pick a tile,
+  //  Silver = pick + hear the model sentence, Gold = pick + say/type why,
+  //  the same Say-it/Say-more/Say-it-well depth curve as everywhere else.
+  //  The Gold "why" step reuses the exact shared Say It interaction built
+  //  for Description Pyramid — same recorder, same persistence, same
+  //  compare card, not a second copy.
+  'image-to-feeling': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0;
+
+      function renderItem() {
+        const item = session[idx];
+        const mascotEmoji = item.mascotEmoji || '👽';
+        const mascotName = item.mascotName || 'Zorp';
+        let selectedTile = null;
+        let done = false;
+
+        document.getElementById('v2-qlabel').textContent = `Item ${idx + 1} of ${session.length}`;
+
+        const stimulusStyle = item.stimulusType === 'colour'
+          ? `background:${item.stimulusValue};`
+          : `background:rgba(255,255,255,0.04);`;
+        const stimulusContent = item.stimulusType === 'colour' ? '' : item.stimulusValue;
+
+        container.innerHTML = `
+          <div class="itf-stimulus" style="${stimulusStyle}">${stimulusContent}</div>
+          <div class="itf-stimulus-label">${item.stimulusLabel}</div>
+          <div class="dp-mascot-wrap"><span class="dp-mascot" id="itf-mascot">${mascotEmoji}</span></div>
+          <p class="itf-prompt">How does ${mascotName} feel about this?</p>
+          <div class="dp-tile-row" id="itf-tiles"></div>
+          <div id="itf-why-zone"></div>
+          <button class="iv-proceed-btn" id="itf-continue-btn" style="display:none;">Continue →</button>
+        `;
+
+        const tileRow = container.querySelector('#itf-tiles');
+        const mascotEl = container.querySelector('#itf-mascot');
+        const continueBtn = container.querySelector('#itf-continue-btn');
+        const whyZone = container.querySelector('#itf-why-zone');
+
+        function bumpMascot() {
+          mascotEl.classList.remove('bump');
+          void mascotEl.offsetWidth;
+          mascotEl.classList.add('bump');
+        }
+
+        function playModelSentence(feeling) {
+          if (!TTS) return;
+          TTS.cancel();
+          let u;
+          try { u = new SpeechSynthesisUtterance(`${mascotName} feels ${feeling}.`); }
+          catch(e) { return; }
+          u.rate = tier === 'bronze' ? 0.8 : 0.85;
+          u.lang = 'en-US';
+          TTS.speak(u);
+        }
+
+        item.tiles.forEach(feeling => {
+          const btn = document.createElement('button');
+          btn.className = 'dp-tile';
+          btn.textContent = feeling;
+          btn.addEventListener('click', () => {
+            if (done) return;
+            sfx('tap');
+            tileRow.querySelectorAll('.dp-tile').forEach(b => { b.classList.remove('selected'); b.style.background=''; b.style.color=''; });
+            btn.classList.add('selected');
+            btn.style.background = '#4FC3F7';
+            selectedTile = feeling;
+            bumpMascot();
+
+            if (tier === 'bronze') {
+              continueBtn.style.display = 'block';
+            } else {
+              playModelSentence(feeling);
+              if (tier === 'silver') {
+                continueBtn.style.display = 'block';
+              } else {
+                // Gold: a why-elaboration step, hybrid typed/say-it — mirrors
+                // Description Pyramid's L3 exactly, same design language.
+                const becauseMode = item.because_mode || 'typed';
+                whyZone.innerHTML = becauseMode === 'typed'
+                  ? `<div class="dp-because-label">Why does ${mascotName} feel ${feeling}?</div><input type="text" class="dp-l3-free-input" id="itf-why-input" placeholder="because…">`
+                  : `<div class="dp-sayit-only-note">You'll say why out loud in a moment.</div>`;
+                continueBtn.style.display = 'block';
+              }
+            }
+          });
+          tileRow.appendChild(btn);
+        });
+
+        continueBtn.addEventListener('click', () => {
+          if (done || !selectedTile) return;
+          done = true;
+
+          if (tier === 'gold' && (item.because_mode || 'typed') === 'say-it') {
+            // Chain into the shared Say It flow for the spoken elaboration —
+            // same recorder/persistence/compare-card as Description Pyramid
+            // uses, not a separate implementation.
+            const target = `${mascotName} feels ${selectedTile} because...`;
+            container.innerHTML = `<p class="module-question" style="text-align:center;">Tell us why:</p><div id="itf-sayit-zone"></div>`;
+            renderSayItInteraction(container.querySelector('#itf-sayit-zone'), {
+              prompt: null, target, audioFile: null, isBronze: false,
+              moduleIndex: state.currentModuleIndex, tier, recordingItemIndex: idx,
+              allowSkip: true, // subjective reflection — never force a recording
+            }, () => advance());
+            return;
+          }
+
+          advance();
+        });
+
+        function advance() {
+          idx++;
+          if (idx < session.length) renderItem();
+          else onComplete(1); // no wrong answer possible — completing the session is full credit
+        }
       }
 
       renderItem();
