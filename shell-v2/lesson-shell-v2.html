@@ -238,6 +238,27 @@ html, body {
 .summary-status.complete   { background: rgba(76,175,80,0.15);  color: var(--pass); }
 .summary-status.incomplete { background: rgba(239,83,80,0.15);  color: var(--fail); }
 
+.summary-item.replayable { cursor: pointer; transition: background .15s; }
+.summary-item.replayable:active { background: var(--surface); }
+.summary-stars { font-size: 14px; letter-spacing: 1px; }
+.summary-replay-hint { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.summary-candoo {
+  font-size: 12px; color: var(--gold); margin-top: 4px;
+  display: flex; align-items: center; gap: 4px;
+}
+
+.selfassess-wrap { text-align: center; padding: 8px 0 4px; }
+.selfassess-prompt { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.selfassess-options { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+.selfassess-btn {
+  flex: 1; max-width: 110px; background: var(--surface2); border: 2px solid transparent;
+  border-radius: var(--radius); padding: 16px 8px; cursor: pointer; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.selfassess-btn .emoji { font-size: 28px; }
+.selfassess-btn .label { font-size: 11px; color: var(--text-dim); }
+.selfassess-btn.selected { border-color: var(--accent); background: rgba(79,195,247,0.1); }
+
 .retry-btn {
   display: block; width: 100%;
   background: transparent; color: var(--text);
@@ -1054,6 +1075,14 @@ html, body {
     <div class="end-name"  id="end-name"></div>
     <div class="end-total" id="end-total"></div>
   </div>
+  <div class="selfassess-wrap" id="selfassess-wrap">
+    <div class="selfassess-prompt">How did that feel?</div>
+    <div class="selfassess-options">
+      <button class="selfassess-btn" data-val="1" onclick="pickSelfAssess(1)"><span class="emoji">😅</span><span class="label">Tricky</span></button>
+      <button class="selfassess-btn" data-val="2" onclick="pickSelfAssess(2)"><span class="emoji">🙂</span><span class="label">OK</span></button>
+      <button class="selfassess-btn" data-val="3" onclick="pickSelfAssess(3)"><span class="emoji">😄</span><span class="label">Easy</span></button>
+    </div>
+  </div>
   <div class="summary-list" id="summary-list"></div>
   <button class="retry-btn" id="retry-btn" style="display:none">↩ Retry incomplete modules</button>
   <button class="done-btn"  id="done-btn">✓ Done</button>
@@ -1188,6 +1217,11 @@ const LESSON = [
     id: 'mod-4',
     type: 'gap-fill',
     label: 'Fill the Gap',
+    canDo: {
+      bronze: 'I can pick the right word for a simple sentence.',
+      silver: 'I can complete sentences using context clues.',
+      gold:   'I can complete sentences confidently, even tricky ones.',
+    },
     data: {
       bronze: {
         pick: 2,
@@ -1830,7 +1864,7 @@ const LESSON = [
 //                      never needs an IndexedDB version-bump migration
 // ══════════════════════════════════════════════════
 const PROGRESS_DB_NAME = 'efl-progress';
-const PROGRESS_DB_VERSION = 1;
+const PROGRESS_DB_VERSION = 2; // bumped to add selfAssessments — IndexedDB only runs onupgradeneeded on a version increase
 let _progressDBPromise = null;
 
 function openProgressDB() {
@@ -1854,6 +1888,7 @@ function openProgressDB() {
       if (!db.objectStoreNames.contains('recordings'))   db.createObjectStore('recordings',   { keyPath: 'key' });
       if (!db.objectStoreNames.contains('tierResults'))   db.createObjectStore('tierResults',   { keyPath: 'key' });
       if (!db.objectStoreNames.contains('wordExposure'))   db.createObjectStore('wordExposure',   { keyPath: 'key' });
+      if (!db.objectStoreNames.contains('selfAssessments'))   db.createObjectStore('selfAssessments',   { keyPath: 'key' });
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -1913,6 +1948,13 @@ async function saveTierResult(student, moduleIndex, tier, score, passed) {
 async function getTierResultsForStudent(student) {
   return _idbGetAllForStudent('tierResults', `${student}::${LESSON_ID}::`);
 }
+async function saveSelfAssessment(student, value) {
+  // One rating per student per lesson-completion visit — a private, in-the-moment
+  // gut-check (matches the classroom's "three fingers" ritual), never scored or
+  // graded, kept separate from tierResults on purpose.
+  const key = `${student}::${LESSON_ID}::${Date.now()}`;
+  await _idbPut('selfAssessments', { key, student, value, updatedAt: Date.now() });
+}
 
 function timeAgo(timestamp) {
   const diffMs = Date.now() - timestamp;
@@ -1930,7 +1972,8 @@ const state = {
   student: null,
   currentModuleIndex: 0,
   currentTier: 'bronze',
-  results: buildResults()
+  results: buildResults(),
+  replayMode: false, // true when a module is launched from the end-screen's free replay grid
 };
 
 function buildResults() {
@@ -2126,6 +2169,26 @@ function handleTierResult(moduleIndex, tier, score) {
 
   const ctaBtn = document.getElementById('result-cta');
 
+  // A free replay from the end screen's grid — not part of the normal
+  // linear first-time flow, so it shouldn't try to auto-advance to "next
+  // tier" or "next module" (which may be irrelevant or already complete).
+  // Just acknowledge the updated score and return to the refreshed grid.
+  if (state.replayMode) {
+    state.replayMode = false;
+    document.getElementById('result-msg').innerHTML = `<strong>Updated!</strong> Your best score is saved.`;
+    ctaBtn.textContent = '← Back to results';
+    ctaBtn.onclick = () => showEndScreen();
+
+    document.getElementById('result-title').textContent = passed ? `${tierName} passed!` : `${tierName} — nice try`;
+    document.getElementById('result-score').innerHTML   = pct === 100 ? 'Perfect!' : `${pct}% correct`;
+    document.getElementById('gr-reinforce-content').style.display = 'none';
+    document.getElementById('gr-complete-content').style.display = 'block';
+    document.getElementById('gr-overlay').style.display = 'flex';
+    const stars = pct === 100 ? 3 : pct >= 60 ? 2 : pct > 0 ? 1 : 0;
+    animateStarsReveal(stars);
+    return;
+  }
+
   if (passed && next) {
     document.getElementById('result-msg').innerHTML =
       `Great work! <strong>${cap(next)}</strong> is now unlocked.`;
@@ -2172,8 +2235,36 @@ function handleTierResult(moduleIndex, tier, score) {
 //  SCREEN 4 — END SCREEN
 // ══════════════════════════════════════════════════
 
+function starsFromPct(pct) {
+  // Same formula as the per-tier completion celebration (handleTierResult)
+  // — one consistent star scale everywhere in the shell, not a second one
+  // invented just for this screen.
+  return pct === 100 ? 3 : pct >= 60 ? 2 : pct > 0 ? 1 : 0;
+}
+function starsHtml(stars) {
+  return '⭐'.repeat(stars) + '✩'.repeat(3 - stars);
+}
+
+function pickSelfAssess(value) {
+  document.querySelectorAll('.selfassess-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.val) === value);
+  });
+  if (state.student) saveSelfAssessment(state.student, value);
+}
+
+function replayModule(i) {
+  const r = state.results[i];
+  let tier = 'bronze';
+  for (const t of ['gold','silver','bronze']) {
+    if (r[t].score !== null) { tier = t; break; }
+  }
+  state.replayMode = true;
+  startModule(i, tier);
+}
+
 function showEndScreen() {
   document.getElementById('end-name').textContent = state.student;
+  document.querySelectorAll('.selfassess-btn').forEach(b => b.classList.remove('selected'));
 
   // Overall score: highest-tier score per module, averaged
   let total = 0;
@@ -2198,21 +2289,26 @@ function showEndScreen() {
       if (r[t].score !== null) { highestTier = t; highestScore = r[t].score; break; }
     }
 
+    const canDoText = highestTier && mod.canDo ? mod.canDo[highestTier] : null;
+
     const item = document.createElement('div');
-    item.className = 'summary-item';
+    item.className = 'summary-item' + (highestScore !== null ? ' replayable' : '');
     item.innerHTML = `
       <div>
         <div class="summary-item-label">${mod.label}</div>
         <div class="summary-item-detail">${
           highestScore !== null
-            ? `${cap(highestTier)} · ${Math.round(highestScore * 100)}%`
+            ? `${cap(highestTier)} · <span class="summary-stars">${starsHtml(starsFromPct(Math.round(highestScore * 100)))}</span>`
             : 'Not attempted'
         }</div>
+        ${highestScore !== null ? `<div class="summary-replay-hint">Tap to practice again</div>` : ''}
+        ${canDoText ? `<div class="summary-candoo">✓ ${canDoText}</div>` : ''}
       </div>
       <div class="summary-status ${r.complete ? 'complete' : 'incomplete'}">
         ${r.complete ? '✓ Done' : 'Retry'}
       </div>
     `;
+    if (highestScore !== null) item.addEventListener('click', () => replayModule(i));
     summaryList.appendChild(item);
   });
 
@@ -2239,6 +2335,7 @@ function retryFailed() {
 function resetAll() {
   state.student = null;
   state.results = buildResults();
+  state.replayMode = false;
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   startBtn.classList.remove('ready');
 }
