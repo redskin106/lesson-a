@@ -2640,6 +2640,27 @@ function compareCardHtml(moduleId, t){
         <div class="compare-word-list">${tierData.items.map(it=>`<div class="compare-word">${it.tokens.length ? it.tokens.map(tk=>tk.text).join(' ') : '<span style="color:var(--text-lo);">empty</span>'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">no sentences</div>'}</div>
         ${editLink}</div>`;
     }
+    if(instanceType(moduleId) === 'pyramid'){
+      const tierData = md('pyramid')[t];
+      return `<div class="compare-card ${t}">${head}<span>${tierData.items.length} item${tierData.items.length===1?'':'s'} · pick ${tierData.pick}</span></div>
+        <div class="compare-word-list">${tierData.items.map(it=>{
+          const depth = t==='bronze' ? 'L1 only' : t==='silver' ? `L1+L2 (${(it.l2||[]).length} groups)` : `L1+L2+L3`;
+          return `<div class="compare-word">${it.emoji||'?'} ${it.l1.answer || '<span style="color:var(--text-lo);">empty</span>'} <em style="color:var(--text-lo);">(${depth})</em></div>`;
+        }).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
+        ${editLink}</div>`;
+    }
+    if(instanceType(moduleId) === 'imagefeeling'){
+      const tierData = md('imagefeeling')[t];
+      return `<div class="compare-card ${t}">${head}<span>${tierData.items.length} prompt${tierData.items.length===1?'':'s'} · pick ${tierData.pick}</span></div>
+        <div class="compare-word-list">${tierData.items.map(it=>`<div class="compare-word">${it.stimulusType==='colour'?'🎨':(it.stimulusValue||'?')} ${it.stimulusLabel || '<span style="color:var(--text-lo);">empty</span>'} <em style="color:var(--text-lo);">(${(it.tiles||[]).length} feeling tiles)</em></div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
+        ${editLink}</div>`;
+    }
+    if(instanceType(moduleId) === 'creativereflection'){
+      const tierData = md('creativereflection')[t];
+      return `<div class="compare-card ${t}">${head}<span>${tierData.items.length} template${tierData.items.length===1?'':'s'} · pick ${tierData.pick}</span></div>
+        <div class="compare-word-list">${tierData.items.map(it=>`<div class="compare-word">${it.template || '<span style="color:var(--text-lo);">empty</span>'}</div>`).join('') || '<div class="compare-word" style="color:var(--text-lo);">empty pool</div>'}</div>
+        ${editLink}</div>`;
+    }
   }catch(e){
     return `<div class="compare-card ${t}">${head}</span></div><div class="compare-sentence" style="color:var(--text-lo);">Nothing here yet</div>${editLink}</div>`;
   }
@@ -2990,6 +3011,49 @@ function renderPreview(){
         <div class="phone-opts">${it.tokens.length ? it.tokens.map(tk=>`<div class="phone-opt">${tk.text}</div>`).join('') : '<div class="phone-opt">Empty sentence</div>'}</div>
         <div class="phone-stars">☆ ☆ ☆</div>`;
     }
+  } else if(instanceType(currentModule)==='pyramid'){
+    const tierData = md('pyramid')[t];
+    const items = tierData.items;
+    if(!items || items.length===0){
+      phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Add an item to preview.</div>`;
+    } else {
+      const idx = Math.min(dpExpandedIndex, items.length - 1);
+      const it = items[idx];
+      phone.innerHTML = `
+        <div class="phone-tier">${t.toUpperCase()} · ${idx+1} of ${items.length} · pick ${tierData.pick}</div>
+        <div style="text-align:center;font-size:40px;margin-bottom:10px;">${it.emoji||'?'}</div>
+        <div class="phone-q">What is it?</div>
+        <div class="phone-opts">${(it.l1.options||[]).map(o=>`<div class="phone-opt ${o===it.l1.answer?'correct':''}">${o||'&nbsp;'}</div>`).join('') || '<div class="phone-opt">No options yet</div>'}</div>
+        <div class="phone-stars">☆ ☆ ☆</div>`;
+    }
+  } else if(instanceType(currentModule)==='imagefeeling'){
+    const tierData = md('imagefeeling')[t];
+    const items = tierData.items;
+    if(!items || items.length===0){
+      phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Add a stimulus to preview.</div>`;
+    } else {
+      const it = items[0];
+      const stimStyle = it.stimulusType==='colour' ? `background:${it.stimulusValue||'#333'};width:44px;height:44px;border-radius:8px;margin:0 auto 10px;` : '';
+      phone.innerHTML = `
+        <div class="phone-tier">${t.toUpperCase()} · pick ${tierData.pick}</div>
+        ${it.stimulusType==='colour' ? `<div style="${stimStyle}"></div>` : `<div style="text-align:center;font-size:36px;margin-bottom:10px;">${it.stimulusValue||'?'}</div>`}
+        <div class="phone-q">How does ${it.mascotName||'Zorp'} feel about this?</div>
+        <div class="phone-opts">${(it.tiles||[]).map(tl=>`<div class="phone-opt">${tl||'&nbsp;'}</div>`).join('') || '<div class="phone-opt">No feeling tiles yet</div>'}</div>
+        <div class="phone-stars">☆ ☆ ☆</div>`;
+    }
+  } else if(instanceType(currentModule)==='creativereflection'){
+    const tierData = md('creativereflection')[t];
+    const items = tierData.items;
+    if(!items || items.length===0){
+      phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Add a template to preview.</div>`;
+    } else {
+      const it = items[0];
+      const preview = it.template ? it.template.replace(/\{\d+\}/g, '____') : '';
+      phone.innerHTML = `
+        <div class="phone-tier">${t.toUpperCase()} · pick ${tierData.pick}</div>
+        <div class="phone-q">${preview || '<span style="color:var(--text-lo);">No template yet</span>'}</div>
+        <div class="phone-stars">☆ ☆ ☆</div>`;
+    }
   } else {
     phone.innerHTML = `<div class="phone-tier">${t.toUpperCase()}</div><div class="phone-q" style="color:var(--text-lo);">Preview follows once this module is built.</div>`;
   }
@@ -3283,7 +3347,8 @@ function finishCreateLesson(){
     id: newId, name: wizLessonName || 'Untitled Lesson',
     theme: wizLessonTheme,
     status:'draft', editedBy:'You', editedAgo:'just now',
-    modules: wizModules.length ? wizModules : ['gapfill'], audioIssues:0
+    modules: wizModules.length ? wizModules : ['gapfill'], audioIssues:0,
+    targetVocabulary: { bronze:[], silver:[], gold:[] }, moduleImageAssignments: {}
   });
   closeModal();
   renderDashboard();
@@ -5156,6 +5221,11 @@ function importLessonFile(input){
       newId = 'imported-' + Date.now();
     }
     const importedLesson = { ...lesson, id:newId, status:'draft', editedBy:'Imported', editedAgo:'just now' };
+    // Backfill fields that didn't exist in older export files (e.g. an export
+    // made before targetVocabulary/moduleImageAssignments existed) — same gap
+    // as finishCreateLesson had, just reachable via a different path.
+    if(!importedLesson.targetVocabulary) importedLesson.targetVocabulary = { bronze:[], silver:[], gold:[] };
+    if(!importedLesson.moduleImageAssignments) importedLesson.moduleImageAssignments = {};
     LESSONS.unshift(importedLesson);
     LESSON_CONTENT[newId] = content || {};
     AUDIO_RECORDED[newId] = audio || {};
