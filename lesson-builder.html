@@ -283,6 +283,9 @@
   .asset-slot-title{ font-size:13px; font-weight:600; color:var(--text-hi); margin-bottom:8px; }
   .asset-dims{ font-size:11px; color:#93C5FD; margin-top:3px; }
   .asset-dims-inline{ font-weight:400; text-transform:none; letter-spacing:0; font-size:11.5px; color:#93C5FD; margin-left:8px; }
+  .asset-row.pending{ border-color:rgba(245,158,11,0.35); }
+  .asset-status.pending{ font-size:11px; color:#FBBF24; max-width:220px; line-height:1.5; }
+  .mark-uploaded-link{ display:block; margin-top:4px; color:#4ADE80; cursor:pointer; text-decoration:underline; }
   .asset-row.pending{ border-color:rgba(255,183,77,0.5); background:rgba(255,183,77,0.05);}
   .asset-thumb{ width:44px; height:44px; border-radius:9px; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
   .asset-info{ flex:1; min-width:0;}
@@ -3060,6 +3063,7 @@ const IMAGE_VARIANT_SLOTS = {
     dims: '1200 × 2580px',
     variants: [
       { id:'default', file:'assets/bg_and_border.png', label:'Default (purple/blue)' },
+      { id:'light', file:'assets/background_light.png', label:'Light', pending:true },
     ],
   },
   scene: {
@@ -3068,6 +3072,7 @@ const IMAGE_VARIANT_SLOTS = {
     dims: '1138 × 1097px',
     variants: [
       { id:'default', file:'assets/school_scene.png', label:'Classroom' },
+      { id:'light', file:'assets/scene_light.png', label:'Classroom (Light)', pending:true },
     ],
   },
 };
@@ -3111,12 +3116,13 @@ function renderAssetsView(){
         <div class="asset-slot-group">
           <div class="asset-slot-title">${slot.icon} ${slot.label} <span class="asset-dims-inline">📐 upload new variants at ${slot.dims} — the frame is built for this exact ratio, anything else will stretch or crop oddly</span></div>
           ${slot.variants.map(v => `
-            <div class="asset-row">
-              <div class="asset-thumb">${slot.icon}</div>
+            <div class="asset-row ${v.pending?'pending':''}">
+              <div class="asset-thumb">${v.pending ? '⏳' : slot.icon}</div>
               <div class="asset-info">
                 <div class="asset-file">${v.file}</div>
                 <div class="asset-label">${v.label}${v.id==='default' ? ' · built-in, cannot be removed' : ''}</div>
               </div>
+              ${v.pending ? `<div class="asset-status pending">⚠ awaiting upload — assignable now, shows broken until the file lands in the repo <span class="mark-uploaded-link" onclick="markVariantUploaded('${slotId}','${v.id}')">✓ mark as uploaded</span></div>` : ''}
               ${v.id!=='default' ? `<div class="asset-actions"><span class="del" onclick="removeImageVariant('${slotId}','${v.id}')">✕ remove</span></div>` : ''}
             </div>`).join('')}
           <div class="add-link" onclick="openAddVariantPrompt('${slotId}')">+ add a variant to ${slot.label.toLowerCase()}</div>
@@ -3142,9 +3148,20 @@ function openAddVariantPrompt(slotId){
   const defaultFile = slot.variants[0].file;
   const ext = defaultFile.split('.').pop();
   const dir = defaultFile.split('/').slice(0,-1).join('/');
+  // Include the slot id in the generated filename — without this, two
+  // different slots (e.g. background and scene) both getting a variant
+  // named "Light" would collide on the exact same file path, since both
+  // slots' defaults live in the same assets/ directory.
   slot.variants.push({
-    id, label: label.trim(), file: `${dir}/${slug}.${ext}`,
+    id, label: label.trim(), file: `${dir}/${slotId}_${slug}.${ext}`, pending: true,
   });
+  renderAssetsView();
+  scheduleSave();
+}
+
+function markVariantUploaded(slotId, variantId){
+  const variant = IMAGE_VARIANT_SLOTS[slotId].variants.find(v => v.id === variantId);
+  if(variant) delete variant.pending;
   renderAssetsView();
   scheduleSave();
 }
