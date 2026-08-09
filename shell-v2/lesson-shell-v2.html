@@ -1892,6 +1892,11 @@ function openProgressDB() {
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
+    // Without this, a version-bump open request just hangs forever (neither
+    // onsuccess nor onerror fires) if an older tab still has the DB open at
+    // the previous version — reject explicitly instead of leaving every
+    // awaiting caller (saveTierResult, saveSelfAssessment, etc.) stuck.
+    req.onblocked = () => reject(new Error('Progress database is open in another tab — please close other tabs of this lesson and reload.'));
   });
   return _progressDBPromise;
 }
@@ -2036,12 +2041,21 @@ startBtn.addEventListener('click', async () => {
   // not assumed here. This just means state.results is honest from the
   // first render instead of quietly pretending prior sessions never
   // happened, which matters for anything downstream that reads it.
-  const priorResults = await getTierResultsForStudent(state.student);
-  priorResults.forEach(r => {
-    if (state.results[r.moduleIndex]) {
-      state.results[r.moduleIndex][r.tier] = { score: r.score, passed: r.passed };
-    }
-  });
+  // Wrapped in try/catch — if the progress DB is ever unavailable (private
+  // browsing restrictions, storage quota, another tab holding it open),
+  // the lesson should still start rather than leave the student stuck on
+  // the name screen with an unhandled rejection. Losing cross-session
+  // history in that edge case is far better than blocking the lesson.
+  try {
+    const priorResults = await getTierResultsForStudent(state.student);
+    priorResults.forEach(r => {
+      if (state.results[r.moduleIndex]) {
+        state.results[r.moduleIndex][r.tier] = { score: r.score, passed: r.passed };
+      }
+    });
+  } catch (e) {
+    console.warn('Could not restore prior progress — starting fresh this session:', e);
+  }
 
   startModule(0, 'bronze');
 });
@@ -2161,7 +2175,7 @@ function animateStarsReveal(starCount) {
 function handleTierResult(moduleIndex, tier, score) {
   const passed = score >= PASS_THRESHOLD;
   state.results[moduleIndex][tier] = { score, passed };
-  if (state.student) saveTierResult(state.student, moduleIndex, tier, score, passed);
+  if (state.student) saveTierResult(state.student, moduleIndex, tier, score, passed).catch(() => {});
 
   const pct      = Math.round(score * 100);
   const tierName = cap(tier);
@@ -2249,7 +2263,7 @@ function pickSelfAssess(value) {
   document.querySelectorAll('.selfassess-btn').forEach(b => {
     b.classList.toggle('selected', parseInt(b.dataset.val) === value);
   });
-  if (state.student) saveSelfAssessment(state.student, value);
+  if (state.student) saveSelfAssessment(state.student, value).catch(() => {});
 }
 
 function replayModule(i) {
@@ -2719,7 +2733,7 @@ function renderSayItInteraction(container, opts, onDone) {
   if (state.student) {
     getRecordings(state.student, moduleIndex, tier, recordingItemIndex).then(attempts => {
       priorAttempts = attempts;
-    });
+    }).catch(() => {}); // fails safe to "no prior attempts" — matches a genuine first try either way
   }
 
   function finishModelPlayback() {
@@ -2865,7 +2879,7 @@ function renderSayItInteraction(container, opts, onDone) {
               compareSub.textContent = `Recorded ${timeAgo(lastAttempt.timestamp)}`;
               compareCard.style.display = 'flex';
             }
-          });
+          }).catch(() => {});
         }
 
         assessWrap.style.display = 'block';
