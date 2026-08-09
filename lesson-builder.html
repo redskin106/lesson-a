@@ -335,6 +335,7 @@ const MODULES = [
   {id:'buildsentence', name:'Build a Sentence', pool:true, built:true},
   {id:'pyramid', name:'Description Pyramid', pool:true, built:true},
   {id:'imagefeeling', name:'How Does It Feel?', pool:true, built:true},
+  {id:'creativereflection', name:'Reflection Card', pool:true, built:true},
 ];
 
 // ==========================================================================
@@ -469,6 +470,16 @@ function blankImageFeelingData(){
     gold:   { pick:1, items:[blankItem()] },
   };
 }
+function blankCreativeReflectionData(){
+  // Defaults follow the real established pattern (the card grows richer
+  // per tier) rather than three identical single-blank templates — a
+  // sensible starting point an author can rename/reshape, not a blank slate.
+  return {
+    bronze: { pick:1, items:[{ template:'It is a {0}.', blankHints:['thing'] }] },
+    silver: { pick:1, items:[{ template:'It is a {0}, {1}, {2}.', blankHints:['size','shape','colour'] }] },
+    gold:   { pick:1, items:[{ template:'It is a {0}, {1}, {2} with {3}.', blankHints:['size','shape','colour','detail'] }] },
+  };
+}
 
 const BLANK_DATA_BY_MODULE = {
   gapfill: blankGapfillData, spelling: blankSpellingData, truefalse: blankTrueFalseData,
@@ -476,6 +487,7 @@ const BLANK_DATA_BY_MODULE = {
   listenchoose: blankListenChooseData, putinorder: blankPutInOrderData, sayit: blankSayItData,
   picword: blankPicWordData, wordscramble: blankWordScrambleData, buildsentence: blankBuildSentenceData,
   pyramid: blankPyramidData, imagefeeling: blankImageFeelingData,
+  creativereflection: blankCreativeReflectionData,
 };
 
 // ---- "Colors Around Us" — real seed content across every module type, used to test the whole tool end to end ----
@@ -1053,6 +1065,16 @@ function isTierFilled(moduleId, tier, dataOverride){
           return !!it.because_mode;
         });
       }
+      case 'creativereflection': {
+        const d = data[tier];
+        if(!d.items.length) return false;
+        return d.items.every(it => {
+          if(!it.template || !it.template.trim()) return false;
+          const blankMatches = it.template.match(/\{\d+\}/g);
+          if(!blankMatches || blankMatches.length === 0) return false; // must have at least one real blank
+          return true;
+        });
+      }
       default: return false;
     }
   }catch(e){ return false; }
@@ -1265,13 +1287,13 @@ function copyFromBronze(){
 }
 
 function selectModule(id){
-  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0; dpExpandedIndex = 0; itfExpandedIndex = 0;
+  currentModule = id; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0; dpExpandedIndex = 0; itfExpandedIndex = 0; crcExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   document.getElementById('crumbMod').textContent = instanceLabel(id);
   renderSidebar(); renderTierTabs(); renderMain();
 }
 function selectTier(t){
-  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0; dpExpandedIndex = 0; itfExpandedIndex = 0;
+  currentTier = t; compareMode = false; selectedChunkIds = new Set(); gfExpandedIndex = 0; tfExpandedIndex = 0; lcExpandedIndex = 0; pioExpandedIndex = 0; siExpandedIndex = 0; dpExpandedIndex = 0; itfExpandedIndex = 0; crcExpandedIndex = 0;
   document.getElementById('compareBtn').classList.remove('active');
   renderTierTabs(); renderMain();
 }
@@ -1391,6 +1413,8 @@ function renderMain(){
     renderPyramidForm(currentModule);
   } else if(instanceType(currentModule)==='imagefeeling'){
     renderImageFeelingForm(currentModule);
+  } else if(instanceType(currentModule)==='creativereflection'){
+    renderCreativeReflectionForm(currentModule);
   } else {
     editView.innerHTML = `<div class="card stub-card"><b>${mod.name} — not mocked up in this prototype</b>Same sidebar, tier tabs, save/publish, and preview pane would wrap around this module's own form — following whichever shape it uses (fixed 3-item or pooled).</div>`;
   }
@@ -1695,6 +1719,132 @@ function itfSetStimulusType(moduleId, i, val){
 }
 function itfSetTiles(moduleId, i, val){
   md(moduleId)[currentTier].items[i].tiles = val.split(',').map(s=>s.trim()).filter(s=>s);
+  scheduleSave(); updatePreviewLive();
+}
+
+// ---- Creative Reflection Card ----
+let crcExpandedIndex = 0;
+
+function renderCreativeReflectionForm(moduleId){
+  const editView = document.getElementById('editView');
+  const tierData = md(moduleId)[currentTier];
+  const items = tierData.items;
+  if(crcExpandedIndex >= items.length) crcExpandedIndex = Math.max(0, items.length - 1);
+
+  editView.innerHTML = `
+    <div class="card">
+      <div class="pool-header">
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — reflection templates</div>
+        <div class="pool-count">${items.length} in pool</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Items drawn this session (pick)</label>
+        <input type="number" min="1" max="${Math.max(1,items.length)}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;" oninput="crcSetPick('${moduleId}',this.value)">
+      </div>
+    </div>
+    <div class="card" style="background:rgba(79,195,247,0.06);border-color:rgba(79,195,247,0.25);">
+      <div class="hint" style="font-size:12px;color:#93C5FD;">This is a digital companion to the physical reflection card students already write in their notebook — not a replacement for it. The template should match how it grows through the pathway: simpler at Bronze, richer at Gold.</div>
+    </div>
+    <div id="crcItemList">
+      ${items.map((item,i)=>`
+        <div class="card">
+          ${i===crcExpandedIndex ? renderCreativeReflectionItemEditor(moduleId, item, i) : `
+            <div class="pool-header" style="cursor:pointer;" onclick="crcExpandedIndex=${i};renderMain();">
+              <div class="card-label" style="margin-bottom:0;">Item ${i+1} — ${item.template || '(no template set yet)'}</div>
+              ${items.length>1 ? `<span class="del" onclick="event.stopPropagation();crcRemoveItem('${moduleId}',${i})">✕ remove</span>` : ''}
+            </div>
+          `}
+        </div>`).join('')}
+    </div>
+    <div class="add-link" onclick="crcAddItem('${moduleId}')">+ add item to pool</div>
+  `;
+}
+
+function renderCreativeReflectionItemEditor(moduleId, item, i){
+  const blankMatches = (item.template || '').match(/\{(\d+)\}/g) || [];
+  const blankIndices = [...new Set(blankMatches.map(m => parseInt(m.slice(1,-1))))].sort((a,b)=>a-b);
+  const hintsText = (item.blankHints || []).join(', ');
+
+  // Live preview — actually renders the template with hint placeholders,
+  // the same way the shell will, so a mismatched {N} count or a typo shows
+  // up immediately instead of surfacing as a broken card for a student.
+  let previewHtml = (item.template || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  blankIndices.forEach(idx => {
+    const hint = (item.blankHints && item.blankHints[idx]) || '?';
+    previewHtml = previewHtml.split(`{${idx}}`).join(`<span style="color:#4FC3F7;font-weight:700;border-bottom:2px solid #4FC3F7;">${hint}</span>`);
+  });
+  const hintCountMismatch = item.blankHints && blankIndices.length !== item.blankHints.filter(h=>h).length;
+
+  return `
+    <div class="pool-header">
+      <div class="card-label" style="margin-bottom:0;">Item ${i+1}</div>
+      ${crcPoolLength(moduleId)>1 ? `<span class="del" onclick="crcRemoveItem('${moduleId}',${i})">✕ remove</span>` : ''}
+    </div>
+
+    <div class="field" style="margin-top:10px;">
+      <label style="font-size:12px;color:var(--text-lo);">Template — use {0}, {1}, {2}... for each blank</label>
+      <input type="text" value="${(item.template||'').replace(/"/g,'&quot;')}" placeholder="It is a {0}, {1}, {2}." oninput="crcSetTemplate('${moduleId}',${i},this.value)" style="margin-top:4px;">
+    </div>
+    <div class="field" style="margin-top:10px;">
+      <label style="font-size:12px;color:var(--text-lo);">Blank hints — comma-separated, one per blank, in order</label>
+      <input type="text" value="${hintsText}" placeholder="size, shape, colour" oninput="crcSetHints('${moduleId}',${i},this.value)" style="margin-top:4px;">
+      ${hintCountMismatch ? `<div class="hint" style="color:#FBBF24;font-size:11px;margin-top:3px;">⚠ ${blankIndices.length} blank${blankIndices.length===1?'':'s'} in the template, but ${item.blankHints.filter(h=>h).length} hint${item.blankHints.filter(h=>h).length===1?'':'s'} given — check they match.</div>` : ''}
+    </div>
+
+    <div class="field" style="margin-top:14px;">
+      <label style="font-size:12px;color:var(--text-lo);">Live preview</label>
+      <div id="crc-preview-${i}" style="margin-top:6px;padding:10px 14px;background:var(--glass);border:1px solid var(--glass-brd);border-radius:10px;font-size:14px;line-height:1.8;">
+        ${previewHtml || '<span style="color:var(--text-lo);">— type a template above —</span>'}
+      </div>
+    </div>
+  `;
+}
+
+function crcRenderPreview(item){
+  const blankMatches = (item.template || '').match(/\{(\d+)\}/g) || [];
+  const blankIndices = [...new Set(blankMatches.map(m => parseInt(m.slice(1,-1))))].sort((a,b)=>a-b);
+  let previewHtml = (item.template || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  blankIndices.forEach(idx => {
+    const hint = (item.blankHints && item.blankHints[idx]) || '?';
+    previewHtml = previewHtml.split(`{${idx}}`).join(`<span style="color:#4FC3F7;font-weight:700;border-bottom:2px solid #4FC3F7;">${hint}</span>`);
+  });
+  return previewHtml || '<span style="color:var(--text-lo);">— type a template above —</span>';
+}
+
+function crcPoolLength(moduleId){ return md(moduleId)[currentTier].items.length; }
+
+function crcSetPick(moduleId, val){
+  const tierData = md(moduleId)[currentTier];
+  tierData.pick = Math.max(1, Math.min(parseInt(val)||1, tierData.items.length));
+  scheduleSave(); updatePreviewLive();
+}
+function crcAddItem(moduleId){
+  const tierData = md(moduleId)[currentTier];
+  tierData.items.push({ template:'', blankHints:[] });
+  crcExpandedIndex = tierData.items.length - 1;
+  renderMain(); renderSidebar();
+}
+function crcRemoveItem(moduleId, i){
+  const tierData = md(moduleId)[currentTier];
+  if(tierData.items.length<=1) return;
+  tierData.items.splice(i,1);
+  tierData.pick = Math.min(tierData.pick, tierData.items.length);
+  if(crcExpandedIndex>=tierData.items.length) crcExpandedIndex = tierData.items.length-1;
+  renderMain(); renderSidebar();
+}
+function crcSetTemplate(moduleId, i, val){
+  const item = md(moduleId)[currentTier].items[i];
+  item.template = val;
+  const preview = document.getElementById(`crc-preview-${i}`);
+  if(preview) preview.innerHTML = crcRenderPreview(item);
+  scheduleSave(); updatePreviewLive();
+}
+function crcSetHints(moduleId, i, val){
+  const item = md(moduleId)[currentTier].items[i];
+  item.blankHints = val.split(',').map(s=>s.trim());
+  const preview = document.getElementById(`crc-preview-${i}`);
+  if(preview) preview.innerHTML = crcRenderPreview(item);
   scheduleSave(); updatePreviewLive();
 }
 
@@ -2871,6 +3021,7 @@ const MODULE_CATALOG = [
   {id:'buildsentence', name:'Build a Sentence', desc:'Assemble tagged word chunks'},
   {id:'pyramid', name:'Description Pyramid', desc:'Scaffolded three-level description builder'},
   {id:'imagefeeling', name:'How Does It Feel?', desc:'Mascot-mediated subjective response, no wrong answer'},
+  {id:'creativereflection', name:'Reflection Card', desc:'Authorable fill-in-the-blank, grows richer per lesson stage'},
 ];
 
 // Cambridge English Young Learners (Pre-A1 Starters / A1 Movers / A2 Flyers) word
@@ -3765,6 +3916,7 @@ const SHELL_TYPE_MAP = {
   picword:       'image-vocab',
   pyramid:       'description-pyramid',
   imagefeeling:  'image-to-feeling',
+  creativereflection: 'creative-reflection',
 };
 
 // pushedAudioIds: Set of ids (from lessons/{lessonId}/manifest.json, status==='pushed') that
@@ -3869,6 +4021,18 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds){
           stimulusType: it.stimulusType, stimulusValue: it.stimulusValue, stimulusLabel: it.stimulusLabel,
           mascotEmoji: it.mascotEmoji || '👽', mascotName: it.mascotName || 'Zorp',
           tiles: it.tiles || [], because_mode: it.because_mode || 'typed',
+        }))
+      }]));
+
+    case 'creativereflection':
+      // Same reasoning as image-to-feeling — the completed sentence is
+      // built from the student's own typed words at runtime, so there's
+      // nothing fixed to pre-generate audio for. Template and hints pass
+      // through unchanged; the shell does the {n}-placeholder rendering.
+      return Object.fromEntries(TIER_ORDER.map(t => [t, {
+        pick: data[t].pick,
+        items: data[t].items.map(it => ({
+          template: it.template || '', blankHints: it.blankHints || [],
         }))
       }]));
 
