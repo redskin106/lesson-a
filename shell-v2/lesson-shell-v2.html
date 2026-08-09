@@ -597,6 +597,21 @@ html, body {
 .itf-stimulus-label { text-align: center; font-size: 3cqw; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5%; }
 .itf-prompt { text-align: center; font-size: 4.2cqw; font-weight: 600; color: #fff; margin-bottom: 5%; }
 
+/* ── Creative Reflection Card ─────────────────────── */
+.crc-card {
+  background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 16px; padding: 6% 6%; margin-bottom: 5%;
+  font-size: 4.4cqw; line-height: 2.2; color: #fff; text-align: center;
+}
+.crc-blank-input {
+  display: inline-block; width: 20cqw; min-width: 60px; background: rgba(79,195,247,0.12);
+  border: none; border-bottom: 2px solid #4FC3F7; color: #4FC3F7; font-weight: 700;
+  font-size: 4.4cqw; font-family: inherit; text-align: center; padding: 0 1%; margin: 0 1%;
+}
+.crc-blank-input::placeholder { color: rgba(79,195,247,0.4); font-weight: 400; }
+.crc-blank-input:focus { outline: none; background: rgba(79,195,247,0.2); }
+.crc-notebook-note { text-align: center; font-size: 2.9cqw; color: var(--text-dim); font-style: italic; margin-bottom: 5%; }
+
 .dp-sentence-strip {
   position:sticky; bottom:0; background:rgba(13,27,42,0.92); backdrop-filter:blur(6px);
   border-top:1px solid rgba(255,255,255,0.08); border-radius:12px 12px 0 0;
@@ -1763,6 +1778,27 @@ const LESSON = [
         { stimulusType: 'colour', stimulusValue: '#6B7280', stimulusLabel: 'grey',
           mascotEmoji: '👽', mascotName: 'Zorp',
           tiles: ['quiet', 'serious', 'mysterious', 'peaceful'], because_mode: 'typed' },
+      ]}
+    }
+  },
+
+  // ── CREATIVE REFLECTION CARD ────────────────────────
+  // Real templates from the Objects lesson (Stage 1 of the Description
+  // Pathway) — the same card grows richer as the tier grows, matching how
+  // it's actually used in the notebook ritual.
+  {
+    id: 'mod-11',
+    type: 'creative-reflection',
+    label: 'Reflection Card',
+    data: {
+      bronze: { pick: 1, items: [
+        { template: 'It is a {0}.', blankHints: ['thing'] },
+      ]},
+      silver: { pick: 1, items: [
+        { template: 'It is a {0}, {1}, {2}.', blankHints: ['size', 'shape', 'colour'] },
+      ]},
+      gold: { pick: 1, items: [
+        { template: 'It is a {0}, {1}, {2} with {3}.', blankHints: ['size', 'shape', 'colour', 'detail'] },
       ]}
     }
   },
@@ -5103,6 +5139,86 @@ const MODULE_REGISTRY = {
           if (idx < session.length) renderItem();
           else onComplete(1); // no wrong answer possible — completing the session is full credit
         }
+      }
+
+      renderItem();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  CREATIVE REFLECTION CARD
+  //  A digital companion to the physical notebook ritual (written by hand,
+  //  bottom-right of the right-hand page, every lesson) — not a
+  //  replacement for it. The template itself grows richer through the
+  //  Description Pathway (Objects: "It is a ___" -> "___, ___, ___ with
+  //  ___" / People: "He/She looks ___ and ___" / Feelings: "I think it
+  //  feels ___ because ___" / Creative Work: the full 3-line card) — so
+  //  the template is authored per lesson, not fixed in the shell. Purpose
+  //  is an emergency presentation tool: any student who freezes when
+  //  showing their work always has something ready to say. No correctness
+  //  possible — this is the student's own expression, always full credit
+  //  for genuine completion. Chains into the same shared Say It
+  //  interaction used by Description Pyramid and Image-to-Feeling.
+  'creative-reflection': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      let idx = 0;
+
+      function renderItem() {
+        const item = session[idx];
+        const parts = item.template.split(/(\{\d+\})/g);
+        let blankCount = 0;
+
+        document.getElementById('v2-qlabel').textContent = `Item ${idx + 1} of ${session.length}`;
+
+        const cardHtml = parts.map(part => {
+          const match = part.match(/^\{(\d+)\}$/);
+          if (!match) return part.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+          const i = parseInt(match[1]);
+          const hint = (item.blankHints && item.blankHints[i]) || '...';
+          blankCount++;
+          return `<input type="text" class="crc-blank-input" id="crc-blank-${i}" data-idx="${i}" placeholder="${hint}" size="1">`;
+        }).join('');
+
+        container.innerHTML = `
+          <p class="crc-notebook-note">Same as the reflection card in your notebook — fill it in here too.</p>
+          <div class="crc-card" id="crc-card">${cardHtml}</div>
+          <button class="iv-proceed-btn" id="crc-continue-btn" style="display:none;">Continue →</button>
+        `;
+
+        const inputs = [...container.querySelectorAll('.crc-blank-input')];
+        const continueBtn = container.querySelector('#crc-continue-btn');
+
+        function checkAllFilled() {
+          const allFilled = inputs.every(inp => inp.value.trim());
+          continueBtn.style.display = allFilled ? 'block' : 'none';
+        }
+        inputs.forEach(inp => inp.addEventListener('input', () => {
+          // Widen the box to fit what they're typing, never truncating their own words.
+          inp.size = Math.max(inp.placeholder.length, inp.value.length, 4);
+          checkAllFilled();
+        }));
+
+        continueBtn.addEventListener('click', () => {
+          const filled = template => {
+            let result = item.template;
+            inputs.forEach(inp => { result = result.replace(`{${inp.dataset.idx}}`, inp.value.trim()); });
+            return result;
+          };
+          const target = filled();
+
+          container.innerHTML = `<p class="module-question" style="text-align:center;">Now say it:</p><div id="crc-sayit-zone"></div>`;
+          renderSayItInteraction(container.querySelector('#crc-sayit-zone'), {
+            prompt: null, target, audioFile: null, isBronze: tier === 'bronze',
+            moduleIndex: state.currentModuleIndex, tier, recordingItemIndex: idx,
+            allowSkip: true, // this is a rehearsal tool, never force the recording
+          }, () => {
+            idx++;
+            if (idx < session.length) renderItem();
+            else onComplete(1); // no wrong answer possible — genuine completion is full credit
+          });
+        });
       }
 
       renderItem();
