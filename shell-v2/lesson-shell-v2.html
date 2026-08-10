@@ -301,6 +301,29 @@ html, body {
   padding: 18px; cursor: pointer; text-align: center;
 }
 
+/* ─── MY LEARNING JOURNEY ──────────── */
+.journey-empty {
+  text-align: center; padding: 40px 20px; color: var(--text-dim);
+  font-size: 15px; line-height: 1.6;
+}
+.journey-unit { margin-bottom: 24px; }
+.journey-unit-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 10px;
+}
+.journey-lesson-card {
+  background: var(--surface2); border-radius: var(--radius);
+  padding: 14px 16px; margin-bottom: 10px;
+}
+.journey-lesson-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.journey-lesson-bar-track {
+  width: 100%; height: 8px; background: var(--surface); border-radius: 99px; overflow: hidden; margin-bottom: 6px;
+}
+.journey-lesson-bar-fill {
+  height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.4s;
+}
+.journey-lesson-detail { font-size: 12.5px; color: var(--text-dim); }
+
 /* ─── MODULE: AUDIO UNDERSTANDING ──────────── */
 
 .module-title    { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
@@ -1022,6 +1045,7 @@ html, body {
   <p class="welcome-sub">Tap your name to begin.</p>
   <div class="name-grid" id="name-grid"></div>
   <button class="start-btn" id="start-btn">Start →</button>
+  <button class="secondary-btn" id="journey-link-btn-name" style="margin-top:10px;opacity:0.25;pointer-events:none;">📊 My Learning Journey</button>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -1121,7 +1145,21 @@ html, body {
   </div>
   <div class="summary-list" id="summary-list"></div>
   <button class="retry-btn" id="retry-btn" style="display:none">↩ Retry incomplete modules</button>
+  <button class="secondary-btn" id="journey-link-btn" style="margin-bottom:12px;">📊 My Learning Journey</button>
   <button class="done-btn"  id="done-btn">✓ Done</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 5 — MY LEARNING JOURNEY
+     Cross-lesson progress view — reads tierResults across every lesson
+     this student has touched on this device, not just the current one.
+═══════════════════════════════════════════════ -->
+<div id="screen-journey" class="screen">
+  <p class="welcome-label">My Journey</p>
+  <h1 class="welcome-title">📊 Your Progress</h1>
+  <p class="welcome-sub" id="journey-subtitle">Across every lesson you've tried on this device.</p>
+  <div id="journey-content"></div>
+  <button class="secondary-btn" id="journey-back-btn">← Back</button>
 </div>
 
 <script>
@@ -1141,6 +1179,17 @@ const PASS_THRESHOLD = 0.6; // 60% to pass a tier
 // Swapped at publish time alongside LESSON — scopes recordings/tierResults
 // so two different lessons never collide in the same student's local storage.
 const LESSON_ID = 'lesson-shell-v2-debug';
+// Human-readable counterpart to LESSON_ID — swapped at publish time the
+// same way. Needed for the cross-lesson progress view, which shows real
+// lesson titles rather than raw slugs. Falls back to LESSON_ID itself if
+// this debug harness copy is ever used directly without a real swap.
+const LESSON_NAME = 'Lesson Shell v2 (debug)';
+// One of the 8 survival units (Identity, Numbers/Money, Food, Transport,
+// Health, Time, Technology, Work) — swapped at publish time alongside
+// LESSON_ID/LESSON_NAME. Left null for lessons published before this field
+// existed, or for the debug harness — the Journey view buckets those under
+// "Other" rather than breaking or looking confusingly empty.
+const LESSON_UNIT = null;
 
 const LESSON = [
   {
@@ -2027,11 +2076,120 @@ function tierResultKey(student, moduleIndex, tier) {
 }
 async function saveTierResult(student, moduleIndex, tier, score, passed) {
   const key = tierResultKey(student, moduleIndex, tier);
-  await _idbPut('tierResults', { key, student, moduleIndex, tier, score, passed, updatedAt: Date.now() });
+  // lessonId/lessonName are explicit fields here, not just embedded in the
+  // key string — needed so a cross-lesson view can query and group by
+  // lesson without having to parse the key format.
+  await _idbPut('tierResults', { key, student, lessonId: LESSON_ID, lessonName: LESSON_NAME, lessonUnit: LESSON_UNIT, moduleIndex, tier, score, passed, totalModules: LESSON.length, updatedAt: Date.now() });
 }
 async function getTierResultsForStudent(student) {
   return _idbGetAllForStudent('tierResults', `${student}::${LESSON_ID}::`);
 }
+// Genuine cross-lesson query — every tierResults record this student has,
+// from every lesson they've touched on this device, not just this one.
+// Filters by the student field directly rather than key-prefix matching,
+// since a cross-lesson record's key won't share this lesson's LESSON_ID
+// prefix at all.
+async function getAllTierResultsForStudent(student) {
+  return openProgressDB().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction('tierResults', 'readonly');
+    const req = tx.objectStore('tierResults').getAll();
+    req.onsuccess = () => resolve((req.result || []).filter(r => r.student === student));
+    req.onerror = () => reject(req.error);
+  })).catch(() => []);
+}
+
+// The 8 survival units, in curriculum order — "Other" catches lessons
+// published before LESSON_UNIT existed, or ones deliberately left
+// unassigned, so nothing silently disappears from the view.
+const JOURNEY_UNIT_ORDER = ['Identity', 'Numbers & Money', 'Food', 'Transport', 'Health', 'Time', 'Technology', 'Work', 'Other'];
+
+// Groups raw tierResults records into per-lesson, then per-unit summaries.
+// Per lesson: takes the HIGHEST score per module across whichever tiers
+// were attempted (same "best tier reached" logic showEndScreen already
+// uses for a single lesson), then averages across attempted modules.
+function aggregateJourneyData(results) {
+  const byLesson = new Map();
+  results.forEach(r => {
+    if (!byLesson.has(r.lessonId)) {
+      byLesson.set(r.lessonId, {
+        lessonId: r.lessonId, lessonName: r.lessonName || r.lessonId,
+        lessonUnit: r.lessonUnit || 'Other', totalModules: r.totalModules || null,
+        moduleScores: new Map(),
+      });
+    }
+    const entry = byLesson.get(r.lessonId);
+    const existing = entry.moduleScores.get(r.moduleIndex);
+    if (existing === undefined || r.score > existing) entry.moduleScores.set(r.moduleIndex, r.score);
+  });
+
+  const lessons = [...byLesson.values()].map(entry => {
+    const scores = [...entry.moduleScores.values()];
+    const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+    return {
+      lessonId: entry.lessonId,
+      lessonName: entry.lessonName,
+      lessonUnit: entry.lessonUnit,
+      modulesAttempted: scores.length,
+      totalModules: entry.totalModules,
+      avgScorePct: Math.round(avgScore * 100),
+    };
+  });
+
+  const byUnit = new Map();
+  lessons.forEach(l => {
+    if (!byUnit.has(l.lessonUnit)) byUnit.set(l.lessonUnit, []);
+    byUnit.get(l.lessonUnit).push(l);
+  });
+  return byUnit;
+}
+
+function journeyLessonCardHtml(l) {
+  const totalLabel = l.totalModules ? `${l.modulesAttempted} of ${l.totalModules} modules` : `${l.modulesAttempted} modules attempted`;
+  return `
+    <div class="journey-lesson-card">
+      <div class="journey-lesson-name">${l.lessonName}</div>
+      <div class="journey-lesson-bar-track"><div class="journey-lesson-bar-fill" style="width:${l.avgScorePct}%;"></div></div>
+      <div class="journey-lesson-detail">${totalLabel} · ${l.avgScorePct}% average</div>
+    </div>`;
+}
+
+let journeyReturnScreen = 'screen-name';
+
+async function showJourneyScreen(returnTo) {
+  journeyReturnScreen = returnTo || 'screen-name';
+  const content = document.getElementById('journey-content');
+  content.innerHTML = '<p class="journey-empty">Loading…</p>';
+  showScreen('screen-journey');
+
+  if (!state.student) {
+    content.innerHTML = '<p class="journey-empty">Pick your name first to see your journey.</p>';
+    return;
+  }
+
+  let byUnit;
+  try {
+    const results = await getAllTierResultsForStudent(state.student);
+    byUnit = aggregateJourneyData(results);
+  } catch (e) {
+    content.innerHTML = '<p class="journey-empty">Could not load your progress right now.</p>';
+    return;
+  }
+
+  if (byUnit.size === 0) {
+    content.innerHTML = '<p class="journey-empty">You haven\'t started any lessons yet on this device.<br>Come back after your first lesson to see your journey! 🌱</p>';
+    return;
+  }
+
+  content.innerHTML = JOURNEY_UNIT_ORDER
+    .filter(unit => byUnit.has(unit))
+    .map(unit => `
+      <div class="journey-unit">
+        <div class="journey-unit-title">${unit}</div>
+        ${byUnit.get(unit).map(journeyLessonCardHtml).join('')}
+      </div>`)
+    .join('');
+}
+
 async function saveSelfAssessment(student, value) {
   // One rating per student per lesson-completion visit — a private, in-the-moment
   // gut-check (matches the classroom's "three fingers" ritual), never scored or
@@ -2288,6 +2446,7 @@ function showScreen(id) {
 
 const nameGrid = document.getElementById('name-grid');
 const startBtn = document.getElementById('start-btn');
+const journeyLinkBtnName = document.getElementById('journey-link-btn-name');
 
 STUDENTS.forEach(name => {
   const btn = document.createElement('button');
@@ -2298,8 +2457,16 @@ STUDENTS.forEach(name => {
     btn.classList.add('selected');
     state.student = name;
     startBtn.classList.add('ready');
+    journeyLinkBtnName.style.opacity = '1';
+    journeyLinkBtnName.style.pointerEvents = 'auto';
   });
   nameGrid.appendChild(btn);
+});
+
+journeyLinkBtnName.addEventListener('click', () => showJourneyScreen('screen-name'));
+
+document.getElementById('journey-back-btn').addEventListener('click', () => {
+  showScreen(journeyReturnScreen);
 });
 
 startBtn.addEventListener('click', async () => {
@@ -2615,6 +2782,8 @@ function showEndScreen() {
   const retryBtn = document.getElementById('retry-btn');
   retryBtn.style.display = hasIncomplete ? 'block' : 'none';
   retryBtn.onclick = retryFailed;
+
+  document.getElementById('journey-link-btn').onclick = () => showJourneyScreen('screen-end');
 
   document.getElementById('done-btn').onclick = () => {
     resetAll();
