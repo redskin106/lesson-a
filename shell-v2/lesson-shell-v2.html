@@ -972,6 +972,11 @@ html, body {
 
 /* Build a Sentence (v2) */
 .sb-prompt-v2 { color: rgba(255,255,255,0.5); font-size: 3.4cqw; text-align: center; margin-bottom: 4%; }
+.qf-situation-v2 {
+  text-align: center; font-size: 4.4cqw; font-weight: 700; color: #fff;
+  background: rgba(255,213,79,0.1); border: 1.5px solid rgba(255,213,79,0.3);
+  border-radius: 12px; padding: 3% 5%; margin-bottom: 3%;
+}
 .sb-slots-v2 { display: flex; gap: 2%; flex-wrap: wrap; justify-content: center; min-height: 12cqw; margin-bottom: 5%; }
 .sb-slot-v2 {
   min-width: 11%; height: 10cqw; padding: 0 3%;
@@ -1871,6 +1876,30 @@ const LESSON = [
       ]},
       gold: { pick: 1, items: [
         { template: 'It is a {0}, {1}, {2} with {3}.', blankHints: ['size', 'shape', 'colour', 'detail'] },
+      ]}
+    }
+  },
+
+  // ── QUESTION FORMATION ──────────────────────────────
+  {
+    id: 'mod-12',
+    type: 'question-formation',
+    label: 'Ask the Question',
+    data: {
+      bronze: { pick: 1, items: [
+        { situation: "It's 3 o'clock.",
+          tokens: [{text:'What',role:'qword'},{text:'time',role:'object'},{text:'is',role:'verb'},{text:'it',role:'subject'}],
+          distractors: [] },
+      ]},
+      silver: { pick: 1, items: [
+        { situation: 'My name is Sophy.',
+          tokens: [{text:'What',role:'qword'},{text:'is',role:'verb'},{text:'your',role:'subject'},{text:'name',role:'object'}],
+          distractors: ['Where', 'do'] },
+      ]},
+      gold: { pick: 1, items: [
+        { situation: 'I go to school by bus.',
+          tokens: [{text:'How',role:'qword'},{text:'do',role:'verb'},{text:'you',role:'subject'},{text:'go',role:'verb'},{text:'to',role:'place'},{text:'school',role:'place'}],
+          distractors: ['What', 'does', 'is', 'are'] },
       ]}
     }
   },
@@ -5293,6 +5322,171 @@ const MODULE_REGISTRY = {
             slotData = slotData.map(() => null);
             bankData.forEach(t => t.used = false);
             sbLocked = false;
+            refreshSlots(); refreshBank();
+            fb.textContent = 'Try again!';
+            fb.style.color = 'rgba(255,255,255,0.4)';
+          }, 1600);
+        }
+      }
+
+      load();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  QUESTION FORMATION
+  //  "Student generates questions from situations" — shown a stated
+  //  situation (e.g. "It's 3 o'clock."), the student assembles the
+  //  question that would prompt it ("What time is it?"). Reuses Build a
+  //  Sentence's exact proven tile/slot mechanic rather than inventing a
+  //  new one — the one real addition is distractor tiles mixed into the
+  //  bank (more of them at higher tiers), which the existing whole-slot
+  //  check already handles correctly with zero changes needed, since a
+  //  wrongly-placed distractor just naturally fails the text comparison.
+  'question-formation': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      let idx = 0, score = 0, qfLocked = false;
+      let slotData = [], bankData = [];
+
+      const ROLE_COLOR = { qword:'#FFD54F', subject:'#00BCD4', verb:'#8BC34A', object:'#FF9800', place:'#AB47BC', time:'#E91E63' };
+      const roleColor = role => ROLE_COLOR[role] || null;
+
+      function pips() {
+        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+      function questionText(tokens) {
+        return tokens.map(t => t.text).join(' ') + '?';
+      }
+
+      function load() {
+        qfLocked = false;
+        const item = session[idx];
+        slotData = item.tokens.map(() => null);
+        const correctTiles = item.tokens.map((t, i) => ({ ...t, id: `c${i}` }));
+        const distractorTiles = (item.distractors || []).map((d, i) => ({ text: d, role: null, id: `d${i}` }));
+        const withId = [...correctTiles, ...distractorTiles];
+        bankData = safeShuffle(withId, r => r.length > 1 && r.every((t, i) => t.id === withId[i].id))
+          .map(t => ({ ...t, used: false }));
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+        draw();
+      }
+
+      function draw() {
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="qf-pips"></div>
+          <p class="qf-situation-v2" id="qf-situation">${session[idx].situation}</p>
+          <p class="sb-prompt-v2">What's the question?</p>
+          <div class="sb-slots-v2" id="qf-slots"></div>
+          <div class="sb-bank-v2" id="qf-bank"></div>
+          <div class="sb-feedback-v2" id="qf-fb">&nbsp;</div>
+          <button class="iv-proceed-btn" id="qf-next-btn">Next →</button>
+        `;
+        container.querySelector('#qf-pips').innerHTML = pips();
+
+        const slotsEl = container.querySelector('#qf-slots');
+        slotData.forEach((_, si) => {
+          const d = document.createElement('div');
+          d.className = 'sb-slot-v2';
+          d.id = `qf-s-${si}`;
+          d.addEventListener('click', () => qfRemove(si));
+          slotsEl.appendChild(d);
+        });
+        const bankEl = container.querySelector('#qf-bank');
+        bankData.forEach((t, bi) => {
+          const b = document.createElement('button');
+          b.className = 'sb-tile-v2';
+          b.id = `qf-t-${bi}`;
+          b.textContent = t.text;
+          b.addEventListener('click', () => qfTap(bi));
+          bankEl.appendChild(b);
+        });
+        refreshSlots(); refreshBank();
+      }
+
+      function refreshSlots() {
+        slotData.forEach((entry, si) => {
+          const el = document.getElementById(`qf-s-${si}`);
+          if (!el) return;
+          el.textContent = entry ? entry.text : '';
+          el.style.borderColor = entry ? '#7052B4' : 'rgba(255,255,255,0.08)';
+          el.style.background = entry ? 'rgba(112,82,180,0.15)' : 'rgba(255,255,255,0.05)';
+          el.style.color = '#fff';
+        });
+      }
+      function refreshBank() {
+        bankData.forEach((t, bi) => {
+          const el = document.getElementById(`qf-t-${bi}`);
+          if (el) el.classList.toggle('used', t.used);
+        });
+      }
+
+      function qfTap(bi) {
+        if (qfLocked) return;
+        const tile = bankData[bi];
+        if (tile.used) return;
+        const si = slotData.indexOf(null);
+        if (si === -1) return;
+        tile.used = true;
+        slotData[si] = { text: tile.text, role: tile.role, bankId: bi };
+        sfx('tap');
+        refreshSlots(); refreshBank();
+        if (slotData.indexOf(null) === -1) setTimeout(qfCheck, 200);
+      }
+      function qfRemove(si) {
+        if (qfLocked) return;
+        const entry = slotData[si];
+        if (!entry) return;
+        bankData[entry.bankId].used = false;
+        slotData[si] = null;
+        sfx('tap');
+        refreshSlots(); refreshBank();
+      }
+
+      function qfCheck() {
+        const item = session[idx];
+        const ok = slotData.every((e, i) => e.text === item.tokens[i].text);
+        qfLocked = true;
+        if (state.student) {
+          item.tokens.forEach(tk => {
+            if (tk.text) recordWordExposure(state.student, tk.text, 'question-formation', ok).catch(() => {});
+          });
+        }
+        const fb = document.getElementById('qf-fb');
+        const nextBtn = document.getElementById('qf-next-btn');
+
+        if (ok) {
+          score++;
+          slotData.forEach((entry, si) => {
+            const el = document.getElementById(`qf-s-${si}`);
+            if (!el) return;
+            const c = roleColor(entry.role);
+            el.style.borderColor = c || 'rgba(255,255,255,0.3)';
+            el.style.background = c ? c + '26' : 'rgba(255,255,255,0.06)';
+            el.style.color = c || 'rgba(255,255,255,0.6)';
+          });
+          const legendTokens = item.tokens.map(t => ({ t: t.text, r: t.role }));
+          fb.innerHTML = `<div class="sb-legend-v2">${grammarLegend(legendTokens)}</div>`;
+          speak(questionText(item.tokens), 'celebrate');
+          nextBtn.style.display = 'block';
+          nextBtn.onclick = () => {
+            idx++;
+            if (idx < session.length) load();
+            else onComplete(score / session.length);
+          };
+        } else {
+          slotData.forEach((_, si) => {
+            const el = document.getElementById(`qf-s-${si}`);
+            if (el) { el.style.borderColor = '#E91E63'; el.style.background = 'rgba(233,30,99,0.1)'; }
+          });
+          fb.textContent = '✗ Not quite — listen and try again';
+          fb.style.color = '#F48FB1';
+          speak(questionText(item.tokens), 'wrong');
+          setTimeout(() => {
+            slotData = slotData.map(() => null);
+            bankData.forEach(t => t.used = false);
+            qfLocked = false;
             refreshSlots(); refreshBank();
             fb.textContent = 'Try again!';
             fb.style.color = 'rgba(255,255,255,0.4)';
