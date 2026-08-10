@@ -5156,7 +5156,14 @@ function loadPersistedState(){
 
   if(saved.currentLessonId && LESSONS.some(l => l.id === saved.currentLessonId)){
     currentLessonId = saved.currentLessonId;
-    currentModule = saved.currentModule || 'gapfill';
+    const restoredLesson = LESSONS.find(l => l.id === currentLessonId);
+    // Only trust the saved module if it's actually still part of this lesson —
+    // a mismatch here (stale reference, lesson edited since last save, etc.)
+    // would otherwise crash renderMain() immediately on load, before any
+    // user action, trying to read data for a module the lesson doesn't have.
+    currentModule = (saved.currentModule && restoredLesson.modules.includes(saved.currentModule))
+      ? saved.currentModule
+      : (restoredLesson.modules[0] || 'gapfill');
     currentTier = saved.currentTier || 'bronze';
   }
   persistLastSavedAt = new Date(saved.savedAt);
