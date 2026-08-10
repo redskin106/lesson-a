@@ -1903,6 +1903,24 @@ const LESSON = [
       ]}
     }
   },
+
+  // ── PHONICS ──────────────────────────────────────────
+  {
+    id: 'mod-13',
+    type: 'phonics',
+    label: 'Sound It Out',
+    data: {
+      bronze: { pick: 1, items: [
+        { word: 'cat', emoji: '🐱', tokens: [{t:'The',r:'connector'},{t:'cat',r:'subject'},{t:'is',r:'verb'},{t:'small',r:'object'}] },
+      ]},
+      silver: { pick: 1, items: [
+        { word: 'ship', emoji: '🚢', tokens: [{t:'The',r:'connector'},{t:'ship',r:'subject'},{t:'is',r:'verb'},{t:'big',r:'object'}] },
+      ]},
+      gold: { pick: 1, items: [
+        { word: 'three', emoji: '3️⃣', tokens: [{t:'I',r:'subject'},{t:'have',r:'verb'},{t:'three',r:'object'},{t:'books',r:'object'}] },
+      ]}
+    }
+  },
 ];
 
 // ══════════════════════════════════════════════════
@@ -5490,6 +5508,190 @@ const MODULE_REGISTRY = {
             refreshSlots(); refreshBank();
             fb.textContent = 'Try again!';
             fb.style.color = 'rgba(255,255,255,0.4)';
+          }, 1600);
+        }
+      }
+
+      load();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  PHONICS
+  //  "Each letter tile speaks its letter aloud when tapped — distinct from
+  //  Word Scramble, which speaks only the completed word." A tight variant
+  //  of Word Scramble's exact mechanic (same slots/bank/hint pattern),
+  //  with one real addition: every tile speaks its own letter name the
+  //  moment it's placed, addressing the sound-discrimination gap flagged
+  //  for Vietnamese students specifically. The whole-word play button
+  //  stays too — this adds letter-level audio, it doesn't replace the
+  //  word-level audio Word Scramble already has.
+  'phonics': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = biasedSelect(items, pick, it => it.word);
+      let idx = 0, score = 0, slotData = [], bankData = [], pnLocked = false;
+
+      const PALETTE = [
+        { border:'#00BCD4', bg:'rgba(0,188,212,.15)' },
+        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
+        { border:'#FF9800', bg:'rgba(255,152,0,.15)' },
+        { border:'#E91E63', bg:'rgba(233,30,99,.15)' }
+      ];
+      function itemColor() { return PALETTE[idx % PALETTE.length]; }
+
+      function pips() {
+        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+
+      function load() {
+        pnLocked = false;
+        const item = session[idx];
+        const letters = item.word.toUpperCase().split('');
+        slotData = letters.map(() => null);
+        const wordUp = item.word.toUpperCase();
+        bankData = safeShuffle(letters, r => r.join('') === wordUp).map((l, i) => ({ letter: l, id: i, used: false }));
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+        draw();
+      }
+
+      function draw() {
+        const item = session[idx];
+        const hasClue = !!findContextClue(item.word, item.tokens);
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="pn-pips"></div>
+          ${hasClue ? '<button class="precheck-hint-btn" id="pn-hint-btn">💡 Hint</button><p class="ws-feedback-v2" id="pn-clue" style="display:none;"></p>' : ''}
+          <div class="ws-visual-v2">
+            <div class="ws-emoji-v2">${item.emoji}</div>
+            <button class="ws-play-btn-v2" id="pn-play-btn">🔊</button>
+          </div>
+          <div class="ws-slots-v2" id="pn-slots"></div>
+          <div class="ws-bank-v2" id="pn-bank"></div>
+          <p class="ws-feedback-v2" id="pn-fb">&nbsp;</p>
+        `;
+        container.querySelector('#pn-pips').innerHTML = pips();
+
+        if (hasClue) {
+          const hintBtn = container.querySelector('#pn-hint-btn');
+          hintBtn.addEventListener('click', () => {
+            const clue = findContextClue(item.word, item.tokens);
+            const clueEl = container.querySelector('#pn-clue');
+            clueEl.innerHTML = `Clue: <span class="gf-context-clue">${clue}</span>`;
+            clueEl.style.display = 'block';
+            hintBtn.disabled = true;
+            hintBtn.textContent = '💡 Hint used';
+          }, { once: true });
+        }
+
+        const pnSlots = container.querySelector('#pn-slots');
+        slotData.forEach((_, si) => {
+          const d = document.createElement('div');
+          d.className = 'ws-slot-v2';
+          d.id = `pn-s-${si}`;
+          d.addEventListener('click', () => pnRemove(si));
+          pnSlots.appendChild(d);
+        });
+
+        const pnBank = container.querySelector('#pn-bank');
+        bankData.forEach((t, bi) => {
+          const b = document.createElement('button');
+          b.className = 'ws-tile-v2';
+          b.id = `pn-t-${bi}`;
+          b.textContent = t.letter;
+          b.addEventListener('click', () => pnTap(bi));
+          pnBank.appendChild(b);
+        });
+
+        container.querySelector('#pn-play-btn').addEventListener('click', () => {
+          speak(item.word, 'neutral');
+        });
+
+        refreshSlots(); refreshBank();
+      }
+
+      function refreshSlots() {
+        const c = itemColor();
+        slotData.forEach((entry, si) => {
+          const el = document.getElementById(`pn-s-${si}`);
+          if (!el) return;
+          el.textContent = entry ? entry.letter : '';
+          el.style.borderColor = entry ? c.border : 'rgba(255,255,255,0.08)';
+          el.style.background = entry ? c.bg : 'rgba(255,255,255,0.05)';
+          el.style.color = entry ? c.border : '#fff';
+        });
+      }
+      function refreshBank() {
+        bankData.forEach((t, bi) => {
+          const el = document.getElementById(`pn-t-${bi}`);
+          if (el) el.classList.toggle('used', t.used);
+        });
+      }
+
+      function pnTap(bi) {
+        if (pnLocked) return;
+        const tile = bankData[bi];
+        if (tile.used) return;
+        const si = slotData.indexOf(null);
+        if (si === -1) return;
+        tile.used = true;
+        slotData[si] = { letter: tile.letter, bankId: bi };
+        sfx('tap');
+        // The one real differentiator from Word Scramble — every tile
+        // speaks its own letter the moment it's placed, not just the
+        // completed word at the end.
+        speak(tile.letter, 'neutral');
+        refreshSlots(); refreshBank();
+        if (slotData.indexOf(null) === -1) setTimeout(pnCheck, 200);
+      }
+      function pnRemove(si) {
+        if (pnLocked) return;
+        const entry = slotData[si];
+        if (!entry) return;
+        bankData[entry.bankId].used = false;
+        slotData[si] = null;
+        sfx('tap');
+        refreshSlots(); refreshBank();
+      }
+
+      function pnCheck() {
+        const item = session[idx];
+        const attempt = slotData.map(e => e.letter).join('').toLowerCase();
+        const ok = attempt === item.word.toLowerCase();
+        pnLocked = true;
+        if (state.student) recordWordExposure(state.student, item.word, 'phonics', ok).catch(() => {});
+        const c = itemColor();
+        const fb = document.getElementById('pn-fb');
+
+        slotData.forEach((_, si) => {
+          const el = document.getElementById(`pn-s-${si}`);
+          if (el) {
+            el.style.borderColor = ok ? c.border : '#E91E63';
+            el.style.background = ok ? c.bg : 'rgba(233,30,99,0.12)';
+            el.style.color = ok ? c.border : '#F48FB1';
+          }
+        });
+
+        if (ok) {
+          score++;
+          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
+          speak(item.word, 'celebrate');
+          setTimeout(() => {
+            const plainSentence = item.tokens.map(t => t.t).join(' ');
+            showGrammarReinforce(item.tokens, plainSentence, () => {
+              idx++;
+              if (idx < session.length) load();
+              else onComplete(score / session.length);
+            });
+          }, 700);
+        } else {
+          if (fb) { fb.textContent = '✗ Not quite — try again'; fb.style.color = '#F48FB1'; }
+          speak(item.word, 'wrong');
+          setTimeout(() => {
+            slotData = slotData.map(() => null);
+            bankData.forEach(t => t.used = false);
+            pnLocked = false;
+            refreshSlots(); refreshBank();
+            if (fb) { fb.textContent = 'Try again!'; fb.style.color = 'rgba(255,255,255,0.4)'; }
           }, 1600);
         }
       }
