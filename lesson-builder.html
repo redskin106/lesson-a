@@ -1267,7 +1267,13 @@ function renderTierTabs(){
   const copyBtn = document.getElementById('copyTierBtn');
   if(copyBtn){
     const isSharedPool = instanceType(currentModule) === 'memorypairs' || instanceType(currentModule) === 'picword';
-    if(currentTier === 'bronze' || compareMode || currentModule === '__vocabulary__' || currentModule === '__visuals__'){
+    // Pyramid and Reflection Card deliberately have a richer structure at
+    // higher tiers (Pyramid's L2/L3 groups, Reflection Card's multi-blank
+    // templates) — Bronze is intentionally minimal for both, so "copying
+    // Bronze in" would silently wipe out real content someone already
+    // built at Silver/Gold rather than give a useful starting point.
+    const tierAsymmetric = instanceType(currentModule) === 'pyramid' || instanceType(currentModule) === 'creativereflection';
+    if(currentTier === 'bronze' || compareMode || currentModule === '__vocabulary__' || currentModule === '__visuals__' || tierAsymmetric){
       copyBtn.style.display = 'none';
     } else {
       copyBtn.style.display = 'inline-block';
@@ -1281,6 +1287,10 @@ function renderTierTabs(){
 function copyFromBronze(){
   const data = md(currentModule);
   if(!data) return;
+  // Matches renderTierTabs' button-hiding logic — guarded here too so this
+  // can never run for these two types regardless of how it gets triggered,
+  // not just when the button happens to be visible.
+  if(instanceType(currentModule) === 'pyramid' || instanceType(currentModule) === 'creativereflection') return;
   data[currentTier] = JSON.parse(JSON.stringify(data.bronze));
   if(instanceType(currentModule) === 'buildsentence') bsActiveItemIndex = null;
   renderMain();
