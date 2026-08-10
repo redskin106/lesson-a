@@ -259,6 +259,33 @@ html, body {
 .selfassess-btn .label { font-size: 11px; color: var(--text-dim); }
 .selfassess-btn.selected { border-color: var(--accent); background: rgba(79,195,247,0.1); }
 
+.vocab-review-summary { margin-bottom: 16px; }
+.vocab-review-line {
+  background: var(--surface2); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius);
+  padding: 12px 16px; font-size: 14px; font-weight: 600; color: var(--text);
+  cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+}
+.vocab-review-line::after { content: '▾'; color: var(--text-dim); font-size: 12px; }
+.vocab-review-line.open::after { content: '▴'; }
+.vocab-review-panel {
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius); padding: 10px 16px 14px;
+}
+.vocab-review-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); gap: 8px;
+}
+.vocab-review-row:last-of-type { border-bottom: none; }
+.vocab-review-word { font-size: 13px; color: var(--text); font-weight: 600; flex: 1; }
+.vocab-review-status { font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+.vocab-review-adjust { display: flex; gap: 4px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); }
+.vocab-adjust-btn {
+  flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+  padding: 5px 4px; font-size: 10.5px; color: var(--text-dim); cursor: pointer; font-family: inherit;
+}
+.vocab-adjust-btn:active { background: rgba(255,255,255,0.12); }
+.vocab-adjust-btn.applied { color: var(--pass); border-color: var(--pass); }
+
 .retry-btn {
   display: block; width: 100%;
   background: transparent; color: var(--text);
@@ -1083,6 +1110,10 @@ html, body {
       <button class="selfassess-btn" data-val="3" onclick="pickSelfAssess(3)"><span class="emoji">😄</span><span class="label">Easy</span></button>
     </div>
   </div>
+  <div class="vocab-review-summary" id="vocab-review-summary" style="display:none;">
+    <div class="vocab-review-line" id="vocab-review-line" onclick="toggleVocabReviewPanel()"></div>
+    <div class="vocab-review-panel" id="vocab-review-panel" style="display:none;"></div>
+  </div>
   <div class="summary-list" id="summary-list"></div>
   <button class="retry-btn" id="retry-btn" style="display:none">↩ Retry incomplete modules</button>
   <button class="done-btn"  id="done-btn">✓ Done</button>
@@ -1864,7 +1895,7 @@ const LESSON = [
 //                      never needs an IndexedDB version-bump migration
 // ══════════════════════════════════════════════════
 const PROGRESS_DB_NAME = 'efl-progress';
-const PROGRESS_DB_VERSION = 2; // bumped to add selfAssessments — IndexedDB only runs onupgradeneeded on a version increase
+const PROGRESS_DB_VERSION = 3; // bumped to add sessionTracker for spaced repetition — IndexedDB only runs onupgradeneeded on a version increase
 let _progressDBPromise = null;
 
 function openProgressDB() {
@@ -1889,6 +1920,7 @@ function openProgressDB() {
       if (!db.objectStoreNames.contains('tierResults'))   db.createObjectStore('tierResults',   { keyPath: 'key' });
       if (!db.objectStoreNames.contains('wordExposure'))   db.createObjectStore('wordExposure',   { keyPath: 'key' });
       if (!db.objectStoreNames.contains('selfAssessments'))   db.createObjectStore('selfAssessments',   { keyPath: 'key' });
+      if (!db.objectStoreNames.contains('sessionTracker'))   db.createObjectStore('sessionTracker',   { keyPath: 'key' });
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -1959,6 +1991,200 @@ async function saveSelfAssessment(student, value) {
   // graded, kept separate from tierResults on purpose.
   const key = `${student}::${LESSON_ID}::${Date.now()}`;
   await _idbPut('selfAssessments', { key, student, value, updatedAt: Date.now() });
+}
+
+// ═══════════════════════════════════════════════════════
+//  SPACED REPETITION / VOCABULARY RECYCLING
+//  Leitner box system, session-based (not calendar-based) intervals —
+//  see SPACED_REPETITION_SPEC.md. wordExposure and sessionTracker are both
+//  deliberately NOT lesson-scoped (no LESSON_ID in their keys, unlike
+//  tierResults/recordings) — word mastery genuinely generalizes across
+//  lessons, so it shouldn't reset just because a student opened a
+//  different lesson. Both stores live in the same shared IndexedDB
+//  database, and every published lesson shares one origin (GitHub Pages),
+//  so this cross-lesson persistence works correctly in practice.
+// ═══════════════════════════════════════════════════════
+
+function normalise(word) {
+  return (word || '').toString().trim().toLowerCase();
+}
+
+// Box -> sessions until due again. Box 5 has no interval — it's retired
+// from active rotation (nextDue stays null).
+const LEITNER_INTERVALS = { 1: 1, 2: 2, 3: 4, 4: 8 };
+
+function wordExposureKey(student, normalisedWord) {
+  return `${student}::${normalisedWord}`;
+}
+
+// One increment per genuine "app open + completed at least one exercise"
+// event, never per question. sessionCounted is a plain module-scope
+// variable, so it can only ever be true once per real page load — exactly
+// matching the spec's definition of a session.
+let sessionCounted = false;
+let _cachedSessionNumber = null;
+
+async function ensureSessionCounted(student) {
+  if (sessionCounted) return;
+  sessionCounted = true;
+  const key = `session::${student}`;
+  const existing = await _idbGet('sessionTracker', key);
+  const newSession = (existing ? existing.currentSession : 0) + 1;
+  _cachedSessionNumber = newSession;
+  await _idbPut('sessionTracker', { key, student, currentSession: newSession, updatedAt: Date.now() });
+}
+
+// Records one exposure (correct or miss) for a single word, creating the
+// record on first encounter. Safe to call with any raw (non-normalised)
+// word string — normalises internally.
+// Tracks every word touched THIS session, for the completion screen's
+// "N words reviewed today" panel. Populated as a side effect of
+// recordWordExposure — one source of truth, not duplicated at each of the
+// 9 module call sites. wasNew distinguishes a genuine first encounter
+// (no meaningful "before" box to show) from a real box transition.
+let sessionReviewedWords = new Map(); // word -> { beforeBox, afterBox, wasNew, lastCorrect }
+
+async function recordWordExposure(student, rawWord, moduleType, correct) {
+  const word = normalise(rawWord);
+  if (!word) return null;
+  await ensureSessionCounted(student);
+  const currentSession = _cachedSessionNumber || 1;
+  const key = wordExposureKey(student, word);
+
+  let record = await _idbGet('wordExposure', key);
+  const wasNew = !record;
+  if (!record) {
+    record = { key, student, word, box: 1, exposures: 0, misses: 0, lastSeen: Date.now(), nextDue: currentSession + 1, sourceModules: [] };
+  }
+  const beforeBox = record.box;
+
+  if (correct) {
+    if (record.box < 5) record.box += 1;
+    record.exposures += 1;
+  } else {
+    record.box = 1;
+    record.misses += 1;
+  }
+  record.lastSeen = Date.now();
+  record.nextDue = record.box === 5 ? null : currentSession + LEITNER_INTERVALS[record.box];
+  if (!record.sourceModules.includes(moduleType)) record.sourceModules.push(moduleType);
+
+  await _idbPut('wordExposure', record);
+  sessionReviewedWords.set(word, { beforeBox, afterBox: record.box, wasNew, lastCorrect: correct });
+  return record;
+}
+
+// Manual self-assessment adjustment — the spec's escape valve for
+// miscalibration. "I know this" moves a word up one box even without
+// another correct exercise attempt; "still learning" drops it straight to
+// Box 1. Both update sessionReviewedWords too, so the completion panel
+// reflects the adjustment immediately rather than showing stale numbers.
+async function manuallyAdjustWord(student, rawWord, direction) {
+  const word = normalise(rawWord);
+  if (!word) return null;
+  const currentSession = _cachedSessionNumber || 1;
+  const key = wordExposureKey(student, word);
+
+  let record = await _idbGet('wordExposure', key);
+  if (!record) return null; // nothing to adjust if it was never actually recorded
+  const beforeBox = record.box;
+
+  if (direction === 'up') {
+    if (record.box < 5) record.box += 1;
+  } else {
+    record.box = 1;
+  }
+  record.lastSeen = Date.now();
+  record.nextDue = record.box === 5 ? null : currentSession + LEITNER_INTERVALS[record.box];
+
+  await _idbPut('wordExposure', record);
+  const existing = sessionReviewedWords.get(word);
+  sessionReviewedWords.set(word, { beforeBox: existing ? existing.beforeBox : beforeBox, afterBox: record.box, wasNew: existing ? existing.wasNew : false, lastCorrect: direction === 'up' });
+  return record;
+}
+
+// Word passport integration — box number drives tick status automatically,
+// no separate field needed. No digital passport screen exists yet (it's
+// currently a physical notebook card per the classroom ritual), so this is
+// the ready-to-use mapping for whenever one gets built, not wired into any
+// UI on its own.
+function passportTickForBox(box) {
+  if (box >= 5) return '✓✓'; // mastered
+  if (box === 4) return '✓';  // confident
+  return '';                  // still learning, unmarked
+}
+
+// Whole-lesson exposure cache — loaded once when the student clicks Start,
+// not per-module. This keeps every module's own item-selection logic
+// synchronous (unchanged in shape from before), instead of needing every
+// render() function across the whole registry to become async-aware just
+// to draw its session's items.
+let wordExposureCache = new Map();
+
+// Central word-field mapping for cache population only — uses each
+// module's REAL data shape as actually implemented in this shell, not the
+// spec's shorthand field names (e.g. Word Match has no 'answer' field at
+// all, it uses left/right — 'left' is the real target word there).
+function extractLessonTrackableWords() {
+  const words = new Set();
+  LESSON.forEach(mod => {
+    ['bronze', 'silver', 'gold'].forEach(t => {
+      const tierData = mod.data && mod.data[t];
+      if (!tierData || !tierData.items) return;
+      tierData.items.forEach(it => {
+        if (mod.type === 'sentence-building') {
+          (it.tokens || []).forEach(tk => { if (tk.text) words.add(normalise(tk.text)); });
+        } else if (mod.type === 'description-pyramid') {
+          if (it.l1 && it.l1.answer) words.add(normalise(it.l1.answer));
+          (it.l2 || []).forEach(g => { if (g.answer) words.add(normalise(g.answer)); });
+        } else if (mod.type === 'word-match') {
+          if (it.left) words.add(normalise(it.left));
+        } else if (mod.type === 'gap-fill' || mod.type === 'audio-understanding') {
+          if (it.answer) words.add(normalise(it.answer));
+        } else if (mod.type === 'memory-pairs' || mod.type === 'image-vocab' || mod.type === 'spelling' || mod.type === 'word-scramble') {
+          if (it.word) words.add(normalise(it.word));
+        }
+      });
+    });
+  });
+  return [...words];
+}
+
+async function loadWordExposureCache(student) {
+  wordExposureCache = new Map();
+  const words = extractLessonTrackableWords();
+  await Promise.all(words.map(async word => {
+    const rec = await _idbGet('wordExposure', wordExposureKey(student, word));
+    if (rec) wordExposureCache.set(word, rec);
+  }));
+}
+
+// Drop-in replacement for the safeShuffle(items,()=>false).slice(0,pick)
+// pattern every module currently uses to draw its session. getWordFn lets
+// each module supply its own accessor for "the word this item tests",
+// since that varies by module shape. Falls back to the exact original
+// random behaviour whenever the cache isn't populated (debug-harness
+// direct module jumps skip the Start flow entirely, and a brand new
+// device naturally starts with an empty cache) — recycling is purely
+// additive, never a requirement for a module to function.
+function biasedSelect(items, pick, getWordFn) {
+  if (wordExposureCache.size === 0) {
+    return safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+  }
+  const currentSession = _cachedSessionNumber || 1;
+  const scored = items.map(item => {
+    const word = normalise(getWordFn(item));
+    const rec = word ? wordExposureCache.get(word) : null;
+    const box = rec ? rec.box : 0; // never-seen words get top priority
+    const isDue = rec ? (rec.nextDue !== null && currentSession >= rec.nextDue) : true;
+    return { item, box, isDue, _tiebreak: Math.random() };
+  });
+  scored.sort((a, b) => {
+    if (a.isDue !== b.isDue) return a.isDue ? -1 : 1;
+    if (a.box !== b.box) return a.box - b.box;
+    return a._tiebreak - b._tiebreak;
+  });
+  return scored.slice(0, Math.min(pick, items.length)).map(s => s.item);
 }
 
 function timeAgo(timestamp) {
@@ -2055,6 +2281,17 @@ startBtn.addEventListener('click', async () => {
     });
   } catch (e) {
     console.warn('Could not restore prior progress — starting fresh this session:', e);
+  }
+
+  // Loaded once here, not per-module — every module's own item-selection
+  // stays synchronous. Same fail-safe reasoning as above: if this fails,
+  // biasedSelect() naturally falls back to plain random selection (an
+  // empty cache is exactly its "no exposure data" case), so recycling
+  // just doesn't happen this session rather than blocking the lesson.
+  try {
+    await loadWordExposureCache(state.student);
+  } catch (e) {
+    console.warn('Could not load vocabulary recycling data — continuing without it this session:', e);
   }
 
   startModule(0, 'bronze');
@@ -2326,6 +2563,8 @@ function showEndScreen() {
     summaryList.appendChild(item);
   });
 
+  renderVocabReviewSummary();
+
   const retryBtn = document.getElementById('retry-btn');
   retryBtn.style.display = hasIncomplete ? 'block' : 'none';
   retryBtn.onclick = retryFailed;
@@ -2337,6 +2576,72 @@ function showEndScreen() {
 
   showScreen('screen-end');
 }
+
+function vocabReviewStatusText(entry) {
+  const { beforeBox, afterBox, wasNew } = entry;
+  if (wasNew && afterBox === 1) return '🆕 New word';
+  if (wasNew) return `⬆ New → Box ${afterBox}`;
+  if (beforeBox < afterBox) return `⬆ Box ${beforeBox} → Box ${afterBox}`;
+  if (beforeBox > afterBox) return `↓ Box ${beforeBox} → Box ${afterBox}`;
+  return afterBox >= 5 ? '✓✓ Box 5 (mastered)' : `Box ${afterBox}`;
+}
+
+function renderVocabReviewSummary() {
+  const wrap = document.getElementById('vocab-review-summary');
+  const line = document.getElementById('vocab-review-line');
+  const panel = document.getElementById('vocab-review-panel');
+  const words = [...sessionReviewedWords.entries()];
+
+  if (words.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  line.textContent = `📚 ${words.length} word${words.length === 1 ? '' : 's'} reviewed today`;
+  line.classList.remove('open');
+  panel.style.display = 'none';
+
+  panel.innerHTML = words.map(([word, entry]) => `
+    <div class="vocab-review-row-wrap">
+      <div class="vocab-review-row" onclick="toggleVocabAdjustRow('${word}')">
+        <span class="vocab-review-word">${word}</span>
+        <span class="vocab-review-status">${vocabReviewStatusText(entry)}</span>
+      </div>
+      <div class="vocab-review-adjust" id="vocab-adjust-${word}" style="display:none;">
+        <button class="vocab-adjust-btn" onclick="event.stopPropagation(); applyVocabAdjust('${word}','up',this)">I know this</button>
+        <button class="vocab-adjust-btn" onclick="event.stopPropagation(); applyVocabAdjust('${word}','down',this)">Still learning</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleVocabReviewPanel() {
+  const line = document.getElementById('vocab-review-line');
+  const panel = document.getElementById('vocab-review-panel');
+  const opening = panel.style.display === 'none';
+  panel.style.display = opening ? 'block' : 'none';
+  line.classList.toggle('open', opening);
+}
+
+function toggleVocabAdjustRow(word) {
+  const el = document.getElementById(`vocab-adjust-${word}`);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+}
+
+async function applyVocabAdjust(word, direction, btnEl) {
+  if (!state.student) return;
+  try {
+    const record = await manuallyAdjustWord(state.student, word, direction);
+    if (!record) return;
+    btnEl.classList.add('applied');
+    btnEl.textContent = direction === 'up' ? '✓ Marked known' : '✓ Marked learning';
+    const row = btnEl.closest('.vocab-review-row-wrap').querySelector('.vocab-review-status');
+    if (row) row.textContent = direction === 'up' ? `⬆ moved to Box ${record.box}` : `↓ reset to Box 1`;
+  } catch (e) {
+    console.warn('Could not apply manual vocabulary adjustment:', e);
+  }
+}
+
 
 function retryFailed() {
   const idx = state.results.findIndex(r => !r.complete);
@@ -2350,6 +2655,10 @@ function resetAll() {
   state.student = null;
   state.results = buildResults();
   state.replayMode = false;
+  sessionReviewedWords = new Map();
+  sessionCounted = false;
+  _cachedSessionNumber = null;
+  wordExposureCache = new Map();
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   startBtn.classList.remove('ready');
 }
@@ -3001,7 +3310,7 @@ const MODULE_REGISTRY = {
   'audio-understanding': {
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
-      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const session = biasedSelect(items, pick, it => it.answer);
       const isBronze = tier === 'bronze';
       const isGold = tier === 'gold';
       let idx = 0, totalScore = 0;
@@ -3125,6 +3434,7 @@ const MODULE_REGISTRY = {
           if (window.speechSynthesis) window.speechSynthesis.cancel();
 
           const correct = (selected.textContent === answer);
+          if (state.student) recordWordExposure(state.student, answer, 'audio-understanding', correct).catch(() => {});
           optionsGrid.querySelectorAll('.lc-option-btn-v2').forEach(b => { b.dataset.done = '1'; b.style.pointerEvents = 'none'; });
           if (correct) totalScore++;
           checkBtn.style.display = 'none';
@@ -3170,7 +3480,7 @@ const MODULE_REGISTRY = {
     // "it's an object," but this needs no new content to work today.
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
-      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const session = biasedSelect(items, pick, it => it.answer);
       let idx = 0, totalScore = 0;
 
       const PALETTE = [
@@ -3303,6 +3613,7 @@ const MODULE_REGISTRY = {
             locked = true;
             checkBtn.disabled = true;
             sfx('correct');
+            if (state.student) recordWordExposure(state.student, answer, 'gap-fill', true).catch(() => {});
             const score = SCORE_BY_HINT_LEVEL[hintLevel];
             const stars = STARS_BY_HINT_LEVEL[hintLevel];
             totalScore += score;
@@ -3335,6 +3646,7 @@ const MODULE_REGISTRY = {
             markPillWrong(selected);
             hintLevel = Math.min(hintLevel + 1, 3);
             sfx('wrong');
+            if (state.student) recordWordExposure(state.student, answer, 'gap-fill', false).catch(() => {});
 
             let eliminatedWord = null;
             let secondClueShown = false;
@@ -3504,7 +3816,7 @@ const MODULE_REGISTRY = {
   'word-match': {
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
-      const pairs = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const pairs = biasedSelect(items, pick, it => it.left);
       const total = pairs.length;
       const isBronze = (tier === 'bronze');
 
@@ -3589,6 +3901,12 @@ const MODULE_REGISTRY = {
         });
 
         if (pairings.size === total) {
+          if (state.student) {
+            pairings.forEach((rightIdx, leftIdx) => {
+              const word = pairs[leftIdx] && pairs[leftIdx].left;
+              if (word) recordWordExposure(state.student, word, 'word-match', rightIdx === leftIdx).catch(() => {});
+            });
+          }
           if (checkAllCorrect()) {
             confirmed = true;
             sfx('correct');
@@ -3908,7 +4226,7 @@ const MODULE_REGISTRY = {
     // full sentence — `sentence` already contains the ___ blank.
     render(container, data, tier, onComplete) {
       const { pick, mode, items } = data;
-      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const session = biasedSelect(items, pick, it => it.word);
       let idx = 0, score = 0, locked = false, selected = null;
 
       function pips() {
@@ -4012,6 +4330,7 @@ const MODULE_REGISTRY = {
           if (!selected || locked) return;
           locked = true;
           const ok = selected.val === selected.ans;
+          if (state.student) recordWordExposure(state.student, selected.ans, 'image-vocab', ok).catch(() => {});
           if (ok) score++;
           const feedback = container.querySelector('#iv-feedback');
           feedback.textContent = ok ? '✓ Correct!' : '✗ See the right answer';
@@ -4060,8 +4379,8 @@ const MODULE_REGISTRY = {
   'memory-pairs': {
     render(container, data, tier, onComplete) {
       const { pick, flipback, items } = data;
-      const PAIRS = Math.min(pick, items.length);
-      const picked = safeShuffle(items, ()=>false).slice(0, PAIRS);
+      const picked = biasedSelect(items, pick, it => it.word);
+      const PAIRS = picked.length;
       const deckSrc = [
         ...picked.map((it,i)=>({...it, kind:'image', pid:i})),
         ...picked.map((it,i)=>({...it, kind:'word',  pid:i})),
@@ -4151,6 +4470,16 @@ const MODULE_REGISTRY = {
         const [a, b] = flipped;
         const ca = deck[a], cb = deck[b];
         const isMatch = ca.pid === cb.pid && ca.kind !== cb.kind;
+        if (state.student) {
+          if (isMatch) {
+            // ca.word === cb.word here — same underlying item, just its image
+            // and word cards — recording it twice would double-advance the box.
+            recordWordExposure(state.student, ca.word, 'memory-pairs', true).catch(() => {});
+          } else {
+            recordWordExposure(state.student, ca.word, 'memory-pairs', false).catch(() => {});
+            recordWordExposure(state.student, cb.word, 'memory-pairs', false).catch(() => {});
+          }
+        }
         if (isMatch) {
           matched++;
           const c = PALETTE[ca.pid % PALETTE.length];
@@ -4206,7 +4535,7 @@ const MODULE_REGISTRY = {
   'word-scramble': {
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
-      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      const session = biasedSelect(items, pick, it => it.word);
       let idx = 0, score = 0, slotData = [], bankData = [], wsLocked = false;
 
       const PALETTE = [
@@ -4331,6 +4660,7 @@ const MODULE_REGISTRY = {
         const attempt = slotData.map(e => e.letter).join('').toLowerCase();
         const ok = attempt === item.word.toLowerCase();
         wsLocked = true;
+        if (state.student) recordWordExposure(state.student, item.word, 'word-scramble', ok).catch(() => {});
         const c = itemColor();
         const fb = document.getElementById('ws-fb');
 
@@ -4387,7 +4717,7 @@ const MODULE_REGISTRY = {
   'spelling': {
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
-      const session = safeShuffle(items, ()=>false).slice(0, Math.min(pick, items.length));
+      const session = biasedSelect(items, pick, it => it.word);
       let idx = 0, score = 0, spLocked = false, retypeMode = false;
       let slotData = [], bankData = [];
 
@@ -4532,6 +4862,7 @@ const MODULE_REGISTRY = {
         const attempt = slotData.map(e => e.letter).join('').toLowerCase();
         const ok = attempt === item.word.toLowerCase();
         spLocked = true;
+        if (state.student) recordWordExposure(state.student, item.word, 'spelling', ok).catch(() => {});
         const fb = document.getElementById('sp-fb');
         slotData.forEach((_, si) => {
           const el = document.getElementById(`sp-s-${si}`);
@@ -4566,6 +4897,11 @@ const MODULE_REGISTRY = {
         const attempt = inp.value.trim().toLowerCase();
         const ok = attempt === item.word.toLowerCase();
         spLocked = true;
+        // Guarded the same way score++ already is — a correct retype right
+        // after the answer was revealed isn't a genuine recall test, so it
+        // shouldn't boost the box. The original wrong attempt (below, in
+        // the miss branch) still gets recorded normally either way.
+        if (state.student && !retypeMode) recordWordExposure(state.student, item.word, 'spelling', ok).catch(() => {});
         const fb = document.getElementById('sp-fb');
         inp.style.borderColor = ok ? '#8BC34A' : '#E91E63';
         inp.style.background = ok ? 'rgba(139,195,74,0.08)' : 'rgba(233,30,99,0.08)';
@@ -4913,6 +5249,13 @@ const MODULE_REGISTRY = {
         const item = session[idx];
         const ok = slotData.every((e, i) => e.text === item.tokens[i].text);
         sbLocked = true;
+        if (state.student) {
+          // Whole-sentence check, no per-slot granularity — every token in
+          // the sentence gets the same correct/wrong status for this attempt.
+          item.tokens.forEach(tk => {
+            if (tk.text) recordWordExposure(state.student, tk.text, 'sentence-building', ok).catch(() => {});
+          });
+        }
         const fb = document.getElementById('sb-fb');
         const nextBtn = document.getElementById('sb-next-btn');
 
@@ -5074,10 +5417,12 @@ const MODULE_REGISTRY = {
               btn.addEventListener('click', () => {
                 if (opt !== item.l1.answer) {
                   sfx('wrong');
+                  if (state.student) recordWordExposure(state.student, item.l1.answer, 'description-pyramid', false).catch(() => {});
                   btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}], {duration:250});
                   return;
                 }
                 sfx('correct');
+                if (state.student) recordWordExposure(state.student, item.l1.answer, 'description-pyramid', true).catch(() => {});
                 l1Answer = opt;
                 btn.classList.add('selected');
                 btn.style.background = '#00BCD4'; btn.style.borderColor = '#00BCD4';
@@ -5102,10 +5447,12 @@ const MODULE_REGISTRY = {
               btn.addEventListener('click', () => {
                 if (opt !== group.answer) {
                   sfx('wrong');
+                  if (state.student) recordWordExposure(state.student, group.answer, 'description-pyramid', false).catch(() => {});
                   btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}], {duration:250});
                   return;
                 }
                 sfx('correct');
+                if (state.student) recordWordExposure(state.student, group.answer, 'description-pyramid', true).catch(() => {});
                 l2Answers[l2GroupIndex] = opt;
                 btn.classList.add('selected');
                 const c = isColour ? dynamicColorFor(opt) : (l2GroupIndex % 2 === 0 ? '#FF9800' : '#AB47BC');
