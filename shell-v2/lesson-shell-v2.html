@@ -2330,6 +2330,11 @@ let wordExposureCache = new Map();
 // module's REAL data shape as actually implemented in this shell, not the
 // spec's shorthand field names (e.g. Word Match has no 'answer' field at
 // all, it uses left/right — 'left' is the real target word there).
+// audio-match ('Listen & Match') is deliberately NOT covered here, same
+// reasoning as its missing recordWordExposure calls in the module itself
+// below — it shares word-match's free-pairing engine but was explicitly
+// excluded from the spec's 9-module tracked list, unlike audio-understanding
+// ('Listen & Choose') which IS tracked. Not an oversight.
 function extractLessonTrackableWords() {
   const words = new Set();
   LESSON.forEach(mod => {
@@ -4243,6 +4248,10 @@ const MODULE_REGISTRY = {
   //  Check button appears when all slots filled.
   //  Score per question: correct positions / total. Averaged across the
   //  `pick` questions drawn for the tier's session.
+  //  Deliberately not wired into spaced repetition — sentence-ordering
+  //  exercises don't have a clean single-word signal the way gap-fill or
+  //  spelling do, and this module type was never on the spec's tracked
+  //  list. No recordWordExposure calls here on purpose, not an oversight.
   // ─────────────────────────────────────────────
   'sequencing': {
     render(container, data, tier, onComplete) {
@@ -5882,7 +5891,16 @@ const MODULE_REGISTRY = {
   'description-pyramid': {
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
-      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      // L1's answer is the one word guaranteed present across all three
+      // tiers (bronze=L1 only, silver=L1+L2, gold=all three), so it's used
+      // as the recycling-priority driver here — same "good enough, not
+      // perfect" tradeoff already accepted elsewhere (word-match uses only
+      // .left, image-vocab uses only .word even in cloze mode) rather than
+      // leaving Pyramid's own selection fully unbiased. L2 group answers
+      // still get their own exposure recording during play either way,
+      // which feeds recycling for any OTHER module testing those same
+      // words even though they don't drive this module's own draw.
+      const session = biasedSelect(items, pick, it => it.l1?.answer ?? '');
       const requiredLevels = tier === 'bronze' ? ['l1'] : tier === 'silver' ? ['l1','l2'] : ['l1','l2','l3'];
       let idx = 0, totalStars = 0;
 
