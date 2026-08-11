@@ -3739,14 +3739,14 @@ let audioModalOverriding = false; // true once "generate different for this less
 // ---- Global audio library: same text + same persona = same audio, reused across every lesson. ----
 // This is the actual payoff of the word bank — pick "water" from the bank, and if it already has
 // audio from another lesson, you get it for free instead of generating (and paying for) it again.
-const GLOBAL_AUDIO_LIBRARY = {}; // keyed by normalized text + persona -> {text, persona, firstLesson, generatedAt}
+const GLOBAL_AUDIO_LIBRARY = {}; // keyed by normalized text + persona + engine -> {text, persona, engine, firstLesson, generatedAt}
 const AUDIO_OVERRIDES = new Set(); // flagKeys that deliberately opted OUT of shared audio for this one field
 
-function audioLibKey(text, persona){ return (text||'').trim().toLowerCase() + '::' + persona; }
-function findGlobalAudio(text, persona){ return GLOBAL_AUDIO_LIBRARY[audioLibKey(text, persona)]; }
-function registerGlobalAudio(text, persona, lessonName){
-  const key = audioLibKey(text, persona);
-  if(!GLOBAL_AUDIO_LIBRARY[key]) GLOBAL_AUDIO_LIBRARY[key] = { text, persona, firstLesson: lessonName, generatedAt: Date.now() };
+function audioLibKey(text, persona, engine){ return (text||'').trim().toLowerCase() + '::' + persona + '::' + (engine || 'elevenlabs'); }
+function findGlobalAudio(text, persona, engine){ return GLOBAL_AUDIO_LIBRARY[audioLibKey(text, persona, engine)]; }
+function registerGlobalAudio(text, persona, lessonName, engine){
+  const key = audioLibKey(text, persona, engine);
+  if(!GLOBAL_AUDIO_LIBRARY[key]) GLOBAL_AUDIO_LIBRARY[key] = { text, persona, engine: engine || 'elevenlabs', firstLesson: lessonName, generatedAt: Date.now() };
 }
 
 function getCurrentAnswer(){
@@ -3786,6 +3786,7 @@ function playDraftTTS(text){
 
 function openAudioGenerator(ctx){
   audioModalContext = ctx;
+  audioModalContext.engine = audioModalContext.engine || 'elevenlabs'; // default for backward compat — every existing call site was implicitly ElevenLabs-only
   audioModalOverriding = false;
   renderAudioModal(false);
 }
@@ -3798,6 +3799,11 @@ function closeAudioModal(){
 
 function switchAudioVoice(){
   audioModalContext.persona = document.getElementById('audioVoiceSelect').value;
+  renderAudioModal(false);
+}
+
+function switchAudioEngine(){
+  audioModalContext.engine = document.getElementById('audioEngineSelect').value;
   renderAudioModal(false);
 }
 
@@ -3824,13 +3830,14 @@ function renderAudioModal(ready){
   const spoken = ctx.spokenText || ctx.text;
   const showsSubstitution = spoken !== ctx.text;
   const isOverridden = AUDIO_OVERRIDES.has(ctx.key);
-  const libMatch = findGlobalAudio(spoken, ctx.persona);
+  const libMatch = findGlobalAudio(spoken, ctx.persona, ctx.engine);
   const showReuseOffer = libMatch && !isOverridden && !audioModalOverriding;
+  const isKokoro = ctx.engine === 'kokoro';
 
   let reuseSectionHtml = '';
   if(showReuseOffer){
     reuseSectionHtml = `
-      <div class="audio-modal-status" style="margin:12px 0;">🔗 Using shared bank audio — same as every other lesson using this text.</div>
+      <div class="audio-modal-status" style="margin:12px 0;">🔗 Using shared bank audio — same as every other lesson using this text${isKokoro?' (Kokoro)':''}.</div>
       <div class="audio-modal-row">
         <button class="btn primary" onclick="useExistingAudio()">✓ Use this audio</button>
         <button class="btn" onclick="startAudioOverride()">Generate different, just for this lesson →</button>
@@ -3842,6 +3849,17 @@ function renderAudioModal(ready){
         <button class="btn" onclick="revertToLibraryAudio()">Revert to bank audio</button>
       </div>`;
   }
+
+  // Kokoro has no live API call here either — same as ElevenLabs, this modal only
+  // tracks that a field is resolved. The real file still needs generating in
+  // Voicebox itself and pushing to the repo under the exact filename this field
+  // expects, same convention either engine uses.
+  const expectedFilename = ctx.moduleId ? `${slugForFilename(spoken)}--${ctx.moduleId}.${ctx.fieldType || 'field'}${ctx.itemIndex!=null?'.item'+ctx.itemIndex:''}.mp3` : null;
+  const kokoroReminderHtml = (isKokoro && !showReuseOffer) ? `
+    <div class="audio-modal-status" style="margin:8px 0 0;font-size:11.5px;">
+      Generate this in Voicebox with Kokoro, then save/push it as<br>
+      <code style="font-size:11px;">audio/${expectedFilename || '(filename)'}</code> before accepting below.
+    </div>` : '';
 
   document.getElementById('modalRoot').innerHTML = `
     <div class="modal-overlay">
@@ -3856,13 +3874,21 @@ function renderAudioModal(ready){
             <option value="Celebration" ${ctx.persona==='Celebration'?'selected':''}>Celebration voice</option>
           </select>
         </div>
+        <div class="wiz-field">
+          <label>Engine</label>
+          <select class="wiz-select" id="audioEngineSelect" onchange="switchAudioEngine()">
+            <option value="elevenlabs" ${ctx.engine==='elevenlabs'?'selected':''}>ElevenLabs (cloud, paid)</option>
+            <option value="kokoro" ${ctx.engine==='kokoro'?'selected':''}>Kokoro (local, free — via Voicebox)</option>
+          </select>
+        </div>
         ${reuseSectionHtml}
         ${(!showReuseOffer && !(isOverridden && !audioModalOverriding)) ? `
         <div class="audio-modal-row">
           <button class="btn" onclick="playDraftTTS(audioModalContext.spokenText || audioModalContext.text)">▶ Play draft (live TTS)</button>
-          <button class="btn primary" id="genFinalBtn" onclick="generateFinalAudio()" ${ready?'disabled style="opacity:.5;"':''}>${ready?'✓ Generated':'✨ Generate final (ElevenLabs)'}</button>
+          <button class="btn primary" id="genFinalBtn" onclick="generateFinalAudio()" ${ready?'disabled style="opacity:.5;"':''}>${ready?'✓ Generated':(isKokoro?'✨ Generate final (Kokoro)':'✨ Generate final (ElevenLabs)')}</button>
         </div>
         <div class="audio-modal-status" id="genFinalStatus">${ready?'Preview below, or accept to mark this resolved.':''}</div>
+        ${kokoroReminderHtml}
         <div class="modal-actions">
           <button class="btn" onclick="closeAudioModal()">Cancel</button>
           <button class="btn primary" id="acceptAudioBtn" onclick="acceptGeneratedAudio()" ${ready?'':'disabled style="opacity:.5;cursor:not-allowed;"'}>Accept &amp; mark resolved</button>
@@ -3877,7 +3903,7 @@ function renderAudioModal(ready){
 
 function generateFinalAudio(){
   const statusEl = document.getElementById('genFinalStatus');
-  statusEl.textContent = 'Generating with ElevenLabs…';
+  statusEl.textContent = audioModalContext.engine === 'kokoro' ? 'Marking as generated with Kokoro…' : 'Generating with ElevenLabs…';
   document.getElementById('genFinalBtn').disabled = true;
   setTimeout(() => {
     if(!audioModalContext) return; // modal was closed while "generating"
@@ -4102,7 +4128,7 @@ function resolveAudioContext(ctx, opts){
     // unless this was a deliberate "different audio just for this lesson" override, which should stay local.
     if(!opts.isOverride){
       const lessonName = (LESSONS.find(l=>l.id===ctx.lessonId) || {}).name || ctx.lessonId;
-      registerGlobalAudio(ctx.spokenText || ctx.text, ctx.persona, lessonName);
+      registerGlobalAudio(ctx.spokenText || ctx.text, ctx.persona, lessonName, ctx.engine);
     }
     if(ctx.lessonId === currentLessonId) renderMain(); // refresh whatever's currently on screen so its icon reflects the resolution
   }
