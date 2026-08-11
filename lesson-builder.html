@@ -3740,6 +3740,19 @@ let audioModalOverriding = false; // true once "generate different for this less
 // This is the actual payoff of the word bank — pick "water" from the bank, and if it already has
 // audio from another lesson, you get it for free instead of generating (and paying for) it again.
 const GLOBAL_AUDIO_LIBRARY = {}; // keyed by normalized text + persona + engine -> {text, persona, engine, firstLesson, generatedAt}
+
+// Persisted separately from GLOBAL_AUDIO_LIBRARY (which is intentionally
+// transient/in-memory) because engine choice needs to survive a page
+// reload — the real workflow spans multiple sessions (generate in
+// Voicebox today, push the file, come back and accept it another day,
+// publish later still). Keyed by normalized text only, not a per-field
+// key — reconstructing each module's own fieldKey format at publish time
+// would mean touching every module's audioFor() call site and risking
+// subtle mismatches; keying by text is simple and correct on both the
+// save side (resolveAudioContext) and read side (transformModuleForPublish),
+// since both already have the actual text in hand.
+const AUDIO_ENGINE_BY_TEXT = {}; // lessonId -> normalizedText -> 'kokoro' | 'elevenlabs'
+function normaliseAudioText(text){ return (text || '').trim().toLowerCase(); }
 const AUDIO_OVERRIDES = new Set(); // flagKeys that deliberately opted OUT of shared audio for this one field
 
 function audioLibKey(text, persona, engine){ return (text||'').trim().toLowerCase() + '::' + persona + '::' + (engine || 'elevenlabs'); }
@@ -4124,6 +4137,13 @@ function resolveAudioContext(ctx, opts){
     if(ctx.lessonId && ctx.tierKey && ctx.fieldType && ctx.moduleId){
       setBaselineValue(ctx.lessonId, ctx.moduleId, ctx.tierKey, ctx.fieldType, ctx.optionIndex, ctx.text, ctx.itemIndex);
     }
+    // Record which engine this text used, for THIS lesson specifically —
+    // unconditional, even for overrides, since publish-time filename
+    // resolution needs this regardless of whether the audio is shared.
+    if(ctx.lessonId){
+      if(!AUDIO_ENGINE_BY_TEXT[ctx.lessonId]) AUDIO_ENGINE_BY_TEXT[ctx.lessonId] = {};
+      AUDIO_ENGINE_BY_TEXT[ctx.lessonId][normaliseAudioText(ctx.spokenText || ctx.text)] = ctx.engine || 'elevenlabs';
+    }
     // Register into the shared library so other lessons using this exact text+voice get it for free —
     // unless this was a deliberate "different audio just for this lesson" override, which should stay local.
     if(!opts.isOverride){
@@ -4196,12 +4216,19 @@ function slugForFilename(text){
     .slice(0, 40) || 'audio';
 }
 
-function transformModuleForPublish(moduleId, data, pushedAudioIds){
+function transformModuleForPublish(moduleId, data, pushedAudioIds, lessonId){
   const type = instanceType(moduleId);
   const pushed = pushedAudioIds || new Set();
+  const engineMap = (lessonId && AUDIO_ENGINE_BY_TEXT[lessonId]) || {};
   const audioFor = (fieldKey, text) => {
     const id = `${moduleId}.${fieldKey}`;
-    return pushed.has(id) ? `audio/${slugForFilename(text)}--${id}.mp3` : undefined;
+    if(!pushed.has(id)) return undefined;
+    // ElevenLabs stays completely unsuffixed, matching every file already
+    // published under the old convention — only Kokoro gets a marker,
+    // since there was nothing to be backward-compatible with there.
+    const engine = engineMap[normaliseAudioText(text)] || 'elevenlabs';
+    const suffix = engine === 'kokoro' ? '--kokoro' : '';
+    return `audio/${slugForFilename(text)}--${id}${suffix}.mp3`;
   };
 
   switch(type){
@@ -4451,7 +4478,7 @@ function transformLessonForPublish(lessonId, pushedAudioIds){
       id: moduleId,
       type: SHELL_TYPE_MAP[instanceType(moduleId)] || instanceType(moduleId),
       label: instanceLabel(moduleId),
-      data: transformModuleForPublish(moduleId, content[moduleId], pushedAudioIds),
+      data: transformModuleForPublish(moduleId, content[moduleId], pushedAudioIds, lessonId),
     };
     const imageVariant = resolveImageVariant(lesson, moduleId);
     if(imageVariant) entry.imageVariant = imageVariant;
@@ -5323,6 +5350,7 @@ function collectPersistedState(){
     LESSONS,
     LESSON_CONTENT,
     AUDIO_RECORDED,
+    AUDIO_ENGINE_BY_TEXT,
     WORD_BANK,
     wordBankSeeded,
     bankIdCounter,
@@ -5383,6 +5411,9 @@ function loadPersistedState(){
 
   Object.keys(AUDIO_RECORDED).forEach(k => delete AUDIO_RECORDED[k]);
   Object.assign(AUDIO_RECORDED, saved.AUDIO_RECORDED || {});
+
+  Object.keys(AUDIO_ENGINE_BY_TEXT).forEach(k => delete AUDIO_ENGINE_BY_TEXT[k]);
+  Object.assign(AUDIO_ENGINE_BY_TEXT, saved.AUDIO_ENGINE_BY_TEXT || {});
 
   WORD_BANK = saved.WORD_BANK || [];
   wordBankSeeded = !!saved.wordBankSeeded;
