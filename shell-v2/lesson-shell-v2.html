@@ -1040,22 +1040,31 @@ html, body {
      SCREEN 1 — NAME PICKER
 ════════════════════════════════════ -->
 <div id="screen-name" class="screen active">
-  <div id="name-picker-fresh">
-    <p class="welcome-label">EFL Lesson</p>
-    <h1 class="welcome-title">Hello! 👋</h1>
-    <p class="welcome-sub">Tap your name to begin.</p>
-    <div class="name-grid" id="name-grid"></div>
-    <button class="start-btn" id="start-btn">Start →</button>
-    <button class="secondary-btn" id="journey-link-btn-name" style="margin-top:10px;opacity:0.25;pointer-events:none;">📊 My Learning Journey</button>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="frame-mask"></div>
+
+  <div class="pos block-flowzone">
+    <div id="name-picker-fresh">
+      <p class="welcome-label">EFL Lesson</p>
+      <h1 class="welcome-title">Hello! 👋</h1>
+      <p class="welcome-sub">Tap your name to begin.</p>
+      <div class="name-grid" id="name-grid"></div>
+      <button class="start-btn" id="start-btn">Start →</button>
+      <button class="secondary-btn" id="journey-link-btn-name" style="margin-top:10px;opacity:0.25;pointer-events:none;">📊 My Learning Journey</button>
+    </div>
+    <div id="name-picker-remembered" style="display:none;">
+      <p class="welcome-label">EFL Lesson</p>
+      <h1 class="welcome-title">Welcome back! 👋</h1>
+      <p class="welcome-sub" id="remembered-welcome-sub"></p>
+      <button class="start-btn ready" id="remembered-start-btn">Start →</button>
+      <button class="secondary-btn" id="remembered-journey-btn" style="margin-top:10px;">📊 My Learning Journey</button>
+      <button class="secondary-btn" id="not-me-btn" style="margin-top:10px;opacity:0.6;">Not me? Choose a different name</button>
+    </div>
   </div>
-  <div id="name-picker-remembered" style="display:none;">
-    <p class="welcome-label">EFL Lesson</p>
-    <h1 class="welcome-title">Welcome back! 👋</h1>
-    <p class="welcome-sub" id="remembered-welcome-sub"></p>
-    <button class="start-btn ready" id="remembered-start-btn">Start →</button>
-    <button class="secondary-btn" id="remembered-journey-btn" style="margin-top:10px;">📊 My Learning Journey</button>
-    <button class="secondary-btn" id="not-me-btn" style="margin-top:10px;opacity:0.6;">Not me? Choose a different name</button>
-  </div>
+</div>
+</div>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -1136,27 +1145,36 @@ html, body {
      SCREEN 4 — END SCREEN
 ════════════════════════════════════ -->
 <div id="screen-end" class="screen">
-  <div class="end-header">
-    <div class="end-trophy">🏆</div>
-    <div class="end-name"  id="end-name"></div>
-    <div class="end-total" id="end-total"></div>
-  </div>
-  <div class="selfassess-wrap" id="selfassess-wrap">
-    <div class="selfassess-prompt">How did that feel?</div>
-    <div class="selfassess-options">
-      <button class="selfassess-btn" data-val="1" onclick="pickSelfAssess(1)"><span class="emoji">😅</span><span class="label">Tricky</span></button>
-      <button class="selfassess-btn" data-val="2" onclick="pickSelfAssess(2)"><span class="emoji">🙂</span><span class="label">OK</span></button>
-      <button class="selfassess-btn" data-val="3" onclick="pickSelfAssess(3)"><span class="emoji">😄</span><span class="label">Easy</span></button>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="frame-mask"></div>
+
+  <div class="pos block-flowzone">
+    <div class="end-header">
+      <div class="end-trophy">🏆</div>
+      <div class="end-name"  id="end-name"></div>
+      <div class="end-total" id="end-total"></div>
     </div>
+    <div class="selfassess-wrap" id="selfassess-wrap">
+      <div class="selfassess-prompt">How did that feel?</div>
+      <div class="selfassess-options">
+        <button class="selfassess-btn" data-val="1" onclick="pickSelfAssess(1)"><span class="emoji">😅</span><span class="label">Tricky</span></button>
+        <button class="selfassess-btn" data-val="2" onclick="pickSelfAssess(2)"><span class="emoji">🙂</span><span class="label">OK</span></button>
+        <button class="selfassess-btn" data-val="3" onclick="pickSelfAssess(3)"><span class="emoji">😄</span><span class="label">Easy</span></button>
+      </div>
+    </div>
+    <div class="vocab-review-summary" id="vocab-review-summary" style="display:none;">
+      <div class="vocab-review-line" id="vocab-review-line" onclick="toggleVocabReviewPanel()"></div>
+      <div class="vocab-review-panel" id="vocab-review-panel" style="display:none;"></div>
+    </div>
+    <div class="summary-list" id="summary-list"></div>
+    <button class="retry-btn" id="retry-btn" style="display:none">↩ Retry incomplete modules</button>
+    <button class="secondary-btn" id="journey-link-btn" style="margin-bottom:12px;">📊 My Learning Journey</button>
+    <button class="done-btn"  id="done-btn">✓ Done</button>
   </div>
-  <div class="vocab-review-summary" id="vocab-review-summary" style="display:none;">
-    <div class="vocab-review-line" id="vocab-review-line" onclick="toggleVocabReviewPanel()"></div>
-    <div class="vocab-review-panel" id="vocab-review-panel" style="display:none;"></div>
-  </div>
-  <div class="summary-list" id="summary-list"></div>
-  <button class="retry-btn" id="retry-btn" style="display:none">↩ Retry incomplete modules</button>
-  <button class="secondary-btn" id="journey-link-btn" style="margin-bottom:12px;">📊 My Learning Journey</button>
-  <button class="done-btn"  id="done-btn">✓ Done</button>
+</div>
+</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════
@@ -1165,11 +1183,20 @@ html, body {
      this student has touched on this device, not just the current one.
 ═══════════════════════════════════════════════ -->
 <div id="screen-journey" class="screen">
-  <p class="welcome-label">My Journey</p>
-  <h1 class="welcome-title">📊 Your Progress</h1>
-  <p class="welcome-sub" id="journey-subtitle">Across every lesson you've tried on this device.</p>
-  <div id="journey-content"></div>
-  <button class="secondary-btn" id="journey-back-btn">← Back</button>
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="frame-mask"></div>
+
+  <div class="pos block-flowzone">
+    <p class="welcome-label">My Journey</p>
+    <h1 class="welcome-title">📊 Your Progress</h1>
+    <p class="welcome-sub" id="journey-subtitle">Across every lesson you've tried on this device.</p>
+    <div id="journey-content"></div>
+    <button class="secondary-btn" id="journey-back-btn">← Back</button>
+  </div>
+</div>
+</div>
 </div>
 
 <script>
