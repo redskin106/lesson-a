@@ -1040,12 +1040,22 @@ html, body {
      SCREEN 1 — NAME PICKER
 ════════════════════════════════════ -->
 <div id="screen-name" class="screen active">
-  <p class="welcome-label">EFL Lesson</p>
-  <h1 class="welcome-title">Hello! 👋</h1>
-  <p class="welcome-sub">Tap your name to begin.</p>
-  <div class="name-grid" id="name-grid"></div>
-  <button class="start-btn" id="start-btn">Start →</button>
-  <button class="secondary-btn" id="journey-link-btn-name" style="margin-top:10px;opacity:0.25;pointer-events:none;">📊 My Learning Journey</button>
+  <div id="name-picker-fresh">
+    <p class="welcome-label">EFL Lesson</p>
+    <h1 class="welcome-title">Hello! 👋</h1>
+    <p class="welcome-sub">Tap your name to begin.</p>
+    <div class="name-grid" id="name-grid"></div>
+    <button class="start-btn" id="start-btn">Start →</button>
+    <button class="secondary-btn" id="journey-link-btn-name" style="margin-top:10px;opacity:0.25;pointer-events:none;">📊 My Learning Journey</button>
+  </div>
+  <div id="name-picker-remembered" style="display:none;">
+    <p class="welcome-label">EFL Lesson</p>
+    <h1 class="welcome-title">Welcome back! 👋</h1>
+    <p class="welcome-sub" id="remembered-welcome-sub"></p>
+    <button class="start-btn ready" id="remembered-start-btn">Start →</button>
+    <button class="secondary-btn" id="remembered-journey-btn" style="margin-top:10px;">📊 My Learning Journey</button>
+    <button class="secondary-btn" id="not-me-btn" style="margin-top:10px;opacity:0.6;">Not me? Choose a different name</button>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -1167,7 +1177,7 @@ html, body {
 //  CONFIG
 // ══════════════════════════════════════════════════
 
-const STUDENTS       = ['Sophy','Davit','Sam','Nu','Tue','Yee','Lee Ga','Felix','Tin','Ken','Thai'];
+const STUDENTS       = ['Davit','Sam','Nu','Tue','Yee','Tin','Ken','Thai'];
 const PASS_THRESHOLD = 0.6; // 60% to pass a tier
 
 // ══════════════════════════════════════════════════
@@ -2449,6 +2459,41 @@ function showScreen(id) {
 //  SCREEN 1 — NAME PICKER
 // ══════════════════════════════════════════════════
 
+// ── REMEMBERED DEVICE STUDENT ──────────────────────
+// Since each student now uses their own device, the full name grid only
+// needs to appear once per device — after that, remember who it belongs
+// to and skip straight to a one-tap "welcome back" screen. Validated
+// against the CURRENT roster on every load, not just saved once: if a
+// student leaves the class, any device that remembered them falls back
+// to the fresh picker automatically rather than silently staying stuck
+// on a name that's no longer valid.
+const REMEMBERED_STUDENT_KEY = 'lessonShell.rememberedStudent';
+
+function getRememberedStudent() {
+  let name;
+  try { name = localStorage.getItem(REMEMBERED_STUDENT_KEY); } catch (e) { return null; }
+  if (!name) return null;
+  if (!STUDENTS.includes(name)) {
+    try { localStorage.removeItem(REMEMBERED_STUDENT_KEY); } catch (e) {}
+    return null;
+  }
+  return name;
+}
+function rememberStudent(name) {
+  try { localStorage.setItem(REMEMBERED_STUDENT_KEY, name); } catch (e) {}
+}
+
+function showFreshPicker() {
+  document.getElementById('name-picker-fresh').style.display = 'block';
+  document.getElementById('name-picker-remembered').style.display = 'none';
+}
+function showRememberedWelcome(name) {
+  document.getElementById('name-picker-fresh').style.display = 'none';
+  document.getElementById('name-picker-remembered').style.display = 'block';
+  document.getElementById('remembered-welcome-sub').textContent = `Ready to continue, ${name}?`;
+  state.student = name;
+}
+
 const nameGrid = document.getElementById('name-grid');
 const startBtn = document.getElementById('start-btn');
 const journeyLinkBtnName = document.getElementById('journey-link-btn-name');
@@ -2461,6 +2506,7 @@ STUDENTS.forEach(name => {
     document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     state.student = name;
+    rememberStudent(name);
     startBtn.classList.add('ready');
     journeyLinkBtnName.style.opacity = '1';
     journeyLinkBtnName.style.pointerEvents = 'auto';
@@ -2468,13 +2514,28 @@ STUDENTS.forEach(name => {
   nameGrid.appendChild(btn);
 });
 
+document.getElementById('not-me-btn').addEventListener('click', () => {
+  state.student = null;
+  journeyLinkBtnName.style.opacity = '0.25';
+  journeyLinkBtnName.style.pointerEvents = 'none';
+  showFreshPicker();
+});
+document.getElementById('remembered-journey-btn').addEventListener('click', () => showJourneyScreen('screen-name'));
+
+function refreshNamePickerScreen() {
+  const remembered = getRememberedStudent();
+  if (remembered) showRememberedWelcome(remembered);
+  else showFreshPicker();
+}
+refreshNamePickerScreen();
+
 journeyLinkBtnName.addEventListener('click', () => showJourneyScreen('screen-name'));
 
 document.getElementById('journey-back-btn').addEventListener('click', () => {
   showScreen(journeyReturnScreen);
 });
 
-startBtn.addEventListener('click', async () => {
+async function beginLessonSession() {
   if (!state.student) return;
   state.currentModuleIndex = 0;
   state.currentTier = 'bronze';
@@ -2514,7 +2575,10 @@ startBtn.addEventListener('click', async () => {
   }
 
   startModule(0, 'bronze');
-});
+}
+
+startBtn.addEventListener('click', beginLessonSession);
+document.getElementById('remembered-start-btn').addEventListener('click', beginLessonSession);
 
 // ══════════════════════════════════════════════════
 //  SCREEN 2 — MODULE RUNNER
@@ -2792,6 +2856,7 @@ function showEndScreen() {
 
   document.getElementById('done-btn').onclick = () => {
     resetAll();
+    refreshNamePickerScreen();
     showScreen('screen-name');
   };
 
@@ -2882,6 +2947,8 @@ function resetAll() {
   wordExposureCache = new Map();
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   startBtn.classList.remove('ready');
+  journeyLinkBtnName.style.opacity = '0.25';
+  journeyLinkBtnName.style.pointerEvents = 'none';
 }
 
 // ══════════════════════════════════════════════════
