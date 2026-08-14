@@ -5038,16 +5038,13 @@ const MODULE_REGISTRY = {
 
         if (ok) {
           score++;
-          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
           speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel, not repeated here
-          setTimeout(() => {
-            const plainSentence = item.tokens.map(t => t.t).join(' ');
-            showGrammarReinforce(item.tokens, plainSentence, () => {
-              idx++;
-              if (idx < session.length) load();
-              else onComplete(score / session.length);
-            });
-          }, 500);
+          const plainSentence = item.tokens.map(t => t.t).join(' ');
+          showGrammarReinforce(item.tokens, plainSentence, () => {
+            idx++;
+            if (idx < session.length) load();
+            else onComplete(score / session.length);
+          });
         } else {
           if (fb) { fb.textContent = `✗ The word is: ${item.word}`; fb.style.color = '#F48FB1'; }
           speak(item.word, 'wrong'); // word once, then silent retry — no second play
@@ -5236,9 +5233,8 @@ const MODULE_REGISTRY = {
         });
         if (ok) {
           score++;
-          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
           speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel
-          setTimeout(() => reinforceThenAdvance(item), 500);
+          reinforceThenAdvance(item);
         } else {
           if (fb) { fb.textContent = `✗ The word is: ${item.word}`; fb.style.color = '#F48FB1'; }
           speak(item.word, 'wrong'); // word once, then silent retry
@@ -5273,9 +5269,8 @@ const MODULE_REGISTRY = {
 
         if (ok) {
           if (!retypeMode) score++;
-          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
           speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel
-          setTimeout(() => reinforceThenAdvance(item), 500);
+          reinforceThenAdvance(item);
         } else {
           if (fb) { fb.textContent = `✗ The word is: ${item.word} — now type it correctly`; fb.style.color = '#F48FB1'; }
           speak(item.word, 'wrong'); // word once, then silent retry
@@ -5989,16 +5984,13 @@ const MODULE_REGISTRY = {
 
         if (ok) {
           score++;
-          if (fb) { fb.textContent = '✓ Correct!'; fb.style.color = '#AED581'; }
           speak(item.word, 'celebrate');
-          setTimeout(() => {
-            const plainSentence = item.tokens.map(t => t.t).join(' ');
-            showGrammarReinforce(item.tokens, plainSentence, () => {
-              idx++;
-              if (idx < session.length) load();
-              else onComplete(score / session.length);
-            });
-          }, 700);
+          const plainSentence = item.tokens.map(t => t.t).join(' ');
+          showGrammarReinforce(item.tokens, plainSentence, () => {
+            idx++;
+            if (idx < session.length) load();
+            else onComplete(score / session.length);
+          });
         } else {
           if (fb) { fb.textContent = '✗ Not quite — try again'; fb.style.color = '#F48FB1'; }
           speak(item.word, 'wrong');
