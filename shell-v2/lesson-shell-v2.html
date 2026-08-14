@@ -3272,7 +3272,13 @@ function grammarLegend(tokens) {
 // when the student taps Continue. Used only after a CORRECT answer.
 function showGrammarReinforce(tokens, plainSentence, onContinue) {
   const overlay = document.getElementById('gr-overlay');
-  document.getElementById('gr-sentence').innerHTML = grammarSentence(tokens);
+  const coloredSentence = grammarSentence(tokens);
+  // Falls back to plain, uncoloured sentence text when no grammar tokens
+  // are authored for this item — e.g. Memory Pairs' content already has
+  // real sentence text ("The apple is red.") but no per-word role tagging,
+  // so the reinforcement panel was showing nothing at all rather than
+  // gracefully degrading to the plain sentence it already had on hand.
+  document.getElementById('gr-sentence').innerHTML = coloredSentence || (plainSentence ? `<span style="color:#fff;">${plainSentence}</span>` : '');
   document.getElementById('gr-legend').innerHTML = grammarLegend(tokens);
   overlay.style.display = 'flex';
   speak(plainSentence, 'neutral', 200);
