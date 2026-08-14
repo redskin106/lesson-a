@@ -742,6 +742,15 @@ html, body {
 .block-qlabel   { left: 13.08%; top: 15.3%; width: 75%;    height: 2.6%; display: flex; align-items: center; }
 .block-progress { left: 13.08%; top: 19.69%; width: 75.17%; height: 1.01%; }
 .block-flowzone { left: 13.00%; top: 24.99%; width: 75.08%; bottom: 4%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+/* module-container specifically reverts to natural, unbounded growth —
+   repositionSceneLayer() (see JS) depends on measuring its TRUE content
+   height to decide where to slide the illustration; a bounded/scrollable
+   container always reports roughly the same bottom edge regardless of
+   actual content, which silently breaks that entire mechanism. The
+   bookend screens (name/end/journey) still get the bounded+scrollable
+   treatment from .block-flowzone above, since they don't use scene
+   repositioning at all. */
+#module-container { bottom: auto; overflow-y: visible; }
 
 .v2-badge { width: 9cqw; aspect-ratio: 1/1; border-radius: 50%; background: linear-gradient(90deg,#753A70,#A54D75); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 500; font-size: 3.6cqw; flex-shrink: 0; }
 .v2-header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
@@ -2643,8 +2652,12 @@ function startModule(moduleIndex, tier) {
   // fixed illustration. Falls back to the default CSS-defined images when a
   // module doesn't specify one, so every already-published lesson keeps
   // working exactly as before with zero changes needed.
-  const bgLayer = document.querySelector('.layer-bg');
-  const sceneLayer = document.querySelector('.layer-scene');
+  // Scoped to #screen-module specifically — since the name/end/journey
+  // screens now share these same classes too, an unscoped query would
+  // silently grab whichever one appears first in the document instead of
+  // the actual active module screen.
+  const bgLayer = document.querySelector('#screen-module .layer-bg');
+  const sceneLayer = document.querySelector('#screen-module .layer-scene');
   bgLayer.style.backgroundImage = (mod.imageVariant && mod.imageVariant.background)
     ? `url('${mod.imageVariant.background}')` : '';
   sceneLayer.style.backgroundImage = (mod.imageVariant && mod.imageVariant.scene)
@@ -3179,9 +3192,14 @@ const SCENE_DEFAULT_TOP = 51.47;
 let _sceneObserver = null;
 
 function repositionSceneLayer() {
+  // Scoped to #screen-module — see the note at the imageVariant swap
+  // logic above; an unscoped query here silently grabbed whichever
+  // .app-frame/.layer-scene came first in the document (screen-name's,
+  // always hidden while a module is showing), which measured as zero
+  // height and made this function return early every single time.
   const flowzone = document.getElementById('module-container');
-  const scene = document.querySelector('.layer-scene');
-  const appFrame = document.querySelector('.app-frame');
+  const scene = document.querySelector('#screen-module .layer-scene');
+  const appFrame = document.querySelector('#screen-module .app-frame');
   if (!flowzone || !scene || !appFrame) return;
 
   const frameRect = appFrame.getBoundingClientRect();
@@ -3202,7 +3220,12 @@ function watchModuleContentForSceneReposition() {
   if (!flowzone) return;
   if (_sceneObserver) _sceneObserver.disconnect();
   _sceneObserver = new MutationObserver(() => repositionSceneLayer());
-  _sceneObserver.observe(flowzone, { childList: true, subtree: true, characterData: true });
+  // attributes+attributeFilter:['style'] matters as much as childList here —
+  // several modules reveal their Check button via style.display on an
+  // already-existing node (not a fresh DOM insertion), which childList
+  // alone never sees. That's exactly the gap that let the illustration
+  // overlap the Check button once it appeared.
+  _sceneObserver.observe(flowzone, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['style'] });
   repositionSceneLayer();
 }
 
