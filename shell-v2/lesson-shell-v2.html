@@ -3717,7 +3717,8 @@ const MODULE_REGISTRY = {
           });
         }
 
-        options.forEach((opt, i) => {
+        const shuffledOptions = safeShuffle(options, () => false);
+        shuffledOptions.forEach((opt, i) => {
           const btn = document.createElement('button');
           btn.className = 'lc-option-btn-v2 locked';
           btn.textContent = opt;
@@ -3925,7 +3926,8 @@ const MODULE_REGISTRY = {
           for (let i = 1; i <= 3; i++) dots[i].classList.toggle('used', hintLevel >= i);
         }
 
-        options.forEach((opt, i) => {
+        const shuffledOptions = safeShuffle(options, () => false);
+        shuffledOptions.forEach((opt, i) => {
           const btn = document.createElement('button');
           btn.className = 'gf-pill';
           btn.textContent = opt;
@@ -6114,7 +6116,8 @@ const MODULE_REGISTRY = {
           if (currentLevel === 'l1') {
             zone.innerHTML = `<div class="dp-tile-row" id="dp-tiles"></div>`;
             const row = zone.querySelector('#dp-tiles');
-            item.l1.options.forEach(opt => {
+            const l1ShuffledOptions = safeShuffle(item.l1.options, () => false);
+            l1ShuffledOptions.forEach(opt => {
               const btn = document.createElement('button');
               btn.className = 'dp-tile';
               btn.textContent = opt;
@@ -6144,7 +6147,8 @@ const MODULE_REGISTRY = {
               <div class="dp-tile-row" id="dp-tiles"></div>`;
             const row = zone.querySelector('#dp-tiles');
             const isColour = isColourGroup(group.label);
-            group.options.forEach(opt => {
+            const l2ShuffledOptions = safeShuffle(group.options, () => false);
+            l2ShuffledOptions.forEach(opt => {
               const btn = document.createElement('button');
               btn.className = 'dp-tile';
               btn.textContent = opt;
