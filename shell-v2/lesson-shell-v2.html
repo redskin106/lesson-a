@@ -4660,7 +4660,16 @@ const MODULE_REGISTRY = {
             if (sentenceEl) sentenceEl.classList.add('gf-blank', 'hint-glow');
           });
         }
-        speak(spokenWord, 'neutral', 300);
+        // Only word-to-image auto-speaks — there, spokenWord is already
+        // visible on screen as text, so saying it aloud adds nothing new.
+        // In image-to-word and cloze-image, spokenWord IS the hidden
+        // answer (matches one of the option buttons, or fills the blank),
+        // so speaking it automatically was giving away the answer before
+        // the student could even try. No other module in the app
+        // auto-speaks an answer before picking — Listen & Choose
+        // deliberately gates its audio behind an explicit tap for exactly
+        // this reason.
+        if (mode === 'word-to-image') speak(spokenWord, 'neutral', 300);
 
         content.querySelectorAll('.iv-option-btn').forEach(btn => {
           btn.addEventListener('click', () => {
