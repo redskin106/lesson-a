@@ -3672,7 +3672,7 @@ const MODULE_REGISTRY = {
 
       function renderQuestion() {
         const { audio, question, options, answer } = session[idx];
-        let hasPlayed = false, playing = false, answered = false, optionsLive = false, selected = null, hintUsed = false;
+        let hasPlayed = false, playing = false, answered = false, optionsLive = false, selected = null, hintLevel = 0;
 
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
@@ -3701,13 +3701,25 @@ const MODULE_REGISTRY = {
         // same reasoning as Picture & Word's image-to-word/word-to-image
         // modes. Gated behind having listened at least once — a hint
         // shouldn't let a student skip the actual listening step.
+        // Two taps allowed now, not one — each eliminates one more wrong
+        // option, same mechanism just one more step. A second hint only
+        // fires if at least 2 wrong options remain afterward, so a
+        // 3-option item never gets hinted down to a giveaway.
         hintBtn.addEventListener('click', () => {
-          if (hintUsed || !hasPlayed) return;
-          hintUsed = true;
-          const wrongBtns = [...optionsGrid.querySelectorAll('.lc-option-btn-v2')].filter(b => b.textContent !== answer);
+          if (hintLevel >= 2 || !hasPlayed) return;
+          const wrongBtns = [...optionsGrid.querySelectorAll('.lc-option-btn-v2')]
+            .filter(b => b.textContent !== answer && !b.classList.contains('precheck-hint-eliminated'));
+          if (hintLevel === 1 && wrongBtns.length < 2) return; // not enough left for a real second hint
           if (wrongBtns.length) { wrongBtns[0].classList.add('precheck-hint-eliminated'); }
-          hintBtn.disabled = true;
-          hintBtn.textContent = '💡 Hint used';
+          hintLevel++;
+          const remainingWrong = [...optionsGrid.querySelectorAll('.lc-option-btn-v2')]
+            .filter(b => b.textContent !== answer && !b.classList.contains('precheck-hint-eliminated'));
+          if (hintLevel >= 2 || remainingWrong.length < 2) {
+            hintBtn.disabled = true;
+            hintBtn.textContent = '💡 Hint used';
+          } else {
+            hintBtn.textContent = '💡 Hint (1 more)';
+          }
         });
 
         function showHint(msg) {
@@ -3768,7 +3780,7 @@ const MODULE_REGISTRY = {
             listenLabel.textContent = 'Listen';
             listenBtn.classList.remove('playing');
             setGridLive(true);
-            if (!hintUsed) hintBtn.disabled = false;
+            if (hintLevel < 2) hintBtn.disabled = false;
           }
           speak(audio, mood, 0, null, onAudioEnd);
           // Fallback in case onEnd never fires (browser quirk) — estimate
