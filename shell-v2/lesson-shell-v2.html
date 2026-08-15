@@ -4140,10 +4140,29 @@ const MODULE_REGISTRY = {
           chosenBtn.classList.add(correct ? 'hl-correct' : 'hl-wrong');
           statusEl.textContent = correct ? 'correct!' : 'not quite right';
 
-          const plain = tokens && tokens.length ? tokens.map(t => t.t).join(' ') : statement;
+          // When the statement is false and the student correctly identifies
+          // it, don't replay the false sentence as reinforcement — that
+          // embeds the wrong information. Use an authored correction field
+          // if one exists, otherwise a generic confirmation with no sentence.
+          // True statements (and wrong answers) still show the full
+          // grammar-colored sentence as before.
+          const isFalseCorrect = correct && answer === false;
+          let plain, reinforceTokens;
+          if (isFalseCorrect) {
+            if (session[idx].correction) {
+              plain = session[idx].correction;
+              reinforceTokens = null; // plain text only, no grammar coloring
+            } else {
+              plain = null; // generic fallback — no sentence at all
+              reinforceTokens = null;
+            }
+          } else {
+            plain = tokens && tokens.length ? tokens.map(t => t.t).join(' ') : statement;
+            reinforceTokens = tokens;
+          }
           setTimeout(() => {
             setGrammarReinforceLabel(correct);
-            showGrammarReinforce(tokens, plain, () => {
+            showGrammarReinforce(reinforceTokens, plain, () => {
               idx++;
               if (idx < session.length) renderQuestion();
               else onComplete(totalScore / session.length);
