@@ -6402,13 +6402,33 @@ const MODULE_REGISTRY = {
             i++;
             setTimeout(playNext, 700);
           } else {
-            // Pause after last phoneme before playing full word
+            // After last phoneme — pause, then show model button for full word
             setTimeout(() => {
-              speak(item.word, 'celebrate');
               renderSlots();
-              // Show record interaction
+              const fb = container.querySelector('#ph-fb');
+              if (fb) { fb.textContent = ''; }
+
+              // Add model + record section
+              const section = document.createElement('div');
+              section.style.cssText = 'margin-top:4%;display:flex;flex-direction:column;gap:3%;';
+              section.innerHTML = `
+                <button id="ph-model-btn"
+                  style="display:flex;align-items:center;justify-content:center;gap:3%;
+                  padding:3.5% 8%;border-radius:999px;
+                  background:rgba(112,82,180,0.16);border:1.5px solid rgba(112,82,180,0.5);
+                  color:#C9B8EA;font-size:4cqw;font-weight:500;cursor:pointer;font-family:inherit;">
+                  🔊 Hear the full word
+                </button>
+              `;
+              container.appendChild(section);
+
+              container.querySelector('#ph-model-btn').addEventListener('click', () => {
+                speak(item.word, 'celebrate');
+              });
+
+              // Record interaction
               const recContainer = document.createElement('div');
-              recContainer.style.marginTop = '4%';
+              recContainer.style.marginTop = '2%';
               container.appendChild(recContainer);
               renderSayItInteraction(recContainer, {
                 prompt: 'Now you say it:',
@@ -6424,9 +6444,12 @@ const MODULE_REGISTRY = {
                 if (idx < session.length) load();
                 else onComplete(score / session.length);
               });
-            }, 600);
+            }, 800);
           }
         }
+
+        // Pause before starting the phoneme sequence
+        setTimeout(playNext, 500);
         playNext();
       }
 
