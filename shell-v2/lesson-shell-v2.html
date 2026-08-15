@@ -1309,107 +1309,43 @@ const LESSON = [
   {
     id: 'mod-1',
     type: 'audio-understanding',
-    label: 'Listen & Choose 1',
-    data: {
-      bronze: {
-        pick: 2,
-        items: [
-          { audio: 'dog', question: 'What word did you hear?',
-            options: ['dog','cat','bus','book'], answer: 'dog' },
-          { audio: 'water', question: 'What word did you hear?',
-            options: ['water','chair','rain','cat'], answer: 'water' }
-        ]
-      },
-      silver: {
-        pick: 2,
-        items: [
-          { audio: 'The dog runs in the park.', question: 'Where does the dog run?',
-            options: ['in the house','in the park','in the school','in the car'], answer: 'in the park' },
-          { audio: 'I eat breakfast before school.', question: 'When does she eat breakfast?',
-            options: ['after dinner','at night','before school','at the weekend'], answer: 'before school' }
-        ]
-      },
-      gold: {
-        pick: 2,
-        items: [
-          { audio: 'My father drives the car every morning.', question: 'What does the father do every morning?',
-            options: ['reads a book','drives the car','goes to school','walks the dog'], answer: 'drives the car' },
-          { audio: 'She goes to the library after class to study quietly.', question: 'Why does she go to the library?',
-            options: ['to meet a friend','to study quietly','to borrow a book','to eat lunch'], answer: 'to study quietly' }
-        ]
-      }
-    }
-  },
   {
-    id: 'mod-2',
+    id: 'mod-1',
     type: 'audio-understanding',
-    label: 'Listen & Choose 2',
+    label: 'Listen & Choose',
     data: {
       bronze: {
-        pick: 2,
+        pick: 3,
         items: [
-          { audio: 'water', question: 'What word did you hear?',
-            options: ['water','chair','rain','cat'], answer: 'water' },
-          { audio: 'school', question: 'What word did you hear?',
-            options: ['school','phone','money','house'], answer: 'school' }
+          { audio: 'dog',    question: 'What word did you hear?', options: ['dog','cat','bus','book'],          answer: 'dog' },
+          { audio: 'water',  question: 'What word did you hear?', options: ['water','chair','rain','cat'],      answer: 'water' },
+          { audio: 'school', question: 'What word did you hear?', options: ['school','phone','money','house'],  answer: 'school' },
         ]
       },
       silver: {
-        pick: 2,
+        pick: 3,
         items: [
-          { audio: 'I eat breakfast before school.', question: 'When does she eat breakfast?',
-            options: ['after dinner','at night','before school','at the weekend'], answer: 'before school' },
-          { audio: 'It is cold in the morning.', question: 'When is it cold?',
-            options: ['at night','in the afternoon','in the morning','at the weekend'], answer: 'in the morning' }
+          { audio: 'The dog runs in the park.',       question: 'Where does the dog run?',
+            options: ['in the house','in the park','in the school','in the car'],                               answer: 'in the park' },
+          { audio: 'I eat breakfast before school.',  question: 'When does she eat breakfast?',
+            options: ['after dinner','at night','before school','at the weekend'],                              answer: 'before school' },
+          { audio: 'It is cold in the morning.',      question: 'When is it cold?',
+            options: ['at night','in the afternoon','in the morning','at the weekend'],                         answer: 'in the morning' },
         ]
       },
       gold: {
-        pick: 2,
+        pick: 3,
         items: [
-          { audio: 'She goes to the library after class to study quietly.', question: 'Why does she go to the library?',
-            options: ['to meet a friend','to study quietly','to borrow a book','to eat lunch'], answer: 'to study quietly' },
-          { audio: 'We visit our grandparents on the weekend because we miss them.', question: 'Why do they visit their grandparents?',
-            options: ['because they are bored','because they miss them','because school is closed','because they live nearby'], answer: 'because they miss them' }
-        ]
-      }
-    }
-  },
-  {
-    id: 'mod-3',
-    type: 'audio-understanding',
-    label: 'Listen & Choose 3',
-    data: {
-      bronze: {
-        pick: 2,
-        items: [
-          { audio: 'school', question: 'What word did you hear?',
-            options: ['school','phone','money','house'], answer: 'school' },
-          { audio: 'dog', question: 'What word did you hear?',
-            options: ['dog','cat','bus','book'], answer: 'dog' }
-        ]
-      },
-      silver: {
-        pick: 2,
-        items: [
-          { audio: 'It is cold in the morning.', question: 'When is it cold?',
-            options: ['at night','in the afternoon','in the morning','at the weekend'], answer: 'in the morning' },
-          { audio: 'I eat breakfast before school.', question: 'When does she eat breakfast?',
-            options: ['after dinner','at night','before school','at the weekend'], answer: 'before school' }
-        ]
-      },
-      gold: {
-        pick: 2,
-        items: [
+          { audio: 'My father drives the car every morning.',                     question: 'What does the father do every morning?',
+            options: ['reads a book','drives the car','goes to school','walks the dog'],                        answer: 'drives the car' },
+          { audio: 'She goes to the library after class to study quietly.',        question: 'Why does she go to the library?',
+            options: ['to meet a friend','to study quietly','to borrow a book','to eat lunch'],                 answer: 'to study quietly' },
           { audio: 'We visit our grandparents on the weekend because we miss them.', question: 'Why do they visit their grandparents?',
             options: ['because they are bored','because they miss them','because school is closed','because they live nearby'], answer: 'because they miss them' },
-          { audio: 'My father drives the car every morning.', question: 'What does the father do every morning?',
-            options: ['reads a book','drives the car','goes to school','walks the dog'], answer: 'drives the car' }
         ]
       }
     }
-  }
-
-  ,
+  },
   // ── GAP FILL ─────────────────────────────────────
   // v2: per-tier pool. `pick` is configurable per lesson/module (teacher-set).
   {
