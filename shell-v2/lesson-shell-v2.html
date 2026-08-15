@@ -752,6 +752,50 @@ html, body {
    repositioning at all. */
 #module-container { bottom: auto; overflow-y: visible; }
 
+/* ─── MODULE CHOICE SCREEN ─────────────────────────── */
+.choice-title { font-size: 4.2cqw; font-weight: 700; color: #fff; margin-bottom: 1%; }
+.choice-sub   { font-size: 2.9cqw; color: var(--text-dim); margin-bottom: 5%; }
+.choice-grid  { display: flex; flex-direction: column; gap: 2.5%; margin-bottom: 5%; }
+.choice-card  {
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 3.5% 4%;
+  display: flex; align-items: center; gap: 3%;
+  cursor: pointer; transition: background .15s, border-color .15s;
+}
+.choice-card:active { background: rgba(255,255,255,0.09); }
+.choice-card.complete { border-color: rgba(76,175,80,0.5); background: rgba(76,175,80,0.07); }
+.choice-card.locked   { opacity: 0.35; pointer-events: none; }
+.choice-badge {
+  width: 8cqw; height: 8cqw; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg,#753A70,#A54D75);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.2cqw; font-weight: 700; color: #fff;
+}
+.choice-info  { flex: 1; min-width: 0; }
+.choice-label { font-size: 3.4cqw; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.choice-tier  { font-size: 2.7cqw; color: var(--text-dim); margin-top: 0.5%; }
+.choice-tier.bronze { color: var(--bronze); }
+.choice-tier.silver { color: var(--silver); }
+.choice-tier.gold   { color: var(--gold); }
+.choice-tier.done   { color: var(--pass); }
+.choice-arrow { font-size: 3.5cqw; color: var(--text-dim); flex-shrink: 0; }
+.choice-done-icon { font-size: 4cqw; flex-shrink: 0; }
+.choice-finish-btn {
+  display: block; width: 100%;
+  background: rgba(139,195,74,0.14); color: #AED581;
+  border: 1.5px solid rgba(139,195,74,0.5); border-radius: 999px;
+  font-size: 4cqw; font-weight: 600;
+  padding: 4% 6%; cursor: pointer; text-align: center;
+  font-family: inherit; margin-top: 3%;
+}
+/* Back button in module header */
+.v2-back-btn {
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  font-size: 4.5cqw; cursor: pointer; padding: 0; line-height: 1;
+  flex-shrink: 0;
+}
+.v2-back-btn:active { color: #fff; }
+
 .v2-badge { width: 9cqw; aspect-ratio: 1/1; border-radius: 50%; background: linear-gradient(90deg,#753A70,#A54D75); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 500; font-size: 3.6cqw; flex-shrink: 0; }
 .v2-header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
 .v2-header-left { display: flex; align-items: center; gap: 2.5cqw; min-width: 0; }
@@ -1081,6 +1125,24 @@ html, body {
 </div>
 
 <!-- ═══════════════════════════════════
+     SCREEN 1b — MODULE CHOICE
+════════════════════════════════════ -->
+<div id="screen-choice" class="screen">
+<div class="frame-wrap">
+<div class="app-frame">
+  <div class="layer-bg"></div>
+  <div class="frame-mask"></div>
+  <div class="pos block-flowzone">
+    <p class="choice-title" id="choice-greeting"></p>
+    <p class="choice-sub" id="choice-sub"></p>
+    <div class="choice-grid" id="choice-grid"></div>
+    <button class="choice-finish-btn" id="choice-finish-btn">✓ I'm done for today</button>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
      SCREEN 2 — MODULE
 ════════════════════════════════════ -->
 <div id="screen-module" class="screen">
@@ -1093,6 +1155,7 @@ html, body {
   <div class="pos block-header">
     <div class="v2-header-inner">
       <div class="v2-header-left">
+        <button class="v2-back-btn" id="v2-back-btn" title="Back to menu">‹</button>
         <div class="v2-badge" id="v2-badge"></div>
         <span class="v2-module-title" id="v2-module-title"></span>
       </div>
@@ -1124,6 +1187,7 @@ html, body {
       <div style="font-size:3.6cqw;color:rgba(255,255,255,0.6);margin-bottom:2%;" id="result-score"></div>
       <div style="font-size:3.4cqw;color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:6%;" id="result-msg"></div>
       <button id="result-cta" class="gr-continue-btn"></button>
+      <button id="result-menu-btn" style="display:none;margin-top:4%;background:none;border:none;color:rgba(255,255,255,0.45);font-size:3cqw;cursor:pointer;font-family:inherit;">← Back to menu</button>
     </div>
   </div>
 </div>
@@ -2629,11 +2693,75 @@ async function beginLessonSession() {
     console.warn('Could not load vocabulary recycling data — continuing without it this session:', e);
   }
 
-  startModule(0, 'bronze');
+  showChoiceScreen();
 }
 
 startBtn.addEventListener('click', beginLessonSession);
 document.getElementById('remembered-start-btn').addEventListener('click', beginLessonSession);
+
+// ══════════════════════════════════════════════════
+//  CHOICE SCREEN
+// ══════════════════════════════════════════════════
+
+function bestTierLabel(r) {
+  // What tier should this module open at, given current results?
+  if (r.gold.passed)   return { tier: 'gold',   label: 'Gold ✓',   css: 'done' };
+  if (r.silver.passed) return { tier: 'gold',   label: 'Gold',     css: 'gold' };
+  if (r.bronze.passed) return { tier: 'silver', label: 'Silver',   css: 'silver' };
+  return                      { tier: 'bronze', label: 'Bronze',   css: 'bronze' };
+}
+
+function showChoiceScreen() {
+  const grid    = document.getElementById('choice-grid');
+  const greeting= document.getElementById('choice-greeting');
+  const sub     = document.getElementById('choice-sub');
+  const finBtn  = document.getElementById('choice-finish-btn');
+
+  greeting.textContent = state.student ? `${state.student}'s lesson` : 'Choose an activity';
+
+  // Count how many modules are fully done
+  const doneCount = state.results.filter(r => r.complete).length;
+  const total     = LESSON.length;
+  sub.textContent = doneCount === 0
+    ? 'Tap any activity to start.'
+    : doneCount === total
+      ? 'All done! Great work.'
+      : `${doneCount} of ${total} complete — keep going!`;
+
+  grid.innerHTML = '';
+  LESSON.forEach((mod, i) => {
+    const r = state.results[i];
+    const { tier, label, css } = bestTierLabel(r);
+    const isComplete = r.complete;
+
+    const card = document.createElement('div');
+    card.className = 'choice-card' + (isComplete ? ' complete' : '');
+
+    card.innerHTML = `
+      <div class="choice-badge">${i + 1}</div>
+      <div class="choice-info">
+        <div class="choice-label">${mod.label}</div>
+        <div class="choice-tier ${css}">${isComplete ? '✓ Complete' : label}</div>
+      </div>
+      ${isComplete ? '<div class="choice-done-icon">✓</div>' : '<div class="choice-arrow">›</div>'}
+    `;
+
+    card.addEventListener('click', () => startModule(i, tier));
+    grid.appendChild(card);
+  });
+
+  // "Finish" button — always visible; goes to end screen
+  finBtn.onclick = () => showEndScreen();
+
+  showScreen('screen-choice');
+}
+
+// Wire up back button — discards partial progress, returns to choice screen
+document.getElementById('v2-back-btn').addEventListener('click', () => {
+  // Cancel any ongoing TTS or recording
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  showChoiceScreen();
+});
 
 // ══════════════════════════════════════════════════
 //  SCREEN 2 — MODULE RUNNER
@@ -2782,26 +2910,33 @@ function handleTierResult(moduleIndex, tier, score) {
     return;
   }
 
+  // Reset the secondary menu button each time
+  const menuBtn = document.getElementById('result-menu-btn');
+  menuBtn.style.display = 'none';
+  menuBtn.onclick = () => showChoiceScreen();
+
   if (passed && next) {
     document.getElementById('result-msg').innerHTML =
-      `Great work! <strong>${cap(next)}</strong> is now unlocked.`;
+      `Great work! <strong>${cap(next)}</strong> is now unlocked on this activity.`;
     ctaBtn.textContent = `Try ${cap(next)} →`;
     ctaBtn.onclick = () => startModule(moduleIndex, next);
+    // Give them the option to go back to menu instead
+    menuBtn.style.display = 'block';
 
   } else if (passed && !next) {
     state.results[moduleIndex].complete = true;
-    const nextMod = moduleIndex + 1;
+    const allDone = state.results.every(r => r.complete);
 
-    if (nextMod < LESSON.length) {
+    if (allDone) {
       document.getElementById('result-msg').innerHTML =
-        `<strong>Module complete!</strong> Moving to the next exercise.`;
-      ctaBtn.textContent = 'Next module →';
-      ctaBtn.onclick = () => startModule(nextMod, 'bronze');
-    } else {
-      document.getElementById('result-msg').innerHTML =
-        `<strong>All done!</strong> You've completed every module.`;
+        `<strong>All done!</strong> You've completed every activity.`;
       ctaBtn.textContent = 'See my results →';
       ctaBtn.onclick = () => showEndScreen();
+    } else {
+      document.getElementById('result-msg').innerHTML =
+        `<strong>Activity complete!</strong> What do you want to do next?`;
+      ctaBtn.textContent = '← Back to menu';
+      ctaBtn.onclick = () => showChoiceScreen();
     }
 
   } else {
