@@ -6275,7 +6275,11 @@ const MODULE_REGISTRY = {
             } else {
               d.style.borderColor = '#00BCD4'; d.style.background = 'rgba(0,188,212,0.15)'; d.style.color = '#4DD0E1';
             }
-            if (!phLocked) d.addEventListener('click', () => phRemove(si));
+            if (!phLocked) d.addEventListener('click', () => {
+              // Tap filled slot: play its sound, then remove on second tap
+              playPhoneme(entry.grapheme);
+              phRemove(si);
+            });
           }
           slotsEl.appendChild(d);
         });
@@ -6323,6 +6327,8 @@ const MODULE_REGISTRY = {
         tile.used = true;
         phSlots[si] = tile;
         sfx('tap');
+        // Play the phoneme sound immediately on tap
+        playPhoneme(tile.grapheme);
         renderSlots(); renderPool();
 
         if (phSlots.indexOf(null) === -1) setTimeout(phCheck, 200);
