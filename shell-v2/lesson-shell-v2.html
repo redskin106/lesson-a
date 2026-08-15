@@ -6390,45 +6390,31 @@ const MODULE_REGISTRY = {
         if (fb) { fb.textContent = ''; }
 
         // Animate: play each phoneme tile in sequence, then the whole word
-        let i = 0;
-        function playNext() {
-          if (i < item.phonemes.length) {
-            const slotEl = document.getElementById(`ph-s-${i}`);
-            if (slotEl) {
-              slotEl.style.borderColor = '#FFD700'; slotEl.style.background = 'rgba(255,215,0,0.2)'; slotEl.style.color = '#FFE082';
-              slotEl.animate([{transform:'scale(1)'},{transform:'scale(1.1)'},{transform:'scale(1)'}], {duration:300});
-            }
-            playPhoneme(item.phonemes[i].grapheme);
-            i++;
-            setTimeout(playNext, 700);
-          } else {
-            setTimeout(() => {
-              renderSlots();
-              const fb = container.querySelector('#ph-fb');
-              if (fb) fb.textContent = '';
-              const recContainer = document.createElement('div');
-              recContainer.style.marginTop = '4%';
-              container.appendChild(recContainer);
-              renderSayItInteraction(recContainer, {
-                prompt: 'Now you say it:',
-                target: item.word,
-                audioFile: null,
-                isBronze,
-                moduleIndex: state.currentModuleIndex,
-                tier,
-                recordingItemIndex: idx,
-                allowSkip: true,
-              }, () => {
-                idx++;
-                if (idx < session.length) load();
-                else onComplete(score / session.length);
-              });
-            }, 1800);
-          }
-        }
+        // Correct — slots go green, pause, then record section appears
+        setTimeout(() => {
+          renderSlots();
+          const fb = container.querySelector('#ph-fb');
+          if (fb) fb.textContent = '';
+          const recContainer = document.createElement('div');
+          recContainer.style.marginTop = '4%';
+          container.appendChild(recContainer);
+          renderSayItInteraction(recContainer, {
+            prompt: 'Now you say it:',
+            target: item.word,
+            audioFile: null,
+            isBronze,
+            moduleIndex: state.currentModuleIndex,
+            tier,
+            recordingItemIndex: idx,
+            allowSkip: true,
+          }, () => {
+            idx++;
+            if (idx < session.length) load();
+            else onComplete(score / session.length);
+          });
+        }, 800);
 
         // Pause before starting the phoneme sequence
-        setTimeout(playNext, 500);
         playNext();
       }
 
