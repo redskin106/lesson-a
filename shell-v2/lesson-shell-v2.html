@@ -2089,14 +2089,67 @@ const LESSON = [
     label: 'Sound It Out',
     data: {
       bronze: { pick: 1, items: [
-        { word: 'cat', emoji: '🐱', tokens: [{t:'The',r:'connector'},{t:'cat',r:'subject'},{t:'is',r:'verb'},{t:'small',r:'object'}] },
+        { word: 'cat', emoji: '🐱',
+          phonemes: [{ grapheme: 'c' }, { grapheme: 'a' }, { grapheme: 't' }],
+          tokens: [{t:'The',r:'connector'},{t:'cat',r:'subject'},{t:'is',r:'verb'},{t:'small',r:'object'}] },
       ]},
       silver: { pick: 1, items: [
-        { word: 'ship', emoji: '🚢', tokens: [{t:'The',r:'connector'},{t:'ship',r:'subject'},{t:'is',r:'verb'},{t:'big',r:'object'}] },
+        { word: 'ship', emoji: '🚢',
+          phonemes: [{ grapheme: 'sh' }, { grapheme: 'i' }, { grapheme: 'p' }],
+          tokens: [{t:'The',r:'connector'},{t:'ship',r:'subject'},{t:'is',r:'verb'},{t:'big',r:'object'}] },
       ]},
       gold: { pick: 1, items: [
-        { word: 'three', emoji: '3️⃣', tokens: [{t:'I',r:'subject'},{t:'have',r:'verb'},{t:'three',r:'object'},{t:'books',r:'object'}] },
+        { word: 'three', emoji: '3️⃣',
+          phonemes: [{ grapheme: 'th' }, { grapheme: 'r' }, { grapheme: 'ee' }],
+          distractor: 'ch',
+          tokens: [{t:'I',r:'subject'},{t:'have',r:'verb'},{t:'three',r:'object'},{t:'books',r:'object'}] },
       ]}
+    }
+  },
+
+  // ── MINIMAL PAIRS ──────────────────────────────────────────────────────
+  {
+    id: 'mod-14',
+    type: 'minimal-pairs',
+    label: 'Listen Close',
+    data: {
+      bronze: { pick: 2, items: [
+        { targetSound: 'SH', targetHint: 'like "shhh!" 🤫',
+          targetAudioFile: 'assets/phonemes/sound_sh.mp3',
+          options: [
+            { emoji: '🚢', word: 'ship', hasTarget: true,  audioFile: null },
+            { emoji: '🍟', word: 'chip', hasTarget: false, audioFile: null },
+          ]},
+        { targetSound: 'SH', targetHint: 'like "shhh!" 🤫',
+          targetAudioFile: 'assets/phonemes/sound_sh.mp3',
+          options: [
+            { emoji: '🐑', word: 'sheep', hasTarget: true,  audioFile: null },
+            { emoji: '🌊', word: 'seep',  hasTarget: false, audioFile: null },
+          ]},
+      ]},
+      silver: { pick: 2, items: [
+        { targetSound: 'TH', targetHint: 'tongue near teeth 👅',
+          targetAudioFile: 'assets/phonemes/sound_th.mp3',
+          options: [
+            { emoji: '📏', word: 'tin',  hasTarget: false, audioFile: null },
+            { emoji: '🧵', word: 'thin', hasTarget: true,  audioFile: null },
+          ]},
+        { targetSound: 'TH', targetHint: 'tongue near teeth 👅',
+          targetAudioFile: 'assets/phonemes/sound_th.mp3',
+          options: [
+            { emoji: '🌳', word: 'tree',  hasTarget: false, audioFile: null },
+            { emoji: '3️⃣', word: 'three', hasTarget: true,  audioFile: null },
+          ]},
+      ]},
+      gold: { pick: 1, items: [
+        { targetSound: 'SH', targetHint: 'like "shhh!" 🤫',
+          targetAudioFile: 'assets/phonemes/sound_sh.mp3',
+          options: [
+            { emoji: '🚢', word: 'ship',  hasTarget: true,  audioFile: null },
+            { emoji: '🐱', word: 'cat',   hasTarget: false, audioFile: null },
+            { emoji: '🐟', word: 'fish',  hasTarget: true,  audioFile: null },
+          ]},
+      ]},
     }
   },
 ];
@@ -6137,183 +6190,432 @@ const MODULE_REGISTRY = {
   },
 
   // ─────────────────────────────────────────────
-  //  PHONICS
-  //  "Each letter tile speaks its letter aloud when tapped — distinct from
-  //  Word Scramble, which speaks only the completed word." A tight variant
-  //  of Word Scramble's exact mechanic (same slots/bank/hint pattern),
-  //  with one real addition: every tile speaks its own letter name the
-  //  moment it's placed, addressing the sound-discrimination gap flagged
-  //  for Vietnamese students specifically. The whole-word play button
-  //  stays too — this adds letter-level audio, it doesn't replace the
-  //  word-level audio Word Scramble already has.
+  //  PHONICS — "Sound It Out"
+  //  Students see the object emoji + (Bronze) the written word.
+  //  Jumbled phoneme group tiles appear in a pool — e.g. SH · I · P.
+  //  Gold adds one distractor tile. Students tap tiles into order,
+  //  then tap each placed tile to hear its phoneme sound (stub: TTS).
+  //  On full correct order: each phoneme plays in sequence, then the
+  //  full word plays. Then: record + self-assess (same Say It mechanic).
+  //  Audio files: assets/phonemes/{grapheme}.mp3 — falls back to TTS.
+  //  Bronze: word shown. Silver: word hidden. Gold: word hidden + distractor.
   'phonics': {
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
       const session = biasedSelect(items, pick, it => it.word);
       let idx = 0, score = 0, slotData = [], bankData = [], pnLocked = false;
 
-      const PALETTE = [
-        { border:'#00BCD4', bg:'rgba(0,188,212,.15)' },
-        { border:'#AB47BC', bg:'rgba(171,71,188,.15)' },
-        { border:'#FF9800', bg:'rgba(255,152,0,.15)' },
-        { border:'#E91E63', bg:'rgba(233,30,99,.15)' }
-      ];
-      function itemColor() { return PALETTE[idx % PALETTE.length]; }
+      const isBronze = tier === 'bronze';
+      const isGold   = tier === 'gold';
+      let idx = 0, score = 0;
+      let phSlots = [], phPool = [], phLocked = false, phCorrect = false;
 
       function pips() {
-        return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+        return session.map((_,i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+
+      // Play phoneme audio — tries assets/phonemes/{grapheme}.mp3, falls back to TTS
+      function playPhoneme(grapheme) {
+        const audioFile = `assets/phonemes/sound_${grapheme}.mp3`;
+        speak(grapheme, 'neutral', 0, audioFile);
       }
 
       function load() {
-        pnLocked = false;
+        phLocked = false; phCorrect = false;
         const item = session[idx];
-        const letters = item.word.toUpperCase().split('');
-        slotData = letters.map(() => null);
-        const wordUp = item.word.toUpperCase();
-        bankData = safeShuffle(letters, r => r.join('') === wordUp).map((l, i) => ({ letter: l, id: i, used: false }));
+        // Build pool: phoneme groups + optional distractor at Gold
+        const groups = [...item.phonemes];
+        if (isGold && item.distractor) groups.push({ grapheme: item.distractor, isDistractor: true });
+        phPool = safeShuffle(groups, r => {
+          // Avoid accidental correct order on first shuffle
+          const nonDistractors = r.filter(g => !g.isDistractor);
+          return nonDistractors.every((g, i) => g.grapheme === item.phonemes[i].grapheme);
+        }).map((g, i) => ({ ...g, id: i, used: false }));
+        phSlots = item.phonemes.map(() => null);
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
         draw();
       }
 
       function draw() {
         const item = session[idx];
-        const hasClue = !!findContextClue(item.word, item.tokens);
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="pn-pips"></div>
-          ${hasClue ? '<button class="precheck-hint-btn" id="pn-hint-btn">💡 Hint</button><p class="ws-feedback-v2" id="pn-clue" style="display:none;"></p>' : ''}
-          <div class="ws-visual-v2">
+          <div class="mp-pips-row-v2" id="ph-pips"></div>
+          <div class="ws-visual-v2" style="text-align:center;margin-bottom:4%;">
             <div class="ws-emoji-v2">${item.emoji}</div>
-            <button class="ws-play-btn-v2" id="pn-play-btn">🔊</button>
+            ${isBronze ? `<div style="font-size:5cqw;font-weight:700;color:#fff;margin-top:2%;">${item.word}</div>` : ''}
+            <button class="ws-play-btn-v2" id="ph-play-btn" style="position:relative;margin:2% auto 0;">🔊</button>
           </div>
-          <div class="ws-slots-v2" id="pn-slots"></div>
-          <div class="ws-bank-v2" id="pn-bank"></div>
-          <p class="ws-feedback-v2" id="pn-fb">&nbsp;</p>
+          <p style="font-size:3cqw;color:var(--text-dim);text-align:center;margin-bottom:3%;">Tap to build the sounds in order →</p>
+          <div class="ws-slots-v2" id="ph-slots" style="justify-content:center;flex-wrap:wrap;"></div>
+          <p style="font-size:3cqw;color:rgba(255,255,255,0.3);text-align:center;margin:2% 0 3%;">tap a tile to place it · tap a slot to remove</p>
+          <div class="ws-bank-v2" id="ph-bank" style="justify-content:center;flex-wrap:wrap;"></div>
+          <p class="ws-feedback-v2" id="ph-fb">&nbsp;</p>
+          <button class="iv-proceed-btn" id="ph-next" style="display:none;">Next →</button>
         `;
-        container.querySelector('#pn-pips').innerHTML = pips();
+        container.querySelector('#ph-pips').innerHTML = pips();
+        container.querySelector('#ph-play-btn').addEventListener('click', () => speak(item.word, 'neutral'));
 
-        if (hasClue) {
-          const hintBtn = container.querySelector('#pn-hint-btn');
-          hintBtn.addEventListener('click', () => {
-            const clue = findContextClue(item.word, item.tokens);
-            const clueEl = container.querySelector('#pn-clue');
-            clueEl.innerHTML = `Clue: <span class="gf-context-clue">${clue}</span>`;
-            clueEl.style.display = 'block';
-            hintBtn.disabled = true;
-            hintBtn.textContent = '💡 Hint used';
-          }, { once: true });
-        }
+        renderSlots(); renderPool();
+      }
 
-        const pnSlots = container.querySelector('#pn-slots');
-        slotData.forEach((_, si) => {
+      function renderSlots() {
+        const slotsEl = document.getElementById('ph-slots');
+        if (!slotsEl) return;
+        slotsEl.innerHTML = '';
+        phSlots.forEach((entry, si) => {
           const d = document.createElement('div');
           d.className = 'ws-slot-v2';
-          d.id = `pn-s-${si}`;
-          d.addEventListener('click', () => pnRemove(si));
-          pnSlots.appendChild(d);
+          d.id = `ph-s-${si}`;
+          d.style.minWidth = '14cqw';
+          d.style.fontSize = '4.5cqw';
+          d.style.fontWeight = '700';
+          if (entry) {
+            d.textContent = entry.grapheme;
+            if (phCorrect) {
+              d.style.borderColor = '#8BC34A'; d.style.background = 'rgba(139,195,74,0.15)'; d.style.color = '#AED581';
+            } else {
+              d.style.borderColor = '#00BCD4'; d.style.background = 'rgba(0,188,212,0.15)'; d.style.color = '#4DD0E1';
+            }
+            if (!phLocked) d.addEventListener('click', () => phRemove(si));
+          }
+          slotsEl.appendChild(d);
         });
+      }
 
-        const pnBank = container.querySelector('#pn-bank');
-        bankData.forEach((t, bi) => {
+      function renderPool() {
+        const bankEl = document.getElementById('ph-bank');
+        if (!bankEl) return;
+        bankEl.innerHTML = '';
+        phPool.forEach((tile, pi) => {
           const b = document.createElement('button');
           b.className = 'ws-tile-v2';
-          b.id = `pn-t-${bi}`;
-          b.textContent = t.letter;
-          b.addEventListener('click', () => pnTap(bi));
-          pnBank.appendChild(b);
-        });
-
-        container.querySelector('#pn-play-btn').addEventListener('click', () => {
-          speak(item.word, 'neutral');
-        });
-
-        refreshSlots(); refreshBank();
-      }
-
-      function refreshSlots() {
-        const c = itemColor();
-        slotData.forEach((entry, si) => {
-          const el = document.getElementById(`pn-s-${si}`);
-          if (!el) return;
-          el.textContent = entry ? entry.letter : '';
-          el.style.borderColor = entry ? c.border : 'rgba(255,255,255,0.08)';
-          el.style.background = entry ? c.bg : 'rgba(255,255,255,0.05)';
-          el.style.color = entry ? c.border : '#fff';
-        });
-      }
-      function refreshBank() {
-        bankData.forEach((t, bi) => {
-          const el = document.getElementById(`pn-t-${bi}`);
-          if (el) el.classList.toggle('used', t.used);
+          b.id = `ph-p-${pi}`;
+          b.textContent = tile.grapheme;
+          b.style.minWidth = '14cqw'; b.style.fontSize = '4.5cqw'; b.style.fontWeight = '700';
+          if (tile.isDistractor) b.style.borderColor = 'rgba(233,30,99,0.4)';
+          if (tile.used) b.classList.add('used');
+          b.addEventListener('click', () => phTap(pi));
+          bankEl.appendChild(b);
         });
       }
 
-      function pnTap(bi) {
-        if (pnLocked) return;
-        const tile = bankData[bi];
+      function phTap(pi) {
+        if (phLocked) return;
+        const tile = phPool[pi];
         if (tile.used) return;
-        const si = slotData.indexOf(null);
+
+        if (tile.isDistractor) {
+          // Shake and reject — this sound doesn't belong in the word
+          const btn = document.getElementById(`ph-p-${pi}`);
+          if (btn) {
+            btn.style.borderColor = '#E91E63'; btn.style.background = 'rgba(233,30,99,0.1)';
+            btn.animate([
+              {transform:'translateX(0)'},{transform:'translateX(-6px)'},
+              {transform:'translateX(6px)'},{transform:'translateX(0)'}
+            ], {duration: 300});
+            setTimeout(() => { btn.style.borderColor = 'rgba(233,30,99,0.4)'; btn.style.background = ''; }, 700);
+          }
+          sfx('wrong');
+          return;
+        }
+
+        const si = phSlots.indexOf(null);
         if (si === -1) return;
         tile.used = true;
-        slotData[si] = { letter: tile.letter, bankId: bi };
+        phSlots[si] = tile;
         sfx('tap');
-        // The one real differentiator from Word Scramble — every tile
-        // speaks its own letter the moment it's placed, not just the
-        // completed word at the end.
-        speak(tile.letter, 'neutral');
-        refreshSlots(); refreshBank();
-        if (slotData.indexOf(null) === -1) setTimeout(pnCheck, 200);
+        renderSlots(); renderPool();
+
+        if (phSlots.indexOf(null) === -1) setTimeout(phCheck, 200);
       }
-      function pnRemove(si) {
-        if (pnLocked) return;
-        const entry = slotData[si];
+
+      function phRemove(si) {
+        if (phLocked) return;
+        const entry = phSlots[si];
         if (!entry) return;
-        bankData[entry.bankId].used = false;
-        slotData[si] = null;
+        phPool[entry.id].used = false;
+        phSlots[si] = null;
         sfx('tap');
-        refreshSlots(); refreshBank();
+        renderSlots(); renderPool();
       }
 
-      function pnCheck() {
+      function phCheck() {
         const item = session[idx];
-        const attempt = slotData.map(e => e.letter).join('').toLowerCase();
-        const ok = attempt === item.word.toLowerCase();
-        pnLocked = true;
-        if (state.student) recordWordExposure(state.student, item.word, 'phonics', ok).catch(() => {});
-        const c = itemColor();
-        const fb = document.getElementById('pn-fb');
-
-        slotData.forEach((_, si) => {
-          const el = document.getElementById(`pn-s-${si}`);
-          if (el) {
-            el.style.borderColor = ok ? c.border : '#E91E63';
-            el.style.background = ok ? c.bg : 'rgba(233,30,99,0.12)';
-            el.style.color = ok ? c.border : '#F48FB1';
-          }
-        });
-
-        if (ok) {
-          score++;
-          speak(item.word, 'celebrate');
-          const plainSentence = item.tokens.map(t => t.t).join(' ');
-          showGrammarReinforce(item.tokens, plainSentence, () => {
-            idx++;
-            if (idx < session.length) load();
-            else onComplete(score / session.length);
-          });
-        } else {
-          if (fb) { fb.textContent = '✗ Not quite — try again'; fb.style.color = '#F48FB1'; }
-          speak(item.word, 'wrong');
-          setTimeout(() => {
-            slotData = slotData.map(() => null);
-            bankData.forEach(t => t.used = false);
-            pnLocked = false;
-            refreshSlots(); refreshBank();
-            if (fb) { fb.textContent = 'Try again!'; fb.style.color = 'rgba(255,255,255,0.4)'; }
-          }, 1600);
+        const ok = phSlots.every((e, i) => e && e.grapheme === item.phonemes[i].grapheme);
+        if (!ok) {
+          sfx('wrong');
+          // Return all to pool, let them try again
+          phSlots = item.phonemes.map(() => null);
+          phPool.forEach(t => { t.used = false; });
+          const fb = document.getElementById('ph-fb');
+          if (fb) { fb.textContent = 'Not quite — try a different order.'; fb.style.color = 'rgba(255,255,255,0.5)'; }
+          renderSlots(); renderPool();
+          return;
         }
+
+        // Correct! Play sequence: each phoneme then full word
+        phLocked = true; phCorrect = true;
+        if (state.student) recordWordExposure(state.student, item.word, 'phonics', true).catch(() => {});
+        renderSlots();
+
+        const fb = document.getElementById('ph-fb');
+        if (fb) { fb.textContent = ''; }
+
+        // Animate: play each phoneme tile in sequence, then the whole word
+        let i = 0;
+        function playNext() {
+          if (i < item.phonemes.length) {
+            const slotEl = document.getElementById(`ph-s-${i}`);
+            if (slotEl) {
+              slotEl.style.borderColor = '#FFD700'; slotEl.style.background = 'rgba(255,215,0,0.2)'; slotEl.style.color = '#FFE082';
+              slotEl.animate([{transform:'scale(1)'},{transform:'scale(1.1)'},{transform:'scale(1)'}], {duration:300});
+            }
+            playPhoneme(item.phonemes[i].grapheme);
+            i++;
+            setTimeout(playNext, 600);
+          } else {
+            // Full word plays after all phonemes
+            setTimeout(() => {
+              speak(item.word, 'celebrate');
+              // Restore gold color
+              renderSlots();
+              // Show record + next
+              const nextBtn = document.getElementById('ph-next');
+              if (nextBtn) {
+                score++;
+                // Chain into record interaction then advance
+                const recContainer = document.createElement('div');
+                recContainer.style.marginTop = '4%';
+                container.appendChild(recContainer);
+                renderSayItInteraction(recContainer, {
+                  prompt: 'Now you say it:',
+                  target: item.word,
+                  audioFile: null,
+                  isBronze,
+                  moduleIndex: state.currentModuleIndex,
+                  tier,
+                  recordingItemIndex: idx,
+                  allowSkip: true,
+                }, () => {
+                  idx++;
+                  if (idx < session.length) load();
+                  else onComplete(score / session.length);
+                });
+              }
+            }, 400);
+          }
+        }
+        playNext();
       }
 
       load();
+    }
+  },
+
+  // ─────────────────────────────────────────────
+  //  MINIMAL PAIRS — "Listen Close"
+  //  One screen, audio-first. Target sound shown + play button at top.
+  //  Bronze: two words hidden (emoji only), tap which has the sound.
+  //  Silver: words revealed, same task.
+  //  Gold: three options, tap ALL that have the sound.
+  //  Wrong taps reset cleanly. No IPA, no symbols — pure listening.
+  'minimal-pairs': {
+    render(container, data, tier, onComplete) {
+      const { pick, items } = data;
+      const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
+      const isGold = tier === 'gold';
+      const showWords = tier !== 'bronze';
+      let idx = 0, totalScore = 0;
+
+      function pips() {
+        return session.map((_,i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
+      }
+
+      function playSound(file, fallback) {
+        if (file) speak(fallback, 'neutral', 0, file);
+        else speak(fallback, 'neutral');
+      }
+
+      function renderQuestion() {
+        const item = session[idx];
+        let answered = false;
+        let goldAnswered = {};
+        document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
+
+        container.innerHTML = `
+          <div class="mp-pips-row-v2" id="mp-pips"></div>
+
+          <!-- Target sound -->
+          <div style="background:rgba(0,188,212,0.07);border:1.5px solid rgba(0,188,212,0.18);
+            border-radius:14px;padding:4% 5%;display:flex;align-items:center;gap:4%;margin-bottom:5%;">
+            <div style="flex:1;">
+              <div style="font-size:2.8cqw;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:1%;">Find this sound</div>
+              <div style="font-size:9cqw;font-weight:800;color:#00BCD4;line-height:1;">${item.targetSound}</div>
+              <div style="font-size:2.9cqw;color:rgba(255,255,255,0.35);margin-top:1%;">${item.targetHint || ''}</div>
+            </div>
+            <button id="mp-target-play"
+              style="width:12cqw;height:12cqw;border-radius:50%;background:rgba(0,188,212,0.14);
+              border:2px solid rgba(0,188,212,0.3);color:#00BCD4;font-size:5cqw;cursor:pointer;
+              display:flex;align-items:center;justify-content:center;flex-shrink:0;">🔊</button>
+          </div>
+
+          <!-- Question -->
+          <div style="font-size:3.8cqw;font-weight:600;color:#fff;text-align:center;margin-bottom:5%;line-height:1.4;">
+            ${isGold ? `Tap <span style="color:#00BCD4;">every word</span> that has this sound` : `Which word has <span style="color:#00BCD4;">${item.targetSound}</span>?`}
+          </div>
+
+          <!-- Word cards or gold options -->
+          <div id="mp-words"></div>
+
+          <div class="ws-feedback-v2" id="mp-fb">&nbsp;</div>
+          <button class="iv-proceed-btn" id="mp-next" style="display:none;">Next →</button>
+        `;
+
+        container.querySelector('#mp-pips').innerHTML = pips();
+        container.querySelector('#mp-target-play').addEventListener('click', () =>
+          playSound(item.targetAudioFile, item.targetSound));
+
+        const wordsEl = container.querySelector('#mp-words');
+
+        if (!isGold) {
+          // Bronze/Silver: two word cards
+          wordsEl.innerHTML = `<div style="display:flex;gap:3%;margin-bottom:4%;">
+            ${item.options.map((opt, i) => `
+              <button class="mp-option-card" id="mp-opt-${i}"
+                style="flex:1;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);
+                border-radius:16px;padding:5% 3%;display:flex;flex-direction:column;align-items:center;
+                gap:3%;cursor:pointer;font-family:inherit;transition:all .18s;">
+                <div style="font-size:2.8cqw;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Word ${i+1}</div>
+                <div style="font-size:12cqw;line-height:1;">${opt.emoji}</div>
+                <div style="font-size:4.5cqw;font-weight:700;color:#fff;
+                  ${showWords ? '' : 'filter:blur(5px);user-select:none;'}">${opt.word}</div>
+                <button onclick="event.stopPropagation();"
+                  style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.1);
+                  border-radius:999px;padding:2% 5%;color:rgba(255,255,255,0.6);font-size:3cqw;
+                  cursor:pointer;font-family:inherit;"
+                  data-play="${i}">🔊 Listen</button>
+              </button>
+            `).join('')}
+          </div>`;
+
+          // Wire play buttons
+          wordsEl.querySelectorAll('[data-play]').forEach(btn => {
+            const i = parseInt(btn.dataset.play);
+            btn.addEventListener('click', () => playSound(item.options[i].audioFile, item.options[i].word));
+          });
+
+          // Wire card taps
+          item.options.forEach((opt, i) => {
+            const card = container.querySelector(`#mp-opt-${i}`);
+            card.addEventListener('click', () => {
+              if (answered) return;
+              answered = true;
+              const correct = opt.hasTarget;
+              const other = container.querySelector(`#mp-opt-${i === 0 ? 1 : 0}`);
+
+              // Reveal words
+              card.querySelectorAll('div').forEach(d => d.style.filter = '');
+              other && other.querySelectorAll('div').forEach(d => d.style.filter = '');
+
+              if (correct) {
+                card.style.borderColor = 'var(--pass)'; card.style.background = 'rgba(76,175,80,0.12)';
+                setFb('✓ Yes! That one has the sound.', '#AED581');
+                totalScore++;
+                showNext(() => advance());
+              } else {
+                card.style.borderColor = 'var(--fail)'; card.style.background = 'rgba(233,30,99,0.1)';
+                if (other) { other.style.borderColor = 'var(--pass)'; other.style.background = 'rgba(76,175,80,0.12)'; }
+                setFb('Not quite — the other one! Listen again 👂', '#F48FB1');
+                setTimeout(() => {
+                  card.style.borderColor = ''; card.style.background = '';
+                  if (other) { other.style.borderColor = ''; other.style.background = ''; }
+                  if (!showWords) {
+                    card.querySelectorAll('div').forEach(d => { if (d.textContent !== `Word ${0+1}` && d.textContent !== `Word ${1+1}`) d.style.filter = 'blur(5px)'; });
+                    other && other.querySelectorAll('div').forEach(d => { if (d.textContent !== `Word ${0+1}` && d.textContent !== `Word ${1+1}`) d.style.filter = 'blur(5px)'; });
+                  }
+                  answered = false;
+                  setFb('Try once more 👂', 'var(--text-dim)');
+                }, 1800);
+              }
+            });
+          });
+
+        } else {
+          // Gold: stacked options, tap all that have the sound
+          wordsEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:2%;">
+            ${item.options.map((opt, i) => `
+              <button id="mp-gopt-${i}"
+                style="background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.09);
+                border-radius:12px;padding:3.5% 4%;display:flex;align-items:center;gap:3%;
+                cursor:pointer;font-family:inherit;transition:all .18s;">
+                <button onclick="event.stopPropagation();"
+                  style="width:10cqw;height:10cqw;border-radius:50%;background:rgba(255,255,255,0.06);
+                  border:1.5px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:4cqw;
+                  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;"
+                  data-gold-play="${i}">🔊</button>
+                <span style="font-size:8cqw;line-height:1;">${opt.emoji}</span>
+                <span style="font-size:4cqw;font-weight:700;color:#fff;flex:1;text-align:left;">${opt.word}</span>
+                <span id="mp-gtick-${i}" style="font-size:4.5cqw;opacity:0;transition:opacity .2s;">✓</span>
+              </button>
+            `).join('')}
+          </div>`;
+
+          wordsEl.querySelectorAll('[data-gold-play]').forEach(btn => {
+            const i = parseInt(btn.dataset.goldPlay);
+            btn.addEventListener('click', () => playSound(item.options[i].audioFile, item.options[i].word));
+          });
+
+          const totalTargets = item.options.filter(o => o.hasTarget).length;
+          let foundTargets = 0;
+
+          item.options.forEach((opt, i) => {
+            const card = container.querySelector(`#mp-gopt-${i}`);
+            card.addEventListener('click', () => {
+              if (goldAnswered[i] !== undefined) return;
+              goldAnswered[i] = opt.hasTarget;
+              if (opt.hasTarget) {
+                card.style.borderColor = 'var(--pass)'; card.style.background = 'rgba(76,175,80,0.12)';
+                const tick = container.querySelector(`#mp-gtick-${i}`);
+                if (tick) { tick.style.opacity = '1'; tick.style.color = '#AED581'; }
+                foundTargets++;
+                if (foundTargets === totalTargets) {
+                  setFb('✓ You found them all!', '#AED581');
+                  totalScore++;
+                  showNext(() => advance());
+                } else {
+                  setFb(`✓ Good — find the other${totalTargets - foundTargets > 1 ? 's' : ''}!`, '#AED581');
+                }
+              } else {
+                card.style.borderColor = 'var(--fail)'; card.style.background = 'rgba(233,30,99,0.1)';
+                setFb("That one doesn't have it — keep listening.", '#F48FB1');
+                setTimeout(() => {
+                  card.style.borderColor = ''; card.style.background = '';
+                  delete goldAnswered[i];
+                  setFb('', 'var(--text-dim)');
+                }, 1100);
+              }
+            });
+          });
+        }
+
+        function setFb(msg, color) {
+          const el = container.querySelector('#mp-fb');
+          if (el) { el.textContent = msg; el.style.color = color; }
+        }
+
+        function showNext(cb) {
+          const btn = container.querySelector('#mp-next');
+          if (btn) { btn.style.display = 'block'; btn.onclick = cb; }
+        }
+
+        function advance() {
+          idx++;
+          if (idx < session.length) renderQuestion();
+          else onComplete(totalScore / session.length);
+        }
+      }
+
+      renderQuestion();
     }
   },
 
