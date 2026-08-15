@@ -4210,10 +4210,6 @@ const MODULE_REGISTRY = {
   //  Tap one → immediate feedback, show correct.
   // ─────────────────────────────────────────────
   'true-false': {
-    // v2 design: pool-based, { pick, items: [...] } per tier, separate pool
-    // per tier. Tap True/False then Check, single attempt per question —
-    // grammar reinforcement shows either way, correct or wrong — then
-    // averages across the session for the tier's overall score.
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
       const session = safeShuffle(items, () => false).slice(0, Math.min(pick, items.length));
@@ -4223,6 +4219,7 @@ const MODULE_REGISTRY = {
         const { statement, answer, tokens } = session[idx];
         let selectedChoice = null;
         let hintUsed = false;
+        let attempts = 0; // track attempts for scoring
 
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
@@ -4278,32 +4275,45 @@ const MODULE_REGISTRY = {
           if (selectedChoice === null) { statusEl.textContent = 'pick True or False first'; return; }
 
           const correct = (selectedChoice === answer);
+          attempts++;
+
+          if (!correct && attempts === 1 && !hintUsed) {
+            // First wrong attempt without hint — allow retry, nudge them
+            selectedChoice = null;
+            trueBtn.classList.remove('selected');
+            falseBtn.classList.remove('selected');
+            statusEl.textContent = 'Not quite — look again and try once more.';
+            sfx('wrong');
+            return;
+          }
+          if (!correct && attempts === 1 && hintUsed) {
+            // First wrong attempt after hint — allow one more retry
+            selectedChoice = null;
+            trueBtn.classList.remove('selected');
+            falseBtn.classList.remove('selected');
+            statusEl.textContent = 'Not quite — one more try.';
+            sfx('wrong');
+            return;
+          }
+
+          // Lock in — score based on hint use and attempts
           trueBtn.disabled = true;
           falseBtn.disabled = true;
           checkBtn.disabled = true;
-          if (correct) totalScore += 1;
+          if (correct) {
+            totalScore += hintUsed ? 0.5 : (attempts === 1 ? 1 : 0.5);
+          }
 
           const chosenBtn = selectedChoice ? trueBtn : falseBtn;
           chosenBtn.classList.remove('selected');
           chosenBtn.classList.add(correct ? 'hl-correct' : 'hl-wrong');
           statusEl.textContent = correct ? 'correct!' : 'not quite right';
 
-          // When the statement is false and the student correctly identifies
-          // it, don't replay the false sentence as reinforcement — that
-          // embeds the wrong information. Use an authored correction field
-          // if one exists, otherwise a generic confirmation with no sentence.
-          // True statements (and wrong answers) still show the full
-          // grammar-colored sentence as before.
           const isFalseCorrect = correct && answer === false;
           let plain, reinforceTokens;
           if (isFalseCorrect) {
-            if (session[idx].correction) {
-              plain = session[idx].correction;
-              reinforceTokens = null; // plain text only, no grammar coloring
-            } else {
-              plain = null; // generic fallback — no sentence at all
-              reinforceTokens = null;
-            }
+            plain = session[idx].correction || null;
+            reinforceTokens = null;
           } else {
             plain = tokens && tokens.length ? tokens.map(t => t.t).join(' ') : statement;
             reinforceTokens = tokens;
@@ -4588,6 +4598,7 @@ const MODULE_REGISTRY = {
           <p class="seq-pool-label-v2">Tap to place ↓</p>
           <div class="seq-pool-v2" id="seq-pool"></div>
           <button id="gf-check-btn" class="gf-check-btn" style="display:none;">Check</button>
+          <p class="gf-status" id="seq-status">&nbsp;</p>
           <button id="seq-next-btn" class="iv-proceed-btn">Next →</button>
         `;
 
@@ -4595,17 +4606,21 @@ const MODULE_REGISTRY = {
         const poolEl   = container.querySelector('#seq-pool');
         const checkBtn = container.querySelector('#gf-check-btn');
         const nextBtn  = container.querySelector('#seq-next-btn');
+        const statusEl = container.querySelector('#seq-status');
+        let seqAttempts = 0;
+        let confirmedSlots = new Set(); // indices confirmed correct by hint
 
         function renderSlots() {
           slotsEl.innerHTML = '';
           slots.forEach((val, i) => {
             const c = PALETTE[i % PALETTE.length];
+            const isConfirmed = confirmedSlots.has(i);
             const slot = document.createElement('div');
             slot.className = 'seq-slot-v2';
-            const numColor = val ? c.border : 'rgba(255,255,255,0.3)';
+            const numColor = val ? (isConfirmed ? '#8BC34A' : c.border) : 'rgba(255,255,255,0.3)';
             slot.innerHTML = `<div class="slot-num-v2" style="color:${numColor};">${i + 1}</div><div class="slot-text-v2">${val || ''}</div>`;
 
-            if (val && !checked) {
+            if (val && !checked && !isConfirmed) {
               slot.style.borderColor = c.border;
               slot.style.background = c.bg;
               slot.querySelector('.slot-text-v2').style.color = c.text;
@@ -4620,6 +4635,14 @@ const MODULE_REGISTRY = {
                 renderSlots();
                 updateCheck();
               });
+            } else if (isConfirmed) {
+              slot.style.borderColor = '#8BC34A';
+              slot.style.background = 'rgba(139,195,74,0.15)';
+              slot.querySelector('.slot-text-v2').style.color = '#AED581';
+            } else if (val) {
+              slot.style.borderColor = c.border;
+              slot.style.background = c.bg;
+              slot.querySelector('.slot-text-v2').style.color = c.text;
             }
             slotsEl.appendChild(slot);
           });
@@ -4637,7 +4660,7 @@ const MODULE_REGISTRY = {
           btn.dataset.word = word;
           btn.addEventListener('click', () => {
             if (btn.classList.contains('used') || checked) return;
-            const emptyIdx = slots.indexOf(null);
+            const emptyIdx = slots.findIndex((s, i) => s === null && !confirmedSlots.has(i));
             if (emptyIdx === -1) return;
             slots[emptyIdx] = word;
             btn.classList.add('used');
@@ -4650,28 +4673,51 @@ const MODULE_REGISTRY = {
 
         checkBtn.addEventListener('click', () => {
           if (checked) return;
-          checked = true;
-          checkBtn.style.display = 'none';
+          seqAttempts++;
           poolEl.querySelectorAll('.seq-item-v2').forEach(b => b.style.pointerEvents = 'none');
 
           let correctCount = 0;
-          slotsEl.querySelectorAll('.seq-slot-v2').forEach((slot, i) => {
-            const isCorrect = (slots[i] === correct[i]);
-            if (isCorrect) {
-              slot.style.borderColor = '#8BC34A';
-              slot.style.background = 'rgba(139,195,74,0.15)';
-              correctCount++;
-            } else {
-              slot.style.borderColor = '#E91E63';
-              slot.style.background = 'rgba(233,30,99,0.12)';
-              slot.querySelector('.slot-text-v2').innerHTML =
-                `<span style="text-decoration:line-through;opacity:0.5;">${slots[i]}</span> <span style="color:#AED581;margin-left:4px;">→ ${correct[i]}</span>`;
-            }
+          let newlyConfirmed = [];
+          slots.forEach((val, i) => {
+            if (val === correct[i]) { correctCount++; newlyConfirmed.push(i); }
           });
 
-          const score = correctCount / correct.length;
-          totalScore += score;
-          nextBtn.style.display = 'block';
+          const allCorrect = correctCount === correct.length;
+
+          if (allCorrect) {
+            checked = true;
+            slotsEl.querySelectorAll('.seq-slot-v2').forEach(slot => {
+              slot.style.borderColor = '#8BC34A';
+              slot.style.background = 'rgba(139,195,74,0.15)';
+            });
+            const seqScore = seqAttempts === 1 ? 1 : seqAttempts === 2 ? 0.6 : 0.3;
+            totalScore += seqScore;
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'block';
+          } else {
+            // Confirm already-correct slots, return wrong ones to pool
+            newlyConfirmed.forEach(i => confirmedSlots.add(i));
+            slots.forEach((val, i) => {
+              if (val !== correct[i] && val !== null) {
+                poolEl.querySelectorAll('.seq-item-v2').forEach(b => {
+                  if (b.dataset.word === val) b.classList.remove('used');
+                });
+                slots[i] = null;
+              }
+            });
+            const confirmedCount = confirmedSlots.size;
+            sfx('wrong');
+            if (confirmedCount > 0) {
+              statusEl.textContent = `${confirmedCount} in the right place — keep going!`;
+              statusEl.style.color = '#AED581';
+            } else {
+              statusEl.textContent = 'Not quite — try a different order.';
+              statusEl.style.color = 'rgba(255,255,255,0.5)';
+            }
+            poolEl.querySelectorAll('.seq-item-v2').forEach(b => b.style.pointerEvents = 'auto');
+            renderSlots();
+            updateCheck();
+          }
         });
 
         nextBtn.addEventListener('click', () => {
@@ -5103,12 +5149,18 @@ const MODULE_REGISTRY = {
         draw();
       }
 
+      let wsHintLevel = 0;
+      let wsAttempts  = 0;
+
       function draw() {
+        wsHintLevel = 0;
+        wsAttempts  = 0;
         const item = session[idx];
         const hasClue = !!findContextClue(item.word, item.tokens);
         container.innerHTML = `
           <div class="mp-pips-row-v2" id="ws-pips"></div>
-          ${hasClue ? '<button class="precheck-hint-btn" id="ws-hint-btn">💡 Hint</button><p class="ws-feedback-v2" id="ws-clue" style="display:none;"></p>' : ''}
+          <button class="precheck-hint-btn" id="ws-hint-btn">💡 Hint</button>
+          <p class="ws-feedback-v2" id="ws-clue" style="display:none;"></p>
           <div class="ws-visual-v2">
             <div class="ws-emoji-v2">${item.emoji}</div>
             <button class="ws-play-btn-v2" id="ws-play-btn">🔊</button>
@@ -5119,17 +5171,37 @@ const MODULE_REGISTRY = {
         `;
         container.querySelector('#ws-pips').innerHTML = pips();
 
-        if (hasClue) {
-          const hintBtn = container.querySelector('#ws-hint-btn');
-          hintBtn.addEventListener('click', () => {
+        const hintBtn = container.querySelector('#ws-hint-btn');
+        const clueEl  = container.querySelector('#ws-clue');
+
+        hintBtn.addEventListener('click', () => {
+          if (wsHintLevel >= 2) return;
+          wsHintLevel++;
+          if (wsHintLevel === 1 && hasClue) {
             const clue = findContextClue(item.word, item.tokens);
-            const clueEl = container.querySelector('#ws-clue');
             clueEl.innerHTML = `Clue: <span class="gf-context-clue">${clue}</span>`;
             clueEl.style.display = 'block';
+            hintBtn.textContent = '💡 Hint (1 more)';
+          } else {
+            // Level 2: lock one correct letter into the first empty slot
+            const word = item.word.toUpperCase();
+            const firstEmpty = slotData.indexOf(null);
+            if (firstEmpty !== -1) {
+              const correctLetter = word[firstEmpty];
+              // find a bank tile with that letter that isn't used
+              const tile = bankData.find(t => t.letter === correctLetter && !t.used);
+              if (tile) {
+                tile.used = true;
+                slotData[firstEmpty] = { letter: tile.letter, bankId: tile.id, locked: true };
+                refreshSlots();
+                refreshBank();
+              }
+            }
             hintBtn.disabled = true;
             hintBtn.textContent = '💡 Hint used';
-          }, { once: true });
-        }
+            clueEl.style.display = 'none';
+          }
+        });
 
         const wsSlots = container.querySelector('#ws-slots');
         slotData.forEach((_, si) => {
@@ -5163,9 +5235,14 @@ const MODULE_REGISTRY = {
           const el = document.getElementById(`ws-s-${si}`);
           if (!el) return;
           el.textContent = entry ? entry.letter : '';
-          el.style.borderColor = entry ? c.border : 'rgba(255,255,255,0.08)';
-          el.style.background = entry ? c.bg : 'rgba(255,255,255,0.05)';
-          el.style.color = entry ? c.border : '#fff';
+          if (entry && entry.locked) {
+            el.style.borderColor = '#8BC34A'; el.style.background = 'rgba(139,195,74,0.15)';
+            el.style.color = '#AED581';
+          } else {
+            el.style.borderColor = entry ? c.border : 'rgba(255,255,255,0.08)';
+            el.style.background = entry ? c.bg : 'rgba(255,255,255,0.05)';
+            el.style.color = entry ? c.border : '#fff';
+          }
         });
       }
       function refreshBank() {
@@ -5179,7 +5256,7 @@ const MODULE_REGISTRY = {
         if (wsLocked) return;
         const tile = bankData[bi];
         if (tile.used) return;
-        const si = slotData.indexOf(null);
+        const si = slotData.findIndex((s, i) => s === null && !(slotData[i] && slotData[i].locked));
         if (si === -1) return;
         tile.used = true;
         slotData[si] = { letter: tile.letter, bankId: bi };
@@ -5190,7 +5267,7 @@ const MODULE_REGISTRY = {
       function wsRemove(si) {
         if (wsLocked) return;
         const entry = slotData[si];
-        if (!entry) return;
+        if (!entry || entry.locked) return;
         bankData[entry.bankId].used = false;
         slotData[si] = null;
         sfx('tap');
@@ -5202,13 +5279,14 @@ const MODULE_REGISTRY = {
         const attempt = slotData.map(e => e.letter).join('').toLowerCase();
         const ok = attempt === item.word.toLowerCase();
         wsLocked = true;
+        wsAttempts++;
         if (state.student) recordWordExposure(state.student, item.word, 'word-scramble', ok).catch(() => {});
         const c = itemColor();
         const fb = document.getElementById('ws-fb');
 
         slotData.forEach((_, si) => {
           const el = document.getElementById(`ws-s-${si}`);
-          if (el) {
+          if (el && !slotData[si]?.locked) {
             el.style.borderColor = ok ? c.border : '#E91E63';
             el.style.background = ok ? c.bg : 'rgba(233,30,99,0.12)';
             el.style.color = ok ? c.border : '#F48FB1';
@@ -5216,8 +5294,10 @@ const MODULE_REGISTRY = {
         });
 
         if (ok) {
-          score++;
-          speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel, not repeated here
+          const wsScore = wsAttempts === 1 && wsHintLevel === 0 ? 1
+                        : wsAttempts === 1 || wsHintLevel === 1 ? 0.67 : 0.34;
+          score += wsScore;
+          speak(item.word, 'celebrate');
           const plainSentence = item.tokens.map(t => t.t).join(' ');
           showGrammarReinforce(item.tokens, plainSentence, () => {
             idx++;
@@ -5225,15 +5305,19 @@ const MODULE_REGISTRY = {
             else onComplete(score / session.length);
           });
         } else {
-          if (fb) { fb.textContent = `✗ The word is: ${item.word}`; fb.style.color = '#F48FB1'; }
-          speak(item.word, 'wrong'); // word once, then silent retry — no second play
+          if (fb) { fb.textContent = 'Not quite — try again!'; fb.style.color = 'rgba(255,255,255,0.5)'; }
+          speak(item.word, 'wrong');
           setTimeout(() => {
-            slotData = slotData.map(() => null);
-            bankData.forEach(t => t.used = false);
+            // Return non-locked tiles to pool
+            slotData = slotData.map((e, i) => e && e.locked ? e : null);
+            bankData.forEach((t, bi) => {
+              const stillLocked = slotData.some(e => e && e.bankId === bi);
+              if (!stillLocked) t.used = false;
+            });
             wsLocked = false;
             refreshSlots(); refreshBank();
-            if (fb) { fb.textContent = 'Try again!'; fb.style.color = 'rgba(255,255,255,0.4)'; }
-          }, 1500);
+            if (fb) { fb.textContent = ''; }
+          }, 1200);
         }
       }
 
@@ -5264,8 +5348,11 @@ const MODULE_REGISTRY = {
         return session.map((_, i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
       }
 
+      let spHintLevel = 0;
+      let spAttempts  = 0;
+
       function load() {
-        spLocked = false; retypeMode = false;
+        spLocked = false; retypeMode = false; spHintLevel = 0; spAttempts = 0;
         const item = session[idx];
         const letters = item.word.toUpperCase().split('');
         slotData = letters.map(() => null);
@@ -5284,7 +5371,8 @@ const MODULE_REGISTRY = {
 
         container.innerHTML = `
           <div class="mp-pips-row-v2" id="sp-pips"></div>
-          ${hasClue ? '<button class="precheck-hint-btn" id="sp-hint-btn">💡 Hint</button><p class="sp-feedback-v2" id="sp-clue" style="display:none;"></p>' : ''}
+          <button class="precheck-hint-btn" id="sp-hint-btn">💡 Hint</button>
+          <p class="sp-feedback-v2" id="sp-clue" style="display:none;"></p>
           <div class="sp-visual-v2">
             ${showImage ? `<div class="sp-emoji-v2">${item.emoji}</div>` : ''}
             <div class="sp-listen-row-v2">
@@ -5303,17 +5391,39 @@ const MODULE_REGISTRY = {
         `;
         container.querySelector('#sp-pips').innerHTML = pips();
 
-        if (hasClue) {
-          const hintBtn = container.querySelector('#sp-hint-btn');
-          hintBtn.addEventListener('click', () => {
+        const hintBtn = container.querySelector('#sp-hint-btn');
+        const clueEl  = container.querySelector('#sp-clue');
+
+        hintBtn.addEventListener('click', () => {
+          if (spHintLevel >= 2) return;
+          spHintLevel++;
+          if (spHintLevel === 1 && hasClue) {
             const clue = findContextClue(item.word, item.tokens);
-            const clueEl = container.querySelector('#sp-clue');
             clueEl.innerHTML = `Clue: <span class="gf-context-clue">${clue}</span>`;
             clueEl.style.display = 'block';
+            hintBtn.textContent = '💡 Hint (1 more)';
+          } else {
+            // Level 2: pre-fill first letter (tile mode) or show it (type mode)
+            if (isTile) {
+              const firstLetter = item.word.toUpperCase()[0];
+              const tile = bankData.find(t => t.letter === firstLetter && !t.used);
+              if (tile && slotData[0] === null) {
+                tile.used = true;
+                slotData[0] = { letter: tile.letter, bankId: tile.id, locked: true };
+                spRefreshSlots(); spRefreshBank();
+              }
+            } else {
+              const inp = container.querySelector('#sp-input');
+              if (inp && !inp.value) {
+                inp.value = item.word[0];
+                inp.placeholder = item.word[0] + '…';
+              }
+            }
+            clueEl.style.display = 'none';
             hintBtn.disabled = true;
             hintBtn.textContent = '💡 Hint used';
-          }, { once: true });
-        }
+          }
+        });
 
         container.querySelector('#sp-play-btn').addEventListener('click', () => speak(item.word, 'neutral'));
 
@@ -5354,7 +5464,7 @@ const MODULE_REGISTRY = {
         if (spLocked) return;
         const tile = bankData[bi];
         if (tile.used) return;
-        const si = slotData.indexOf(null);
+        const si = slotData.findIndex((s, i) => s === null && !(slotData[i] && slotData[i].locked));
         if (si === -1) return;
         tile.used = true;
         slotData[si] = { letter: tile.letter, bankId: bi };
@@ -5365,7 +5475,7 @@ const MODULE_REGISTRY = {
       function spRemove(si) {
         if (spLocked) return;
         const entry = slotData[si];
-        if (!entry) return;
+        if (!entry || entry.locked) return;
         bankData[entry.bankId].used = false;
         slotData[si] = null;
         sfx('tap');
@@ -5376,8 +5486,12 @@ const MODULE_REGISTRY = {
           const el = document.getElementById(`sp-s-${si}`);
           if (!el) return;
           el.textContent = entry ? entry.letter : '';
-          el.style.borderColor = entry ? '#7052B4' : 'rgba(255,255,255,0.08)';
-          el.style.background = entry ? 'rgba(112,82,180,0.15)' : 'rgba(255,255,255,0.05)';
+          if (entry && entry.locked) {
+            el.style.borderColor = '#8BC34A'; el.style.background = 'rgba(139,195,74,0.15)';
+          } else {
+            el.style.borderColor = entry ? '#7052B4' : 'rgba(255,255,255,0.08)';
+            el.style.background = entry ? 'rgba(112,82,180,0.15)' : 'rgba(255,255,255,0.05)';
+          }
         });
       }
       function spRefreshBank() {
@@ -5401,29 +5515,34 @@ const MODULE_REGISTRY = {
         const attempt = slotData.map(e => e.letter).join('').toLowerCase();
         const ok = attempt === item.word.toLowerCase();
         spLocked = true;
+        spAttempts++;
         if (state.student) recordWordExposure(state.student, item.word, 'spelling', ok).catch(() => {});
         const fb = document.getElementById('sp-fb');
-        slotData.forEach((_, si) => {
+        slotData.forEach((entry, si) => {
           const el = document.getElementById(`sp-s-${si}`);
-          if (el) {
+          if (el && !entry?.locked) {
             el.style.borderColor = ok ? '#8BC34A' : '#E91E63';
             el.style.background = ok ? 'rgba(139,195,74,0.15)' : 'rgba(233,30,99,0.12)';
           }
         });
         if (ok) {
-          score++;
-          speak(item.word, 'celebrate'); // word once — sentence comes from the reinforcement panel
+          const spScore = spAttempts === 1 && spHintLevel === 0 ? 1
+                        : spHintLevel === 1 || spAttempts === 1 ? 0.67 : 0.34;
+          score += spScore;
+          speak(item.word, 'celebrate');
           reinforceThenAdvance(item);
         } else {
-          if (fb) { fb.textContent = `✗ The word is: ${item.word}`; fb.style.color = '#F48FB1'; }
-          speak(item.word, 'wrong'); // word once, then silent retry
+          if (fb) { fb.textContent = 'Not quite — try again!'; fb.style.color = 'rgba(255,255,255,0.5)'; }
+          speak(item.word, 'wrong');
           setTimeout(() => {
-            slotData = slotData.map(() => null);
-            bankData.forEach(t => t.used = false);
+            slotData = slotData.map((e, i) => e && e.locked ? e : null);
+            bankData.forEach((t, bi) => {
+              if (!slotData.some(e => e && e.bankId === bi)) t.used = false;
+            });
             spLocked = false;
             spRefreshSlots(); spRefreshBank();
-            if (fb) { fb.textContent = 'Try again!'; fb.style.color = 'rgba(255,255,255,0.4)'; }
-          }, 1500);
+            if (fb) { fb.textContent = ''; }
+          }, 1200);
         }
       }
 
@@ -5787,8 +5906,6 @@ const MODULE_REGISTRY = {
         const ok = slotData.every((e, i) => e.text === item.tokens[i].text);
         sbLocked = true;
         if (state.student) {
-          // Whole-sentence check, no per-slot granularity — every token in
-          // the sentence gets the same correct/wrong status for this attempt.
           item.tokens.forEach(tk => {
             if (tk.text) recordWordExposure(state.student, tk.text, 'sentence-building', ok).catch(() => {});
           });
@@ -5806,9 +5923,6 @@ const MODULE_REGISTRY = {
             el.style.background = c ? c + '26' : 'rgba(255,255,255,0.06)';
             el.style.color = c || 'rgba(255,255,255,0.6)';
           });
-          // Reuse the shared grammarLegend helper — remap text/role to t/r
-          // since this module's tokens use different field names than the
-          // gap-fill/true-false grammar-token convention.
           const legendTokens = item.tokens.map(t => ({ t: t.text, r: t.role }));
           fb.innerHTML = `<div class="sb-legend-v2">${grammarLegend(legendTokens)}</div>`;
           speak(sentenceText(item.tokens), 'celebrate');
@@ -5819,13 +5933,21 @@ const MODULE_REGISTRY = {
             else onComplete(score / session.length);
           };
         } else {
-          slotData.forEach((_, si) => {
+          // Pulse wrong slots in red, leave correct ones highlighted green
+          slotData.forEach((entry, si) => {
             const el = document.getElementById(`sb-s-${si}`);
-            if (el) { el.style.borderColor = '#E91E63'; el.style.background = 'rgba(233,30,99,0.1)'; }
+            if (!el) return;
+            const isCorrect = entry && entry.text === item.tokens[si].text;
+            if (isCorrect) {
+              el.style.borderColor = '#8BC34A'; el.style.background = 'rgba(139,195,74,0.12)';
+            } else {
+              el.style.borderColor = '#E91E63'; el.style.background = 'rgba(233,30,99,0.1)';
+            }
           });
-          fb.textContent = '✗ Not quite — listen and try again';
-          fb.style.color = '#F48FB1';
-          speak(sentenceText(item.tokens), 'wrong'); // deliberately speaks even on wrong here, matches locked demo
+          const correctCount = slotData.filter((e, i) => e && e.text === item.tokens[i].text).length;
+          fb.textContent = correctCount > 0 ? `${correctCount} in the right place — keep going!` : 'Not quite — try a different order.';
+          fb.style.color = correctCount > 0 ? '#AED581' : '#F48FB1';
+          speak(sentenceText(item.tokens), 'wrong');
           setTimeout(() => {
             slotData = slotData.map(() => null);
             bankData.forEach(t => t.used = false);
@@ -5984,12 +6106,20 @@ const MODULE_REGISTRY = {
             else onComplete(score / session.length);
           };
         } else {
-          slotData.forEach((_, si) => {
+          // Pulse wrong slots red, leave correct ones green
+          slotData.forEach((entry, si) => {
             const el = document.getElementById(`qf-s-${si}`);
-            if (el) { el.style.borderColor = '#E91E63'; el.style.background = 'rgba(233,30,99,0.1)'; }
+            if (!el) return;
+            const isCorrect = entry && entry.text === item.tokens[si].text;
+            if (isCorrect) {
+              el.style.borderColor = '#8BC34A'; el.style.background = 'rgba(139,195,74,0.12)';
+            } else {
+              el.style.borderColor = '#E91E63'; el.style.background = 'rgba(233,30,99,0.1)';
+            }
           });
-          fb.textContent = '✗ Not quite — listen and try again';
-          fb.style.color = '#F48FB1';
+          const correctCount = slotData.filter((e, i) => e && e.text === item.tokens[i].text).length;
+          fb.textContent = correctCount > 0 ? `${correctCount} in the right place — keep going!` : 'Not quite — try a different order.';
+          fb.style.color = correctCount > 0 ? '#AED581' : '#F48FB1';
           speak(questionText(item.tokens), 'wrong');
           setTimeout(() => {
             slotData = slotData.map(() => null);
