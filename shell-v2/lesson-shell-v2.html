@@ -6332,7 +6332,8 @@ const MODULE_REGISTRY = {
         if (tile.used) return;
 
         if (tile.isDistractor) {
-          // Shake and reject — this sound doesn't belong in the word
+          // Play the sound so student hears it, then shake and reject
+          playPhoneme(tile.grapheme);
           const btn = document.getElementById(`ph-p-${pi}`);
           if (btn) {
             btn.style.borderColor = '#E91E63'; btn.style.background = 'rgba(233,30,99,0.1)';
