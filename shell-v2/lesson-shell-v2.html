@@ -6213,28 +6213,32 @@ const MODULE_REGISTRY = {
         return session.map((_,i) => `<div class="mp-pip-v2${i<idx?' done':i===idx?' current':''}"></div>`).join('');
       }
 
-      // Map graphemes to example words for TTS fallback
-      // (real audio: assets/phonemes/sound_{grapheme}.mp3)
-      const PHONEME_WORDS = {
-        'sh':'shh', 'th':'the', 'ch':'church', 'ng':'ring',
-        'oo':'moon', 'ooo':'book', 'ai':'rain', 'ee':'see',
-        'ar':'car',  'or':'for',  'er':'her',  'oa':'go',
-        'oi':'boy',  'ou':'out',  'ue':'blue',  'ie':'fly',
-        'qu':'quick','ck':'kick',
-        'a':'apple','b':'bed','c':'cat','d':'dog','e':'egg',
-        'f':'fish','g':'got','h':'hot','i':'it','j':'jam',
-        'k':'kit','l':'lap','m':'map','n':'nap','o':'on',
-        'p':'pan','r':'ran','s':'sat','t':'tap','u':'up',
-        'v':'van','w':'wet','x':'fox','y':'yes','z':'zip',
+      // Map graphemes to Jolly Phonics filenames (not always 1:1)
+      const PHONEME_FILE = {
+        'c':'ck', 'k':'k', 'ck':'ck',
+        'g':'g',  'j':'j', 'qu':'qu',
+        'x':'x',  'y':'y', 'z':'z',
+        'ng':'ng', 'sh':'sh', 'th':'th', 'ch':'ch',
+        'ai':'ai', 'ee':'ee', 'ie':'ie', 'oa':'oa',
+        'oo':'ooo', 'or':'or', 'ur':'er', 'er':'er',
+        'ow':'ou', 'ou':'ou', 'oi':'oi',
+        'ear':'ar', 'air':'ar', 'ar':'ar',
+        'ue':'ue', 'thh':'thh',
       };
 
       function playPhoneme(grapheme) {
-        const audioFile = `assets/phonemes/sound_${grapheme}.mp3`;
-        const ttsWord = PHONEME_WORDS[grapheme] || grapheme;
-        // Try real audio first, fall back to speaking an example word
+        const fileKey = PHONEME_FILE[grapheme] || grapheme;
+        const audioFile = `assets/phonemes/sound_${fileKey}.mp3`;
         const a = new Audio(audioFile);
-        a.onerror = () => speak(ttsWord, 'slow');
-        a.play().catch(() => speak(ttsWord, 'slow'));
+        a.onerror = () => {
+          // TTS fallback — speak a word containing the sound
+          const FALLBACK = {
+            'c':'cat','k':'kit','g':'got','j':'jam','qu':'quick',
+            'x':'fox','y':'yes','z':'zip','ng':'ring',
+          };
+          speak(FALLBACK[grapheme] || grapheme, 'slow');
+        };
+        a.play().catch(() => a.onerror());
       }
 
       function load() {
