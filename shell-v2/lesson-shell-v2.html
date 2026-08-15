@@ -6394,7 +6394,7 @@ const MODULE_REGISTRY = {
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="mp-pips" style="${session.length <= 1 ? 'display:none;' : ''}"></div>
+          <div class="mp-pips-row-v2" id="mp-pips" style="display:none;"></div>
 
           <!-- Target sound banner -->
           <div style="background:rgba(0,188,212,0.07);border:1.5px solid rgba(0,188,212,0.2);
@@ -6437,30 +6437,34 @@ const MODULE_REGISTRY = {
         const wordsEl = container.querySelector('#mp-words');
 
         if (!isGold) {
+          // Use divs not nested buttons — button-in-button is invalid HTML
           wordsEl.innerHTML = `
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4%;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4%;margin-bottom:4%;">
               ${item.options.map((opt, i) => `
-                <button class="iv-option-btn" id="mp-opt-${i}"
-                  style="flex-direction:column;align-items:center;gap:2.5%;
-                  padding:5% 4%;border-radius:14px;min-height:32cqw;">
+                <div class="iv-option-btn" id="mp-opt-${i}"
+                  style="flex-direction:column;align-items:center;gap:3%;
+                  padding:5% 4%;border-radius:14px;min-height:30cqw;cursor:pointer;">
                   <div style="font-size:2.6cqw;color:var(--text-dim);text-transform:uppercase;
-                    letter-spacing:.07em;margin-bottom:1%;">Word ${i+1}</div>
-                  <div style="font-size:14cqw;line-height:1;">${opt.emoji}</div>
+                    letter-spacing:.07em;">Word ${i+1}</div>
+                  <div style="font-size:14cqw;line-height:1;margin:2% 0;">${opt.emoji}</div>
                   <div class="mp-word-label" style="font-size:4cqw;font-weight:700;
-                    color:rgba(255,255,255,0.9);min-height:5cqw;margin-top:1%;
+                    color:rgba(255,255,255,0.9);min-height:5cqw;
                     ${showWords ? '' : 'filter:blur(6px);user-select:none;'}">${opt.word}</div>
-                  <button style="margin-top:2%;background:rgba(255,255,255,0.06);
+                  <div class="mp-listen-btn" data-play="${i}"
+                    style="margin-top:3%;background:rgba(255,255,255,0.06);
                     border:1px solid rgba(255,255,255,0.12);border-radius:999px;
-                    padding:2% 8%;color:rgba(255,255,255,0.5);font-size:3cqw;
-                    cursor:pointer;font-family:inherit;"
-                    data-play="${i}" onclick="event.stopPropagation();">🔊 Listen</button>
-                </button>
+                    padding:2% 8%;color:rgba(255,255,255,0.5);font-size:2.8cqw;cursor:pointer;">
+                    🔊 Listen</div>
+                </div>
               `).join('')}
             </div>`;
 
-          wordsEl.querySelectorAll('[data-play]').forEach(btn => {
-            const i = parseInt(btn.dataset.play);
-            btn.addEventListener('click', () => playSound(item.options[i].audioFile, item.options[i].word));
+          wordsEl.querySelectorAll('.mp-listen-btn').forEach(div => {
+            const i = parseInt(div.dataset.play);
+            div.addEventListener('click', (e) => {
+              e.stopPropagation();
+              playSound(item.options[i].audioFile, item.options[i].word);
+            });
           });
 
           item.options.forEach((opt, i) => {
