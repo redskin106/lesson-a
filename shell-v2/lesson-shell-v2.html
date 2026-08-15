@@ -6218,7 +6218,7 @@ const MODULE_REGISTRY = {
         'c':'ck', 'k':'k', 'ck':'ck',
         'g':'g',  'j':'j', 'qu':'qu',
         'x':'x',  'y':'y', 'z':'z',
-        'ng':'ng', 'sh':'sh', 'th':'th', 'ch':'ch',
+        'ng':'ng', 'sh':'sh', 'th':'thh', 'ch':'ch',
         'ai':'ai', 'ee':'ee', 'ie':'ie', 'oa':'oa',
         'oo':'ooo', 'or':'or', 'ur':'er', 'er':'er',
         'ow':'ou', 'ou':'ou', 'oi':'oi',
@@ -6294,14 +6294,16 @@ const MODULE_REGISTRY = {
             d.textContent = entry.grapheme;
             if (phCorrect) {
               d.style.borderColor = '#8BC34A'; d.style.background = 'rgba(139,195,74,0.15)'; d.style.color = '#AED581';
+              // After correct: tap to hear phoneme again, no removal
+              d.style.cursor = 'pointer';
+              d.addEventListener('click', () => playPhoneme(entry.grapheme));
             } else {
               d.style.borderColor = '#00BCD4'; d.style.background = 'rgba(0,188,212,0.15)'; d.style.color = '#4DD0E1';
+              if (!phLocked) d.addEventListener('click', () => {
+                playPhoneme(entry.grapheme);
+                phRemove(si);
+              });
             }
-            if (!phLocked) d.addEventListener('click', () => {
-              // Tap filled slot: play its sound, then remove on second tap
-              playPhoneme(entry.grapheme);
-              phRemove(si);
-            });
           }
           slotsEl.appendChild(d);
         });
@@ -6380,6 +6382,7 @@ const MODULE_REGISTRY = {
 
         // Correct! Play sequence: each phoneme then full word
         phLocked = true; phCorrect = true;
+        score++;
         if (state.student) recordWordExposure(state.student, item.word, 'phonics', true).catch(() => {});
         renderSlots();
 
@@ -6397,37 +6400,31 @@ const MODULE_REGISTRY = {
             }
             playPhoneme(item.phonemes[i].grapheme);
             i++;
-            setTimeout(playNext, 600);
+            setTimeout(playNext, 700);
           } else {
-            // Full word plays after all phonemes
+            // Pause after last phoneme before playing full word
             setTimeout(() => {
               speak(item.word, 'celebrate');
-              // Restore gold color
               renderSlots();
-              // Show record + next
-              const nextBtn = document.getElementById('ph-next');
-              if (nextBtn) {
-                score++;
-                // Chain into record interaction then advance
-                const recContainer = document.createElement('div');
-                recContainer.style.marginTop = '4%';
-                container.appendChild(recContainer);
-                renderSayItInteraction(recContainer, {
-                  prompt: 'Now you say it:',
-                  target: item.word,
-                  audioFile: null,
-                  isBronze,
-                  moduleIndex: state.currentModuleIndex,
-                  tier,
-                  recordingItemIndex: idx,
-                  allowSkip: true,
-                }, () => {
-                  idx++;
-                  if (idx < session.length) load();
-                  else onComplete(score / session.length);
-                });
-              }
-            }, 400);
+              // Show record interaction
+              const recContainer = document.createElement('div');
+              recContainer.style.marginTop = '4%';
+              container.appendChild(recContainer);
+              renderSayItInteraction(recContainer, {
+                prompt: 'Now you say it:',
+                target: item.word,
+                audioFile: null,
+                isBronze,
+                moduleIndex: state.currentModuleIndex,
+                tier,
+                recordingItemIndex: idx,
+                allowSkip: true,
+              }, () => {
+                idx++;
+                if (idx < session.length) load();
+                else onComplete(score / session.length);
+              });
+            }, 600);
           }
         }
         playNext();
