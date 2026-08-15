@@ -6203,7 +6203,6 @@ const MODULE_REGISTRY = {
     render(container, data, tier, onComplete) {
       const { pick, items } = data;
       const session = biasedSelect(items, pick, it => it.word);
-      let idx = 0, score = 0, slotData = [], bankData = [], pnLocked = false;
 
       const isBronze = tier === 'bronze';
       const isGold   = tier === 'gold';
