@@ -3852,7 +3852,6 @@ const MODULE_REGISTRY = {
         { border:'#8BC34A', bg:'rgba(139,195,74,.18)', color:'#AED581' }
       ];
       const SCORE_BY_HINT_LEVEL = { 0: 1, 1: 2/3, 2: 1/3, 3: 1/3 };
-      const STARS_BY_HINT_LEVEL = { 0: 3, 1: 2, 2: 1, 3: 1 };
 
       function renderQuestion() {
         const { sentence, options, answer, tokens } = session[idx];
@@ -3977,9 +3976,8 @@ const MODULE_REGISTRY = {
             sfx('correct');
             if (state.student) recordWordExposure(state.student, answer, 'gap-fill', true).catch(() => {});
             const score = SCORE_BY_HINT_LEVEL[hintLevel];
-            const stars = STARS_BY_HINT_LEVEL[hintLevel];
             totalScore += score;
-            statusEl.textContent = `correct! ${'⭐'.repeat(stars)}${'✩'.repeat(3 - stars)}`;
+            statusEl.textContent = 'correct!';
 
             const proceed = () => {
               const plain = (tokens || []).map(t => t.t).join(' ');
