@@ -6260,18 +6260,24 @@ const MODULE_REGISTRY = {
       function draw() {
         const item = session[idx];
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="ph-pips"></div>
-          <div class="ws-visual-v2" style="text-align:center;margin-bottom:4%;">
+          <div class="mp-pips-row-v2" id="ph-pips" style="${session.length <= 1 ? 'display:none;' : ''}"></div>
+
+          <!-- Stimulus -->
+          <div style="text-align:center;margin-bottom:3%;">
             <div class="ws-emoji-v2">${item.emoji}</div>
-            ${isBronze ? `<div style="font-size:5cqw;font-weight:700;color:#fff;margin-top:2%;">${item.word}</div>` : ''}
+            ${isBronze ? `<div style="font-size:5.5cqw;font-weight:700;color:#fff;margin-top:1.5%;letter-spacing:0.05em;">${item.word}</div>` : ''}
             <button class="ws-play-btn-v2" id="ph-play-btn" style="position:relative;margin:2% auto 0;">🔊</button>
           </div>
-          <p style="font-size:3cqw;color:var(--text-dim);text-align:center;margin-bottom:3%;">Tap to build the sounds in order →</p>
-          <div class="ws-slots-v2" id="ph-slots" style="justify-content:center;flex-wrap:wrap;"></div>
-          <p style="font-size:3cqw;color:rgba(255,255,255,0.3);text-align:center;margin:2% 0 3%;">tap a tile to place it · tap a slot to remove</p>
-          <div class="ws-bank-v2" id="ph-bank" style="justify-content:center;flex-wrap:wrap;"></div>
-          <p class="ws-feedback-v2" id="ph-fb">&nbsp;</p>
-          <button class="iv-proceed-btn" id="ph-next" style="display:none;">Next →</button>
+
+          <!-- Slots -->
+          <div style="font-size:2.8cqw;color:var(--text-dim);text-align:center;margin-bottom:2%;text-transform:uppercase;letter-spacing:0.08em;">Build the sounds in order</div>
+          <div class="ws-slots-v2" id="ph-slots" style="justify-content:center;flex-wrap:wrap;margin-bottom:3%;min-height:13cqw;"></div>
+
+          <!-- Pool -->
+          <div style="font-size:2.4cqw;color:rgba(255,255,255,0.2);text-align:center;margin-bottom:2%;">tap a tile to place it · tap a slot to remove</div>
+          <div class="ws-bank-v2" id="ph-bank" style="justify-content:center;flex-wrap:wrap;min-height:13cqw;margin-bottom:2%;"></div>
+
+          <p class="ws-feedback-v2" id="ph-fb" style="min-height:3cqw;margin-bottom:2%;">&nbsp;</p>
         `;
         container.querySelector('#ph-pips').innerHTML = pips();
         container.querySelector('#ph-play-btn').addEventListener('click', () => speak(item.word, 'neutral'));
@@ -6287,8 +6293,9 @@ const MODULE_REGISTRY = {
           const d = document.createElement('div');
           d.className = 'ws-slot-v2';
           d.id = `ph-s-${si}`;
-          d.style.minWidth = '14cqw';
-          d.style.fontSize = '4.5cqw';
+          d.style.minWidth = '16cqw';
+          d.style.height = '16cqw';
+          d.style.fontSize = '5cqw';
           d.style.fontWeight = '700';
           if (entry) {
             d.textContent = entry.grapheme;
@@ -6318,7 +6325,7 @@ const MODULE_REGISTRY = {
           b.className = 'ws-tile-v2';
           b.id = `ph-p-${pi}`;
           b.textContent = tile.grapheme;
-          b.style.minWidth = '14cqw'; b.style.fontSize = '4.5cqw'; b.style.fontWeight = '700';
+          b.style.minWidth = '16cqw'; b.style.height = '16cqw'; b.style.fontSize = '5cqw'; b.style.fontWeight = '700';
           if (tile.isDistractor) b.style.borderColor = 'rgba(233,30,99,0.4)';
           if (tile.used) b.classList.add('used');
           b.addEventListener('click', () => phTap(pi));
