@@ -6348,8 +6348,6 @@ const MODULE_REGISTRY = {
         if (si === -1) return;
         tile.used = true;
         phSlots[si] = tile;
-        sfx('tap');
-        // Play the phoneme sound immediately on tap
         playPhoneme(tile.grapheme);
         renderSlots(); renderPool();
 
