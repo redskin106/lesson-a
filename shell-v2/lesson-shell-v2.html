@@ -732,10 +732,10 @@ html, body {
 #screen-module.screen { padding: 0; align-items: center; justify-content: center; }
 .frame-wrap { width: min(400px, 100vw); max-height: 94vh; position: relative; container-type: inline-size; }
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
-.app-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12.7cqw; }
+.app-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12.7cqw; isolation: isolate; }
 .layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; }
 .layer-scene { position: absolute; left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
-.frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
+.frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; border-radius: 12.7cqw; overflow: hidden; }
 
 .pos            { position: absolute; z-index: 2; }
 .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
@@ -2111,7 +2111,7 @@ const LESSON = [
   {
     id: 'mod-14',
     type: 'minimal-pairs',
-    label: 'Listen Close',
+    label: 'Listen Closely',
     data: {
       bronze: { pick: 2, items: [
         { targetSound: 'SH', targetHint: 'like "shhh!" 🤫',
@@ -6461,31 +6461,26 @@ const MODULE_REGISTRY = {
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="mp-pips"></div>
+          <div class="mp-pips-row-v2" id="mp-pips" style="${session.length <= 1 ? 'display:none;' : ''}"></div>
 
-          <!-- Target sound -->
-          <div style="background:rgba(0,188,212,0.07);border:1.5px solid rgba(0,188,212,0.18);
-            border-radius:14px;padding:4% 5%;display:flex;align-items:center;gap:4%;margin-bottom:5%;">
+          <div class="gf-context-banner" style="display:flex;align-items:center;gap:4%;margin-bottom:5%;padding:4% 5%;">
             <div style="flex:1;">
-              <div style="font-size:2.8cqw;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:1%;">Find this sound</div>
-              <div style="font-size:9cqw;font-weight:800;color:#00BCD4;line-height:1;">${item.targetSound}</div>
-              <div style="font-size:2.9cqw;color:rgba(255,255,255,0.35);margin-top:1%;">${item.targetHint || ''}</div>
+              <div style="font-size:2.8cqw;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2%;">Find this sound</div>
+              <div style="font-size:10cqw;font-weight:800;color:#00BCD4;line-height:1;letter-spacing:.05em;">${item.targetSound}</div>
+              <div style="font-size:3cqw;color:rgba(255,255,255,0.3);margin-top:1.5%;">${item.targetHint || ''}</div>
             </div>
-            <button id="mp-target-play"
-              style="width:12cqw;height:12cqw;border-radius:50%;background:rgba(0,188,212,0.14);
-              border:2px solid rgba(0,188,212,0.3);color:#00BCD4;font-size:5cqw;cursor:pointer;
-              display:flex;align-items:center;justify-content:center;flex-shrink:0;">🔊</button>
+            <button class="ws-play-btn-v2" id="mp-target-play">🔊</button>
           </div>
 
-          <!-- Question -->
-          <div style="font-size:3.8cqw;font-weight:600;color:#fff;text-align:center;margin-bottom:5%;line-height:1.4;">
-            ${isGold ? `Tap <span style="color:#00BCD4;">every word</span> that has this sound` : `Which word has <span style="color:#00BCD4;">${item.targetSound}</span>?`}
-          </div>
+          <p style="font-size:3.6cqw;font-weight:600;color:#fff;text-align:center;margin-bottom:5%;line-height:1.4;">
+            ${isGold
+              ? `Tap <span style="color:#00BCD4;">every word</span> that has this sound`
+              : `Which word has <span style="color:#00BCD4;">${item.targetSound}</span>?`}
+          </p>
 
-          <!-- Word cards or gold options -->
-          <div id="mp-words"></div>
+          <div id="mp-words" style="margin-bottom:4%;"></div>
 
-          <div class="ws-feedback-v2" id="mp-fb">&nbsp;</div>
+          <p class="ws-feedback-v2" id="mp-fb">&nbsp;</p>
           <button class="iv-proceed-btn" id="mp-next" style="display:none;">Next →</button>
         `;
 
@@ -6496,33 +6491,26 @@ const MODULE_REGISTRY = {
         const wordsEl = container.querySelector('#mp-words');
 
         if (!isGold) {
-          // Bronze/Silver: two word cards
-          wordsEl.innerHTML = `<div style="display:flex;gap:3%;margin-bottom:4%;">
-            ${item.options.map((opt, i) => `
-              <button class="mp-option-card" id="mp-opt-${i}"
-                style="flex:1;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);
-                border-radius:16px;padding:5% 3%;display:flex;flex-direction:column;align-items:center;
-                gap:3%;cursor:pointer;font-family:inherit;transition:all .18s;">
-                <div style="font-size:2.8cqw;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Word ${i+1}</div>
-                <div style="font-size:12cqw;line-height:1;">${opt.emoji}</div>
-                <div style="font-size:4.5cqw;font-weight:700;color:#fff;
-                  ${showWords ? '' : 'filter:blur(5px);user-select:none;'}">${opt.word}</div>
-                <button onclick="event.stopPropagation();"
-                  style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.1);
-                  border-radius:999px;padding:2% 5%;color:rgba(255,255,255,0.6);font-size:3cqw;
-                  cursor:pointer;font-family:inherit;"
-                  data-play="${i}">🔊 Listen</button>
-              </button>
-            `).join('')}
-          </div>`;
+          wordsEl.innerHTML = `
+            <div class="iv-options-grid" style="grid-template-columns:1fr 1fr;">
+              ${item.options.map((opt, i) => `
+                <button class="iv-option-btn" id="mp-opt-${i}"
+                  style="flex-direction:column;gap:3%;padding:5% 3%;min-height:28cqw;border-radius:14px;">
+                  <div style="font-size:2.6cqw;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;">Word ${i+1}</div>
+                  <div style="font-size:13cqw;line-height:1;">${opt.emoji}</div>
+                  <div class="mp-word-label" style="font-size:4.5cqw;font-weight:700;color:#fff;min-height:5.5cqw;
+                    ${showWords ? '' : 'filter:blur(6px);user-select:none;'}">${opt.word}</div>
+                  <button class="precheck-hint-btn" style="font-size:3cqw;padding:2% 6%;margin-top:1%;"
+                    data-play="${i}" onclick="event.stopPropagation();">🔊 Listen</button>
+                </button>
+              `).join('')}
+            </div>`;
 
-          // Wire play buttons
           wordsEl.querySelectorAll('[data-play]').forEach(btn => {
             const i = parseInt(btn.dataset.play);
             btn.addEventListener('click', () => playSound(item.options[i].audioFile, item.options[i].word));
           });
 
-          // Wire card taps
           item.options.forEach((opt, i) => {
             const card = container.querySelector(`#mp-opt-${i}`);
             card.addEventListener('click', () => {
@@ -6530,53 +6518,41 @@ const MODULE_REGISTRY = {
               answered = true;
               const correct = opt.hasTarget;
               const other = container.querySelector(`#mp-opt-${i === 0 ? 1 : 0}`);
-
-              // Reveal words
-              card.querySelectorAll('div').forEach(d => d.style.filter = '');
-              other && other.querySelectorAll('div').forEach(d => d.style.filter = '');
-
+              container.querySelectorAll('.mp-word-label').forEach(d => d.style.filter = '');
               if (correct) {
-                card.style.borderColor = 'var(--pass)'; card.style.background = 'rgba(76,175,80,0.12)';
-                setFb('✓ Yes! That one has the sound.', '#AED581');
+                card.classList.add('correct');
+                setFb('\u2713 Yes! That one has the sound.', '#AED581');
                 totalScore++;
                 showNext(() => advance());
               } else {
-                card.style.borderColor = 'var(--fail)'; card.style.background = 'rgba(233,30,99,0.1)';
-                if (other) { other.style.borderColor = 'var(--pass)'; other.style.background = 'rgba(76,175,80,0.12)'; }
-                setFb('Not quite — the other one! Listen again 👂', '#F48FB1');
+                card.classList.add('wrong');
+                if (other) other.classList.add('correct');
+                setFb('Not quite \u2014 listen again \ud83d\udc42', '#F48FB1');
                 setTimeout(() => {
-                  card.style.borderColor = ''; card.style.background = '';
-                  if (other) { other.style.borderColor = ''; other.style.background = ''; }
-                  if (!showWords) {
-                    card.querySelectorAll('div').forEach(d => { if (d.textContent !== `Word ${0+1}` && d.textContent !== `Word ${1+1}`) d.style.filter = 'blur(5px)'; });
-                    other && other.querySelectorAll('div').forEach(d => { if (d.textContent !== `Word ${0+1}` && d.textContent !== `Word ${1+1}`) d.style.filter = 'blur(5px)'; });
-                  }
+                  card.classList.remove('wrong');
+                  if (other) other.classList.remove('correct');
+                  if (!showWords) container.querySelectorAll('.mp-word-label').forEach(d => d.style.filter = 'blur(6px)');
                   answered = false;
-                  setFb('Try once more 👂', 'var(--text-dim)');
+                  setFb('Try once more', 'rgba(255,255,255,0.4)');
                 }, 1800);
               }
             });
           });
 
         } else {
-          // Gold: stacked options, tap all that have the sound
-          wordsEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:2%;">
-            ${item.options.map((opt, i) => `
-              <button id="mp-gopt-${i}"
-                style="background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.09);
-                border-radius:12px;padding:3.5% 4%;display:flex;align-items:center;gap:3%;
-                cursor:pointer;font-family:inherit;transition:all .18s;">
-                <button onclick="event.stopPropagation();"
-                  style="width:10cqw;height:10cqw;border-radius:50%;background:rgba(255,255,255,0.06);
-                  border:1.5px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:4cqw;
-                  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;"
-                  data-gold-play="${i}">🔊</button>
-                <span style="font-size:8cqw;line-height:1;">${opt.emoji}</span>
-                <span style="font-size:4cqw;font-weight:700;color:#fff;flex:1;text-align:left;">${opt.word}</span>
-                <span id="mp-gtick-${i}" style="font-size:4.5cqw;opacity:0;transition:opacity .2s;">✓</span>
-              </button>
-            `).join('')}
-          </div>`;
+          wordsEl.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:3%;">
+              ${item.options.map((opt, i) => `
+                <button class="iv-option-btn" id="mp-gopt-${i}"
+                  style="justify-content:flex-start;gap:4%;padding:3.5% 4%;border-radius:12px;text-align:left;">
+                  <button class="precheck-hint-btn" style="font-size:4cqw;padding:2% 4%;flex-shrink:0;"
+                    data-gold-play="${i}" onclick="event.stopPropagation();">\ud83d\udd0a</button>
+                  <span style="font-size:8cqw;line-height:1;">${opt.emoji}</span>
+                  <span style="font-size:4cqw;font-weight:700;color:#fff;flex:1;">${opt.word}</span>
+                  <span id="mp-gtick-${i}" style="font-size:4.5cqw;opacity:0;transition:opacity .2s;color:#AED581;">\u2713</span>
+                </button>
+              `).join('')}
+            </div>`;
 
           wordsEl.querySelectorAll('[data-gold-play]').forEach(btn => {
             const i = parseInt(btn.dataset.goldPlay);
@@ -6592,24 +6568,25 @@ const MODULE_REGISTRY = {
               if (goldAnswered[i] !== undefined) return;
               goldAnswered[i] = opt.hasTarget;
               if (opt.hasTarget) {
-                card.style.borderColor = 'var(--pass)'; card.style.background = 'rgba(76,175,80,0.12)';
+                card.classList.add('correct');
+                card.onclick = null;
                 const tick = container.querySelector(`#mp-gtick-${i}`);
-                if (tick) { tick.style.opacity = '1'; tick.style.color = '#AED581'; }
+                if (tick) tick.style.opacity = '1';
                 foundTargets++;
                 if (foundTargets === totalTargets) {
-                  setFb('✓ You found them all!', '#AED581');
+                  setFb('\u2713 You found them all!', '#AED581');
                   totalScore++;
                   showNext(() => advance());
                 } else {
-                  setFb(`✓ Good — find the other${totalTargets - foundTargets > 1 ? 's' : ''}!`, '#AED581');
+                  setFb(`\u2713 Good \u2014 find the other${totalTargets - foundTargets > 1 ? 's' : ''}!`, '#AED581');
                 }
               } else {
-                card.style.borderColor = 'var(--fail)'; card.style.background = 'rgba(233,30,99,0.1)';
-                setFb("That one doesn't have it — keep listening.", '#F48FB1');
+                card.classList.add('wrong');
+                setFb("That one doesn't have it \u2014 keep listening", '#F48FB1');
                 setTimeout(() => {
-                  card.style.borderColor = ''; card.style.background = '';
+                  card.classList.remove('wrong');
                   delete goldAnswered[i];
-                  setFb('', 'var(--text-dim)');
+                  setFb('', 'rgba(255,255,255,0.4)');
                 }, 1100);
               }
             });
@@ -6620,12 +6597,10 @@ const MODULE_REGISTRY = {
           const el = container.querySelector('#mp-fb');
           if (el) { el.textContent = msg; el.style.color = color; }
         }
-
         function showNext(cb) {
           const btn = container.querySelector('#mp-next');
           if (btn) { btn.style.display = 'block'; btn.onclick = cb; }
         }
-
         function advance() {
           idx++;
           if (idx < session.length) renderQuestion();
