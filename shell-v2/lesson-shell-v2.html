@@ -734,7 +734,7 @@ html, body {
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12.7cqw; isolation: isolate; }
 .layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; }
-.layer-scene { position: absolute; left: 2.58%; top: 51.47%; width: 94.83%; height: 42.98%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
+.layer-scene { position: absolute; left: 2.58%; top: 52%; width: 94.83%; height: 41.5%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
 .frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; border-radius: 12.7cqw; overflow: hidden; }
 
 .pos            { position: absolute; z-index: 2; }
@@ -6463,24 +6463,37 @@ const MODULE_REGISTRY = {
         container.innerHTML = `
           <div class="mp-pips-row-v2" id="mp-pips" style="${session.length <= 1 ? 'display:none;' : ''}"></div>
 
-          <div class="gf-context-banner" style="display:flex;align-items:center;gap:4%;margin-bottom:5%;padding:4% 5%;">
-            <div style="flex:1;">
-              <div style="font-size:2.8cqw;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2%;">Find this sound</div>
-              <div style="font-size:10cqw;font-weight:800;color:#00BCD4;line-height:1;letter-spacing:.05em;">${item.targetSound}</div>
-              <div style="font-size:3cqw;color:rgba(255,255,255,0.3);margin-top:1.5%;">${item.targetHint || ''}</div>
+          <!-- Target sound banner -->
+          <div style="background:rgba(0,188,212,0.07);border:1.5px solid rgba(0,188,212,0.2);
+            border-radius:14px;padding:4% 5%;display:flex;align-items:center;
+            gap:4%;margin-bottom:5%;flex-shrink:0;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:2.8cqw;color:var(--text-dim);text-transform:uppercase;
+                letter-spacing:.08em;margin-bottom:2%;">Find this sound</div>
+              <div style="font-size:10cqw;font-weight:800;color:#00BCD4;line-height:1;
+                letter-spacing:.05em;">${item.targetSound}</div>
+              <div style="font-size:3cqw;color:rgba(255,255,255,0.3);margin-top:1.5%;">
+                ${item.targetHint || ''}</div>
             </div>
-            <button class="ws-play-btn-v2" id="mp-target-play">🔊</button>
+            <button id="mp-target-play"
+              style="width:11cqw;height:11cqw;border-radius:50%;flex-shrink:0;
+              background:rgba(0,188,212,0.15);border:1.5px solid rgba(0,188,212,0.35);
+              color:#00BCD4;font-size:4.5cqw;cursor:pointer;
+              display:flex;align-items:center;justify-content:center;font-family:inherit;">🔊</button>
           </div>
 
-          <p style="font-size:3.6cqw;font-weight:600;color:#fff;text-align:center;margin-bottom:5%;line-height:1.4;">
+          <!-- Question -->
+          <p style="font-size:3.6cqw;font-weight:600;color:#fff;text-align:center;
+            margin-bottom:5%;line-height:1.4;">
             ${isGold
-              ? `Tap <span style="color:#00BCD4;">every word</span> that has this sound`
-              : `Which word has <span style="color:#00BCD4;">${item.targetSound}</span>?`}
+              ? \`Tap <span style="color:#00BCD4;">every word</span> that has this sound\`
+              : \`Which word has <span style="color:#00BCD4;">${item.targetSound}</span>?\`}
           </p>
 
-          <div id="mp-words" style="margin-bottom:4%;"></div>
+          <!-- Word cards -->
+          <div id="mp-words" style="flex:1;"></div>
 
-          <p class="ws-feedback-v2" id="mp-fb">&nbsp;</p>
+          <p class="ws-feedback-v2" id="mp-fb" style="margin-top:3%;">&nbsp;</p>
           <button class="iv-proceed-btn" id="mp-next" style="display:none;">Next →</button>
         `;
 
@@ -6492,15 +6505,21 @@ const MODULE_REGISTRY = {
 
         if (!isGold) {
           wordsEl.innerHTML = `
-            <div class="iv-options-grid" style="grid-template-columns:1fr 1fr;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4%;">
               ${item.options.map((opt, i) => `
                 <button class="iv-option-btn" id="mp-opt-${i}"
-                  style="flex-direction:column;gap:3%;padding:5% 3%;min-height:28cqw;border-radius:14px;">
-                  <div style="font-size:2.6cqw;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;">Word ${i+1}</div>
-                  <div style="font-size:13cqw;line-height:1;">${opt.emoji}</div>
-                  <div class="mp-word-label" style="font-size:4.5cqw;font-weight:700;color:#fff;min-height:5.5cqw;
+                  style="flex-direction:column;align-items:center;gap:2.5%;
+                  padding:5% 4%;border-radius:14px;min-height:32cqw;">
+                  <div style="font-size:2.6cqw;color:var(--text-dim);text-transform:uppercase;
+                    letter-spacing:.07em;margin-bottom:1%;">Word ${i+1}</div>
+                  <div style="font-size:14cqw;line-height:1;">${opt.emoji}</div>
+                  <div class="mp-word-label" style="font-size:4cqw;font-weight:700;
+                    color:rgba(255,255,255,0.9);min-height:5cqw;margin-top:1%;
                     ${showWords ? '' : 'filter:blur(6px);user-select:none;'}">${opt.word}</div>
-                  <button class="precheck-hint-btn" style="font-size:3cqw;padding:2% 6%;margin-top:1%;"
+                  <button style="margin-top:2%;background:rgba(255,255,255,0.06);
+                    border:1px solid rgba(255,255,255,0.12);border-radius:999px;
+                    padding:2% 8%;color:rgba(255,255,255,0.5);font-size:3cqw;
+                    cursor:pointer;font-family:inherit;"
                     data-play="${i}" onclick="event.stopPropagation();">🔊 Listen</button>
                 </button>
               `).join('')}
