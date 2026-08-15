@@ -1897,7 +1897,12 @@ const LESSON = [
         {
           emoji: '👜',
           full_sentence_audio: null,
-          l1: { options: ['bag', 'box', 'bottle', 'book'], answer: 'bag' },
+          l1: { options: [
+            { label: 'bag',    emoji: '🎒' },
+            { label: 'box',    emoji: '📦' },
+            { label: 'bottle', emoji: '🍶' },
+            { label: 'book',   emoji: '📚' }
+          ], answer: 'bag' },
           l2: [],
           l3: { tiles: [], because_mode: 'typed' }
         }
@@ -1906,11 +1911,16 @@ const LESSON = [
         {
           emoji: '👜',
           full_sentence_audio: null,
-          l1: { options: ['bag', 'box', 'bottle', 'book'], answer: 'bag' },
+          l1: { options: [
+            { label: 'bag',    emoji: '🎒' },
+            { label: 'box',    emoji: '📦' },
+            { label: 'bottle', emoji: '🍶' },
+            { label: 'book',   emoji: '📚' }
+          ], answer: 'bag' },
           l2: [
-            { label: 'size',   options: ['big', 'small', 'long', 'short'], answer: 'small' },
-            { label: 'shape',  options: ['round', 'flat', 'square', 'long'], answer: 'flat' },
-            { label: 'colour', options: ['red', 'blue', 'black', 'brown'], answer: 'red' }
+            { label: 'size',   options: [{ label:'big', emoji:'🐘' }, { label:'small', emoji:'🐭' }, { label:'long', emoji:'📏' }, { label:'short', emoji:'✂️' }], answer: 'small' },
+            { label: 'shape',  options: [{ label:'round', emoji:'⭕' }, { label:'flat', emoji:'🥞' }, { label:'square', emoji:'🟥' }, { label:'long', emoji:'📏' }], answer: 'flat' },
+            { label: 'colour', options: [{ label:'red', emoji:'🔴' }, { label:'blue', emoji:'🔵' }, { label:'black', emoji:'⚫' }, { label:'brown', emoji:'🟤' }], answer: 'red' }
           ],
           l3: { tiles: [], because_mode: 'typed' }
         }
@@ -1919,11 +1929,16 @@ const LESSON = [
         {
           emoji: '👜',
           full_sentence_audio: null,
-          l1: { options: ['bag', 'box', 'bottle', 'book'], answer: 'bag' },
+          l1: { options: [
+            { label: 'bag',    emoji: '🎒' },
+            { label: 'box',    emoji: '📦' },
+            { label: 'bottle', emoji: '🍶' },
+            { label: 'book',   emoji: '📚' }
+          ], answer: 'bag' },
           l2: [
-            { label: 'size',   options: ['big', 'small', 'long', 'short'], answer: 'small' },
-            { label: 'shape',  options: ['round', 'flat', 'square', 'long'], answer: 'flat' },
-            { label: 'colour', options: ['red', 'blue', 'black', 'brown'], answer: 'red' }
+            { label: 'size',   options: [{ label:'big', emoji:'🐘' }, { label:'small', emoji:'🐭' }, { label:'long', emoji:'📏' }, { label:'short', emoji:'✂️' }], answer: 'small' },
+            { label: 'shape',  options: [{ label:'round', emoji:'⭕' }, { label:'flat', emoji:'🥞' }, { label:'square', emoji:'🟥' }, { label:'long', emoji:'📏' }], answer: 'flat' },
+            { label: 'colour', options: [{ label:'red', emoji:'🔴' }, { label:'blue', emoji:'🔵' }, { label:'black', emoji:'⚫' }, { label:'brown', emoji:'🟤' }], answer: 'red' }
           ],
           l3: { tiles: ['with a zip', 'with a handle', 'looks old', 'looks new'], because_mode: 'typed' }
         }
@@ -6154,11 +6169,16 @@ const MODULE_REGISTRY = {
             const row = zone.querySelector('#dp-tiles');
             const l1ShuffledOptions = safeShuffle(item.l1.options, () => false);
             l1ShuffledOptions.forEach(opt => {
+              // Support both plain string options (legacy) and {label, emoji} objects
+              const label = (typeof opt === 'object') ? opt.label : opt;
+              const emoji = (typeof opt === 'object') ? opt.emoji : null;
               const btn = document.createElement('button');
               btn.className = 'dp-tile';
-              btn.textContent = opt;
+              btn.innerHTML = emoji
+                ? `<span style="display:block;font-size:5cqw;line-height:1.2;">${emoji}</span><span style="display:block;font-size:3cqw;">${label}</span>`
+                : label;
               btn.addEventListener('click', () => {
-                if (opt !== item.l1.answer) {
+                if (label !== item.l1.answer) {
                   sfx('wrong');
                   if (state.student) recordWordExposure(state.student, item.l1.answer, 'description-pyramid', false).catch(() => {});
                   btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}], {duration:250});
@@ -6166,7 +6186,7 @@ const MODULE_REGISTRY = {
                 }
                 sfx('correct');
                 if (state.student) recordWordExposure(state.student, item.l1.answer, 'description-pyramid', true).catch(() => {});
-                l1Answer = opt;
+                l1Answer = label;
                 btn.classList.add('selected');
                 btn.style.background = '#00BCD4'; btn.style.borderColor = '#00BCD4';
                 updateStrip();
@@ -6185,11 +6205,16 @@ const MODULE_REGISTRY = {
             const isColour = isColourGroup(group.label);
             const l2ShuffledOptions = safeShuffle(group.options, () => false);
             l2ShuffledOptions.forEach(opt => {
+              // Support both plain string options (legacy) and {label, emoji} objects
+              const label = (typeof opt === 'object') ? opt.label : opt;
+              const emoji = (typeof opt === 'object') ? opt.emoji : null;
               const btn = document.createElement('button');
               btn.className = 'dp-tile';
-              btn.textContent = opt;
+              btn.innerHTML = emoji
+                ? `<span style="display:block;font-size:5cqw;line-height:1.2;">${emoji}</span><span style="display:block;font-size:3cqw;">${label}</span>`
+                : (isColour ? label : label);
               btn.addEventListener('click', () => {
-                if (opt !== group.answer) {
+                if (label !== group.answer) {
                   sfx('wrong');
                   if (state.student) recordWordExposure(state.student, group.answer, 'description-pyramid', false).catch(() => {});
                   btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}], {duration:250});
@@ -6197,9 +6222,9 @@ const MODULE_REGISTRY = {
                 }
                 sfx('correct');
                 if (state.student) recordWordExposure(state.student, group.answer, 'description-pyramid', true).catch(() => {});
-                l2Answers[l2GroupIndex] = opt;
+                l2Answers[l2GroupIndex] = label;
                 btn.classList.add('selected');
-                const c = isColour ? dynamicColorFor(opt) : (l2GroupIndex % 2 === 0 ? '#FF9800' : '#AB47BC');
+                const c = isColour ? dynamicColorFor(label) : (l2GroupIndex % 2 === 0 ? '#FF9800' : '#AB47BC');
                 btn.style.background = c; btn.style.borderColor = c;
                 updateStrip();
                 l2GroupIndex++;
@@ -6224,14 +6249,18 @@ const MODULE_REGISTRY = {
               <button class="iv-proceed-btn dp-check-btn" id="dp-l3-continue" style="display:none;">Continue →</button>`;
             const row = zone.querySelector('#dp-tiles');
             (item.l3.tiles || []).forEach(opt => {
+              const label = (typeof opt === 'object') ? opt.label : opt;
+              const emoji = (typeof opt === 'object') ? opt.emoji : null;
               const btn = document.createElement('button');
               btn.className = 'dp-tile';
-              btn.textContent = opt;
+              btn.innerHTML = emoji
+                ? `<span style="display:block;font-size:5cqw;line-height:1.2;">${emoji}</span><span style="display:block;font-size:3cqw;">${label}</span>`
+                : label;
               btn.addEventListener('click', () => {
                 row.querySelectorAll('.dp-tile').forEach(b => { b.classList.remove('selected'); b.style.background=''; b.style.borderColor=''; });
                 btn.classList.add('selected');
                 btn.style.background = '#FFD700'; btn.style.borderColor = '#FFD700';
-                l3TileAnswer = opt;
+                l3TileAnswer = label;
                 freeInput.value = '';
                 updateStrip();
                 continueBtn.style.display = 'block';
