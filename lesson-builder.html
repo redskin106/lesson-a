@@ -1664,6 +1664,10 @@ function renderMain(){
     document.getElementById('gfSentence').addEventListener('input', updatePreviewLive);
     document.querySelectorAll('#gfOptions .opt-row input').forEach(inp=>inp.addEventListener('input', updatePreviewLive));
     updatePreviewLive();
+    // Initialise token editor for the currently expanded item
+    const gfScope = tokenKey(currentTier, gfExpandedIndex);
+    ensureLiveTokens(currentTier, gfExpandedIndex);
+    renderTokenEditor(gfScope);
   } else if(instanceType(currentModule)==='spelling' || instanceType(currentModule)==='wordscramble' || instanceType(currentModule)==='phonics'){
     renderWordEmojiPoolForm(currentModule);
   } else if(instanceType(currentModule)==='wordmatch' || instanceType(currentModule)==='listenmatch'){
