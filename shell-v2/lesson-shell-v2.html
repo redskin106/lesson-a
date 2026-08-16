@@ -1138,9 +1138,11 @@ html, body {
 <div class="app-frame">
   <div class="layer-bg"></div>
   <div class="frame-mask"></div>
-  <div class="pos choice-zone">
-    <p class="choice-title" id="choice-greeting"></p>
-    <p class="choice-sub" id="choice-sub"></p>
+  <div class="pos block-header" style="display:flex;align-items:center;justify-content:space-between;width:75%;">
+    <p class="choice-title" id="choice-greeting" style="margin:0;font-size:3.8cqw;"></p>
+    <p class="choice-sub" id="choice-sub" style="margin:0;font-size:2.6cqw;color:var(--text-dim);text-align:right;"></p>
+  </div>
+  <div class="pos block-flowzone" id="choice-flowzone">
     <div class="choice-grid" id="choice-grid"></div>
     <button class="choice-finish-btn" id="choice-finish-btn">✓ I'm done for today</button>
   </div>
@@ -2712,7 +2714,7 @@ function showChoiceScreen() {
   greeting.textContent = state.student ? `${state.student}'s lesson` : 'Choose an activity';
 
   // Reset scroll to top
-  const zone = document.querySelector('.choice-zone');
+  const zone = document.getElementById('choice-flowzone');
   if (zone) zone.scrollTop = 0;
 
   // Count how many modules are fully done
