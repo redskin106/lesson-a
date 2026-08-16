@@ -734,7 +734,7 @@ html, body {
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12.7cqw; isolation: isolate; }
 .layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; }
-.layer-scene { position: absolute; left: 2.58%; top: 52%; width: 94.83%; height: 41.5%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
+.layer-scene { position: absolute; left: 2.58%; top: 54%; width: 94.83%; height: 41.5%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
 .frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; border-radius: 12.7cqw; overflow: hidden; }
 
 .pos            { position: absolute; z-index: 2; }
@@ -982,13 +982,13 @@ html, body {
 .lc-option-btn-v2.locked { opacity: 0.35; }
 
 /* Word Scramble (v2) */
-.ws-visual-v2 { text-align: center; margin-bottom: 5%; position: relative; }
+.ws-visual-v2 { text-align: center; margin-bottom: 5%; display: flex; flex-direction: column; align-items: center; gap: 2%; }
 .ws-emoji-v2 { font-size: 15cqw; line-height: 1; }
 .ws-play-btn-v2 {
-  position: absolute; left: 0; top: 0;
   background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
   border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
   cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 .ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 3%; }
 .ws-slot-v2 {
@@ -5144,7 +5144,7 @@ const MODULE_REGISTRY = {
         const item = session[idx];
         const hasClue = !!findContextClue(item.word, item.tokens);
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="ws-pips"></div>
+          <div class="mp-pips-row-v2" id="ws-pips" style="${session.length<=1?'display:none;':''}" ></div>
           <button class="precheck-hint-btn" id="ws-hint-btn">💡 Hint</button>
           <p class="ws-feedback-v2" id="ws-clue" style="display:none;"></p>
           <div class="ws-visual-v2">
@@ -5356,7 +5356,7 @@ const MODULE_REGISTRY = {
         const hasClue = !!findContextClue(item.word, item.tokens);
 
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="sp-pips"></div>
+          <div class="mp-pips-row-v2" id="sp-pips" style="${session.length<=1?'display:none;':''}" ></div>
           <button class="precheck-hint-btn" id="sp-hint-btn">💡 Hint</button>
           <p class="sp-feedback-v2" id="sp-clue" style="display:none;"></p>
           <div class="sp-visual-v2">
@@ -5819,7 +5819,7 @@ const MODULE_REGISTRY = {
 
       function draw() {
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="sb-pips"></div>
+          <div class="mp-pips-row-v2" id="sb-pips" style="${session.length<=1?'display:none;':''}" ></div>
           <p class="sb-prompt-v2">Put the words in order.</p>
           <div class="sb-slots-v2" id="sb-slots"></div>
           <div class="sb-bank-v2" id="sb-bank"></div>
@@ -5991,7 +5991,7 @@ const MODULE_REGISTRY = {
 
       function draw() {
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="qf-pips"></div>
+          <div class="mp-pips-row-v2" id="qf-pips" style="${session.length<=1?'display:none;':''}" ></div>
           <p class="qf-situation-v2" id="qf-situation">${session[idx].situation}</p>
           <p class="sb-prompt-v2">What's the question?</p>
           <div class="sb-slots-v2" id="qf-slots"></div>
@@ -6394,7 +6394,7 @@ const MODULE_REGISTRY = {
         document.getElementById('v2-qlabel').textContent = `Question ${idx + 1} of ${session.length}`;
 
         container.innerHTML = `
-          <div class="mp-pips-row-v2" id="mp-pips" style="display:none;"></div>
+          <div class="mp-pips-row-v2" id="mp-pips" style="display:none;margin:0;"></div>
 
           <!-- Target sound banner -->
           <div style="background:rgba(0,188,212,0.07);border:1.5px solid rgba(0,188,212,0.2);
