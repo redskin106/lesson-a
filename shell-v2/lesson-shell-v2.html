@@ -1137,7 +1137,9 @@ html, body {
 <div class="app-frame">
   <div class="layer-bg"></div>
   <div class="frame-mask"></div>
-  <div class="pos" style="left:5%;top:8%;width:90%;bottom:4%;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <!-- Solid dark header overlay to hide gradient bleed -->
+  <div style="position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,#0D1B2A 0%,#0D1B2A 18%,transparent 35%);pointer-events:none;"></div>
+  <div class="pos" style="left:5%;top:8%;width:90%;bottom:4%;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:3;">
     <p class="choice-title" id="choice-greeting"></p>
     <p class="choice-sub" id="choice-sub"></p>
     <div class="choice-grid" id="choice-grid"></div>
