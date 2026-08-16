@@ -758,9 +758,9 @@ html, body {
 #module-container { bottom: auto; overflow-y: visible; }
 
 /* ─── MODULE CHOICE SCREEN ─────────────────────────── */
-.choice-title { font-size: 4.2cqw; font-weight: 700; color: #fff; margin-bottom: 1%; }
-.choice-sub   { font-size: 2.9cqw; color: var(--text-dim); margin-bottom: 5%; }
-.choice-grid  { display: flex; flex-direction: column; gap: 2.5%; margin-bottom: 5%; }
+.choice-title { font-size: 4.2cqw; font-weight: 700; color: #fff; margin-bottom: 1%; margin-top: 2%; }
+.choice-sub   { font-size: 2.9cqw; color: var(--text-dim); margin-bottom: 4%; }
+.choice-grid  { display: flex; flex-direction: column; gap: 2%; margin-bottom: 4%; }
 .choice-card  {
   background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
   border-radius: 12px; padding: 3.5% 4%;
@@ -1136,8 +1136,9 @@ html, body {
 <div class="frame-wrap">
 <div class="app-frame">
   <div class="layer-bg"></div>
+  <div class="layer-scene" id="choice-scene"></div>
   <div class="frame-mask"></div>
-  <div class="pos block-flowzone">
+  <div class="pos" style="left:5%;top:8%;width:90%;bottom:4%;overflow-y:auto;-webkit-overflow-scrolling:touch;">
     <p class="choice-title" id="choice-greeting"></p>
     <p class="choice-sub" id="choice-sub"></p>
     <div class="choice-grid" id="choice-grid"></div>
