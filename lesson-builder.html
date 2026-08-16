@@ -340,6 +340,7 @@ const MODULES = [
   {id:'creativereflection', name:'Reflection Card', pool:true, built:true},
   {id:'questionformation', name:'Ask the Question', pool:true, built:true},
   {id:'phonics', name:'Sound It Out', pool:true, built:true},
+  {id:'minimalpairs', name:'Listen Closely', pool:true, built:true},
 ];
 
 // ==========================================================================
@@ -446,7 +447,27 @@ function blankWordScrambleData(){
   return blankPoolWithPick(4);
 }
 function blankPhonicsData(){
-  return blankPoolWithPick(4); // same {word,emoji} pool shape as Word Scramble
+  const blankItem = () => ({ word:'', emoji:'', phonemes:['','',''], tokens:[] });
+  return {
+    bronze: { pick:1, items:[blankItem()] },
+    silver: { pick:1, items:[blankItem()] },
+    gold:   { pick:1, items:[blankItem()] },
+  };
+}
+function blankMinimalPairsData(){
+  const blankItem = () => ({
+    targetSound: '', targetHint: '',
+    targetAudioFile: null,
+    options: [
+      { emoji:'', word:'', hasTarget:true,  audioFile:null },
+      { emoji:'', word:'', hasTarget:false, audioFile:null },
+    ]
+  });
+  return {
+    bronze: { pick:2, items:[blankItem(), blankItem()] },
+    silver: { pick:2, items:[blankItem(), blankItem()] },
+    gold:   { pick:1, items:[blankItem()] },
+  };
 }
 function blankBuildSentenceData(){
   return blankPoolWithPick(4); // each pool item is just { tokens: [...] }
@@ -506,6 +527,7 @@ const BLANK_DATA_BY_MODULE = {
   pyramid: blankPyramidData, imagefeeling: blankImageFeelingData,
   creativereflection: blankCreativeReflectionData, questionformation: blankQuestionFormationData,
   phonics: blankPhonicsData,
+  minimalpairs: blankMinimalPairsData,
 };
 
 // ---- "Colors Around Us" — real seed content across every module type, used to test the whole tool end to end ----
@@ -1054,8 +1076,12 @@ function isTierFilled(moduleId, tier, dataOverride){
       case 'putinorder': { const d=data[tier]; return d.items.length>=1 && d.items.every(it=>it.items.length>=2 && it.items.every(w=>w) && !!it.prompt); }
       case 'wordmatch': case 'listenmatch':
         return data[tier].items.length>=1 && data[tier].items.every(p=>p.left && p.right);
-      case 'spelling': case 'wordscramble': case 'phonics':
+      case 'spelling': case 'wordscramble':
         return data[tier].items.length>=1 && data[tier].items.every(it=>it.word);
+      case 'phonics':
+        return data[tier].items.length>=1 && data[tier].items.every(it=>it.word && it.phonemes && it.phonemes.some(p=>p));
+      case 'minimalpairs':
+        return data[tier].items.length>=1 && data[tier].items.every(it=>it.targetSound && it.options.length>=2 && it.options.every(o=>o.word));
       case 'buildsentence':
         return data[tier].items.length>=1 && data[tier].items.every(it=>it.tokens.length>=1);
       case 'memorypairs':
@@ -1467,6 +1493,10 @@ function renderMain(){
     renderCreativeReflectionForm(currentModule);
   } else if(instanceType(currentModule)==='questionformation'){
     renderQuestionFormationForm();
+  } else if(instanceType(currentModule)==='phonics'){
+    renderPhonicsForm();
+  } else if(instanceType(currentModule)==='minimalpairs'){
+    renderMinimalPairsForm();
   } else {
     editView.innerHTML = `<div class="card stub-card"><b>${mod.name} — not mocked up in this prototype</b>Same sidebar, tier tabs, save/publish, and preview pane would wrap around this module's own form — following whichever shape it uses (fixed 3-item or pooled).</div>`;
   }
@@ -3309,6 +3339,7 @@ const MODULE_CATALOG = [
   {id:'creativereflection', name:'Reflection Card', desc:'Authorable fill-in-the-blank, grows richer per lesson stage'},
   {id:'questionformation', name:'Ask the Question', desc:'Student assembles the question a stated situation prompts'},
   {id:'phonics', name:'Sound It Out', desc:'Letter-tap tile assembly — each tile speaks its own letter aloud, unlike Word Scramble'},
+  {id:'minimalpairs', name:'Listen Closely', desc:'Hear a target sound, identify which word(s) contain it — Bronze=one correct, Gold=multi-select'},
 ];
 
 // Cambridge English Young Learners (Pre-A1 Starters / A1 Movers / A2 Flyers) word
@@ -4428,22 +4459,34 @@ function transformModuleForPublish(moduleId, data, pushedAudioIds, lessonId){
       }]));
 
     case 'phonics':
-      // Identical shape to wordscramble — same {word, emoji, tokens} pool,
-      // the shell's own per-letter-tap audio is the only real difference,
-      // and that's entirely client-side (browser TTS speaking single
-      // letters), nothing to transform for publish here.
       return Object.fromEntries(TIER_ORDER.map(t => [t, {
         pick: data[t].pick,
         items: data[t].items.map((it,i) => {
           const o = { word: it.word };
           if(it.emoji) o.emoji = it.emoji;
-          o.sentence = it.sentence || '';
-          if(it.clozeWord) o.clozeWord = it.clozeWord;
+          // phonemes: array of {grapheme} objects matching the shell's data shape
+          o.phonemes = (it.phonemes||[]).filter(Boolean).map(g => ({ grapheme: g }));
+          if(it.distractor) o.distractor = it.distractor;
           if(it.tokens && it.tokens.length) o.tokens = it.tokens;
           o.audioFile = audioFor(`${t}.item${i}.word`, it.word);
-          if(it.sentence) o.sentenceAudioFile = audioFor(`${t}.item${i}.sentence`, it.sentence);
           return o;
         })
+      }]));
+
+    case 'minimalpairs':
+      return Object.fromEntries(TIER_ORDER.map(t => [t, {
+        pick: data[t].pick,
+        items: data[t].items.map((it,i) => ({
+          targetSound: it.targetSound || '',
+          targetHint: it.targetHint || '',
+          targetAudioFile: it.targetAudioFile || null,
+          options: (it.options||[]).map((opt,j) => ({
+            emoji: opt.emoji || '',
+            word: opt.word || '',
+            hasTarget: !!opt.hasTarget,
+            audioFile: opt.audioFile || null,
+          })),
+        }))
       }]));
 
     case 'spelling':
@@ -4757,6 +4800,186 @@ function downloadJsonRobust(textareaId, filename, btn, msgId){
   }catch(e){
     if(msgEl) msgEl.textContent = 'Download isn\'t available here — use Copy JSON instead and paste into a new file.';
   }
+}
+
+// ---- Phonics (Sound It Out) ----
+let phonicsExpandedIndex = 0;
+function renderPhonicsForm(){
+  const editView = document.getElementById('editView');
+  const tierData = md('phonics')[currentTier];
+  const items = tierData.items;
+  if(phonicsExpandedIndex >= items.length) phonicsExpandedIndex = 0;
+
+  editView.innerHTML = `
+    <div class="card">
+      <div class="pool-header">
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — Sound It Out items</div>
+        <div class="pool-count">${items.length} in pool</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Items drawn per session (pick)</label>
+        <input type="number" min="1" max="${Math.max(1,items.length)}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;"
+          oninput="md('phonics')[currentTier].pick=Math.max(1,parseInt(this.value)||1);">
+      </div>
+    </div>
+    ${items.map((it,i) => `
+      <div class="card">
+        ${i === phonicsExpandedIndex ? `
+          <div class="pool-header">
+            <div class="card-label" style="margin-bottom:0;">Item ${i+1}</div>
+            ${items.length>1 ? `<span class="del" onclick="phonicsRemoveItem(${i})">✕ remove</span>` : ''}
+          </div>
+          <div class="field" style="margin-top:10px;display:flex;gap:12px;align-items:center;">
+            <button class="emoji-field-btn ${it.emoji?'':'empty'}"
+              onclick="openEmojiPicker(function(e){ phonicsUpdateField(${i},'emoji',e); })">${it.emoji||'?'}</button>
+            <div style="flex:1;">
+              <label style="font-size:12px;color:var(--text-lo);">Word</label>
+              <input type="text" value="${it.word||''}" placeholder="e.g. ship"
+                style="margin-top:4px;"
+                oninput="phonicsUpdateField(${i},'word',this.value)">
+            </div>
+          </div>
+          <div class="field" style="margin-top:10px;">
+            <label style="font-size:12px;color:var(--text-lo);">Phonemes — one per box, comma-separated (digraphs like sh, th, ch as one unit)</label>
+            <input type="text" value="${(it.phonemes||[]).join(', ')}" placeholder="e.g. sh, i, p"
+              style="margin-top:4px;"
+              oninput="phonicsUpdatePhonemes(${i},this.value)">
+            <div class="hint" style="font-size:11px;color:var(--text-lo);margin-top:4px;">
+              Digraphs (sh, th, ch) count as one phoneme. Each becomes a separate tap tile in the shell.
+            </div>
+          </div>
+          <div class="field" style="margin-top:10px;">
+            <label style="font-size:12px;color:var(--text-lo);">Optional distractor phoneme (Gold only — extra wrong tile)</label>
+            <input type="text" value="${it.distractor||''}" placeholder="e.g. ch"
+              style="margin-top:4px;"
+              oninput="phonicsUpdateField(${i},'distractor',this.value)">
+          </div>
+        ` : `
+          <div class="pool-header" style="cursor:pointer;" onclick="phonicsExpandedIndex=${i};renderPhonicsForm();">
+            <div style="font-size:13.5px;color:var(--text);">${it.word||'(empty)'} ${it.phonemes&&it.phonemes.length ? '· '+it.phonemes.join('-') : ''}</div>
+            <span style="color:var(--text-lo);font-size:12px;">Edit ›</span>
+          </div>
+        `}
+      </div>`).join('')}
+    <div class="add-link" onclick="phonicsAddItem()">+ add item</div>`;
+}
+function phonicsUpdateField(i, field, val){
+  md('phonics')[currentTier].items[i][field] = val;
+}
+function phonicsUpdatePhonemes(i, val){
+  md('phonics')[currentTier].items[i].phonemes = val.split(',').map(s=>s.trim()).filter(Boolean);
+}
+function phonicsAddItem(){
+  md('phonics')[currentTier].items.push({ word:'', emoji:'', phonemes:[], tokens:[] });
+  phonicsExpandedIndex = md('phonics')[currentTier].items.length - 1;
+  renderPhonicsForm();
+}
+function phonicsRemoveItem(i){
+  md('phonics')[currentTier].items.splice(i, 1);
+  phonicsExpandedIndex = Math.max(0, i - 1);
+  renderPhonicsForm();
+}
+
+// ---- Minimal Pairs (Listen Closely) ----
+let mpairExpandedIndex = 0;
+function renderMinimalPairsForm(){
+  const editView = document.getElementById('editView');
+  const tierData = md('minimalpairs')[currentTier];
+  const items = tierData.items;
+  if(mpairExpandedIndex >= items.length) mpairExpandedIndex = 0;
+
+  editView.innerHTML = `
+    <div class="card">
+      <div class="pool-header">
+        <div class="card-label" style="margin-bottom:0;">${currentTier} — Listen Closely items</div>
+        <div class="pool-count">${items.length} in pool</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-lo);">Items drawn per session (pick)</label>
+        <input type="number" min="1" max="${Math.max(1,items.length)}" value="${tierData.pick}"
+          style="width:80px;margin-top:4px;"
+          oninput="md('minimalpairs')[currentTier].pick=Math.max(1,parseInt(this.value)||1);">
+      </div>
+    </div>
+    ${items.map((it,i) => `
+      <div class="card">
+        ${i === mpairExpandedIndex ? `
+          <div class="pool-header">
+            <div class="card-label" style="margin-bottom:0;">Item ${i+1}</div>
+            ${items.length>1 ? `<span class="del" onclick="mpairRemoveItem(${i})">✕ remove</span>` : ''}
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+            <div class="field">
+              <label style="font-size:12px;color:var(--text-lo);">Target sound (e.g. SH)</label>
+              <input type="text" value="${it.targetSound||''}" placeholder="SH"
+                oninput="mpairUpdateField(${i},'targetSound',this.value.toUpperCase())">
+            </div>
+            <div class="field">
+              <label style="font-size:12px;color:var(--text-lo);">Hint (e.g. like "shhh!" 🤫)</label>
+              <input type="text" value="${(it.targetHint||'').replace(/"/g,'&quot;')}" placeholder='like "shhh!" 🤫'
+                oninput="mpairUpdateField(${i},'targetHint',this.value)">
+            </div>
+          </div>
+          <div class="field" style="margin-top:8px;">
+            <label style="font-size:12px;color:var(--text-lo);">Target sound audio file path (optional — leave blank for TTS)</label>
+            <input type="text" value="${it.targetAudioFile||''}" placeholder="assets/phonemes/sound_sh.mp3"
+              oninput="mpairUpdateField(${i},'targetAudioFile',this.value||null)">
+          </div>
+          <div class="card-label" style="margin-top:14px;">Word options</div>
+          <div class="hint" style="font-size:11px;color:var(--text-lo);margin-bottom:8px;">
+            Mark which words CONTAIN the target sound. Gold can have 3+ options.
+          </div>
+          ${(it.options||[]).map((opt,j) => `
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+              <button class="emoji-field-btn ${opt.emoji?'':'empty'}" style="width:36px;height:36px;font-size:18px;flex-shrink:0;"
+                onclick="openEmojiPicker(function(e){ mpairUpdateOption(${i},${j},'emoji',e); })">${opt.emoji||'?'}</button>
+              <input type="text" value="${opt.word||''}" placeholder="word"
+                style="flex:1;" oninput="mpairUpdateOption(${i},${j},'word',this.value)">
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-lo);white-space:nowrap;cursor:pointer;">
+                <input type="checkbox" ${opt.hasTarget?'checked':''} onchange="mpairUpdateOption(${i},${j},'hasTarget',this.checked)">
+                has sound
+              </label>
+              ${(it.options||[]).length > 2 ? `<span class="del" onclick="mpairRemoveOption(${i},${j})">✕</span>` : ''}
+            </div>`).join('')}
+          <div class="add-link" onclick="mpairAddOption(${i})">+ add word option</div>
+        ` : `
+          <div class="pool-header" style="cursor:pointer;" onclick="mpairExpandedIndex=${i};renderMinimalPairsForm();">
+            <div style="font-size:13.5px;color:var(--text);">
+              ${it.targetSound||'(no sound)'} — ${(it.options||[]).map(o=>o.word).filter(Boolean).join(' / ')||'no words yet'}
+            </div>
+            <span style="color:var(--text-lo);font-size:12px;">Edit ›</span>
+          </div>
+        `}
+      </div>`).join('')}
+    <div class="add-link" onclick="mpairAddItem()">+ add item</div>`;
+}
+function mpairUpdateField(i, field, val){
+  md('minimalpairs')[currentTier].items[i][field] = val;
+}
+function mpairUpdateOption(i, j, field, val){
+  md('minimalpairs')[currentTier].items[i].options[j][field] = val;
+}
+function mpairAddOption(i){
+  md('minimalpairs')[currentTier].items[i].options.push({ emoji:'', word:'', hasTarget:false, audioFile:null });
+  renderMinimalPairsForm();
+}
+function mpairRemoveOption(i, j){
+  md('minimalpairs')[currentTier].items[i].options.splice(j, 1);
+  renderMinimalPairsForm();
+}
+function mpairAddItem(){
+  md('minimalpairs')[currentTier].items.push({
+    targetSound:'', targetHint:'', targetAudioFile:null,
+    options:[{emoji:'',word:'',hasTarget:true,audioFile:null},{emoji:'',word:'',hasTarget:false,audioFile:null}]
+  });
+  mpairExpandedIndex = md('minimalpairs')[currentTier].items.length - 1;
+  renderMinimalPairsForm();
+}
+function mpairRemoveItem(i){
+  md('minimalpairs')[currentTier].items.splice(i, 1);
+  mpairExpandedIndex = Math.max(0, i - 1);
+  renderMinimalPairsForm();
 }
 
 // ---- Preview production JSON — lets you SEE transformLessonForPublish's real output
