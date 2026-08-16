@@ -733,9 +733,9 @@ html, body {
 .frame-wrap { width: min(400px, 100vw); max-height: 94vh; position: relative; container-type: inline-size; }
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame { position: absolute; inset: 0; overflow: hidden; border-radius: 12.7cqw; isolation: isolate; }
-.layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; }
-.layer-scene { position: absolute; left: 2.58%; top: 54%; width: 94.83%; height: 41.5%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
-.frame-mask  { position: absolute; inset: 0; z-index: 4; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; border-radius: 12.7cqw; overflow: hidden; }
+.layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; pointer-events: none; }
+.layer-scene { position: absolute; left: 3%; top: 54%; width: 94%; height: 41%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; border-radius: 0 0 9.7cqw 9.7cqw; overflow: hidden; }
+.frame-mask  { position: absolute; inset: 0; z-index: 5; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
 
 .pos            { position: absolute; z-index: 2; }
 .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
