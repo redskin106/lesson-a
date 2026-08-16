@@ -1355,11 +1355,47 @@ function removeModuleFromLesson(id){
   if(!lesson || lesson.modules.length <= 1) return;
   if(!confirm(`Remove "${instanceLabel(id)}" from this lesson? The module data will be lost.`)) return;
   lesson.modules = lesson.modules.filter(m => m !== id);
-  // Remove the module's authored data from the content store
   if(LESSON_CONTENT[currentLessonId]) delete LESSON_CONTENT[currentLessonId][id];
-  // If the removed module was selected, switch to the first remaining module
   if(currentModule === id) currentModule = lesson.modules[0] || '__vocabulary__';
   renderSidebar(); renderTierTabs(); renderMain();
+}
+
+function openAddModuleModal(){
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  if(!lesson) return;
+  const existing = new Set(lesson.modules.map(id => instanceType(id)));
+  // Show all module types — allow adding a second instance of any type
+  const rows = MODULES.map(m => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--glass-brd);">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">${m.name}</div>
+        <div style="font-size:12px;color:var(--text-lo);">${m.desc||''}</div>
+      </div>
+      <button class="btn" style="flex-shrink:0;margin-left:12px;"
+        onclick="addModuleToLesson('${m.id}');closeModal();">Add</button>
+    </div>`).join('');
+  showModal(`
+    <div class="modal-title">Add a module</div>
+    <div style="max-height:60vh;overflow-y:auto;">${rows}</div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancel</button></div>`);
+}
+
+function addModuleToLesson(typeId){
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  if(!lesson) return;
+  // Generate a unique instance id — bare type for first, type-2/type-3 etc for repeats
+  const existing = lesson.modules.filter(id => instanceType(id) === typeId);
+  const newId = existing.length === 0 ? typeId : `${typeId}-${existing.length + 1}`;
+  lesson.modules.push(newId);
+  // Initialise blank data for this instance
+  const blankFn = BLANK_DATA_BY_MODULE[typeId];
+  if(blankFn){
+    ensureLessonContent(currentLessonId);
+    LESSON_CONTENT[currentLessonId][newId] = blankFn();
+  }
+  currentModule = newId;
+  renderSidebar(); renderTierTabs(); renderMain();
+  scheduleSave();
 }
 
 function selectModule(id){
@@ -5837,6 +5873,7 @@ function renderEditorShell(){
       <div class="lesson-sub">${lesson.status === 'published' ? 'Published' : 'Draft'} · edited ${lesson.editedAgo || 'just now'}</div>
       <textarea class="lesson-notes" id="lessonNotes" placeholder="Notes to keep yourself on track — theme, tone, anything you don't want to forget mid-edit…">${lesson.notes || ''}</textarea>
       <ul class="mod-list" id="modList"></ul>
+      <div class="add-link" style="margin-top:8px;padding:0 4px;" onclick="openAddModuleModal()">+ add module</div>
     </div>
     <div class="main">
       <div class="topbar">
