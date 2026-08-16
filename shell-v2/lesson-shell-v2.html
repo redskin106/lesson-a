@@ -1112,18 +1112,43 @@ html, body {
 
   <div class="pos block-flowzone">
     <div id="name-picker-fresh">
-      <p class="welcome-label">EFL Lesson</p>
+      <p class="welcome-label">SkillsXLab</p>
       <h1 class="welcome-title">Hello! 👋</h1>
+
+      <!-- Lesson card -->
+      <div style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);
+        border-radius:16px;padding:4% 5%;margin:4% 0;text-align:left;">
+        <div style="font-size:8cqw;margin-bottom:2%;">🎒</div>
+        <div style="font-size:4.5cqw;font-weight:700;color:#fff;margin-bottom:1%;">Objects Around Us</div>
+        <div style="font-size:3cqw;color:var(--text-dim);">Description Pathway · Lesson 1</div>
+        <div style="margin-top:3%;height:3px;background:rgba(255,255,255,0.08);border-radius:99px;">
+          <div style="height:100%;width:0%;background:#00BCD4;border-radius:99px;"></div>
+        </div>
+      </div>
+
       <p class="welcome-sub">Tap your name to begin.</p>
       <div class="name-grid" id="name-grid"></div>
       <button class="start-btn" id="start-btn">Start →</button>
       <button class="secondary-btn" id="journey-link-btn-name" style="margin-top:10px;opacity:0.25;pointer-events:none;">📊 My Learning Journey</button>
     </div>
     <div id="name-picker-remembered" style="display:none;">
-      <p class="welcome-label">EFL Lesson</p>
+      <p class="welcome-label">SkillsXLab</p>
       <h1 class="welcome-title">Welcome back! 👋</h1>
+
+      <!-- Lesson card -->
+      <div style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);
+        border-radius:16px;padding:4% 5%;margin:4% 0;text-align:left;">
+        <div style="font-size:8cqw;margin-bottom:2%;">🎒</div>
+        <div style="font-size:4.5cqw;font-weight:700;color:#fff;margin-bottom:1%;">Objects Around Us</div>
+        <div style="font-size:3cqw;color:var(--text-dim);">Description Pathway · Lesson 1</div>
+        <div style="margin-top:3%;height:3px;background:rgba(255,255,255,0.08);border-radius:99px;">
+          <div id="remembered-progress-bar" style="height:100%;width:0%;background:#00BCD4;border-radius:99px;transition:width 0.6s ease;"></div>
+        </div>
+        <div id="remembered-progress-label" style="font-size:2.8cqw;color:var(--text-dim);margin-top:2%;"></div>
+      </div>
+
       <p class="welcome-sub" id="remembered-welcome-sub"></p>
-      <button class="start-btn ready" id="remembered-start-btn">Start →</button>
+      <button class="start-btn ready" id="remembered-start-btn">Continue →</button>
       <button class="secondary-btn" id="remembered-journey-btn" style="margin-top:10px;">📊 My Learning Journey</button>
       <button class="secondary-btn" id="not-me-btn" style="margin-top:10px;opacity:0.6;">Not me? Choose a different name</button>
     </div>
@@ -2610,6 +2635,16 @@ function showRememberedWelcome(name) {
   document.getElementById('name-picker-remembered').style.display = 'block';
   document.getElementById('remembered-welcome-sub').textContent = `Ready to continue, ${name}?`;
   state.student = name;
+  // Update progress bar from stored results
+  getAllTierResultsForStudent(name).then(results => {
+    const attempted = new Set(results.map(r => r.moduleIndex)).size;
+    const total = LESSON.length;
+    const pct = total ? Math.round(attempted / total * 100) : 0;
+    const bar = document.getElementById('remembered-progress-bar');
+    const label = document.getElementById('remembered-progress-label');
+    if (bar) bar.style.width = pct + '%';
+    if (label) label.textContent = attempted ? `${attempted} of ${total} activities tried` : 'Not started yet';
+  }).catch(() => {});
 }
 
 const nameGrid = document.getElementById('name-grid');
