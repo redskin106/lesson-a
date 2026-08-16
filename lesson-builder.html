@@ -1360,28 +1360,32 @@ function removeModuleFromLesson(id){
   renderSidebar(); renderTierTabs(); renderMain();
 }
 
-function openAddModuleModal(){
+function toggleAddModuleDropdown(e){
+  e.stopPropagation();
+  const dd = document.getElementById('addModuleDropdown');
+  if(dd.style.display !== 'none'){ dd.style.display = 'none'; return; }
   const lesson = LESSONS.find(l => l.id === currentLessonId);
   if(!lesson) return;
-  const rows = MODULES.map(m => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--glass-brd);">
-      <div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);">${m.name}</div>
-        <div style="font-size:12px;color:var(--text-lo);">${m.desc||''}</div>
-      </div>
-      <button class="btn" style="flex-shrink:0;margin-left:12px;"
-        onclick="addModuleToLesson('${m.id}');closeModal();">Add</button>
+  dd.innerHTML = MODULES.map(m => `
+    <div onclick="addModuleToLesson('${m.id}')"
+      style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--glass-brd);
+      font-size:13px;color:var(--text);"
+      onmouseover="this.style.background='rgba(255,255,255,0.06)'"
+      onmouseout="this.style.background=''">
+      <span style="font-weight:600;">${m.name}</span>
+      ${m.desc ? `<div style="font-size:11px;color:var(--text-lo);margin-top:2px;">${m.desc}</div>` : ''}
     </div>`).join('');
-  document.getElementById('modalRoot').innerHTML = `
-    <div class="modal-backdrop" onclick="closeModal()"></div>
-    <div class="modal">
-      <div class="modal-title">Add a module</div>
-      <div style="max-height:60vh;overflow-y:auto;">${rows}</div>
-      <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancel</button></div>
-    </div>`;
+  dd.style.display = 'block';
+  // Close on outside click
+  setTimeout(() => document.addEventListener('click', function h(){
+    dd.style.display = 'none';
+    document.removeEventListener('click', h);
+  }), 10);
 }
 
 function addModuleToLesson(typeId){
+  const dd = document.getElementById('addModuleDropdown');
+  if(dd) dd.style.display = 'none';
   const lesson = LESSONS.find(l => l.id === currentLessonId);
   if(!lesson) return;
   // Generate a unique instance id — bare type for first, type-2/type-3 etc for repeats
@@ -5874,7 +5878,13 @@ function renderEditorShell(){
       <div class="lesson-sub">${lesson.status === 'published' ? 'Published' : 'Draft'} · edited ${lesson.editedAgo || 'just now'}</div>
       <textarea class="lesson-notes" id="lessonNotes" placeholder="Notes to keep yourself on track — theme, tone, anything you don't want to forget mid-edit…">${lesson.notes || ''}</textarea>
       <ul class="mod-list" id="modList"></ul>
-      <div class="add-link" style="margin-top:8px;padding:0 4px;" onclick="openAddModuleModal()">+ add module</div>
+      <div style="position:relative;margin-top:8px;padding:0 4px;">
+        <div class="add-link" onclick="toggleAddModuleDropdown(event)">+ add module</div>
+        <div id="addModuleDropdown" style="display:none;position:absolute;left:0;right:0;top:100%;
+          background:var(--bg2);border:1px solid var(--glass-brd);border-radius:8px;
+          z-index:100;max-height:300px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+        </div>
+      </div>
     </div>
     <div class="main">
       <div class="topbar">
