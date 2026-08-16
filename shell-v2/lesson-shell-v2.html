@@ -609,6 +609,9 @@ html, body {
 .dp-mascot { font-size:11cqw; line-height:1; transition:transform .25s ease; }
 .dp-mascot.bump { animation: dp-mascot-bump .4s ease; }
 @keyframes dp-mascot-bump { 0%,100%{transform:scale(1);} 50%{transform:scale(1.25);} }
+.dp-image-wrap { display:flex; justify-content:center; margin-bottom:4%; }
+.dp-image { width:28cqw; height:28cqw; object-fit:cover; border-radius:3cqw; border:2px solid rgba(255,255,255,0.15); box-shadow:0 4px 20px rgba(0,0,0,0.4); }
+.dp-image-fallback { width:28cqw; height:28cqw; display:flex; align-items:center; justify-content:center; font-size:12cqw; background:rgba(255,255,255,0.05); border-radius:3cqw; border:2px solid rgba(255,255,255,0.1); }
 
 .dp-pyramid { display:flex; flex-direction:column; gap:2.5%; margin-bottom:4%; }
 .dp-block {
@@ -1899,10 +1902,11 @@ const LESSON = [
     data: {
       bronze: { pick: 1, items: [
         {
-          emoji: '👜',
+          imageFile: null,
+          label: 'bag',
           full_sentence_audio: null,
           l1: { options: [
-            { label: 'bag',    emoji: '🎒' },
+            { label: 'bag',    emoji: '👜' },
             { label: 'box',    emoji: '📦' },
             { label: 'bottle', emoji: '🍶' },
             { label: 'book',   emoji: '📚' }
@@ -1913,38 +1917,40 @@ const LESSON = [
       ]},
       silver: { pick: 1, items: [
         {
-          emoji: '👜',
+          imageFile: null,
+          label: 'bag',
           full_sentence_audio: null,
           l1: { options: [
-            { label: 'bag',    emoji: '🎒' },
+            { label: 'bag',    emoji: '👜' },
             { label: 'box',    emoji: '📦' },
             { label: 'bottle', emoji: '🍶' },
             { label: 'book',   emoji: '📚' }
           ], answer: 'bag' },
           l2: [
-            { label: 'size',   options: [{ label:'big', emoji:'🐘' }, { label:'small', emoji:'🐭' }, { label:'long', emoji:'📏' }, { label:'short', emoji:'✂️' }], answer: 'small' },
-            { label: 'shape',  options: [{ label:'round', emoji:'⭕' }, { label:'flat', emoji:'🥞' }, { label:'square', emoji:'🟥' }, { label:'long', emoji:'📏' }], answer: 'flat' },
-            { label: 'colour', options: [{ label:'red', emoji:'🔴' }, { label:'blue', emoji:'🔵' }, { label:'black', emoji:'⚫' }, { label:'brown', emoji:'🟤' }], answer: 'red' }
+            { label: 'Size',   options: [{ label:'big', emoji:'🐘' }, { label:'small', emoji:'🐭' }, { label:'long', emoji:'📏' }, { label:'flat', emoji:'▬' }], answer: 'small' },
+            { label: 'Shape',  options: [{ label:'round', emoji:'⭕' }, { label:'flat', emoji:'🥞' }, { label:'square', emoji:'🟥' }, { label:'long', emoji:'📏' }], answer: 'flat' },
+            { label: 'Colour', options: [{ label:'red', emoji:'🔴' }, { label:'blue', emoji:'🔵' }, { label:'black', emoji:'⚫' }, { label:'brown', emoji:'🟤' }], answer: 'red' }
           ],
           l3: { tiles: [], because_mode: 'typed' }
         }
       ]},
       gold: { pick: 1, items: [
         {
-          emoji: '👜',
+          imageFile: null,
+          label: 'bag',
           full_sentence_audio: null,
           l1: { options: [
-            { label: 'bag',    emoji: '🎒' },
+            { label: 'bag',    emoji: '👜' },
             { label: 'box',    emoji: '📦' },
             { label: 'bottle', emoji: '🍶' },
             { label: 'book',   emoji: '📚' }
           ], answer: 'bag' },
           l2: [
-            { label: 'size',   options: [{ label:'big', emoji:'🐘' }, { label:'small', emoji:'🐭' }, { label:'long', emoji:'📏' }, { label:'short', emoji:'✂️' }], answer: 'small' },
-            { label: 'shape',  options: [{ label:'round', emoji:'⭕' }, { label:'flat', emoji:'🥞' }, { label:'square', emoji:'🟥' }, { label:'long', emoji:'📏' }], answer: 'flat' },
-            { label: 'colour', options: [{ label:'red', emoji:'🔴' }, { label:'blue', emoji:'🔵' }, { label:'black', emoji:'⚫' }, { label:'brown', emoji:'🟤' }], answer: 'red' }
+            { label: 'Size',   options: [{ label:'big', emoji:'🐘' }, { label:'small', emoji:'🐭' }, { label:'long', emoji:'📏' }, { label:'flat', emoji:'▬' }], answer: 'small' },
+            { label: 'Shape',  options: [{ label:'round', emoji:'⭕' }, { label:'flat', emoji:'🥞' }, { label:'square', emoji:'🟥' }, { label:'long', emoji:'📏' }], answer: 'flat' },
+            { label: 'Colour', options: [{ label:'red', emoji:'🔴' }, { label:'blue', emoji:'🔵' }, { label:'black', emoji:'⚫' }, { label:'brown', emoji:'🟤' }], answer: 'red' }
           ],
-          l3: { tiles: ['with a zip', 'with a handle', 'looks old', 'looks new'], because_mode: 'typed' }
+          l3: { tiles: ['useful', 'heavy', 'smooth', 'beautiful', 'old', 'new'], because_mode: 'typed' }
         }
       ]}
     }
@@ -6632,13 +6638,7 @@ const MODULE_REGISTRY = {
         document.getElementById('v2-qlabel').textContent = `Item ${idx + 1} of ${session.length}`;
 
         function setMascot(reaction) {
-          const el = container.querySelector('#dp-mascot');
-          if (!el) return;
-          const map = { start:'🙂', l1:'👀', l2:'😮', l3:'🎉' };
-          el.textContent = map[reaction] || '🙂';
-          el.classList.remove('bump');
-          void el.offsetWidth; // restart the animation
-          el.classList.add('bump');
+          // Image stays constant throughout — no mascot to update
         }
 
         function buildStripHtml() {
@@ -6774,10 +6774,11 @@ const MODULE_REGISTRY = {
           } else if (currentLevel === 'l3') {
             const becauseMode = item.l3.because_mode || 'typed';
             zone.innerHTML = `
+              <div class="dp-group-label">because it is…</div>
               <div class="dp-tile-row" id="dp-tiles"></div>
               <input type="text" class="dp-l3-free-input" id="dp-l3-free" placeholder="…or type your own">
               ${becauseMode === 'typed'
-                ? `<div class="dp-because-label">Why? (optional)</div><input type="text" class="dp-l3-free-input" id="dp-because-input" placeholder="because it…">`
+                ? `<input type="text" class="dp-l3-free-input" id="dp-because-input" placeholder="because it…" style="margin-top:2%;">`
                 : `<div class="dp-sayit-only-note">You'll say why out loud in a moment.</div>`}
               <button class="iv-proceed-btn dp-check-btn" id="dp-l3-continue" style="display:none;">Continue →</button>`;
             const row = zone.querySelector('#dp-tiles');
@@ -6845,7 +6846,11 @@ const MODULE_REGISTRY = {
               : `${plain}.`;
 
             container.innerHTML = `
-              <div class="dp-mascot-wrap"><span class="dp-mascot bump" id="dp-mascot">🎉</span></div>
+              <div class="dp-image-wrap">
+                ${item.imageFile
+                  ? `<img class="dp-image" src="${item.imageFile}" alt="${item.label || ''}">`
+                  : `<div class="dp-image-fallback">🎉</div>`}
+              </div>
               <p class="module-question" style="text-align:center;">Nice work! Now you say it:</p>
               <div id="dp-sayit-zone"></div>
             `;
@@ -6875,7 +6880,11 @@ const MODULE_REGISTRY = {
         }
 
         container.innerHTML = `
-          <div class="dp-mascot-wrap"><span class="dp-mascot" id="dp-mascot">🙂</span></div>
+          <div class="dp-image-wrap">
+            ${item.imageFile
+              ? `<img class="dp-image" src="${item.imageFile}" alt="${item.label || ''}">`
+              : `<div class="dp-image-fallback">🖼️</div>`}
+          </div>
           <div class="dp-pyramid" id="dp-pyramid"></div>
           <div id="dp-active-zone"></div>
           <div class="dp-sentence-strip" id="dp-strip"></div>
