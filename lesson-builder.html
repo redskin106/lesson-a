@@ -398,79 +398,238 @@ const FOOD_COURT_SPELLING = {
 const LESSON_CONTENT = {}; // keyed by lessonId -> { gapfill?: {...}, spelling?: {...} }
 
 function blankGapfillData(){
-  const blankItem = () => ({ sentence:'', answer:'', options:['',''], tokens:[] });
-  const blankTier = () => ({ pick:2, items:[blankItem()] });
-  return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
+  return {
+    bronze: { pick:2, items:[
+      { sentence:'A ___ is red.', answer:'apple', options:['apple','chair'], tokens:[] },
+      { sentence:'The ___ is big.', answer:'bag', options:['bag','pen'], tokens:[] },
+    ]},
+    silver: { pick:2, items:[
+      { sentence:'The apple is ___ and round.', answer:'red', options:['red','blue'], tokens:[] },
+      { sentence:'She has a ___ bag.', answer:'heavy', options:['heavy','small'], tokens:[] },
+    ]},
+    gold: { pick:2, items:[
+      { sentence:'The bag is ___ because it has many books.', answer:'heavy', options:['heavy','empty'], tokens:[] },
+      { sentence:'An apple is ___ when it is ripe.', answer:'sweet', options:['sweet','sour'], tokens:[] },
+    ]},
+  };
 }
 function blankPoolWithPick(pick){
   const blankTier = () => ({ pick, items:[] });
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankSpellingData(){
-  return blankPoolWithPick(4);
+  return {
+    bronze: { pick:3, items:[
+      { word:'bag', emoji:'👜', tokens:[] },
+      { word:'cat', emoji:'🐱', tokens:[] },
+      { word:'pen', emoji:'🖊️', tokens:[] },
+    ]},
+    silver: { pick:3, items:[
+      { word:'desk', emoji:'🪑', tokens:[] },
+      { word:'book', emoji:'📖', tokens:[] },
+      { word:'lamp', emoji:'💡', tokens:[] },
+    ]},
+    gold: { pick:3, items:[
+      { word:'shelf', emoji:'🗄️', tokens:[] },
+      { word:'clock', emoji:'🕐', tokens:[] },
+      { word:'chair', emoji:'🪑', tokens:[] },
+    ]},
+  };
 }
 function blankTrueFalseData(){
-  const blankItem = () => ({ statement:'', answer:true, tokens:[] });
-  const blankTier = () => ({ pick:2, items:[blankItem()] });
-  return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
+  return {
+    bronze: { pick:2, items:[
+      { statement:'A cat is an animal.', answer:true, tokens:[] },
+      { statement:'A pen is red.', answer:false, correction:'A pen can be many colours.', tokens:[] },
+    ]},
+    silver: { pick:2, items:[
+      { statement:'A bag is heavier than a pen.', answer:true, tokens:[] },
+      { statement:'All apples are green.', answer:false, correction:'Apples can be red, green or yellow.', tokens:[] },
+    ]},
+    gold: { pick:2, items:[
+      { statement:'A plastic bag is better for the environment than a cloth bag.', answer:false, correction:'A cloth bag is reusable and better for the environment.', tokens:[] },
+      { statement:'An object can be both big and heavy.', answer:true, tokens:[] },
+    ]},
+  };
 }
-function blankPairsData(){ // Word Match & Listen & Match share this shape
-  return blankPoolWithPick(4);
+function blankPairsData(){
+  return {
+    bronze: { pick:3, items:[
+      { word:'big', emoji:'🐘' }, { word:'small', emoji:'🐭' },
+      { word:'heavy', emoji:'🪨' }, { word:'light', emoji:'🪶' },
+    ]},
+    silver: { pick:3, items:[
+      { word:'round', emoji:'⚽' }, { word:'square', emoji:'🟥' },
+      { word:'sharp', emoji:'🔪' }, { word:'soft', emoji:'🧸' },
+    ]},
+    gold: { pick:3, items:[
+      { word:'transparent', emoji:'🪟' }, { word:'opaque', emoji:'🧱' },
+      { word:'flexible', emoji:'🪢' }, { word:'rigid', emoji:'📏' },
+    ]},
+  };
 }
 function blankMemoryPairsData(){
   const blankItem = () => ({ word:'', emoji:'', image:null, sentence:'', tokens:[] });
-  const blankTier = () => ({ pick:3, flipback:1200, items:[blankItem()] });
+  const blankTier = () => ({ pick:3, flipback:1200, items:[
+    { word:'big', emoji:'🐘', image:null, sentence:'The elephant is big.', tokens:[] },
+    { word:'small', emoji:'🐭', image:null, sentence:'The mouse is small.', tokens:[] },
+    { word:'round', emoji:'⚽', image:null, sentence:'A ball is round.', tokens:[] },
+  ]});
   return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
 }
 function blankListenChooseData(){
-  const blankItem = () => ({ audio:'', question:'', options:['',''], answer:'' });
-  const blankTier = () => ({ pick:2, items:[blankItem()] });
-  return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
+  return {
+    bronze: { pick:2, items:[
+      { audio:'', question:'What colour is an apple?', options:['red','blue'], answer:'red' },
+      { audio:'', question:'What shape is a ball?', options:['round','square'], answer:'round' },
+    ]},
+    silver: { pick:2, items:[
+      { audio:'', question:'Which object is heavy?', options:['feather','rock'], answer:'rock' },
+      { audio:'', question:'Which object is transparent?', options:['window','wall'], answer:'window' },
+    ]},
+    gold: { pick:2, items:[
+      { audio:'', question:'Which word describes texture?', options:['smooth','tall'], answer:'smooth' },
+      { audio:'', question:'Which object is both small and light?', options:['coin','brick'], answer:'coin' },
+    ]},
+  };
 }
 function blankPutInOrderData(){
-  const blankItem = () => ({ prompt:'', items:[] }); // 'items' here = the correct order (teacher-authored); maps to 'correct' + synthesized 'sequence' at publish time
-  const blankTier = () => ({ pick:2, items:[blankItem()] });
-  return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
+  return {
+    bronze: { pick:2, items:[
+      { prompt:'', items:['big','and','round'] },
+      { prompt:'', items:['small','and','light'] },
+    ]},
+    silver: { pick:2, items:[
+      { prompt:'', items:['The','apple','is','red','and','round'] },
+      { prompt:'', items:['My','bag','is','heavy'] },
+    ]},
+    gold: { pick:2, items:[
+      { prompt:'', items:['The','chair','is','made','of','wood'] },
+      { prompt:'', items:['It','is','smooth','and','comfortable'] },
+    ]},
+  };
 }
 function blankSayItData(){
-  const blankItem = () => ({ prompt:'', target:'' });
-  const blankTier = () => ({ pick:2, items:[blankItem()] });
-  return { bronze: blankTier(), silver: blankTier(), gold: blankTier() };
+  return {
+    bronze: { pick:2, items:[
+      { prompt:'Say the colour:', target:'red' },
+      { prompt:'Say the size:', target:'big' },
+    ]},
+    silver: { pick:2, items:[
+      { prompt:'Describe the apple:', target:'The apple is red and round.' },
+      { prompt:'Describe the bag:', target:'The bag is big and heavy.' },
+    ]},
+    gold: { pick:2, items:[
+      { prompt:'Describe this object fully:', target:'It is a small, round, red apple.' },
+      { prompt:'Compare the two objects:', target:'The rock is heavier than the feather.' },
+    ]},
+  };
 }
 function blankPicWordData(){
-  // cloze = just the answer word (e.g. 'red'); sentence = the blanked sentence (e.g. 'The apple is ___.')
-  const blankItem = () => ({ word:'', emoji:'', sentence:'', cloze:'' });
-  const blankTier = (mode) => ({ pick:3, mode, items:[blankItem()] });
-  return { bronze: blankTier('word-to-image'), silver: blankTier('image-to-word'), gold: blankTier('cloze-image') };
+  return {
+    bronze: { pick:3, mode:'word-to-image', items:[
+      { word:'apple', emoji:'🍎', sentence:'The apple is red.', cloze:'apple' },
+      { word:'bag', emoji:'👜', sentence:'The bag is heavy.', cloze:'bag' },
+      { word:'ball', emoji:'⚽', sentence:'The ball is round.', cloze:'ball' },
+    ]},
+    silver: { pick:3, mode:'image-to-word', items:[
+      { word:'chair', emoji:'🪑', sentence:'The chair is wooden.', cloze:'chair' },
+      { word:'clock', emoji:'🕐', sentence:'The clock is round.', cloze:'clock' },
+      { word:'lamp', emoji:'💡', sentence:'The lamp is tall.', cloze:'lamp' },
+    ]},
+    gold: { pick:3, mode:'cloze-image', items:[
+      { word:'window', emoji:'🪟', sentence:'The window is ___.', cloze:'transparent' },
+      { word:'rock', emoji:'🪨', sentence:'The rock is ___.', cloze:'heavy' },
+      { word:'feather', emoji:'🪶', sentence:'The feather is ___.', cloze:'light' },
+    ]},
+  };
 }
 function blankWordScrambleData(){
-  return blankPoolWithPick(4);
+  return {
+    bronze: { pick:3, items:[
+      { word:'big', emoji:'🐘', tokens:[] },
+      { word:'red', emoji:'🍎', tokens:[] },
+      { word:'soft', emoji:'🧸', tokens:[] },
+    ]},
+    silver: { pick:3, items:[
+      { word:'round', emoji:'⚽', tokens:[] },
+      { word:'heavy', emoji:'🪨', tokens:[] },
+      { word:'sharp', emoji:'🔪', tokens:[] },
+    ]},
+    gold: { pick:3, items:[
+      { word:'smooth', emoji:'🪵', tokens:[] },
+      { word:'transparent', emoji:'🪟', tokens:[] },
+      { word:'flexible', emoji:'🪢', tokens:[] },
+    ]},
+  };
 }
 function blankPhonicsData(){
-  const blankItem = () => ({ word:'', emoji:'', phonemes:['','',''], tokens:[] });
   return {
-    bronze: { pick:1, items:[blankItem()] },
-    silver: { pick:1, items:[blankItem()] },
-    gold:   { pick:1, items:[blankItem()] },
+    bronze: { pick:2, items:[
+      { word:'cat', emoji:'🐱', phonemes:['c','a','t'], tokens:[] },
+      { word:'bag', emoji:'👜', phonemes:['b','a','g'], tokens:[] },
+      { word:'pin', emoji:'📌', phonemes:['p','i','n'], tokens:[] },
+    ]},
+    silver: { pick:2, items:[
+      { word:'ship', emoji:'🚢', phonemes:['sh','i','p'], tokens:[] },
+      { word:'chip', emoji:'🍟', phonemes:['ch','i','p'], tokens:[] },
+      { word:'thin', emoji:'📏', phonemes:['th','i','n'], tokens:[] },
+    ]},
+    gold: { pick:2, items:[
+      { word:'plant', emoji:'🌱', phonemes:['p','l','a','n','t'], tokens:[] },
+      { word:'chest', emoji:'📦', phonemes:['ch','e','s','t'], tokens:[] },
+      { word:'shrink', emoji:'🔬', phonemes:['sh','r','i','ng','k'], tokens:[] },
+    ]},
   };
 }
 function blankMinimalPairsData(){
-  const blankItem = () => ({
-    targetSound: '', targetHint: '',
-    targetAudioFile: null,
-    options: [
-      { emoji:'', word:'', hasTarget:true,  audioFile:null },
-      { emoji:'', word:'', hasTarget:false, audioFile:null },
-    ]
-  });
   return {
-    bronze: { pick:2, items:[blankItem(), blankItem()] },
-    silver: { pick:2, items:[blankItem(), blankItem()] },
-    gold:   { pick:1, items:[blankItem()] },
+    bronze: { pick:2, items:[
+      { targetSound:'SH', targetHint:'like "shhh!" 🤫', targetAudioFile:'assets/phonemes/sound_sh.mp3',
+        options:[
+          { emoji:'🚢', word:'ship', hasTarget:true,  audioFile:null },
+          { emoji:'🍟', word:'chip', hasTarget:false, audioFile:null },
+        ]},
+      { targetSound:'CH', targetHint:'like a sneeze "achoo!" 🤧', targetAudioFile:'assets/phonemes/sound_ch.mp3',
+        options:[
+          { emoji:'🪑', word:'chair', hasTarget:true,  audioFile:null },
+          { emoji:'🐻', word:'bear',  hasTarget:false, audioFile:null },
+        ]},
+    ]},
+    silver: { pick:2, items:[
+      { targetSound:'TH', targetHint:'tongue between teeth 👅', targetAudioFile:'assets/phonemes/sound_th.mp3',
+        options:[
+          { emoji:'📏', word:'thin',  hasTarget:true,  audioFile:null },
+          { emoji:'🥫', word:'tin',   hasTarget:false, audioFile:null },
+          { emoji:'3️⃣', word:'three', hasTarget:true,  audioFile:null },
+        ]},
+      { targetSound:'SH', targetHint:'like "shhh!" 🤫', targetAudioFile:'assets/phonemes/sound_sh.mp3',
+        options:[
+          { emoji:'🐑', word:'sheep', hasTarget:true,  audioFile:null },
+          { emoji:'👶', word:'sleep', hasTarget:false, audioFile:null },
+          { emoji:'🚢', word:'ship',  hasTarget:true,  audioFile:null },
+        ]},
+    ]},
+    gold: { pick:2, items:[
+      { targetSound:'NG', targetHint:'humming sound 🎵', targetAudioFile:'assets/phonemes/sound_ng.mp3',
+        options:[
+          { emoji:'💍', word:'ring',   hasTarget:true,  audioFile:null },
+          { emoji:'🏃', word:'run',    hasTarget:false, audioFile:null },
+          { emoji:'🎤', word:'sing',   hasTarget:true,  audioFile:null },
+          { emoji:'🌊', word:'swim',   hasTarget:false, audioFile:null },
+        ]},
+      { targetSound:'OO', targetHint:'long "ooo" 🌙', targetAudioFile:'assets/phonemes/sound_ooo.mp3',
+        options:[
+          { emoji:'🌙', word:'moon',  hasTarget:true,  audioFile:null },
+          { emoji:'📖', word:'book',  hasTarget:false, audioFile:null },
+          { emoji:'🥄', word:'spoon', hasTarget:true,  audioFile:null },
+          { emoji:'👣', word:'foot',  hasTarget:false, audioFile:null },
+        ]},
+    ]},
   };
 }
 function blankBuildSentenceData(){
-  return blankPoolWithPick(4); // each pool item is just { tokens: [...] }
+  return blankPoolWithPick(4);
 }
 function blankPyramidData(){
   const blankItem = (withL2, withL3) => ({
@@ -499,9 +658,6 @@ function blankImageFeelingData(){
   };
 }
 function blankCreativeReflectionData(){
-  // Defaults follow the real established pattern (the card grows richer
-  // per tier) rather than three identical single-blank templates — a
-  // sensible starting point an author can rename/reshape, not a blank slate.
   return {
     bronze: { pick:1, items:[{ template:'It is a {0}.', blankHints:['thing'] }] },
     silver: { pick:1, items:[{ template:'It is a {0}, {1}, {2}.', blankHints:['size','shape','colour'] }] },
@@ -509,8 +665,6 @@ function blankCreativeReflectionData(){
   };
 }
 function blankQuestionFormationData(){
-  // Distractor count grows with tier, matching the real established
-  // pattern — bronze stays fully scaffolded (no wrong tiles at all).
   const blankItem = (distractorCount) => ({ situation: '', tokens: [], distractors: Array(distractorCount).fill('') });
   return {
     bronze: { pick:1, items:[blankItem(0)] },
