@@ -6359,7 +6359,7 @@ const MODULE_REGISTRY = {
           renderSayItInteraction(recContainer, {
             prompt: 'Now you say it:',
             target: item.word,
-            audioFile: null,
+            audioFile: item.audioFile || null,
             isBronze,
             moduleIndex: state.currentModuleIndex,
             tier,
