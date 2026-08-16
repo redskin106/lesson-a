@@ -734,12 +734,13 @@ html, body {
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame {
   position: absolute; inset: 0; overflow: hidden; isolation: isolate;
-  border-radius: 12.7cqw;
-  /* clip-path matches the phone screen outline including corner radius */
-  clip-path: inset(0 0 0 0 round 12.7cqw);
+  border-radius: 12cqw / 10.8cqw;
+  /* clip-path uses pixel-measured corner geometry from bg_and_border.png:
+     corners are 144px wide (12cqw) × 129px tall (10.8cqw) — slightly elliptical */
+  clip-path: inset(0 0 0 0 round 12cqw / 10.8cqw);
 }
 .layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; pointer-events: none; }
-.layer-scene { position: absolute; left: 8%; top: 55%; width: 84%; height: 38%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; border-radius: 0 0 13cqw 13cqw; overflow: hidden; }
+.layer-scene { position: absolute; left: 4%; top: 55%; width: 92%; height: 38%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
 .frame-mask  { position: absolute; top: -4px; left: 0; right: 0; bottom: 0; z-index: 5; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
 
 .pos            { position: absolute; z-index: 2; }
