@@ -236,3 +236,9 @@ Statement/sentence:
 - [ ] Reflection Card — output broken
 - [ ] Any module with hardcoded px sizes
 - [ ] Any module with inline hex colours not matching token values
+
+## 10. Frame & Mask Notes
+- `frame-mask` uses `top: -4px` (not `inset: 0`) to shift mask up slightly and cover scene bleed at bottom edge
+- `layer-bg` stays at z-index 0 — raising it breaks all UI content
+- `app-frame` has `clip-path: inset(0 0 0 0 round 12.7cqw)` as belt-and-braces corner clipping
+- If bleed returns, increase `top` negative value (e.g. `-6px`, `-8px`) — do NOT touch z-index
