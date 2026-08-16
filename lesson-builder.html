@@ -1363,8 +1363,6 @@ function removeModuleFromLesson(id){
 function openAddModuleModal(){
   const lesson = LESSONS.find(l => l.id === currentLessonId);
   if(!lesson) return;
-  const existing = new Set(lesson.modules.map(id => instanceType(id)));
-  // Show all module types — allow adding a second instance of any type
   const rows = MODULES.map(m => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--glass-brd);">
       <div>
@@ -1374,10 +1372,13 @@ function openAddModuleModal(){
       <button class="btn" style="flex-shrink:0;margin-left:12px;"
         onclick="addModuleToLesson('${m.id}');closeModal();">Add</button>
     </div>`).join('');
-  showModal(`
-    <div class="modal-title">Add a module</div>
-    <div style="max-height:60vh;overflow-y:auto;">${rows}</div>
-    <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancel</button></div>`);
+  document.getElementById('modalRoot').innerHTML = `
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal">
+      <div class="modal-title">Add a module</div>
+      <div style="max-height:60vh;overflow-y:auto;">${rows}</div>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancel</button></div>
+    </div>`;
 }
 
 function addModuleToLesson(typeId){
