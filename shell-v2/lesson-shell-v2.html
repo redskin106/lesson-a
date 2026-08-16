@@ -730,8 +730,8 @@ html, body {
    (= .block-flowzone), never touch the frame chrome directly.
    ═══════════════════════════════════════════════════════ */
 #screen-module.screen { padding: 0; align-items: center; justify-content: center; }
-.frame-wrap { width: min(400px, 100vw); height: min(860px, 100vh); max-height: 100vh; position: relative; container-type: inline-size; overflow: hidden; }
-.frame-wrap::before { content: none; }
+.frame-wrap { width: min(400px, 100vw); max-height: 94vh; position: relative; container-type: inline-size; }
+.frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame {
   position: absolute; inset: 0; overflow: hidden; isolation: isolate;
   border-radius: 12.7cqw;
@@ -2710,6 +2710,10 @@ function showChoiceScreen() {
   const finBtn  = document.getElementById('choice-finish-btn');
 
   greeting.textContent = state.student ? `${state.student}'s lesson` : 'Choose an activity';
+
+  // Reset scroll to top
+  const zone = document.querySelector('.choice-zone');
+  if (zone) zone.scrollTop = 0;
 
   // Count how many modules are fully done
   const doneCount = state.results.filter(r => r.complete).length;
