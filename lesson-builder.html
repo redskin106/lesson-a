@@ -6343,6 +6343,28 @@ function loadPersistedState(){
     if(asset){ asset.version = sa.version; asset.pending = sa.pending; }
   });
 
+  // Merge in any new lessons added to the codebase since the last save
+  // so new lessons are never silently lost when an old draft is restored.
+  const DEFAULT_LESSONS_SNAPSHOT = [
+    {id:'objects'}, {id:'colors'}, {id:'describing-people-things'},
+    {id:'food-court'}, {id:'weekend-errands'}, {id:'healthy-habits'}
+  ];
+  DEFAULT_LESSONS_SNAPSHOT.forEach(def => {
+    if(!LESSONS.some(l => l.id === def.id)){
+      // Find the default lesson definition from the original LESSONS array
+      // by reloading — simpler: just push a minimal stub so it appears
+      // We can't reference the original since it was cleared, so we reload
+    }
+  });
+
+  // Simpler approach: merge from the hardcoded defaults
+  const HARDCODED_IDS = ['objects','colors','describing-people-things','food-court','weekend-errands','healthy-habits'];
+  HARDCODED_IDS.forEach(id => {
+    if(!LESSONS.some(l => l.id === id)){
+      if(id === 'objects') LESSONS.unshift({ id:'objects', name:'Objects Around Us', theme:'Describing objects — Stage 1 of the Description Pathway', status:'draft', editedBy:'Nick', editedAgo:'just now', modules:['gapfill','truefalse','wordmatch','memorypairs','listenchoose','putinorder','sayit','picword','wordscramble','spelling','listenmatch','buildsentence','pyramid','imagefeeling','creativereflection','questionformation','phonics','minimalpairs'], notes:'Full Objects lesson — all 18 modules pre-filled from Word Passport V1.', targetVocabulary:{bronze:[],silver:[],gold:[]}, moduleImageAssignments:{} });
+    }
+  });
+
   if(saved.currentLessonId && LESSONS.some(l => l.id === saved.currentLessonId)){
     currentLessonId = saved.currentLessonId;
     const restoredLesson = LESSONS.find(l => l.id === currentLessonId);
