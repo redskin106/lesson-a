@@ -805,6 +805,10 @@ LESSON_CONTENT['objects'] = {
 
 };
 
+// Snapshot hardcoded defaults so mergeDefaultLessonContent() can restore them
+// after loadPersistedState() potentially wipes LESSON_CONTENT
+window._DEFAULT_LESSON_CONTENT = JSON.parse(JSON.stringify(LESSON_CONTENT));
+
 function blankGapfillData(){
   return {
     bronze: { pick:2, items:[
@@ -6982,6 +6986,17 @@ function renderEditorShell(){
 }
 
 const restoredDraft = loadPersistedState();
+// After restore — fill in any lesson content missing from the saved draft.
+// This handles the case where new pre-filled lessons were added to the codebase
+// after the user's last save, so they always see the latest authored content.
+(function mergeDefaultLessonContent(){
+  const defaults = window._DEFAULT_LESSON_CONTENT || {};
+  Object.keys(defaults).forEach(lessonId => {
+    if(!LESSON_CONTENT[lessonId] || !LESSON_CONTENT[lessonId].gapfill){
+      LESSON_CONTENT[lessonId] = defaults[lessonId];
+    }
+  });
+})();
 seedWordBankFromColors(); // no-ops if a restored draft already seeded the bank
 renderEditorShell();
 renderDashboard();
