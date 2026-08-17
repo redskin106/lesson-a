@@ -5952,8 +5952,11 @@ function renderPhonicsForm(){
               ${it.phonemes&&it.phonemes.length ? `
                 <span style="font-size:11px;color:var(--text-lo);margin-left:6px;">
                   ${it.phonemes.map(p => {
-                    const hasFile = ['a','ai','ar','b','ch','ck','d','e','ee','er','f','g','h','i','ie','j','k','l','m','n','ng','o','oa','oi','oo','ooo','or','ou','p','qu','r','s','sh','t','th','thh','u','ue','v','w','x','y','z'].includes(p);
-                    return `<span style="color:${hasFile?'#AED581':'#EF9A9A'}" title="${hasFile?'Jolly Phonics audio':'TTS fallback'}">${p}</span>`;
+                    const PHONEME_FILE = {'c':'ck','k':'k','ck':'ck','g':'g','j':'j','qu':'qu','x':'x','y':'y','z':'z','ng':'ng','sh':'sh','th':'thh','ch':'ch','ai':'ai','ee':'ee','ie':'ie','oa':'oa','oo':'ooo','or':'or','ur':'er','er':'er','ow':'ou','ou':'ou','oi':'oi','ear':'ar','air':'ar','ar':'ar','ue':'ue','thh':'thh'};
+                    const JOLLY = ['a','ai','ar','b','ch','ck','d','e','ee','er','f','g','h','i','ie','j','k','l','m','n','ng','o','oa','oi','oo','ooo','or','ou','p','qu','r','s','sh','t','th','thh','u','ue','v','w','x','y','z'];
+                    const fileKey = PHONEME_FILE[p] || p;
+                    const hasFile = JOLLY.includes(fileKey);
+                    return `<span style="color:${hasFile?'#AED581':'#EF9A9A'}" title="${hasFile?'Jolly Phonics: sound_'+fileKey+'.mp3':'TTS fallback'}">${p}</span>`;
                   }).join(' · ')}
                 </span>` : ''}
             </div>
@@ -5964,20 +5967,41 @@ function renderPhonicsForm(){
     <div class="add-link" onclick="phonicsAddItem()">+ add item</div>`;
 }
 function phonicsPreviewSound(grapheme){
-  const file = `https://redskin106.github.io/lesson-a/shell-v2/assets/phonemes/sound_${grapheme}.mp3`;
-  const a = new Audio(file);
-  a.onerror = () => {
-    // fallback: TTS the grapheme name
+  // Same mapping as shell's PHONEME_FILE
+  const PHONEME_FILE = {
+    'c':'ck', 'k':'k', 'ck':'ck',
+    'g':'g',  'j':'j', 'qu':'qu',
+    'x':'x',  'y':'y', 'z':'z',
+    'ng':'ng', 'sh':'sh', 'th':'thh', 'ch':'ch',
+    'ai':'ai', 'ee':'ee', 'ie':'ie', 'oa':'oa',
+    'oo':'ooo', 'or':'or', 'ur':'er', 'er':'er',
+    'ow':'ou', 'ou':'ou', 'oi':'oi',
+    'ear':'ar', 'air':'ar', 'ar':'ar',
+    'ue':'ue', 'thh':'thh',
+  };
+  const JOLLY_PHONICS = ['a','ai','ar','b','ch','ck','d','e','ee','er','f','g','h','i','ie','j','k','l','m','n','ng','o','oa','oi','oo','ooo','or','ou','p','qu','r','s','sh','t','th','thh','u','ue','v','w','x','y','z'];
+  const fileKey = PHONEME_FILE[grapheme] || grapheme;
+  if(!JOLLY_PHONICS.includes(fileKey)){
     if(window.speechSynthesis){
       const u = new SpeechSynthesisUtterance(grapheme);
-      u.rate = 0.8;
+      u.rate = 0.7;
+      window.speechSynthesis.speak(u);
+    }
+    return;
+  }
+  const file = `https://redskin106.github.io/lesson-a/shell-v2/assets/phonemes/sound_${fileKey}.mp3`;
+  const a = new Audio(file);
+  a.onerror = () => {
+    if(window.speechSynthesis){
+      const u = new SpeechSynthesisUtterance(grapheme);
+      u.rate = 0.7;
       window.speechSynthesis.speak(u);
     }
   };
   a.play().catch(() => {
     if(window.speechSynthesis){
       const u = new SpeechSynthesisUtterance(grapheme);
-      u.rate = 0.8;
+      u.rate = 0.7;
       window.speechSynthesis.speak(u);
     }
   });
