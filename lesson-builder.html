@@ -808,8 +808,6 @@ LESSON_CONTENT['objects'] = {
 // Snapshot hardcoded defaults so mergeDefaultLessonContent() can restore them
 // after loadPersistedState() potentially wipes LESSON_CONTENT
 window._DEFAULT_LESSON_CONTENT = JSON.parse(JSON.stringify(LESSON_CONTENT));
-
-function blankGapfillData(){
   return {
     bronze: { pick:2, items:[
       { sentence:'A ___ is red.', answer:'apple', options:['apple','chair'], tokens:[] },
@@ -7045,8 +7043,21 @@ const restoredDraft = loadPersistedState();
 (function mergeDefaultLessonContent(){
   const defaults = window._DEFAULT_LESSON_CONTENT || {};
   Object.keys(defaults).forEach(lessonId => {
-    if(!LESSON_CONTENT[lessonId] || !LESSON_CONTENT[lessonId].gapfill){
+    if(!LESSON_CONTENT[lessonId]){
+      // Whole lesson missing — restore everything
       LESSON_CONTENT[lessonId] = defaults[lessonId];
+    } else {
+      // Lesson exists but individual modules may be missing or empty
+      Object.keys(defaults[lessonId]).forEach(moduleId => {
+        const existing = LESSON_CONTENT[lessonId][moduleId];
+        const hasItems = existing &&
+          (existing.bronze?.items?.length > 0 ||
+           existing.silver?.items?.length > 0 ||
+           existing.gold?.items?.length > 0);
+        if(!hasItems){
+          LESSON_CONTENT[lessonId][moduleId] = defaults[lessonId][moduleId];
+        }
+      });
     }
   });
 })();
