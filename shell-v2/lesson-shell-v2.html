@@ -613,15 +613,15 @@ html, body {
 .dp-image { width:28cqw; height:28cqw; object-fit:cover; border-radius:3cqw; border:2px solid rgba(255,255,255,0.15); box-shadow:0 4px 20px rgba(0,0,0,0.4); }
 .dp-image-fallback { width:28cqw; height:28cqw; display:flex; align-items:center; justify-content:center; font-size:12cqw; background:rgba(255,255,255,0.05); border-radius:3cqw; border:2px solid rgba(255,255,255,0.1); }
 
-.dp-pyramid { display:flex; flex-direction:column; gap:2.5%; margin-bottom:4%; }
+.dp-pyramid { display:flex; flex-direction:column; gap:2%; margin-bottom:3%; }
 .dp-block {
-  border-radius:12px; padding:4% 5%; position:relative;
+  border-radius:10px; padding:3% 4%; position:relative;
   border:1.5px solid transparent; transition: all .3s ease;
   display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:1.5%;
-  min-height:60px; font-size:16px;
+  min-height:44px; font-size:3.8cqw;
 }
-.dp-block-l1 { margin:0 15%; }
-.dp-block-l2 { margin:0 7%; }
+.dp-block-l1 { margin:0 18%; }
+.dp-block-l2 { margin:0 8%; }
 .dp-block-l3 { margin:0; }
 
 .dp-block.locked { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.06); opacity:0.4; color:var(--text-dim); }
@@ -990,15 +990,15 @@ html, body {
 .lc-option-btn-v2.locked { opacity: 0.35; }
 
 /* Word Scramble (v2) */
-.ws-visual-v2 { text-align: center; margin-bottom: 3%; display: flex; flex-direction: column; align-items: center; gap: 3%; }
-.ws-emoji-v2 { font-size: 14cqw; line-height: 1; }
+.ws-visual-v2 { text-align: center; margin-top: 3%; margin-bottom: 4%; display: flex; flex-direction: column; align-items: center; gap: 4%; }
+.ws-emoji-v2 { font-size: 13cqw; line-height: 1; }
 .ws-play-btn-v2 {
   background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
   border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
   cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  flex-shrink: 0; margin-top: 1%;
 }
-.ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 4%; }
+.ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; padding-bottom: 4%; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 0; }
 .ws-slot-v2 {
   width: 11cqw; height: 13cqw; border-radius: 10px;
   border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
@@ -1006,7 +1006,7 @@ html, body {
   font-size: 5cqw; font-weight: 700; color: #fff; cursor: pointer;
   transition: border-color .2s, background .2s, color .2s;
 }
-.ws-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; margin-bottom: 3%; }
+.ws-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; padding-top: 4%; margin-bottom: 3%; row-gap: 2.5%; }
 .ws-tile-v2 {
   width: 11cqw; height: 13cqw; border-radius: 10px;
   border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
