@@ -990,15 +990,15 @@ html, body {
 .lc-option-btn-v2.locked { opacity: 0.35; }
 
 /* Word Scramble (v2) */
-.ws-visual-v2 { text-align: center; margin-bottom: 5%; display: flex; flex-direction: column; align-items: center; gap: 2%; }
-.ws-emoji-v2 { font-size: 15cqw; line-height: 1; }
+.ws-visual-v2 { text-align: center; margin-bottom: 3%; display: flex; flex-direction: column; align-items: center; gap: 3%; }
+.ws-emoji-v2 { font-size: 14cqw; line-height: 1; }
 .ws-play-btn-v2 {
   background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
   border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
   cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 3%; }
+.ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; margin-bottom: 4%; }
 .ws-slot-v2 {
   width: 11cqw; height: 13cqw; border-radius: 10px;
   border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
@@ -1006,7 +1006,7 @@ html, body {
   font-size: 5cqw; font-weight: 700; color: #fff; cursor: pointer;
   transition: border-color .2s, background .2s, color .2s;
 }
-.ws-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; margin-bottom: 4%; }
+.ws-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 13cqw; margin-bottom: 3%; }
 .ws-tile-v2 {
   width: 11cqw; height: 13cqw; border-radius: 10px;
   border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
@@ -1059,13 +1059,13 @@ html, body {
 .sp-feedback-v2 { min-height: 4cqw; text-align: center; font-size: 3.4cqw; margin-bottom: 2%; }
 
 /* Build a Sentence (v2) */
-.sb-prompt-v2 { color: rgba(255,255,255,0.5); font-size: 3.4cqw; text-align: center; margin-bottom: 4%; }
+.sb-prompt-v2 { color: rgba(255,255,255,0.5); font-size: 3.4cqw; text-align: center; margin-bottom: 3%; }
 .qf-situation-v2 {
   text-align: center; font-size: 4.4cqw; font-weight: 700; color: #fff;
   background: rgba(255,213,79,0.1); border: 1.5px solid rgba(255,213,79,0.3);
-  border-radius: 12px; padding: 3% 5%; margin-bottom: 3%;
+  border-radius: 12px; padding: 3% 5%; margin-bottom: 4%;
 }
-.sb-slots-v2 { display: flex; gap: 2%; flex-wrap: wrap; justify-content: center; min-height: 14cqw; margin-bottom: 5%; }
+.sb-slots-v2 { display: flex; gap: 2%; flex-wrap: wrap; justify-content: center; min-height: 14cqw; margin-bottom: 4%; padding: 2% 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .sb-slot-v2 {
   min-width: 14%; height: 12cqw; padding: 0 3%;
   border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
@@ -1073,7 +1073,7 @@ html, body {
   font-size: 4cqw; font-weight: 600; color: #fff; cursor: pointer;
   transition: border-color .2s, background .2s, color .2s;
 }
-.sb-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 12cqw; margin-bottom: 4%; }
+.sb-bank-v2 { display: flex; gap: 2.5%; flex-wrap: wrap; justify-content: center; min-height: 12cqw; margin-bottom: 3%; padding-top: 4%; }
 .sb-tile-v2 {
   padding: 3.5% 5%; border-radius: 12px;
   border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
@@ -6495,18 +6495,18 @@ const MODULE_REGISTRY = {
 
         if (!isGold) {
           wordsEl.innerHTML = `
-            <div style="display:flex;gap:4%;margin-bottom:4%;">
+            <div style="display:flex;gap:4%;justify-content:center;flex-wrap:wrap;margin-bottom:4%;">
               ${item.options.map((opt, i) => `
                 <div id="mp-opt-${i}"
-                  style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3%;
-                  padding:5% 4%;border-radius:14px;min-height:30cqw;cursor:pointer;
+                  style="width:42%;max-width:42%;display:flex;flex-direction:column;align-items:center;gap:3%;
+                  padding:5% 4%;border-radius:14px;cursor:pointer;
                   background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.08);
                   transition:border-color .2s,background .2s;">
                   <div style="font-size:2.6cqw;color:var(--text-dim);text-transform:uppercase;
                     letter-spacing:.07em;">Word ${i+1}</div>
                   <div style="font-size:14cqw;line-height:1;margin:2% 0;">${opt.emoji}</div>
                   <div class="mp-word-label" style="font-size:4cqw;font-weight:700;
-                    color:rgba(255,255,255,0.9);min-height:5cqw;
+                    color:rgba(255,255,255,0.9);min-height:5cqw;text-align:center;
                     ${showWords ? '' : 'filter:blur(6px);user-select:none;'}">${opt.word}</div>
                   <div class="mp-listen-btn" data-play="${i}"
                     style="margin-top:3%;background:rgba(255,255,255,0.06);
