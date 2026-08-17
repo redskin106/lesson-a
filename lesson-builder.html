@@ -2450,7 +2450,7 @@ function renderMain(){
     const gfScope = tokenKey(currentTier, gfExpandedIndex);
     ensureLiveTokens(currentTier, gfExpandedIndex);
     renderTokenEditor(gfScope);
-  } else if(instanceType(currentModule)==='spelling' || instanceType(currentModule)==='wordscramble' || instanceType(currentModule)==='phonics'){
+  } else if(instanceType(currentModule)==='spelling' || instanceType(currentModule)==='wordscramble'){
     renderWordEmojiPoolForm(currentModule);
   } else if(instanceType(currentModule)==='wordmatch' || instanceType(currentModule)==='listenmatch'){
     renderPairsForm(currentModule);
