@@ -679,12 +679,12 @@ html, body {
 .crc-card {
   background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.1);
   border-radius: 16px; padding: 6% 6%; margin-bottom: 5%;
-  font-size: 4.4cqw; line-height: 2.2; color: #fff; text-align: center;
+  font-size: 4.4cqw; line-height: 2.8; color: #fff; text-align: center;
 }
 .crc-blank-input {
-  display: inline-block; width: 20cqw; min-width: 60px; background: rgba(79,195,247,0.12);
+  display: inline-block; width: 28cqw; min-width: 80px; background: rgba(79,195,247,0.12);
   border: none; border-bottom: 2px solid #4FC3F7; color: #4FC3F7; font-weight: 700;
-  font-size: 4.4cqw; font-family: inherit; text-align: center; padding: 0 1%; margin: 0 1%;
+  font-size: 4.4cqw; font-family: inherit; text-align: center; padding: 0 2%; margin: 0 1%;
 }
 .crc-blank-input::placeholder { color: rgba(79,195,247,0.4); font-weight: 400; }
 .crc-blank-input:focus { outline: none; background: rgba(79,195,247,0.2); }
@@ -7096,12 +7096,13 @@ const MODULE_REGISTRY = {
           const i = parseInt(match[1]);
           const hint = (item.blankHints && item.blankHints[i]) || '...';
           blankCount++;
-          return `<input type="text" class="crc-blank-input" id="crc-blank-${i}" data-idx="${i}" placeholder="${hint}" size="1">`;
+          return `<input type="text" class="crc-blank-input" id="crc-blank-${i}" data-idx="${i}" placeholder="${hint}">`;
         }).join('');
 
         container.innerHTML = `
           <p class="crc-notebook-note">Can you remember what you wrote in your notebook? 📓</p>
           <div class="crc-card" id="crc-card">${cardHtml}</div>
+          <div style="flex:1;min-height:4%;"></div>
           <button class="iv-proceed-btn" id="crc-continue-btn" style="display:none;">Continue →</button>
         `;
 
@@ -7113,8 +7114,6 @@ const MODULE_REGISTRY = {
           continueBtn.style.display = allFilled ? 'block' : 'none';
         }
         inputs.forEach(inp => inp.addEventListener('input', () => {
-          // Widen the box to fit what they're typing, never truncating their own words.
-          inp.size = Math.max(inp.placeholder.length, inp.value.length, 4);
           checkAllFilled();
         }));
 
