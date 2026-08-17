@@ -3402,10 +3402,11 @@ function repositionSceneLayer() {
   if (frameRect.height === 0) return;
 
   const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
-  const GAP_PCT = 2;
-  const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
-  scene.style.top = Math.min(newTop, 58) + '%';
-  scene.style.opacity = newTop > 58 ? '0' : '1';
+  // Only move scene UP when content is short — never push it down past default
+  // Never hide the scene — content scrolls, scene stays visible at bottom
+  const newTop = Math.min(SCENE_DEFAULT_TOP, contentBottomPct + 2);
+  scene.style.top = Math.max(newTop, 48) + '%';
+  scene.style.opacity = '1';
 }
 
 function watchModuleContentForSceneReposition() {
