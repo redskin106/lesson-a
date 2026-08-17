@@ -1702,6 +1702,9 @@ function renderSidebar(){
       <span class="mod-num">📖</span> Target Vocabulary
       ${vocabIssueCount > 0 ? `<span class="vocab-issue-badge">${vocabIssueCount}</span>` : ''}
     </li>
+    <li class="mod-item vocab-item ${currentModule==='__passport__'?'active':''}" onclick="selectPassport()">
+      <span class="mod-num">🗂️</span> Word Passport
+    </li>
     <li class="mod-item vocab-item ${currentModule==='__visuals__'?'active':''}" onclick="selectVisuals()">
       <span class="mod-num">🖼️</span> Visuals
     </li>
@@ -1736,6 +1739,84 @@ function selectVocabulary(){
   document.getElementById('crumbMod').textContent = 'Target Vocabulary';
   renderSidebar(); renderTierTabs(); renderMain();
 }
+
+function selectPassport(){
+  currentModule = '__passport__';
+  compareMode = false;
+  document.getElementById('compareBtn').classList.remove('active');
+  document.getElementById('aiGenBtn').classList.remove('active');
+  document.getElementById('aiGenPanel').style.display = 'none';
+  document.getElementById('crumbMod').textContent = 'Word Passport';
+  renderSidebar(); renderTierTabs(); renderMain();
+}
+
+function renderPassportEditor(){
+  const editView = document.getElementById('editView');
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  if(!lesson.wordPassport) lesson.wordPassport = {
+    nouns: [...WORD_PASSPORT.nouns],
+    colours: [...WORD_PASSPORT.colours],
+    bronze: [...WORD_PASSPORT.bronze],
+    silver: [...WORD_PASSPORT.silver],
+    gold: [...WORD_PASSPORT.gold],
+  };
+  const p = lesson.wordPassport;
+
+  const section = (label, key, hint) => `
+    <div class="card" style="margin-bottom:10px;">
+      <div class="card-label">${label}</div>
+      <div style="font-size:11px;color:var(--text-lo);margin-bottom:6px;">${hint}</div>
+      <textarea style="width:100%;min-height:60px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+        border-radius:6px;color:var(--text);font-size:13px;padding:8px;font-family:inherit;resize:vertical;"
+        oninput="updatePassportSection('${key}', this.value)">${p[key].join(', ')}</textarea>
+    </div>`;
+
+  editView.innerHTML = `
+    <div class="card" style="margin-bottom:10px;border-color:rgba(0,188,212,0.2);">
+      <div class="card-label" style="color:#4DD0E1;">🗂️ Word Passport</div>
+      <div style="font-size:12px;color:var(--text-lo);line-height:1.6;">
+        This vocabulary constrains the AI generator. Edit comma-separated word lists.
+        The AI will only use words from these lists when generating exercises.
+      </div>
+    </div>
+    ${section('📦 Nouns (flat — all tiers)', 'nouns', 'Objects students will name and describe')}
+    ${section('🎨 Colours (flat — all tiers)', 'colours', 'Colour words — CSS swatches, no image files needed')}
+    ${section('🥉 Bronze Adjectives (Pre-A1)', 'bronze', 'Simple, observable attributes')}
+    ${section('🥈 Silver Adjectives (A1)', 'silver', 'Fuller attribute set, condition words')}
+    ${section('🥇 Gold Adjectives (A2 receptive)', 'gold', 'Texture, material, opinion words')}
+    <div class="card" style="margin-top:4px;">
+      <div class="card-label">API Key for AI Generator</div>
+      <div style="font-size:11px;color:var(--text-lo);margin-bottom:8px;">Stored in browser only, never sent anywhere except Anthropic.</div>
+      <input type="password" id="passport-api-key" placeholder="sk-ant-..." value="${getStoredApiKey()}"
+        style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);
+        background:rgba(255,255,255,0.05);color:var(--text);font-size:13px;margin-bottom:8px;">
+      <button class="btn" onclick="saveApiKeyFromPassport()" style="font-size:12px;">Save API key</button>
+    </div>`;
+}
+
+function updatePassportSection(key, value){
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  if(!lesson.wordPassport) return;
+  lesson.wordPassport[key] = value.split(',').map(w => w.trim()).filter(Boolean);
+  scheduleSave();
+}
+
+function getStoredApiKey(){
+  try { return localStorage.getItem('anthropic_api_key') || ''; } catch(e){ return ''; }
+}
+
+function saveApiKeyFromPassport(){
+  const inp = document.getElementById('passport-api-key');
+  if(!inp) return;
+  try {
+    if(inp.value.trim()) localStorage.setItem('anthropic_api_key', inp.value.trim());
+    else localStorage.removeItem('anthropic_api_key');
+  } catch(e){}
+  inp.placeholder = 'Saved ✓';
+  setTimeout(() => { inp.placeholder = 'sk-ant-...'; }, 2000);
+}
+
+
 
 function renderVocabularyEditor(){
   const editView = document.getElementById('editView');
@@ -1885,7 +1966,7 @@ function renderTierTabs(){
     // Bronze in" would silently wipe out real content someone already
     // built at Silver/Gold rather than give a useful starting point.
     const tierAsymmetric = instanceType(currentModule) === 'pyramid' || instanceType(currentModule) === 'creativereflection';
-    if(currentTier === 'bronze' || compareMode || currentModule === '__vocabulary__' || currentModule === '__visuals__' || tierAsymmetric){
+    if(currentTier === 'bronze' || compareMode || currentModule === '__vocabulary__' || currentModule === '__passport__' || currentModule === '__visuals__' || tierAsymmetric){
       copyBtn.style.display = 'none';
     } else {
       copyBtn.style.display = 'inline-block';
@@ -1973,7 +2054,7 @@ function selectTier(t){
   renderTierTabs(); renderMain();
 }
 function toggleCompare(){
-  if(currentModule === '__vocabulary__' || currentModule === '__visuals__') return;
+  if(currentModule === '__vocabulary__' || currentModule === '__passport__' || currentModule === '__visuals__') return;
   compareMode = !compareMode;
   document.getElementById('compareBtn').classList.toggle('active', compareMode);
   renderTierTabs(); renderMain();
@@ -2107,32 +2188,82 @@ async function runAiGenerate(){
   const promptFn = MODULE_AI_PROMPTS[type];
   if(!promptFn) return;
 
+  // Get API key from settings
+  let apiKey = '';
+  try { apiKey = localStorage.getItem('anthropic_api_key') || ''; } catch(e){}
+  if(!apiKey){
+    results.innerHTML = `
+      <div style="font-size:13px;color:var(--text);">
+        <div style="margin-bottom:8px;color:var(--text-lo);">Enter your Anthropic API key to use AI generation:</div>
+        <input type="password" id="ai-key-input" placeholder="sk-ant-..." 
+          style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);
+          background:rgba(255,255,255,0.05);color:var(--text);font-size:13px;margin-bottom:8px;">
+        <button class="btn" onclick="saveAiKey()" style="width:100%;font-size:12px;">Save key & generate</button>
+        <div style="font-size:11px;color:var(--text-lo);margin-top:6px;">Stored in browser localStorage only. Never sent anywhere except Anthropic.</div>
+      </div>`;
+    return;
+  }
+
   btn.textContent = 'Generating…';
   btn.disabled = true;
   results.innerHTML = '<div style="color:var(--text-lo);font-size:13px;">Asking Claude…</div>';
 
-  const prompt = promptFn(currentTier, WORD_PASSPORT);
+  const passport = getWordPassportForLesson();
+  const prompt = promptFn(currentTier, passport);
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
+    if(!res.ok){
+      const err = await res.json().catch(() => ({}));
+      if(res.status === 401){
+        try { localStorage.removeItem('anthropic_api_key'); } catch(e){}
+        throw new Error('Invalid API key — cleared. Please re-enter.');
+      }
+      throw new Error(err.error?.message || `API error ${res.status}`);
+    }
     const data = await res.json();
     const text = data.content.map(b => b.text || '').join('');
     const clean = text.replace(/```json|```/g, '').trim();
     const items = JSON.parse(clean);
     renderAiResults(items, type);
   } catch(e) {
-    results.innerHTML = `<div style="color:var(--pink);font-size:13px;">Error: ${e.message}. Try again.</div>`;
+    results.innerHTML = `<div style="color:var(--pink);font-size:13px;">Error: ${e.message}</div>`;
     btn.textContent = 'Generate items →';
     btn.disabled = false;
   }
+}
+
+function saveAiKey(){
+  const inp = document.getElementById('ai-key-input');
+  if(!inp || !inp.value.trim()) return;
+  try { localStorage.setItem('anthropic_api_key', inp.value.trim()); } catch(e){}
+  runAiGenerate();
+}
+
+function getWordPassportForLesson(){
+  // Try to get passport from lesson data first, fall back to defaults
+  const lesson = LESSONS.find(l => l.id === currentLessonId);
+  const passport = (lesson && lesson.wordPassport) || {};
+  return {
+    nouns:   passport.nouns   || WORD_PASSPORT.nouns,
+    colours: passport.colours || WORD_PASSPORT.colours,
+    bronze:  passport.bronze  || WORD_PASSPORT.bronze,
+    silver:  passport.silver  || WORD_PASSPORT.silver,
+    gold:    passport.gold    || WORD_PASSPORT.gold,
+  };
 }
 
 function renderAiResults(items, type){
@@ -2216,6 +2347,12 @@ function renderMain(){
     editView.style.display = 'block';
     compareView.style.display = 'none';
     renderVocabularyEditor();
+    return;
+  }
+  if(currentModule === '__passport__'){
+    editView.style.display = 'block';
+    compareView.style.display = 'none';
+    renderPassportEditor();
     return;
   }
   if(currentModule === '__visuals__'){
