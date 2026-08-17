@@ -1979,6 +1979,231 @@ function toggleCompare(){
   renderTierTabs(); renderMain();
 }
 
+// ---- AI Content Generator ----
+let aiGenOpen = false;
+
+const WORD_PASSPORT = {
+  nouns: ['bag','pen','book','cup','key','coin','ball','box','phone','chair','table','bottle'],
+  colours: ['red','blue','yellow','green','black','white','pink','brown','orange','purple'],
+  bronze: ['big','small','round','flat','old','new','clean','full'],
+  silver: ['long','short','square','straight','dirty','empty','broken','beautiful'],
+  gold: ['soft','hard','smooth','heavy','plastic','metal','thin','wide'],
+};
+
+const MODULE_AI_PROMPTS = {
+  gapfill: (tier, passport) => `You are an expert EFL teacher creating gap-fill exercises for refugee students aged 16-18 at ${tier === 'bronze' ? 'Pre-A1' : tier === 'silver' ? 'A1' : 'A2'} level.
+
+STRICT RULES:
+- ONE blank per sentence
+- The correct answer must be UNAMBIGUOUS — only ONE word fits correctly
+- Use ONLY vocabulary from this approved list:
+  Nouns: ${passport.nouns.join(', ')}
+  Colours: ${passport.colours.join(', ')}
+  ${tier === 'bronze' ? 'Adjectives: ' + passport.bronze.join(', ') : ''}
+  ${tier === 'silver' ? 'Adjectives: ' + [...passport.bronze, ...passport.silver].join(', ') : ''}
+  ${tier === 'gold' ? 'Adjectives: ' + [...passport.bronze, ...passport.silver, ...passport.gold].join(', ') : ''}
+- Sentences must describe OBJECTS (things you can touch/see)
+- ${tier === 'bronze' ? 'Very simple: "It\'s a ___." or "The ___ is big."' : tier === 'silver' ? 'Medium: "The bottle is full and ___."' : 'Complex: "The bag is heavy because it has ___."'}
+- Distractors must be CLEARLY wrong (not debatable)
+- Never use a/an distinction as the key skill
+
+Generate exactly 3 gap-fill items. Return ONLY valid JSON, no markdown, no explanation:
+[
+  {"sentence": "It's a ___.", "answer": "bag", "options": ["bag", "big", "red", "round"]},
+  ...
+]`,
+
+  truefalse: (tier, passport) => `You are an expert EFL teacher creating true/false exercises for refugee students aged 16-18 at ${tier === 'bronze' ? 'Pre-A1' : tier === 'silver' ? 'A1' : 'A2'} level.
+
+STRICT RULES:
+- Statements must be about OBJECTS (things you can touch/see)
+- Use ONLY vocabulary from this approved list:
+  Nouns: ${passport.nouns.join(', ')}
+  Adjectives: ${[...passport.bronze, ...(tier !== 'bronze' ? passport.silver : []), ...(tier === 'gold' ? passport.gold : [])].join(', ')}
+- Statements must be OBJECTIVELY true or false — not debatable or culturally specific
+- False statements need a clear, simple correction
+- ${tier === 'bronze' ? 'Simple observable facts: "A ball is round." (true)' : tier === 'silver' ? 'Condition/comparison facts: "All pens are the same colour." (false)' : 'Reasoning: "A plastic bottle is heavier than a metal coin." (false)'}
+- Avoid statements that could be "it depends"
+
+Generate exactly 3 true/false items. Return ONLY valid JSON:
+[
+  {"statement": "A ball is round.", "answer": true},
+  {"statement": "A coin is square.", "answer": false, "correction": "A coin is round."},
+  ...
+]`,
+
+  wordmatch: (tier, passport) => `You are an expert EFL teacher creating word-match exercises for refugee students aged 16-18 at ${tier === 'bronze' ? 'Pre-A1' : tier === 'silver' ? 'A1' : 'A2'} level.
+
+Create word-emoji pairs from this approved vocabulary:
+  Nouns: ${passport.nouns.join(', ')}
+  ${tier === 'bronze' ? 'Bronze adjectives: ' + passport.bronze.join(', ') : ''}
+  ${tier === 'silver' ? 'Silver adjectives: ' + passport.silver.join(', ') : ''}
+  ${tier === 'gold' ? 'Gold adjectives: ' + passport.gold.join(', ') : ''}
+
+RULES:
+- Each pair: one word + one emoji that clearly represents it
+- Emojis must be unambiguous (not culturally specific)
+- Mix nouns and adjectives
+- No two pairs should have similar-looking emojis
+
+Generate exactly 5 word-emoji pairs. Return ONLY valid JSON:
+[
+  {"word": "bag", "emoji": "👜"},
+  {"word": "round", "emoji": "⭕"},
+  ...
+]`,
+
+  sayit: (tier, passport) => `You are an expert EFL teacher creating speaking practice items for refugee students aged 16-18 at ${tier === 'bronze' ? 'Pre-A1' : tier === 'silver' ? 'A1' : 'A2'} level.
+
+Use ONLY vocabulary from:
+  Nouns: ${passport.nouns.join(', ')}
+  Adjectives: ${[...passport.bronze, ...(tier !== 'bronze' ? passport.silver : []), ...(tier === 'gold' ? passport.gold : [])].join(', ')}
+
+${tier === 'bronze' ? 'Target: single words or very short phrases ("It\'s a bag.")' : tier === 'silver' ? 'Target: simple descriptions ("The bottle is full and round.")' : 'Target: full descriptive sentences with because ("The bag is heavy because it has many books.")'}
+
+Generate exactly 3 Say It items. Return ONLY valid JSON:
+[
+  {"prompt": "What is it?", "target": "It's a bag."},
+  ...
+]`,
+};
+
+function toggleAiGen(){
+  aiGenOpen = !aiGenOpen;
+  document.getElementById('aiGenBtn').classList.toggle('active', aiGenOpen);
+  const panel = document.getElementById('aiGenPanel');
+  if(!aiGenOpen){ panel.style.display = 'none'; return; }
+
+  const type = instanceType(currentModule);
+  if(!MODULE_AI_PROMPTS[type]){
+    panel.style.display = 'block';
+    panel.innerHTML = `<div class="card" style="color:var(--text-lo);font-size:13px;padding:12px;">
+      AI generation not yet supported for <strong>${type}</strong>.<br>
+      Supported: Gap Fill, True/False, Word Match, Say It
+    </div>`;
+    return;
+  }
+
+  panel.style.display = 'block';
+  panel.innerHTML = `
+    <div class="card" style="border-color:rgba(0,188,212,0.3);">
+      <div class="card-label" style="color:#4DD0E1;margin-bottom:8px;">✨ Generate ${currentTier} items with AI</div>
+      <div style="font-size:12px;color:var(--text-lo);margin-bottom:12px;">
+        Uses your Word Passport vocabulary. Review each item before accepting.
+      </div>
+      <button class="btn" id="aiRunBtn" onclick="runAiGenerate()" style="background:rgba(0,188,212,0.15);border-color:rgba(0,188,212,0.5);color:#4DD0E1;width:100%;">
+        Generate items →
+      </button>
+      <div id="aiGenResults" style="margin-top:12px;"></div>
+    </div>`;
+}
+
+async function runAiGenerate(){
+  const btn = document.getElementById('aiRunBtn');
+  const results = document.getElementById('aiGenResults');
+  if(!btn || !results) return;
+
+  const type = instanceType(currentModule);
+  const promptFn = MODULE_AI_PROMPTS[type];
+  if(!promptFn) return;
+
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+  results.innerHTML = '<div style="color:var(--text-lo);font-size:13px;">Asking Claude…</div>';
+
+  const prompt = promptFn(currentTier, WORD_PASSPORT);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(b => b.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const items = JSON.parse(clean);
+    renderAiResults(items, type);
+  } catch(e) {
+    results.innerHTML = `<div style="color:var(--pink);font-size:13px;">Error: ${e.message}. Try again.</div>`;
+    btn.textContent = 'Generate items →';
+    btn.disabled = false;
+  }
+}
+
+function renderAiResults(items, type){
+  const results = document.getElementById('aiGenResults');
+  const btn = document.getElementById('aiRunBtn');
+  if(!results) return;
+  btn.textContent = 'Generate more →';
+  btn.disabled = false;
+
+  results.innerHTML = `
+    <div style="font-size:12px;color:var(--text-lo);margin-bottom:8px;">
+      Review each item — Accept adds it to the module, Reject discards it.
+    </div>
+    ${items.map((item, i) => `
+      <div id="ai-item-${i}" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;margin-bottom:8px;">
+        <div style="font-size:13px;color:var(--text);margin-bottom:8px;">${renderAiItemPreview(item, type)}</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" onclick="acceptAiItem(${i}, ${JSON.stringify(item).replace(/"/g,'&quot;')}, '${type}')"
+            style="flex:1;background:rgba(139,195,74,0.12);border-color:rgba(139,195,74,0.4);color:#AED581;font-size:12px;">
+            ✓ Accept
+          </button>
+          <button class="btn" onclick="document.getElementById('ai-item-${i}').remove()"
+            style="flex:1;background:rgba(239,83,80,0.08);border-color:rgba(239,83,80,0.3);color:#EF9A9A;font-size:12px;">
+            ✕ Reject
+          </button>
+        </div>
+      </div>`).join('')}`;
+}
+
+function renderAiItemPreview(item, type){
+  if(type === 'gapfill') return `<strong>${item.sentence}</strong><br><span style="color:var(--text-lo);font-size:11px;">Answer: ${item.answer} | Options: ${item.options.join(', ')}</span>`;
+  if(type === 'truefalse') return `<strong>${item.statement}</strong> → <span style="color:${item.answer?'#AED581':'#EF9A9A'}">${item.answer ? 'TRUE' : 'FALSE'}</span>${item.correction ? `<br><span style="font-size:11px;color:var(--text-lo);">Correction: ${item.correction}</span>` : ''}`;
+  if(type === 'wordmatch') return `<strong>${item.emoji} ${item.word}</strong>`;
+  if(type === 'sayit') return `<strong>${item.prompt}</strong><br><span style="color:var(--text-lo);">${item.target}</span>`;
+  return JSON.stringify(item);
+}
+
+function acceptAiItem(i, item, type){
+  const tierData = md(currentModule)[currentTier];
+  if(!tierData.items) tierData.items = [];
+
+  // Convert AI output to the correct data shape per module type
+  let newItem;
+  if(type === 'gapfill'){
+    newItem = { sentence: item.sentence, answer: item.answer, options: item.options, tokens: [] };
+  } else if(type === 'truefalse'){
+    newItem = { statement: item.statement, answer: item.answer, tokens: [] };
+    if(item.correction) newItem.correction = item.correction;
+  } else if(type === 'wordmatch'){
+    newItem = { word: item.word, emoji: item.emoji };
+  } else if(type === 'sayit'){
+    newItem = { prompt: item.prompt, target: item.target };
+  } else {
+    newItem = item;
+  }
+
+  tierData.items.push(newItem);
+  scheduleSave();
+  renderMain();
+
+  // Mark as accepted in the panel
+  const el = document.getElementById(`ai-item-${i}`);
+  if(el){
+    el.style.borderColor = 'rgba(139,195,74,0.4)';
+    el.style.background = 'rgba(139,195,74,0.06)';
+    el.querySelector('div:last-child').innerHTML = '<span style="color:#AED581;font-size:12px;">✓ Added to module</span>';
+  }
+}
+
+
+
 function tokenChips(tokens){
   return tokens.map(tk => `<div class="chip ${tk.r||'connector'}">${tk.t}</div>`).join('');
 }
@@ -6494,9 +6719,11 @@ function renderEditorShell(){
         <div style="display:flex;gap:8px;">
           <button class="copy-tier-btn" id="copyTierBtn" onclick="copyFromBronze()" style="display:none;"></button>
           <button class="compare-btn" id="compareBtn" onclick="toggleCompare()">⇄ Compare all 3 tiers</button>
+          <button class="compare-btn" id="aiGenBtn" onclick="toggleAiGen()" style="background:rgba(0,188,212,0.1);border-color:rgba(0,188,212,0.4);color:#4DD0E1;">✨ Generate with AI</button>
         </div>
       </div>
       <div id="editView"></div>
+      <div id="aiGenPanel" style="display:none;margin-top:12px;"></div>
       <div id="compareView" style="display:none;"></div>
     </div>
     <div class="preview-col">
