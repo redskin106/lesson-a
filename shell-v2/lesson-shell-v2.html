@@ -741,8 +741,8 @@ html, body {
   clip-path: inset(0 0 0 0 round 12cqw);
 }
 .layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; pointer-events: none; }
-.layer-scene { position: absolute; left: 4%; top: 55%; width: 92%; height: 38%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
-.frame-mask  { position: absolute; top: -4px; left: 0; right: 0; bottom: 0; z-index: 5; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
+.layer-scene { position: absolute; left: 2.58%; top: 54%; width: 94.83%; height: 41.5%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
+.frame-mask  { position: absolute; inset: 0; z-index: 5; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
 
 .pos            { position: absolute; z-index: 2; }
 .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
@@ -3381,7 +3381,7 @@ function showReinforcePanel(item, onClose) {
 //  tall enough to push the illustration mostly off-frame, fade it out
 //  rather than showing an awkward sliver.
 // ══════════════════════════════════════════════════
-const SCENE_DEFAULT_TOP = 55;
+const SCENE_DEFAULT_TOP = 54;
 let _sceneObserver = null;
 
 function repositionSceneLayer() {
@@ -3402,8 +3402,8 @@ function repositionSceneLayer() {
   const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
   const GAP_PCT = 2;
   const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
-  scene.style.top = Math.min(newTop, 62) + '%';
-  scene.style.opacity = newTop > 62 ? '0' : '1';
+  scene.style.top = Math.min(newTop, 58) + '%';
+  scene.style.opacity = newTop > 58 ? '0' : '1';
 }
 
 function watchModuleContentForSceneReposition() {
