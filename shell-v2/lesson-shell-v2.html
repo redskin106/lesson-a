@@ -3381,7 +3381,7 @@ function showReinforcePanel(item, onClose) {
 //  tall enough to push the illustration mostly off-frame, fade it out
 //  rather than showing an awkward sliver.
 // ══════════════════════════════════════════════════
-const SCENE_DEFAULT_TOP = 51.47;
+const SCENE_DEFAULT_TOP = 55;
 let _sceneObserver = null;
 
 function repositionSceneLayer() {
@@ -3402,9 +3402,8 @@ function repositionSceneLayer() {
   const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
   const GAP_PCT = 2;
   const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
-  const cappedTop = Math.min(newTop, 57);
-  scene.style.top = cappedTop + '%';
-  scene.style.opacity = (100 - cappedTop) < 5 ? '0' : '1';
+  scene.style.top = Math.min(newTop, 62) + '%';
+  scene.style.opacity = newTop > 62 ? '0' : '1';
 }
 
 function watchModuleContentForSceneReposition() {
