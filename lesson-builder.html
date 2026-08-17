@@ -6730,7 +6730,7 @@ function retryPublish(){
 // that simulation for a real trigger call is separate, later work.
 // ==========================================================================
 
-const PERSIST_KEY = 'lessonBuilder.draftState.v1';
+const PERSIST_KEY = 'lessonBuilder.draftState.v2'; // bumped to v2 to bust old cache
 const PERSIST_DEBOUNCE_MS = 1200;
 let persistSaveTimer = null;
 let persistLastSavedAt = null;
@@ -6738,7 +6738,7 @@ let persistLastSavedAt = null;
 // Everything a reload needs to reconstruct exactly where you left off.
 function collectPersistedState(){
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     savedAt: new Date().toISOString(),
     LESSONS,
     LESSON_CONTENT,
@@ -6792,7 +6792,7 @@ function loadPersistedState(){
   if(!raw) return false;
   let saved;
   try{ saved = JSON.parse(raw); } catch(e){ console.error('Saved draft was corrupt, ignoring it:', e); return false; }
-  if(!saved || saved.schemaVersion !== 1) return false;
+  if(!saved || saved.schemaVersion !== 2) return false;
 
   // LESSONS / LESSON_CONTENT / AUDIO_RECORDED / FIXED_ASSETS are declared
   // `const` — restore by mutating in place rather than reassigning.
@@ -6869,7 +6869,7 @@ function exportCurrentLesson(){
   ensureLessonContent(lesson.id);
   ensureAudioRecorded(lesson.id);
   const payload = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     exportedAt: new Date().toISOString(),
     lesson,
     content: LESSON_CONTENT[lesson.id],
@@ -6900,7 +6900,7 @@ function importLessonFile(input){
     try{ payload = JSON.parse(reader.result); }
     catch(e){ alert('That file isn\'t valid lesson export JSON.'); input.value = ''; return; }
 
-    if(!payload || !payload.lesson || payload.schemaVersion !== 1){
+    if(!payload || !payload.lesson || payload.schemaVersion !== 2){
       alert('That file doesn\'t look like a Lesson Builder export.');
       input.value = ''; return;
     }
