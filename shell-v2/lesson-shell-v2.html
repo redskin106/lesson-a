@@ -758,7 +758,7 @@ html, body {
    bookend screens (name/end/journey) still get the bounded+scrollable
    treatment from .block-flowzone above, since they don't use scene
    repositioning at all. */
-#module-container { bottom: auto; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+#module-container { bottom: auto; overflow-y: visible; }
 /* Clip module content at the scene boundary so it never paints over the illustration */
 #screen-module .block-flowzone { overflow: hidden; }
 
@@ -3402,10 +3402,11 @@ function repositionSceneLayer() {
   if (frameRect.height === 0) return;
 
   const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
-  // Only move scene UP when content is short — never push it down past default
-  // Never hide the scene — content scrolls, scene stays visible at bottom
-  const newTop = Math.min(SCENE_DEFAULT_TOP, contentBottomPct + 2);
-  scene.style.top = Math.max(newTop, 48) + '%';
+  const GAP_PCT = 2;
+  // Push scene down as content grows — scene starts at default and moves down
+  // The mask clips anything that goes past the phone boundary
+  const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
+  scene.style.top = newTop + '%';
   scene.style.opacity = '1';
 }
 
