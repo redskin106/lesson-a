@@ -741,7 +741,7 @@ html, body {
   clip-path: inset(0 0 0 0 round 12cqw);
 }
 .layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; pointer-events: none; }
-.layer-scene { position: absolute; left: 4%; bottom: 0; top: auto; width: 92%; height: 38%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: opacity 0.35s ease; }
+.layer-scene { position: absolute; left: 4%; top: 55%; width: 92%; height: 43%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: opacity 0.35s ease; }
 .frame-mask  { position: absolute; top: -4px; left: 0; right: 0; bottom: 0; z-index: 5; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
 
 .pos            { position: absolute; z-index: 2; }
@@ -3400,9 +3400,11 @@ function repositionSceneLayer() {
   if (frameRect.height === 0) return;
 
   const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
-  // Scene is bottom-anchored at height 38%, so it occupies 62%-100%
-  // Fade it when content reaches the scene area (below 60%)
-  scene.style.opacity = contentBottomPct > 58 ? '0' : '1';
+  const GAP_PCT = 2;
+  const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
+  const cappedTop = Math.min(newTop, 57);
+  scene.style.top = cappedTop + '%';
+  scene.style.opacity = (100 - cappedTop) < 5 ? '0' : '1';
 }
 
 function watchModuleContentForSceneReposition() {
