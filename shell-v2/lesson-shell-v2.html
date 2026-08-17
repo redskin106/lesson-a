@@ -758,7 +758,9 @@ html, body {
    bookend screens (name/end/journey) still get the bounded+scrollable
    treatment from .block-flowzone above, since they don't use scene
    repositioning at all. */
-#module-container { bottom: auto; overflow-y: visible; }
+#module-container { bottom: auto; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+/* Clip module content at the scene boundary so it never paints over the illustration */
+#screen-module .block-flowzone { overflow: hidden; }
 
 /* ─── MODULE CHOICE SCREEN ─────────────────────────── */
 .choice-title { font-size: 4.2cqw; font-weight: 700; color: #fff; margin-bottom: 1%; margin-top: 2%; }
