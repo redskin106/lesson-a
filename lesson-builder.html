@@ -2535,13 +2535,43 @@ function renderPyramidForm(moduleId){
               <div class="card-label" style="margin-bottom:0;">Item ${i+1}</div>
               ${items.length>1 ? `<span class="del" onclick="dpRemoveItem('${moduleId}',${i})">✕ remove</span>` : ''}
             </div>
-            <div class="field" style="margin-top:10px;display:flex;gap:12px;align-items:flex-start;">
-              <button class="emoji-field-btn ${item.emoji?'':'empty'}" onclick="openEmojiPicker(function(e){ dpUpdateField('${moduleId}',${i},'emoji',e); })">${item.emoji || '?'}</button>
-              <div style="flex:1;">
-                <label style="font-size:12px;color:var(--text-lo);">Full sentence audio</label>
-                <div class="row-inline" style="margin-top:4px;">
-                  <span class="hint" style="font-size:12px;color:var(--text-lo);">${item.full_sentence_audio ? 'Audio set — regenerate after editing the sentence below' : 'Generated at publish time from the assembled sentence'}</span>
-                </div>
+
+            <!-- Image upload -->
+            <div class="field" style="margin-top:10px;">
+              <label style="font-size:12px;color:var(--text-lo);">Object image</label>
+              <div style="font-size:11px;color:rgba(0,188,212,0.7);margin:4px 0 8px;">
+                📐 Square crop · JPG or WebP · under 100KB · neutral background recommended
+              </div>
+              <div id="dp-drop-${i}"
+                style="border:2px dashed rgba(255,255,255,0.15);border-radius:10px;padding:16px;
+                text-align:center;cursor:pointer;transition:border-color 0.2s;position:relative;"
+                onclick="document.getElementById('dp-file-${i}').click()"
+                ondragover="event.preventDefault();this.style.borderColor='#4DD0E1';"
+                ondragleave="this.style.borderColor='rgba(255,255,255,0.15)';"
+                ondrop="dpHandleDrop(event,'${moduleId}',${i})">
+                ${item.imageFile
+                  ? `<img src="${item.imageFile}" style="max-width:100%;max-height:120px;border-radius:6px;object-fit:cover;">`
+                  : `<div style="color:var(--text-lo);font-size:13px;">🖼️ Drop image here or tap to browse</div>`}
+                <input type="file" id="dp-file-${i}" accept="image/*" style="display:none;"
+                  onchange="dpHandleFileInput(event,'${moduleId}',${i})">
+              </div>
+              ${item.imageFile ? `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                  <span style="font-size:11px;color:var(--text-lo);word-break:break-all;">${item.imageFile}</span>
+                  <span class="del" style="flex-shrink:0;margin-left:8px;" onclick="dpClearImage('${moduleId}',${i})">✕ remove</span>
+                </div>` : ''}
+            </div>
+
+            <div class="field" style="margin-top:10px;">
+              <label style="font-size:12px;color:var(--text-lo);">Object label (used in sentence strip)</label>
+              <input type="text" value="${item.label||''}" placeholder="e.g. bag"
+                style="margin-top:4px;" oninput="dpUpdateField('${moduleId}',${i},'label',this.value)">
+            </div>
+
+            <div class="field" style="margin-top:8px;">
+              <label style="font-size:12px;color:var(--text-lo);">Full sentence audio</label>
+              <div class="row-inline" style="margin-top:4px;">
+                <span class="hint" style="font-size:12px;color:var(--text-lo);">${item.full_sentence_audio ? 'Audio set — regenerate after editing' : 'Generated at publish time'}</span>
               </div>
             </div>
 
@@ -2615,6 +2645,72 @@ function dpRemoveItem(moduleId, i){
   if(dpExpandedIndex>=tierData.items.length) dpExpandedIndex = tierData.items.length-1;
   renderMain(); renderSidebar();
 }
+function dpClearImage(moduleId, i){
+  md(moduleId)[currentTier].items[i].imageFile = null;
+  renderPyramidForm(moduleId);
+  scheduleSave();
+}
+
+async function dpHandleDrop(event, moduleId, i){
+  event.preventDefault();
+  const file = event.dataTransfer.files[0];
+  if(!file || !file.type.startsWith('image/')) return;
+  await dpUploadImage(file, moduleId, i);
+}
+
+async function dpHandleFileInput(event, moduleId, i){
+  const file = event.target.files[0];
+  if(!file) return;
+  await dpUploadImage(file, moduleId, i);
+}
+
+async function dpUploadImage(file, moduleId, i){
+  const drop = document.getElementById(`dp-drop-${i}`);
+  if(drop) drop.innerHTML = '<div style="color:var(--text-lo);font-size:13px;">Uploading…</div>';
+
+  // Warn if file is too large
+  if(file.size > 200 * 1024){
+    if(!confirm(`This image is ${Math.round(file.size/1024)}KB — recommended under 100KB. Upload anyway?`)) {
+      renderPyramidForm(moduleId);
+      return;
+    }
+  }
+
+  // Get object label for filename
+  const item = md(moduleId)[currentTier].items[i];
+  const label = (item.label || `item${i}`).toLowerCase().replace(/[^a-z0-9]/g,'_');
+  const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+  const remotePath = `shell-v2/assets/pyramid/${label}.${ext}`;
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
+    // Check if file exists to get SHA
+    let sha = null;
+    try {
+      const check = await ghApiRequest('GET', `/contents/${remotePath}`);
+      sha = check.sha;
+    } catch(e){}
+
+    const payload = {
+      message: `asset: pyramid image ${label}.${ext}`,
+      content: base64,
+      ...(sha ? { sha } : {})
+    };
+
+    await ghApiRequest('PUT', `/contents/${remotePath}`, payload);
+
+    // Store relative path
+    item.imageFile = `assets/pyramid/${label}.${ext}`;
+    scheduleSave();
+    renderPyramidForm(moduleId);
+  } catch(e) {
+    alert(`Upload failed: ${e.message}`);
+    renderPyramidForm(moduleId);
+  }
+}
+
 function dpUpdateField(moduleId, i, field, val){
   md(moduleId)[currentTier].items[i][field] = val;
   scheduleSave(); renderMain(); updatePreviewLive();
