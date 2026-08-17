@@ -764,14 +764,14 @@ LESSON_CONTENT['objects'] = {
   phonics: {
     bronze: { pick:2, items:[
       { word:'bag', emoji:'👜', phonemes:['b','a','g'], tokens:[] },
-      { word:'cup', emoji:'☕', phonemes:['c','u','p'], tokens:[] },
+      { word:'cup', emoji:'☕', phonemes:['k','u','p'], tokens:[] },
       { word:'key', emoji:'🔑', phonemes:['k','ee'], tokens:[] },
       { word:'pen', emoji:'🖊️', phonemes:['p','e','n'], tokens:[] },
     ]},
     silver: { pick:2, items:[
-      { word:'coin', emoji:'🪙', phonemes:['c','oi','n'], tokens:[] },
+      { word:'coin', emoji:'🪙', phonemes:['k','oi','n'], tokens:[] },
       { word:'book', emoji:'📖', phonemes:['b','oo','k'], tokens:[] },
-      { word:'phone', emoji:'📱', phonemes:['ph','o','n','e'], tokens:[] },
+      { word:'phone', emoji:'📱', phonemes:['f','o','n'], tokens:[] },
       { word:'chair', emoji:'🪑', phonemes:['ch','ai','r'], tokens:[] },
     ]},
     gold: { pick:2, items:[
@@ -5947,7 +5947,16 @@ function renderPhonicsForm(){
           </div>
         ` : `
           <div class="pool-header" style="cursor:pointer;" onclick="phonicsExpandedIndex=${i};renderPhonicsForm();">
-            <div style="font-size:13.5px;color:var(--text);">${it.word||'(empty)'} ${it.phonemes&&it.phonemes.length ? '· '+it.phonemes.join('-') : ''}</div>
+            <div style="font-size:13.5px;color:var(--text);">
+              ${it.word||'(empty)'}
+              ${it.phonemes&&it.phonemes.length ? `
+                <span style="font-size:11px;color:var(--text-lo);margin-left:6px;">
+                  ${it.phonemes.map(p => {
+                    const hasFile = ['a','ai','ar','b','ch','ck','d','e','ee','er','f','g','h','i','ie','j','k','l','m','n','ng','o','oa','oi','oo','ooo','or','ou','p','qu','r','s','sh','t','th','thh','u','ue','v','w','x','y','z'].includes(p);
+                    return `<span style="color:${hasFile?'#AED581':'#EF9A9A'}" title="${hasFile?'Jolly Phonics audio':'TTS fallback'}">${p}</span>`;
+                  }).join(' · ')}
+                </span>` : ''}
+            </div>
             <span style="color:var(--text-lo);font-size:12px;">Edit ›</span>
           </div>
         `}
