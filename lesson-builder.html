@@ -397,6 +397,402 @@ const FOOD_COURT_SPELLING = {
 // ---- Per-lesson content store. Every lesson gets its own data, not a shared global. ----
 const LESSON_CONTENT = {}; // keyed by lessonId -> { gapfill?: {...}, spelling?: {...} }
 
+// ── Objects Lesson — pre-filled from Word Passport V1 ──────────────────────
+LESSON_CONTENT['objects'] = {
+
+  gapfill: {
+    bronze: { pick:2, items:[
+      { sentence:'It\'s a ___.', answer:'bag', options:['bag','cup'], tokens:[] },
+      { sentence:'It\'s a ___.', answer:'ball', options:['ball','key'], tokens:[] },
+      { sentence:'The cup is ___.', answer:'round', options:['round','flat'], tokens:[] },
+      { sentence:'The bag is ___.', answer:'big', options:['big','small'], tokens:[] },
+    ]},
+    silver: { pick:2, items:[
+      { sentence:'The bottle is ___ and round.', answer:'full', options:['full','empty'], tokens:[] },
+      { sentence:'The pen is ___ and straight.', answer:'long', options:['long','short'], tokens:[] },
+      { sentence:'The box is ___ and ___.', answer:'square', options:['square','round'], tokens:[] },
+      { sentence:'The bag is ___ because it has many books.', answer:'heavy', options:['heavy','light'], tokens:[] },
+    ]},
+    gold: { pick:2, items:[
+      { sentence:'The table is made of ___.', answer:'wood', options:['wood','plastic'], tokens:[] },
+      { sentence:'The phone has a ___ screen.', answer:'smooth', options:['smooth','rough'], tokens:[] },
+      { sentence:'The coin is ___ and ___.', answer:'metal', options:['metal','plastic'], tokens:[] },
+      { sentence:'The bag looks ___ because it is very old.', answer:'dirty', options:['dirty','clean'], tokens:[] },
+    ]},
+  },
+
+  truefalse: {
+    bronze: { pick:2, items:[
+      { statement:'A ball is round.', answer:true, tokens:[] },
+      { statement:'A pen is big.', answer:false, correction:'A pen is small.', tokens:[] },
+      { statement:'A bag can hold things.', answer:true, tokens:[] },
+      { statement:'A coin is square.', answer:false, correction:'A coin is round.', tokens:[] },
+    ]},
+    silver: { pick:2, items:[
+      { statement:'A bottle can be full or empty.', answer:true, tokens:[] },
+      { statement:'All bags are the same colour.', answer:false, correction:'Bags can be many different colours.', tokens:[] },
+      { statement:'A key is usually small.', answer:true, tokens:[] },
+      { statement:'A table is usually round.', answer:false, correction:'Most tables are square or rectangular.', tokens:[] },
+    ]},
+    gold: { pick:2, items:[
+      { statement:'A plastic bottle is heavier than a metal coin.', answer:false, correction:'A metal coin is usually heavier than a plastic bottle.', tokens:[] },
+      { statement:'A smooth surface is easy to touch.', answer:true, tokens:[] },
+      { statement:'Old objects are always dirty.', answer:false, correction:'Old objects can be clean or dirty.', tokens:[] },
+      { statement:'A thin pen is easier to carry than a thick book.', answer:true, tokens:[] },
+    ]},
+  },
+
+  wordmatch: {
+    bronze: { pick:4, items:[
+      { word:'big', emoji:'🐘' }, { word:'small', emoji:'🐭' },
+      { word:'round', emoji:'⭕' }, { word:'flat', emoji:'▬' },
+      { word:'old', emoji:'⏳' }, { word:'new', emoji:'✨' },
+      { word:'clean', emoji:'🧼' }, { word:'full', emoji:'🫙' },
+    ]},
+    silver: { pick:4, items:[
+      { word:'long', emoji:'📏' }, { word:'short', emoji:'✂️' },
+      { word:'square', emoji:'🟥' }, { word:'straight', emoji:'➡️' },
+      { word:'dirty', emoji:'💩' }, { word:'empty', emoji:'🪣' },
+      { word:'broken', emoji:'💔' }, { word:'beautiful', emoji:'🌸' },
+    ]},
+    gold: { pick:4, items:[
+      { word:'soft', emoji:'🧸' }, { word:'hard', emoji:'🪨' },
+      { word:'smooth', emoji:'🪞' }, { word:'heavy', emoji:'⚖️' },
+      { word:'plastic', emoji:'🧴' }, { word:'metal', emoji:'🔩' },
+      { word:'thin', emoji:'📄' }, { word:'wide', emoji:'↔️' },
+    ]},
+  },
+
+  memorypairs: {
+    bronze: { pick:3, flipback:1200, items:[
+      { word:'bag', emoji:'👜', image:null, sentence:'It\'s a bag.', tokens:[] },
+      { word:'ball', emoji:'⚽', image:null, sentence:'It\'s a ball.', tokens:[] },
+      { word:'book', emoji:'📖', image:null, sentence:'It\'s a book.', tokens:[] },
+      { word:'cup', emoji:'☕', image:null, sentence:'It\'s a cup.', tokens:[] },
+      { word:'key', emoji:'🔑', image:null, sentence:'It\'s a key.', tokens:[] },
+      { word:'coin', emoji:'🪙', image:null, sentence:'It\'s a coin.', tokens:[] },
+    ]},
+    silver: { pick:3, flipback:1200, items:[
+      { word:'big', emoji:'🐘', image:null, sentence:'The bag is big.', tokens:[] },
+      { word:'small', emoji:'🐭', image:null, sentence:'The key is small.', tokens:[] },
+      { word:'round', emoji:'⭕', image:null, sentence:'The ball is round.', tokens:[] },
+      { word:'flat', emoji:'▬', image:null, sentence:'The coin is flat.', tokens:[] },
+      { word:'long', emoji:'📏', image:null, sentence:'The pen is long.', tokens:[] },
+      { word:'square', emoji:'🟥', image:null, sentence:'The box is square.', tokens:[] },
+    ]},
+    gold: { pick:3, flipback:1200, items:[
+      { word:'smooth', emoji:'🪞', image:null, sentence:'The table is smooth.', tokens:[] },
+      { word:'heavy', emoji:'⚖️', image:null, sentence:'The bag is heavy.', tokens:[] },
+      { word:'soft', emoji:'🧸', image:null, sentence:'The ball is soft.', tokens:[] },
+      { word:'hard', emoji:'🪨', image:null, sentence:'The coin is hard.', tokens:[] },
+      { word:'plastic', emoji:'🧴', image:null, sentence:'The bottle is plastic.', tokens:[] },
+      { word:'metal', emoji:'🔩', image:null, sentence:'The key is metal.', tokens:[] },
+    ]},
+  },
+
+  listenchoose: {
+    bronze: { pick:2, items:[
+      { audio:'', question:'Which object is round?', options:['ball','book'], answer:'ball' },
+      { audio:'', question:'Which object is small?', options:['key','table'], answer:'key' },
+      { audio:'', question:'Which object is big?', options:['bag','coin'], answer:'bag' },
+      { audio:'', question:'Which object is flat?', options:['coin','ball'], answer:'coin' },
+    ]},
+    silver: { pick:2, items:[
+      { audio:'', question:'Which object can be full or empty?', options:['bottle','pen'], answer:'bottle' },
+      { audio:'', question:'Which object is long and straight?', options:['pen','cup'], answer:'pen' },
+      { audio:'', question:'Which object is square?', options:['box','ball'], answer:'box' },
+      { audio:'', question:'Which object is usually clean and shiny?', options:['coin','bag'], answer:'coin' },
+    ]},
+    gold: { pick:2, items:[
+      { audio:'', question:'Which object feels smooth?', options:['phone','bag'], answer:'phone' },
+      { audio:'', question:'Which object is made of metal?', options:['key','bottle'], answer:'key' },
+      { audio:'', question:'Which object is thin and light?', options:['pen','book'], answer:'pen' },
+      { audio:'', question:'Which object is heavy when full?', options:['bottle','coin'], answer:'bottle' },
+    ]},
+  },
+
+  putinorder: {
+    bronze: { pick:2, items:[
+      { prompt:'', items:['It\'s', 'a', 'bag'] },
+      { prompt:'', items:['It\'s', 'big', 'and', 'round'] },
+      { prompt:'', items:['It\'s', 'a', 'small', 'key'] },
+    ]},
+    silver: { pick:2, items:[
+      { prompt:'', items:['The', 'bottle', 'is', 'full', 'and', 'round'] },
+      { prompt:'', items:['It\'s', 'a', 'long', 'straight', 'pen'] },
+      { prompt:'', items:['The', 'box', 'is', 'square', 'and', 'empty'] },
+    ]},
+    gold: { pick:2, items:[
+      { prompt:'', items:['The', 'bag', 'is', 'heavy', 'because', 'it', 'has', 'many', 'books'] },
+      { prompt:'', items:['It', 'looks', 'old', 'but', 'it', 'is', 'clean'] },
+      { prompt:'', items:['The', 'phone', 'has', 'a', 'smooth', 'plastic', 'screen'] },
+    ]},
+  },
+
+  sayit: {
+    bronze: { pick:2, items:[
+      { prompt:'What is it?', target:'It\'s a bag.' },
+      { prompt:'What is it?', target:'It\'s a ball.' },
+      { prompt:'What is it?', target:'It\'s a book.' },
+      { prompt:'Describe it:', target:'It\'s big and round.' },
+    ]},
+    silver: { pick:2, items:[
+      { prompt:'Describe the bottle:', target:'The bottle is full and round.' },
+      { prompt:'Describe the pen:', target:'The pen is long and straight.' },
+      { prompt:'Describe the box:', target:'The box is square and empty.' },
+      { prompt:'Describe the bag:', target:'It\'s a big, old, brown bag.' },
+    ]},
+    gold: { pick:2, items:[
+      { prompt:'Describe the phone fully:', target:'It\'s a small, flat, smooth phone.' },
+      { prompt:'Describe and explain:', target:'The bag is heavy because it has many books.' },
+      { prompt:'Compare two objects:', target:'The key is smaller and heavier than the pen.' },
+      { prompt:'Describe the texture:', target:'The table feels smooth when you touch it.' },
+    ]},
+  },
+
+  picword: {
+    bronze: { pick:3, mode:'word-to-image', items:[
+      { word:'bag', emoji:'👜', sentence:'It\'s a bag.', cloze:'bag' },
+      { word:'ball', emoji:'⚽', sentence:'It\'s a ball.', cloze:'ball' },
+      { word:'book', emoji:'📖', sentence:'It\'s a book.', cloze:'book' },
+      { word:'cup', emoji:'☕', sentence:'It\'s a cup.', cloze:'cup' },
+      { word:'key', emoji:'🔑', sentence:'It\'s a key.', cloze:'key' },
+      { word:'coin', emoji:'🪙', sentence:'It\'s a coin.', cloze:'coin' },
+    ]},
+    silver: { pick:3, mode:'image-to-word', items:[
+      { word:'box', emoji:'📦', sentence:'The box is square.', cloze:'box' },
+      { word:'phone', emoji:'📱', sentence:'The phone is flat.', cloze:'phone' },
+      { word:'chair', emoji:'🪑', sentence:'The chair is big.', cloze:'chair' },
+      { word:'table', emoji:'🪵', sentence:'The table is long.', cloze:'table' },
+      { word:'bottle', emoji:'🍶', sentence:'The bottle is full.', cloze:'bottle' },
+      { word:'pen', emoji:'🖊️', sentence:'The pen is long.', cloze:'pen' },
+    ]},
+    gold: { pick:3, mode:'cloze-image', items:[
+      { word:'bag', emoji:'👜', sentence:'The bag is ___.', cloze:'heavy' },
+      { word:'bottle', emoji:'🍶', sentence:'The bottle is ___.', cloze:'empty' },
+      { word:'phone', emoji:'📱', sentence:'The screen is ___.', cloze:'smooth' },
+      { word:'key', emoji:'🔑', sentence:'The key is ___.', cloze:'metal' },
+      { word:'ball', emoji:'⚽', sentence:'The ball is ___.', cloze:'soft' },
+      { word:'table', emoji:'🪵', sentence:'The table is ___.', cloze:'hard' },
+    ]},
+  },
+
+  wordscramble: {
+    bronze: { pick:3, items:[
+      { word:'bag', emoji:'👜', tokens:[] },
+      { word:'ball', emoji:'⚽', tokens:[] },
+      { word:'cup', emoji:'☕', tokens:[] },
+      { word:'key', emoji:'🔑', tokens:[] },
+      { word:'big', emoji:'🐘', tokens:[] },
+      { word:'old', emoji:'⏳', tokens:[] },
+    ]},
+    silver: { pick:3, items:[
+      { word:'book', emoji:'📖', tokens:[] },
+      { word:'coin', emoji:'🪙', tokens:[] },
+      { word:'round', emoji:'⭕', tokens:[] },
+      { word:'clean', emoji:'🧼', tokens:[] },
+      { word:'full', emoji:'🫙', tokens:[] },
+      { word:'long', emoji:'📏', tokens:[] },
+    ]},
+    gold: { pick:3, items:[
+      { word:'bottle', emoji:'🍶', tokens:[] },
+      { word:'phone', emoji:'📱', tokens:[] },
+      { word:'smooth', emoji:'🪞', tokens:[] },
+      { word:'heavy', emoji:'⚖️', tokens:[] },
+      { word:'plastic', emoji:'🧴', tokens:[] },
+      { word:'beautiful', emoji:'🌸', tokens:[] },
+    ]},
+  },
+
+  spelling: {
+    bronze: { pick:3, items:[
+      { word:'bag', emoji:'👜', tokens:[] },
+      { word:'cup', emoji:'☕', tokens:[] },
+      { word:'key', emoji:'🔑', tokens:[] },
+      { word:'big', emoji:'🐘', tokens:[] },
+      { word:'old', emoji:'⏳', tokens:[] },
+      { word:'new', emoji:'✨', tokens:[] },
+    ]},
+    silver: { pick:3, items:[
+      { word:'ball', emoji:'⚽', tokens:[] },
+      { word:'coin', emoji:'🪙', tokens:[] },
+      { word:'book', emoji:'📖', tokens:[] },
+      { word:'round', emoji:'⭕', tokens:[] },
+      { word:'flat', emoji:'▬', tokens:[] },
+      { word:'long', emoji:'📏', tokens:[] },
+    ]},
+    gold: { pick:3, items:[
+      { word:'phone', emoji:'📱', tokens:[] },
+      { word:'table', emoji:'🪵', tokens:[] },
+      { word:'smooth', emoji:'🪞', tokens:[] },
+      { word:'heavy', emoji:'⚖️', tokens:[] },
+      { word:'plastic', emoji:'🧴', tokens:[] },
+      { word:'metal', emoji:'🔩', tokens:[] },
+    ]},
+  },
+
+  listenmatch: {
+    bronze: { pick:4, items:[
+      { word:'bag', emoji:'👜' }, { word:'ball', emoji:'⚽' },
+      { word:'cup', emoji:'☕' }, { word:'key', emoji:'🔑' },
+      { word:'book', emoji:'📖' }, { word:'coin', emoji:'🪙' },
+    ]},
+    silver: { pick:4, items:[
+      { word:'box', emoji:'📦' }, { word:'pen', emoji:'🖊️' },
+      { word:'phone', emoji:'📱' }, { word:'chair', emoji:'🪑' },
+      { word:'table', emoji:'🪵' }, { word:'bottle', emoji:'🍶' },
+    ]},
+    gold: { pick:4, items:[
+      { word:'smooth', emoji:'🪞' }, { word:'heavy', emoji:'⚖️' },
+      { word:'soft', emoji:'🧸' }, { word:'hard', emoji:'🪨' },
+      { word:'plastic', emoji:'🧴' }, { word:'metal', emoji:'🔩' },
+    ]},
+  },
+
+  buildsentence: {
+    bronze: { pick:2, items:[
+      { tokens:[{text:'It\'s',role:'verb'},{text:'a',role:'other'},{text:'bag',role:'object'}] },
+      { tokens:[{text:'It\'s',role:'verb'},{text:'big',role:'object'},{text:'and',role:'other'},{text:'round',role:'object'}] },
+      { tokens:[{text:'The',role:'other'},{text:'ball',role:'subject'},{text:'is',role:'verb'},{text:'round',role:'object'}] },
+    ]},
+    silver: { pick:2, items:[
+      { tokens:[{text:'The',role:'other'},{text:'bottle',role:'subject'},{text:'is',role:'verb'},{text:'full',role:'object'},{text:'and',role:'other'},{text:'round',role:'object'}] },
+      { tokens:[{text:'It\'s',role:'verb'},{text:'a',role:'other'},{text:'long',role:'object'},{text:'straight',role:'object'},{text:'pen',role:'object'}] },
+      { tokens:[{text:'The',role:'other'},{text:'box',role:'subject'},{text:'is',role:'verb'},{text:'square',role:'object'},{text:'and',role:'other'},{text:'empty',role:'object'}] },
+    ]},
+    gold: { pick:2, items:[
+      { tokens:[{text:'The',role:'other'},{text:'bag',role:'subject'},{text:'is',role:'verb'},{text:'heavy',role:'object'},{text:'because',role:'other'},{text:'it',role:'subject'},{text:'has',role:'verb'},{text:'many',role:'other'},{text:'books',role:'object'}] },
+      { tokens:[{text:'The',role:'other'},{text:'phone',role:'subject'},{text:'has',role:'verb'},{text:'a',role:'other'},{text:'smooth',role:'object'},{text:'plastic',role:'object'},{text:'screen',role:'object'}] },
+      { tokens:[{text:'It',role:'subject'},{text:'looks',role:'verb'},{text:'old',role:'object'},{text:'but',role:'other'},{text:'it',role:'subject'},{text:'is',role:'verb'},{text:'clean',role:'object'}] },
+    ]},
+  },
+
+  pyramid: {
+    bronze: { pick:1, items:[
+      { imageFile:null, label:'bag',
+        l1:{ options:[{label:'bag',emoji:'👜'},{label:'box',emoji:'📦'},{label:'bottle',emoji:'🍶'},{label:'book',emoji:'📖'}], answer:'bag' },
+        l2:[], l3:{ tiles:[], because_mode:'typed' } },
+      { imageFile:null, label:'ball',
+        l1:{ options:[{label:'ball',emoji:'⚽'},{label:'cup',emoji:'☕'},{label:'coin',emoji:'🪙'},{label:'key',emoji:'🔑'}], answer:'ball' },
+        l2:[], l3:{ tiles:[], because_mode:'typed' } },
+    ]},
+    silver: { pick:1, items:[
+      { imageFile:null, label:'bag',
+        l1:{ options:[{label:'bag',emoji:'👜'},{label:'box',emoji:'📦'},{label:'bottle',emoji:'🍶'},{label:'book',emoji:'📖'}], answer:'bag' },
+        l2:[
+          { label:'Size', options:[{label:'big',emoji:'🐘'},{label:'small',emoji:'🐭'},{label:'long',emoji:'📏'},{label:'flat',emoji:'▬'}], answer:'big' },
+          { label:'Shape', options:[{label:'round',emoji:'⭕'},{label:'flat',emoji:'▬'},{label:'square',emoji:'🟥'},{label:'long',emoji:'📏'}], answer:'flat' },
+          { label:'Colour', options:[{label:'red',emoji:'🔴'},{label:'blue',emoji:'🔵'},{label:'black',emoji:'⚫'},{label:'brown',emoji:'🟤'}], answer:'brown' },
+        ], l3:{ tiles:[], because_mode:'typed' } },
+      { imageFile:null, label:'ball',
+        l1:{ options:[{label:'ball',emoji:'⚽'},{label:'cup',emoji:'☕'},{label:'coin',emoji:'🪙'},{label:'key',emoji:'🔑'}], answer:'ball' },
+        l2:[
+          { label:'Size', options:[{label:'big',emoji:'🐘'},{label:'small',emoji:'🐭'},{label:'long',emoji:'📏'},{label:'flat',emoji:'▬'}], answer:'small' },
+          { label:'Shape', options:[{label:'round',emoji:'⭕'},{label:'flat',emoji:'▬'},{label:'square',emoji:'🟥'},{label:'long',emoji:'📏'}], answer:'round' },
+          { label:'Colour', options:[{label:'red',emoji:'🔴'},{label:'white',emoji:'⚪'},{label:'black',emoji:'⚫'},{label:'yellow',emoji:'🟡'}], answer:'white' },
+        ], l3:{ tiles:[], because_mode:'typed' } },
+    ]},
+    gold: { pick:1, items:[
+      { imageFile:null, label:'bag',
+        l1:{ options:[{label:'bag',emoji:'👜'},{label:'box',emoji:'📦'},{label:'bottle',emoji:'🍶'},{label:'book',emoji:'📖'}], answer:'bag' },
+        l2:[
+          { label:'Size', options:[{label:'big',emoji:'🐘'},{label:'small',emoji:'🐭'},{label:'long',emoji:'📏'},{label:'flat',emoji:'▬'}], answer:'big' },
+          { label:'Shape', options:[{label:'round',emoji:'⭕'},{label:'flat',emoji:'▬'},{label:'square',emoji:'🟥'},{label:'long',emoji:'📏'}], answer:'flat' },
+          { label:'Colour', options:[{label:'red',emoji:'🔴'},{label:'blue',emoji:'🔵'},{label:'black',emoji:'⚫'},{label:'brown',emoji:'🟤'}], answer:'brown' },
+        ], l3:{ tiles:['useful','heavy','smooth','beautiful','old','new'], because_mode:'typed' } },
+      { imageFile:null, label:'phone',
+        l1:{ options:[{label:'phone',emoji:'📱'},{label:'pen',emoji:'🖊️'},{label:'coin',emoji:'🪙'},{label:'key',emoji:'🔑'}], answer:'phone' },
+        l2:[
+          { label:'Size', options:[{label:'big',emoji:'🐘'},{label:'small',emoji:'🐭'},{label:'thin',emoji:'📄'},{label:'flat',emoji:'▬'}], answer:'small' },
+          { label:'Shape', options:[{label:'round',emoji:'⭕'},{label:'flat',emoji:'▬'},{label:'square',emoji:'🟥'},{label:'long',emoji:'📏'}], answer:'flat' },
+          { label:'Colour', options:[{label:'black',emoji:'⚫'},{label:'white',emoji:'⚪'},{label:'silver',emoji:'🩶'},{label:'gold',emoji:'🟡'}], answer:'black' },
+        ], l3:{ tiles:['useful','smooth','hard','plastic','metal','thin'], because_mode:'typed' } },
+    ]},
+  },
+
+  imagefeeling: {
+    bronze: { pick:1, items:[
+      { stimulusType:'colour', stimulusValue:'#E53935', stimulusLabel:'red',
+        mascotEmoji:'👽', mascotName:'Zorp', tiles:['happy','excited','scared','warm'] },
+      { stimulusType:'colour', stimulusValue:'#1E88E5', stimulusLabel:'blue',
+        mascotEmoji:'👽', mascotName:'Zorp', tiles:['calm','cold','sad','quiet'] },
+    ]},
+    silver: { pick:1, items:[
+      { stimulusType:'colour', stimulusValue:'#43A047', stimulusLabel:'green',
+        mascotEmoji:'👽', mascotName:'Zorp', tiles:['natural','quiet','fresh','calm'] },
+      { stimulusType:'colour', stimulusValue:'#FF6D00', stimulusLabel:'orange',
+        mascotEmoji:'👽', mascotName:'Zorp', tiles:['warm','excited','happy','energetic'] },
+    ]},
+    gold: { pick:1, items:[
+      { stimulusType:'colour', stimulusValue:'#7B1FA2', stimulusLabel:'purple',
+        mascotEmoji:'👽', mascotName:'Zorp', tiles:['mysterious','excited','curious','calm'], because_mode:'typed' },
+      { stimulusType:'colour', stimulusValue:'#6D4C41', stimulusLabel:'brown',
+        mascotEmoji:'👽', mascotName:'Zorp', tiles:['warm','natural','old','comfortable'], because_mode:'typed' },
+    ]},
+  },
+
+  creativereflection: {
+    bronze: { pick:1, items:[{ template:'It\'s a {0}.', blankHints:['thing'] }] },
+    silver: { pick:1, items:[{ template:'It\'s a {0}, {1}, {2} {3}.', blankHints:['size','shape','colour','thing'] }] },
+    gold:   { pick:1, items:[{ template:'It\'s a {0}, {1}, {2} {3} with {4}.', blankHints:['size','shape','colour','thing','detail'] }] },
+  },
+
+  questionformation: {
+    bronze: { pick:1, items:[
+      { situation:'You see an object on the table.', tokens:[{text:'What',role:'qword'},{text:'is',role:'verb'},{text:'it',role:'object'}], distractors:[] },
+    ]},
+    silver: { pick:1, items:[
+      { situation:'You want to know the colour.', tokens:[{text:'What',role:'qword'},{text:'colour',role:'object'},{text:'is',role:'verb'},{text:'it',role:'object'}], distractors:['How','When'] },
+    ]},
+    gold: { pick:1, items:[
+      { situation:'You want to know what it\'s made of.', tokens:[{text:'What',role:'qword'},{text:'is',role:'verb'},{text:'it',role:'object'},{text:'made',role:'verb'},{text:'of',role:'other'}], distractors:['When','Where','How','Why'] },
+    ]},
+  },
+
+  phonics: {
+    bronze: { pick:2, items:[
+      { word:'bag', emoji:'👜', phonemes:['b','a','g'], tokens:[] },
+      { word:'cup', emoji:'☕', phonemes:['c','u','p'], tokens:[] },
+      { word:'key', emoji:'🔑', phonemes:['k','ee'], tokens:[] },
+      { word:'pen', emoji:'🖊️', phonemes:['p','e','n'], tokens:[] },
+    ]},
+    silver: { pick:2, items:[
+      { word:'coin', emoji:'🪙', phonemes:['c','oi','n'], tokens:[] },
+      { word:'book', emoji:'📖', phonemes:['b','oo','k'], tokens:[] },
+      { word:'phone', emoji:'📱', phonemes:['ph','o','n'], tokens:[] },
+      { word:'chair', emoji:'🪑', phonemes:['ch','air'], tokens:[] },
+    ]},
+    gold: { pick:2, items:[
+      { word:'smooth', emoji:'🪞', phonemes:['s','m','oo','th'], tokens:[] },
+      { word:'straight', emoji:'➡️', phonemes:['s','t','r','ai','t'], tokens:[] },
+      { word:'bottle', emoji:'🍶', phonemes:['b','o','t','l'], tokens:[] },
+      { word:'plastic', emoji:'🧴', phonemes:['p','l','a','s','t','i','c'], tokens:[] },
+    ]},
+  },
+
+  minimalpairs: {
+    bronze: { pick:2, items:[
+      { targetSound:'B', targetHint:'lips together, then pop! 💥', targetAudioFile:'assets/phonemes/sound_b.mp3',
+        options:[{emoji:'👜',word:'bag',hasTarget:true,audioFile:null},{emoji:'🏳️',word:'flag',hasTarget:false,audioFile:null}] },
+      { targetSound:'K', targetHint:'back of throat 🗣️', targetAudioFile:'assets/phonemes/sound_k.mp3',
+        options:[{emoji:'🔑',word:'key',hasTarget:true,audioFile:null},{emoji:'🌊',word:'sea',hasTarget:false,audioFile:null}] },
+    ]},
+    silver: { pick:2, items:[
+      { targetSound:'OO', targetHint:'long "ooo" 🌙', targetAudioFile:'assets/phonemes/sound_ooo.mp3',
+        options:[{emoji:'📖',word:'book',hasTarget:false,audioFile:null},{emoji:'🥄',word:'spoon',hasTarget:true,audioFile:null},{emoji:'🪙',word:'coin',hasTarget:false,audioFile:null}] },
+      { targetSound:'CH', targetHint:'like a sneeze "achoo!" 🤧', targetAudioFile:'assets/phonemes/sound_ch.mp3',
+        options:[{emoji:'🪑',word:'chair',hasTarget:true,audioFile:null},{emoji:'🐻',word:'bear',hasTarget:false,audioFile:null},{emoji:'🍟',word:'chip',hasTarget:true,audioFile:null}] },
+    ]},
+    gold: { pick:2, items:[
+      { targetSound:'TH', targetHint:'tongue between teeth 👅', targetAudioFile:'assets/phonemes/sound_th.mp3',
+        options:[{emoji:'📄',word:'thin',hasTarget:true,audioFile:null},{emoji:'🥫',word:'tin',hasTarget:false,audioFile:null},{emoji:'3️⃣',word:'three',hasTarget:true,audioFile:null},{emoji:'🌳',word:'tree',hasTarget:false,audioFile:null}] },
+      { targetSound:'SM', targetHint:'s + m together', targetAudioFile:null,
+        options:[{emoji:'🪞',word:'smooth',hasTarget:true,audioFile:null},{emoji:'🧸',word:'soft',hasTarget:false,audioFile:null},{emoji:'🌙',word:'moon',hasTarget:false,audioFile:null},{emoji:'😄',word:'smile',hasTarget:true,audioFile:null}] },
+    ]},
+  },
+
+};
+
 function blankGapfillData(){
   return {
     bronze: { pick:2, items:[
@@ -3558,6 +3954,11 @@ const CAMBRIDGE_WORDLIST = {"a":"preA1","about":"preA1","above":"a1","across":"a
 const CAMBRIDGE_LEVEL_FOR_TIER = { bronze: 'preA1', silver: 'a1', gold: 'a2' };
 
 const LESSONS = [
+  { id:'objects', name:'Objects Around Us', theme:'Describing objects — Stage 1 of the Description Pathway', status:'draft',
+    editedBy:'Nick', editedAgo:'just now',
+    modules:['gapfill','truefalse','wordmatch','memorypairs','listenchoose','putinorder','sayit','picword','wordscramble','spelling','listenmatch','buildsentence','pyramid','imagefeeling','creativereflection','questionformation','phonics','minimalpairs'],
+    notes:'Full Objects lesson — all 18 modules pre-filled from Word Passport V1. Bronze=Pre-A1, Silver=A1, Gold=A2 receptive.',
+    targetVocabulary: { bronze:[], silver:[], gold:[] }, moduleImageAssignments: {} },
   { id:'colors', name:'Colors Around Us', theme:'Everyday colors, real objects', status:'draft',
     editedBy:'Nick', editedAgo:'just now',
     modules:['gapfill','truefalse','wordmatch','memorypairs','listenchoose','putinorder','sayit','picword','wordscramble','spelling','listenmatch','buildsentence','pyramid','imagefeeling','creativereflection','questionformation','phonics','minimalpairs'],
