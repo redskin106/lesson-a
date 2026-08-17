@@ -3403,10 +3403,10 @@ function repositionSceneLayer() {
 
   const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
   const GAP_PCT = 2;
-  // Push scene down as content grows — scene starts at default and moves down
-  // The mask clips anything that goes past the phone boundary
+  // Push scene down as content grows, but cap at 60% — beyond that the scene
+  // bottom (top + 41.5%) goes past 100% and gets clipped by the mask bezel
   const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
-  scene.style.top = newTop + '%';
+  scene.style.top = Math.min(newTop, 60) + '%';
   scene.style.opacity = '1';
 }
 
