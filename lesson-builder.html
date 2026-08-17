@@ -6065,8 +6065,17 @@ function renderMinimalPairsForm(){
           </div>
           <div class="field" style="margin-top:8px;">
             <label style="font-size:12px;color:var(--text-lo);">Target sound audio file path (optional — leave blank for TTS)</label>
-            <input type="text" value="${it.targetAudioFile||''}" placeholder="assets/phonemes/sound_sh.mp3"
-              oninput="mpairUpdateField(${i},'targetAudioFile',this.value||null)">
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+              <input type="text" value="${it.targetAudioFile||''}" placeholder="assets/phonemes/sound_sh.mp3"
+                style="flex:1;"
+                oninput="mpairUpdateField(${i},'targetAudioFile',this.value||null)">
+              <button onclick="mpairPreviewSound(${i})"
+                style="padding:6px 12px;border-radius:999px;border:1.5px solid rgba(0,188,212,0.4);
+                background:rgba(0,188,212,0.08);color:#4DD0E1;font-size:12px;cursor:pointer;
+                font-family:inherit;white-space:nowrap;flex-shrink:0;">
+                🔊 Preview
+              </button>
+            </div>
           </div>
           <div class="card-label" style="margin-top:14px;">Word options</div>
           <div class="hint" style="font-size:11px;color:var(--text-lo);margin-bottom:8px;">
@@ -6095,6 +6104,17 @@ function renderMinimalPairsForm(){
         `}
       </div>`).join('')}
     <div class="add-link" onclick="mpairAddItem()">+ add item</div>`;
+}
+function mpairPreviewSound(i){
+  const item = md('minimalpairs')[currentTier].items[i];
+  if(item.targetAudioFile){
+    const url = `https://redskin106.github.io/lesson-a/shell-v2/${item.targetAudioFile}`;
+    const a = new Audio(url);
+    a.onerror = () => phonicsPreviewSound(item.targetSound.toLowerCase());
+    a.play().catch(() => phonicsPreviewSound(item.targetSound.toLowerCase()));
+  } else if(item.targetSound){
+    phonicsPreviewSound(item.targetSound.toLowerCase());
+  }
 }
 function mpairUpdateField(i, field, val){
   md('minimalpairs')[currentTier].items[i][field] = val;
