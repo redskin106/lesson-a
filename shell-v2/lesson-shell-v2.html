@@ -613,15 +613,15 @@ html, body {
 .dp-image { width:28cqw; height:28cqw; object-fit:cover; border-radius:3cqw; border:2px solid rgba(255,255,255,0.15); box-shadow:0 4px 20px rgba(0,0,0,0.4); }
 .dp-image-fallback { width:28cqw; height:28cqw; display:flex; align-items:center; justify-content:center; font-size:12cqw; background:rgba(255,255,255,0.05); border-radius:3cqw; border:2px solid rgba(255,255,255,0.1); }
 
-.dp-pyramid { display:flex; flex-direction:column; gap:2%; margin-bottom:3%; }
+.dp-pyramid { display:flex; flex-direction:column; gap:1.5%; margin-bottom:3%; }
 .dp-block {
-  border-radius:10px; padding:3% 4%; position:relative;
+  border-radius:8px; padding:2% 3%; position:relative;
   border:1.5px solid transparent; transition: all .3s ease;
   display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:1.5%;
-  min-height:44px; font-size:3.8cqw;
+  min-height:36px; font-size:3.6cqw;
 }
-.dp-block-l1 { margin:0 18%; }
-.dp-block-l2 { margin:0 8%; }
+.dp-block-l1 { margin:0 20%; }
+.dp-block-l2 { margin:0 9%; }
 .dp-block-l3 { margin:0; }
 
 .dp-block.locked { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.06); opacity:0.4; color:var(--text-dim); }
@@ -733,7 +733,7 @@ html, body {
    (= .block-flowzone), never touch the frame chrome directly.
    ═══════════════════════════════════════════════════════ */
 #screen-module.screen { padding: 0; align-items: center; justify-content: center; }
-.frame-wrap { width: min(400px, 100vw); max-height: 94vh; position: relative; container-type: inline-size; }
+.frame-wrap { width: min(400px, 100vw); position: relative; container-type: inline-size; }
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame {
   position: absolute; inset: 0; overflow: hidden; isolation: isolate;
@@ -990,15 +990,15 @@ html, body {
 .lc-option-btn-v2.locked { opacity: 0.35; }
 
 /* Word Scramble (v2) */
-.ws-visual-v2 { text-align: center; margin-top: 3%; margin-bottom: 4%; display: flex; flex-direction: column; align-items: center; gap: 4%; }
-.ws-emoji-v2 { font-size: 13cqw; line-height: 1; }
+.ws-visual-v2 { text-align: center; margin-top: 3%; margin-bottom: 0; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.ws-emoji-v2 { font-size: 13cqw; line-height: 1; margin-bottom: 4%; }
 .ws-play-btn-v2 {
   background: rgba(112,82,180,0.16); border: 1.5px solid rgba(112,82,180,0.5);
   border-radius: 50%; width: 9cqw; height: 9cqw; font-size: 4cqw;
   cursor: pointer; color: #C9B8EA; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; margin-top: 1%;
+  flex-shrink: 0; margin-bottom: 4%;
 }
-.ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; padding-bottom: 4%; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 0; }
+.ws-slots-v2 { display: flex; gap: 2%; justify-content: center; flex-wrap: wrap; padding-bottom: 4%; border-bottom: 1px solid transparent; margin-bottom: 0; }
 .ws-slot-v2 {
   width: 11cqw; height: 13cqw; border-radius: 10px;
   border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
@@ -1065,7 +1065,7 @@ html, body {
   background: rgba(255,213,79,0.1); border: 1.5px solid rgba(255,213,79,0.3);
   border-radius: 12px; padding: 3% 5%; margin-bottom: 4%;
 }
-.sb-slots-v2 { display: flex; gap: 2%; flex-wrap: wrap; justify-content: center; min-height: 14cqw; margin-bottom: 4%; padding: 2% 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.sb-slots-v2 { display: flex; gap: 2%; flex-wrap: wrap; justify-content: center; min-height: 14cqw; margin-bottom: 4%; padding: 2% 0; border-bottom: 1px solid transparent; }
 .sb-slot-v2 {
   min-width: 14%; height: 12cqw; padding: 0 3%;
   border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05);
@@ -6257,11 +6257,11 @@ const MODULE_REGISTRY = {
           </div>
 
           <!-- Slots -->
-          <div style="font-size:2.8cqw;color:var(--text-dim);text-align:center;margin-bottom:2%;text-transform:uppercase;letter-spacing:0.08em;">Build the sounds in order</div>
-          <div class="ws-slots-v2" id="ph-slots" style="justify-content:center;flex-wrap:wrap;margin-bottom:3%;min-height:13cqw;"></div>
+          <div style="font-size:2.8cqw;color:var(--text-dim);text-align:center;margin-bottom:4%;text-transform:uppercase;letter-spacing:0.08em;">Build the sounds in order</div>
+          <div class="ws-slots-v2" id="ph-slots" style="justify-content:center;flex-wrap:wrap;padding-bottom:4%;border-bottom:1px solid transparent;min-height:13cqw;"></div>
 
           <!-- Pool -->
-          <div style="font-size:2.4cqw;color:rgba(255,255,255,0.2);text-align:center;margin-bottom:2%;">tap a tile to place it · tap a slot to remove</div>
+          <div style="font-size:2.4cqw;color:rgba(255,255,255,0.2);text-align:center;margin-top:4%;margin-bottom:2%;">tap a tile to place it · tap a slot to remove</div>
           <div class="ws-bank-v2" id="ph-bank" style="justify-content:center;flex-wrap:wrap;min-height:13cqw;margin-bottom:2%;"></div>
 
           <p class="ws-feedback-v2" id="ph-fb" style="min-height:3cqw;margin-bottom:2%;">&nbsp;</p>
