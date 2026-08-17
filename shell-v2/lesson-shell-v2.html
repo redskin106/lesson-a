@@ -733,7 +733,7 @@ html, body {
    (= .block-flowzone), never touch the frame chrome directly.
    ═══════════════════════════════════════════════════════ */
 #screen-module.screen { padding: 0; align-items: center; justify-content: center; }
-.frame-wrap { width: min(400px, 100vw); position: relative; container-type: inline-size; }
+.frame-wrap { width: min(400px, 100vw); max-height: 94vh; position: relative; container-type: inline-size; }
 .frame-wrap::before { content: ''; display: block; padding-top: 215%; }
 .app-frame {
   position: absolute; inset: 0; overflow: hidden; isolation: isolate;
@@ -1235,7 +1235,7 @@ html, body {
      word-scramble, spelling modules
 ════════════════════════════════════ -->
 <div id="reinforce-panel" style="
-  position:absolute;bottom:0;left:0;right:0;
+  position:fixed;bottom:0;left:0;right:0;
   background:#0D1B2A;
   border-top:1px solid #1E3248;
   border-radius:20px 20px 0 0;
