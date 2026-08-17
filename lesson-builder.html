@@ -4489,7 +4489,10 @@ function renderDashboard(){
           <div class="lc-name">${l.name}</div>
           <div class="lc-theme">${l.theme}</div>
         </div>
-        <div class="status-pill ${l.status}">${l.status}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="status-pill ${l.status}">${l.status}</div>
+          <span class="del" title="Delete lesson" onclick="event.stopPropagation();deleteLesson('${l.id}')">✕</span>
+        </div>
       </div>
       <div class="lc-meta">
         <span>${l.modules.length} module${l.modules.length>1?'s':''}</span>
@@ -4520,6 +4523,17 @@ function renderDashboard(){
         </div>
       </div>
     </div>`;
+}
+
+function deleteLesson(id){
+  const lesson = LESSONS.find(l => l.id === id);
+  if(!lesson) return;
+  if(!confirm(`Delete "${lesson.name}"? This cannot be undone.`)) return;
+  const idx = LESSONS.findIndex(l => l.id === id);
+  LESSONS.splice(idx, 1);
+  delete LESSON_CONTENT[id];
+  scheduleSave();
+  renderDashboard();
 }
 
 function openLessonFromDashboard(id){
