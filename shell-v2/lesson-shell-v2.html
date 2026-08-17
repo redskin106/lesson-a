@@ -5403,7 +5403,7 @@ const MODULE_REGISTRY = {
         bankData = safeShuffle(letters, r => r.join('') === wordUp).map((l, i) => ({ letter: l, id: i, used: false }));
 
         const showImage = tier === 'bronze';
-        const isTile = tier !== 'gold';
+        const isTile = false; // all tiers use typing — tiles only for Word Scramble
         const instruction = tier === 'bronze' ? 'Tap the letters to spell the word'
                            : tier === 'silver' ? 'Listen and spell what you hear'
                            : 'Listen and type the word';
