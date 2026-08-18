@@ -1814,9 +1814,9 @@ function buildGrid() {
     // Group singles by category for section labels
     const groups = [
       { label: 'Nouns',   filter: c => !c.isColour && ['bag','ball','book','box','chair','cup','pen','phone','coin','key','table','bottle'].includes(c.word) },
-      { label: 'Shapes',  filter: c => !c.isColour && ['circle','rectangle','triangle'].includes(c.word) },
+      { label: 'Shapes',  filter: c => !c.isColour && ['circle','rectangle','triangle','square'].includes(c.word) },
       { label: 'Colours', filter: c => c.isColour },
-      { label: 'Gold',    filter: c => !c.isColour && c.tier === 'gold' && !['circle','rectangle','triangle'].includes(c.word) },
+      { label: 'Gold',    filter: c => !c.isColour && c.tier === 'gold' && !['circle','rectangle','triangle','square'].includes(c.word) },
     ];
     groups.forEach(group => {
       const cards = singleCards.filter(group.filter);
