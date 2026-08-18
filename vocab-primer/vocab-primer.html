@@ -101,10 +101,13 @@ html, body {
   border: 1.5px solid var(--border);
   overflow: hidden; cursor: pointer; position: relative;
   display: flex; flex-direction: column;
-  transition: transform 0.12s;
+  transition: transform 0.12s, border-color 0.12s;
+  min-height: 72px;
 }
 .gc:active { transform: scale(0.97); }
 .gc.pair   { grid-column: span 2; }
+.gc.done-card     { border-color: var(--sage); }
+.gc.practice-card { border-color: var(--coral); }
 
 /* Status dot */
 .gc-dot {
@@ -117,26 +120,21 @@ html, body {
 .gc-dot.practicing { background: var(--coral); border-color: var(--coral); }
 
 /* Single card image */
-.gc-img {
-  width: 100%; aspect-ratio: 1/1; background: #272320;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 52px; position: relative; overflow: hidden;
-  flex-shrink: 0;
-}
-.gc-img img { width: 82%; height: 82%; object-fit: contain; }
+/* gc-img removed — grid is text-only */
+/* Tier accent on grid cards */
+.gc[data-tier="bronze"] { border-left: 3px solid var(--gold); }
+.gc[data-tier="silver"] { border-left: 3px solid var(--cream-dim); }
+.gc[data-tier="gold"]   { border-left: 3px solid #e8d07a; }
 .gc-video-pip {
-  position: absolute; bottom: 7px; left: 8px;
-  background: rgba(20,17,14,0.78); border: 1px solid rgba(232,115,74,0.4);
-  border-radius: var(--rpill); padding: 3px 8px;
-  font-size: 10px; color: var(--coral); display: flex; align-items: center; gap: 3px;
+  font-size: 10px; color: var(--coral);
+  margin-left: auto; flex-shrink: 0;
 }
 .gc-label {
-  padding: 10px 12px; display: flex; flex-shrink: 0;
-  align-items: center; justify-content: space-between;
+  flex: 1; padding: 14px 14px;
+  display: flex; align-items: center; justify-content: space-between;
   background: var(--bg-card);
-  min-height: 44px;
 }
-.gc-word { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; color: var(--cream); }
+.gc-word { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--cream); line-height: 1.1; }
 .gc-play {
   width: 28px; height: 28px; border-radius: 50%;
   background: var(--cream-faint); border: none; font-size: 12px;
@@ -145,33 +143,27 @@ html, body {
 
 /* Pair card */
 .pair-cols { display: flex; width: 100%; }
-.pair-col  { flex: 1; display: flex; flex-direction: column; align-items: center; background: #272320; }
-.pair-col:first-child { border-right: 1px solid var(--border); }
-.pair-col-img {
-  width: 100%; aspect-ratio: 1/1;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 52px; overflow: hidden; flex-shrink: 0;
+.pair-col  {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 16px 10px; min-height: 72px;
 }
-.pair-col-img img { width: 80%; height: 80%; object-fit: contain; }
+.pair-col:first-child { border-right: 1px solid var(--border); }
+.pair-col-img { display: none; } /* hidden in grid — shown on card */
 .pair-col-word {
-  width: 100%; padding: 10px 6px; flex-shrink: 0;
-  text-align: center; background: var(--bg-lift);
-  border-top: 1px solid var(--border);
-  font-family: 'Fraunces', serif; font-size: 16px;
-  font-weight: 700; color: var(--cream); line-height: 1;
+  font-family: 'Fraunces', serif; font-size: 19px;
+  font-weight: 700; color: var(--cream);
+  text-align: center; line-height: 1.1;
 }
 .pair-footer {
   display: flex; align-items: center; justify-content: center;
-  padding: 7px 12px; gap: 6px; background: var(--bg-card);
-  border-top: 1px solid var(--border);
+  padding: 5px 12px 8px; gap: 8px; background: var(--bg-card);
 }
 .pair-footer-vs {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
-  color: var(--cream-dim); background: var(--bg-lift);
-  border: 1px solid var(--border); border-radius: var(--rpill);
-  padding: 2px 8px;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.1em;
+  color: var(--cream-dim); text-transform: uppercase;
 }
-.pair-footer-video { font-size: 10px; color: var(--coral); margin-left: auto; }
+.pair-footer-video { font-size: 10px; color: var(--coral); }
 
 /* ════════════════════════════════
    SINGLE CARD SCREEN
@@ -1546,47 +1538,43 @@ function pairDotClass(card) {
 
 function buildSingleGridCard(card, i) {
   const el = document.createElement('div');
-  el.className = 'gc';
+  const rating = progress[cardKey(card)] || '';
+  el.dataset.tier = card.tier;
+  el.className = 'gc' + (rating === 'got-it' ? ' done-card' : rating === 'practicing' ? ' practice-card' : '');
   el.onclick = () => openSingle(i);
-  const hasVideo = !!card.video;
-  const imgContent = card.image
-    ? `<img src="${card.image}" alt="${card.word}">`
-    : card.emoji;
   el.innerHTML = `
     <div class="${dotClass(cardKey(card))}"></div>
-    <div class="gc-img">
-      ${imgContent}
-      ${hasVideo ? `<div class="gc-video-pip">🎬</div>` : ''}
-    </div>
     <div class="gc-label">
       <span class="gc-word">${card.word}</span>
-      <button class="gc-play" onclick="event.stopPropagation();playAudio(null,'${card.word}')">🔊</button>
+      <div style="display:flex;align-items:center;gap:6px;">
+        ${card.video ? `<span class="gc-video-pip">🎬</span>` : ''}
+        <button class="gc-play" onclick="event.stopPropagation();playAudio(null,'${card.word}')">🔊</button>
+      </div>
     </div>`;
   return el;
 }
 
 function buildPairGridCard(card, i) {
   const el = document.createElement('div');
-  el.className = 'gc pair';
-  el.onclick = () => openPair(i);
   const hasVideo = card.video1 || card.video2;
-  const img1 = card.image1 ? `<img src="${card.image1}" alt="${card.word1}">` : card.emoji1;
-  const img2 = card.image2 ? `<img src="${card.image2}" alt="${card.word2}">` : card.emoji2;
+  const dot = pairDotClass(card);
+  el.dataset.tier = card.tier;
+  el.className = 'gc pair' +
+    (dot.includes('done') ? ' done-card' : dot.includes('practicing') ? ' practice-card' : '');
+  el.onclick = () => openPair(i);
   el.innerHTML = `
-    <div class="${pairDotClass(card)}" style="z-index:4"></div>
+    <div class="${dot}" style="z-index:4"></div>
     <div class="pair-cols">
       <div class="pair-col">
-        <div class="pair-col-img">${img1}</div>
         <div class="pair-col-word">${card.word1}</div>
       </div>
       <div class="pair-col">
-        <div class="pair-col-img">${img2}</div>
         <div class="pair-col-word">${card.word2}</div>
       </div>
     </div>
     <div class="pair-footer">
-      <span class="pair-footer-vs">opposite pair</span>
-      ${hasVideo ? `<span class="pair-footer-video">🎬 video</span>` : ''}
+      <span class="pair-footer-vs">opposite</span>
+      ${hasVideo ? `<span class="pair-footer-video">🎬</span>` : ''}
     </div>`;
   return el;
 }
