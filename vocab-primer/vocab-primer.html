@@ -1255,7 +1255,7 @@ function renderSingle() {
   // Phonemes
   const phEl = document.getElementById('sc-phonemes');
   phEl.innerHTML = (card.phonemes || []).map((ph, pi) =>
-    `<button class="ph-tile" onclick="this.classList.toggle('tapped');playPhoneme('${ph.s}')">
+    `<button class="ph-tile" onclick="this.classList.toggle('tapped');playPhoneme('${ph.s}','${ph.audio||''}')">
       ${ph.s}<div class="ph-sub">tap to hear</div>
     </button>`
   ).join('');
@@ -1339,7 +1339,7 @@ function renderPair() {
   layout.querySelectorAll('[data-phoneme]').forEach(btn => {
     btn.addEventListener('click', () => {
       btn.classList.toggle('pair-ph-tapped');
-      playPhoneme(btn.dataset.phoneme);
+      playPhoneme(btn.dataset.phoneme, btn.dataset.audio || '');
     });
   });
 }
@@ -1372,7 +1372,7 @@ function buildPairHalfHTML(card, side) {
     <div>
       <div class="slabel">Sounds</div>
       <div class="pair-phonemes">
-        ${phonemes.map(ph => `<button class="pair-ph" data-phoneme="${ph.s}">${ph.s}</button>`).join('')}
+        ${phonemes.map(ph => `<button class="pair-ph" data-phoneme="${ph.s}" data-audio="${ph.audio||''}">${ph.s}</button>`).join('')}
       </div>
     </div>
     <div class="pair-trio-row" id="pair-trio-${side}-${word}">
@@ -1412,24 +1412,47 @@ function playAudio(url, fallbackTTS) {
   }
 }
 
-// Jolly Phonics filename map — same as shell PHONEME_FILE
+// Jolly Phonics grapheme → filename (same as shell PHONEME_FILE)
 const PHONEME_FILE = {
   'c':'ck','k':'k','ck':'ck','g':'g','j':'j','qu':'qu',
   'x':'x','y':'y','z':'z','ng':'ng','sh':'sh','th':'thh',
   'ch':'ch','ai':'ai','ee':'ee','ie':'ie','oa':'oa',
   'oo':'ooo','or':'or','ur':'er','er':'er','ow':'ou','ou':'ou',
   'oi':'oi','ear':'ar','air':'ar','ar':'ar','ue':'ue','thh':'thh',
+  // single letters that map directly
+  'a':'a','b':'b','d':'d','e':'e','f':'f','h':'h','i':'i',
+  'l':'l','m':'m','n':'n','o':'o','p':'p','r':'r','s':'s',
+  't':'t','u':'u','v':'v','w':'w',
 };
+
+// IPA symbol → Jolly Phonics grapheme (for primer's IPA-keyed phonemes)
+const IPA_TO_JP = {
+  // vowels
+  'æ':'a', 'ɑː':'ar', 'ɒ':'o', 'ɔː':'or', 'ə':'e', 'əʊ':'oa',
+  'eɪ':'ai', 'iː':'ee', 'ɪ':'i', 'uː':'ooo', 'ʊ':'oo',
+  'aɪ':'ie', 'aʊ':'ou', 'ɔɪ':'oi', 'ɜː':'er', 'ʌ':'u',
+  'juː':'ue', 'eə':'air', 'ɪə':'ear',
+  // consonants (IPA = grapheme)
+  'b':'b','d':'d','f':'f','g':'g','h':'h','j':'j','k':'k',
+  'l':'l','m':'m','n':'n','p':'p','r':'r','s':'s','t':'t',
+  'v':'v','w':'w','x':'x','y':'y','z':'z',
+  'tʃ':'ch','dʒ':'j','ŋ':'ng','ʃ':'sh','θ':'th','ð':'thh',
+};
+
 const PHONEME_TTS_FALLBACK = {
   'c':'cat','k':'kit','g':'got','j':'jam','qu':'quick',
   'x':'fox','y':'yes','z':'zip','ng':'ring',
 };
 
-function playPhoneme(symbol) {
-  const fileKey   = PHONEME_FILE[symbol] || symbol;
-  const audioFile = `../assets/phonemes/sound_${fileKey}.mp3`;
+// Play phoneme — accepts IPA symbol OR grapheme, with custom URL override
+function playPhoneme(symbol, customUrl) {
+  if (customUrl) { new Audio(customUrl).play().catch(() => {}); return; }
+  // Resolve: IPA → grapheme → filename
+  const grapheme = IPA_TO_JP[symbol] || symbol;
+  const fileKey  = PHONEME_FILE[grapheme] || grapheme;
+  const audioFile = `../shell-v2/assets/phonemes/sound_${fileKey}.mp3`;
   const a = new Audio(audioFile);
-  a.onerror = () => speakTTS(PHONEME_TTS_FALLBACK[symbol] || symbol);
+  a.onerror = () => speakTTS(PHONEME_TTS_FALLBACK[grapheme] || symbol);
   a.play().catch(() => a.onerror());
 }
 
