@@ -108,7 +108,7 @@ html, body {
 
 /* Status dot */
 .gc-dot {
-  position: absolute; top: 10px; right: 10px;
+  position: absolute; top: 10px; left: 10px;
   width: 10px; height: 10px; border-radius: 50%;
   background: rgba(240,234,216,0.15);
   border: 1.5px solid rgba(240,234,216,0.2); z-index: 3;
@@ -120,9 +120,9 @@ html, body {
 .gc-img {
   width: 100%; aspect-ratio: 1/1; background: #272320;
   display: flex; align-items: center; justify-content: center;
-  font-size: 62px; position: relative; overflow: hidden;
+  font-size: 56px; position: relative;
 }
-.gc-img img { width: 85%; height: 85%; object-fit: contain; }
+.gc-img img { width: 82%; height: 82%; object-fit: contain; position: absolute; }
 .gc-video-pip {
   position: absolute; bottom: 7px; left: 8px;
   background: rgba(20,17,14,0.78); border: 1px solid rgba(232,115,74,0.4);
@@ -146,17 +146,18 @@ html, body {
 .pair-col  { flex: 1; display: flex; flex-direction: column; align-items: center; background: #272320; }
 .pair-col:first-child { border-right: 1px solid var(--border); }
 .pair-col-img {
-  width: 100%; height: 100px;
+  width: 100%; height: 120px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 54px;
+  font-size: 60px; position: relative;
 }
-.pair-col-img img { width: 80%; height: 80%; object-fit: contain; }
+.pair-col-img img { width: 80%; height: 80%; object-fit: contain; position: absolute; }
 .pair-col-word {
-  width: 100%; padding: 8px 6px;
+  width: 100%; padding: 9px 6px;
   text-align: center; background: var(--bg-lift);
   border-top: 1px solid var(--border);
-  font-family: 'Fraunces', serif; font-size: 16px;
+  font-family: 'Fraunces', serif; font-size: 17px;
   font-weight: 700; color: var(--cream); line-height: 1;
+  letter-spacing: 0.01em;
 }
 .pair-footer {
   display: flex; align-items: center; justify-content: center;
@@ -466,7 +467,7 @@ html, body {
     </div>
     <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
   </div>
-  <div class="idx-section" id="idx-pairs-label" style="display:none">Pairs</div>
+  <!-- pairs label rendered inside grid -->
   <div class="card-grid" id="card-grid"></div>
 </div>
 
