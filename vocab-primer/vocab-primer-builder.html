@@ -790,7 +790,7 @@ function buildPhonemeEditor(field, phonemes, cardIdx) {
   return `<div class="phoneme-list" id="ph-list-${field}-${cardIdx}">
     ${chips}
     <div class="ph-add-row">
-      <input class="ph-add-input" id="ph-input-${field}-${cardIdx}" placeholder="ɛ" title="IPA symbol">
+      <input class="ph-add-input" id="ph-input-${field}-${cardIdx}" placeholder="ɛ" title="IPA symbol" onkeydown="if(event.key==='Enter'){addPhoneme('${field}',${cardIdx});event.preventDefault();}">
       <button class="btn sm gold" onclick="addPhoneme('${field}',${cardIdx})">＋</button>
     </div>
   </div>`;
@@ -1079,7 +1079,13 @@ async function pushToGitHub() {
   if (updated === primerHTML) { toast('⚠️ Could not locate DECK in primer — export manually'); return; }
 
   // Push
-  const content = btoa(unescape(encodeURIComponent(updated)));
+  // btoa fails on multibyte chars (e.g. emoji in dataURLs) — use TextEncoder
+  const encoded = new TextEncoder().encode(updated);
+  // Chunk to avoid call stack limit on large files
+  let binary = '';
+  const bytes = new Uint8Array(encoded);
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  const content = btoa(binary);
   const payload = { message: 'Builder: update DECK data', content, ...(sha ? { sha } : {}) };
 
   toast('⏳ Pushing to GitHub…');
