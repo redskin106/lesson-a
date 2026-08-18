@@ -785,14 +785,27 @@ function buildPairEditor(card, i) {
 }
 
 /* ── Image upload widget ── */
+const IMG_SPEC = {
+  img:           { label: 'Photo',         note: 'Square · white bg · JPG/PNG · under 100KB' },
+  illustration:  { label: 'Illustration',  note: 'Square · transparent/white bg · PNG · under 100KB' },
+  image1:        { label: 'Photo (Word 1)',  note: 'Square · white bg · JPG/PNG · under 100KB' },
+  image2:        { label: 'Photo (Word 2)',  note: 'Square · white bg · JPG/PNG · under 100KB' },
+  illustration1: { label: 'Illus (Word 1)', note: 'Square · transparent/white bg · PNG · under 100KB' },
+  illustration2: { label: 'Illus (Word 2)', note: 'Square · transparent/white bg · PNG · under 100KB' },
+};
+
 function buildImgUpload(field, currentUrl, cardIdx) {
-  const id = `img-${field}-${cardIdx}`;
+  const id   = `img-${field}-${cardIdx}`;
+  const spec = IMG_SPEC[field] || { note: 'Square · JPG/PNG · under 100KB' };
   const hasImg = currentUrl && currentUrl.length > 10;
   return `<div class="img-upload" id="upload-${id}">
     <input type="file" accept="image/*" data-imgfield="${field}" data-cardidx="${cardIdx}" onchange="handleImageUpload(this)">
     ${hasImg
-      ? `<img class="img-upload-preview" src="${currentUrl}" style="display:block;" alt="">`
-      : `<div class="img-upload-icon">🖼</div><div class="img-upload-label">Tap to upload</div>`
+      ? `<img class="img-upload-preview" src="${currentUrl}" style="display:block;" alt="">
+         <div style="font-size:10px;color:var(--dim);text-align:center;padding:4px 0;">${spec.note}</div>`
+      : `<div class="img-upload-icon">🖼</div>
+         <div class="img-upload-label">Tap to upload</div>
+         <div style="font-size:10px;color:var(--dim);margin-top:4px;">${spec.note}</div>`
     }
   </div>`;
 }
