@@ -741,8 +741,8 @@ html, body {
   clip-path: inset(0 0 0 0 round 12cqw);
 }
 .layer-bg    { position: absolute; inset: 0; background-image: url('assets/bg_and_border.png'); background-size: 100% 100%; z-index: 0; pointer-events: none; }
-.layer-scene { position: absolute; left: 2.58%; top: 54%; width: 94.83%; height: 41.5%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
-.frame-mask  { position: absolute; inset: 0; z-index: 5; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
+.layer-scene { position: absolute; left: 4%; top: 55%; width: 92%; height: 38%; background-image: url('assets/school_scene.png'); background-size: 100% 100%; z-index: 1; transition: top 0.35s ease, opacity 0.35s ease; }
+.frame-mask  { position: absolute; top: -4px; left: 0; right: 0; bottom: 0; z-index: 5; background-image: url('assets/frame_mask.png'); background-size: 100% 100%; pointer-events: none; }
 
 .pos            { position: absolute; z-index: 2; }
 .block-header   { left: 12.92%; top: 8.06%;  width: 75%;    height: 3.5%; }
@@ -3383,7 +3383,7 @@ function showReinforcePanel(item, onClose) {
 //  tall enough to push the illustration mostly off-frame, fade it out
 //  rather than showing an awkward sliver.
 // ══════════════════════════════════════════════════
-const SCENE_DEFAULT_TOP = 54;
+const SCENE_DEFAULT_TOP = 55;
 let _sceneObserver = null;
 
 function repositionSceneLayer() {
@@ -3404,13 +3404,9 @@ function repositionSceneLayer() {
   const contentBottomPct = ((flowRect.bottom - frameRect.top) / frameRect.height) * 100;
   const GAP_PCT = 2;
   const newTop = Math.max(SCENE_DEFAULT_TOP, contentBottomPct + GAP_PCT);
-  // If content pushes scene past 60%, hide it — avoids overlap and mask artifacts
-  if (newTop > 60) {
-    scene.style.opacity = '0';
-  } else {
-    scene.style.top = newTop + '%';
-    scene.style.opacity = '1';
-  }
+  scene.style.top = newTop + '%';
+  scene.style.opacity = '1';
+  // No capping, no fading — mask handles clipping at phone boundary
 }
 
 function watchModuleContentForSceneReposition() {
@@ -6464,7 +6460,7 @@ const MODULE_REGISTRY = {
             gap:4%;margin-bottom:5%;flex-shrink:0;">
             <div style="flex:1;min-width:0;">
               <div style="font-size:2.8cqw;color:var(--text-dim);text-transform:uppercase;
-                letter-spacing:.08em;margin-bottom:2%;">Find this sound</div>
+                letter-spacing:.08em;margin-bottom:4%;">Find this sound</div>
               <div style="font-size:10cqw;font-weight:800;color:#00BCD4;line-height:1;
                 letter-spacing:.05em;">${item.targetSound}</div>
               <div style="font-size:3cqw;color:rgba(255,255,255,0.3);margin-top:1.5%;">
@@ -6559,16 +6555,23 @@ const MODULE_REGISTRY = {
           });
 
         } else {
+          // Gold: stacked horizontal rows
           wordsEl.innerHTML = `
             <div style="display:flex;flex-direction:column;gap:3%;">
               ${item.options.map((opt, i) => `
-                <button class="iv-option-btn" id="mp-gopt-${i}"
-                  style="justify-content:flex-start;gap:4%;padding:3.5% 4%;border-radius:12px;text-align:left;">
-                  <button class="precheck-hint-btn" style="font-size:4cqw;padding:2% 4%;flex-shrink:0;"
-                    data-gold-play="${i}" onclick="event.stopPropagation();">\ud83d\udd0a</button>
+                <button id="mp-gopt-${i}"
+                  style="background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.09);
+                  border-radius:12px;padding:3.5% 4%;display:flex;align-items:center;gap:3%;
+                  cursor:pointer;font-family:inherit;transition:all .18s;">
+                  <button onclick="event.stopPropagation();"
+                    style="width:10cqw;height:10cqw;border-radius:50%;
+                    background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+                    color:rgba(255,255,255,0.5);font-size:4cqw;cursor:pointer;
+                    display:flex;align-items:center;justify-content:center;flex-shrink:0;"
+                    data-gold-play="${i}">\ud83d\udd0a</button>
                   <span style="font-size:8cqw;line-height:1;">${opt.emoji}</span>
-                  <span style="font-size:4cqw;font-weight:700;color:#fff;flex:1;">${opt.word}</span>
-                  <span id="mp-gtick-${i}" style="font-size:4.5cqw;opacity:0;transition:opacity .2s;color:#AED581;">\u2713</span>
+                  <span style="font-size:4cqw;font-weight:700;color:#fff;flex:1;text-align:left;">${opt.word}</span>
+                  <span id="mp-gtick-${i}" style="font-size:4.5cqw;opacity:0;transition:opacity .2s;">\u2713</span>
                 </button>
               `).join('')}
             </div>`;
