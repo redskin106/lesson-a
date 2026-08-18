@@ -217,11 +217,12 @@ html, body {
 .card-img img { width: 85%; height: 85%; object-fit: contain; }
 .card-video-btn {
   position: absolute; bottom: 10px; right: 10px;
-  background: var(--coral-dim); border: 1.5px solid var(--coral);
-  border-radius: var(--rpill); padding: 7px 14px;
-  font-size: 12px; color: var(--coral); font-weight: 600;
-  display: flex; align-items: center; gap: 5px;
-  transition: background 0.13s;
+  background: rgba(20,17,14,0.82); border: 1.5px solid var(--coral);
+  border-radius: var(--rpill); padding: 8px 14px;
+  font-size: 12px; color: var(--coral); font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+  transition: background 0.13s; backdrop-filter: blur(6px);
+  letter-spacing: 0.02em;
 }
 .card-video-btn:active { background: rgba(232,115,74,0.3); }
 
@@ -259,49 +260,70 @@ html, body {
 .ph-tile:active, .ph-tile.tapped { background: rgba(201,168,76,0.3); transform: scale(0.94); }
 .ph-sub { font-family: 'Inter', sans-serif; font-size: 8px; color: rgba(201,168,76,0.55); letter-spacing: 0.06em; }
 
-/* Record */
-.record-block {
+/* ── Trio record block ── */
+.trio-wrap {
   background: var(--bg-card); border: 1.5px solid var(--border);
   border-radius: 12px; padding: 14px;
   display: flex; flex-direction: column; gap: 10px;
 }
-.record-row { display: flex; align-items: center; gap: 10px; }
-.record-btn {
-  background: var(--coral-dim); border: 1.5px solid var(--coral);
-  border-radius: var(--rpill); padding: 9px 18px;
-  color: var(--coral); font-size: 12px; font-weight: 600;
-  display: flex; align-items: center; gap: 5px; white-space: nowrap;
-  transition: background 0.13s;
+.trio-row { display: flex; gap: 8px; }
+.trio-btn {
+  flex: 1; padding: 10px 6px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: transparent;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; transition: all 0.15s;
 }
-.record-btn.recording { background: rgba(232,115,74,0.35); }
-.record-playback {
-  background: var(--sage-dim); border: 1.5px solid var(--sage);
-  border-radius: var(--rpill); padding: 9px 18px;
-  color: var(--sage); font-size: 12px; font-weight: 600;
-  display: flex; align-items: center; gap: 5px; white-space: nowrap;
-  display: none;
+.trio-icon  { font-size: 18px; line-height: 1; }
+.trio-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cream-dim); }
+/* Model — coral */
+.trio-btn.model { border-color: var(--coral); color: var(--coral); }
+.trio-btn.model .trio-label { color: var(--coral); }
+.trio-btn.model.playing { background: var(--coral-dim); }
+/* You — purple */
+.trio-btn.playback { border-color: #9b7fd4; color: #c4a8f0; opacity: 0.3; pointer-events: none; }
+.trio-btn.playback .trio-label { color: #9b7fd4; }
+.trio-btn.playback.ready { opacity: 1; pointer-events: auto; }
+.trio-btn.playback.playing { background: rgba(155,127,212,0.15); }
+/* Record — red */
+.trio-btn.record { border-color: #e05c5c; color: #e05c5c; }
+.trio-btn.record .trio-label { color: #e05c5c; }
+.trio-btn.record.recording {
+  background: rgba(224,92,92,0.15);
+  animation: pulse-rec 1s ease-in-out infinite;
 }
-.wave {
-  flex: 1; height: 30px; background: var(--cream-faint);
-  border-radius: 7px; display: flex; align-items: center;
-  justify-content: center; gap: 3px; overflow: hidden;
+@keyframes pulse-rec {
+  0%,100%{ box-shadow: 0 0 0 0 rgba(224,92,92,0.4); }
+  50%    { box-shadow: 0 0 0 6px rgba(224,92,92,0); }
 }
-.wbar {
-  width: 3px; border-radius: 2px; background: var(--cream-dim);
-  animation: wv 1.2s ease-in-out infinite;
+.trio-hint { font-size: 11px; color: var(--cream-dim); text-align: center; }
+/* Compare card */
+.compare-card {
+  display: none; background: var(--bg-lift);
+  border: 1px solid var(--border); border-radius: 9px;
+  padding: 10px 12px; align-items: center; gap: 10px;
 }
-.wbar:nth-child(1){height:7px;animation-delay:0s}
-.wbar:nth-child(2){height:16px;animation-delay:.1s}
-.wbar:nth-child(3){height:11px;animation-delay:.2s}
-.wbar:nth-child(4){height:20px;animation-delay:.3s}
-.wbar:nth-child(5){height:13px;animation-delay:.4s}
-.wbar:nth-child(6){height:18px;animation-delay:.5s}
-.wbar:nth-child(7){height:9px;animation-delay:.6s}
-@keyframes wv {
-  0%,100%{transform:scaleY(1);opacity:.35}
-  50%{transform:scaleY(1.9);opacity:1}
+.compare-play {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(155,127,212,0.15); border: 1.5px solid #9b7fd4;
+  color: #c4a8f0; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
-.record-hint { font-size: 11px; color: var(--cream-dim); text-align: center; }
+.compare-info { flex: 1; }
+.compare-title { font-size: 11px; font-weight: 600; color: var(--cream); }
+.compare-sub   { font-size: 10px; color: var(--cream-dim); margin-top: 1px; }
+/* Recording history */
+.rec-history { display: flex; flex-direction: column; gap: 6px; }
+.rec-history-head { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cream-dim); }
+.rec-history-row {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-lift); border-radius: 8px; padding: 7px 10px;
+  border: 1px solid var(--border);
+}
+.rec-history-num  { font-size: 10px; color: var(--cream-dim); width: 16px; text-align: center; }
+.rec-history-time { font-size: 11px; color: var(--cream-dim); flex: 1; }
+.rec-history-play {
+  background: none; border: none; color: var(--cream-dim); font-size: 14px; cursor: pointer; padding: 2px 4px;
+}
 
 /* Rating */
 .rating-row { display: flex; gap: 8px; }
@@ -380,14 +402,22 @@ html, body {
 }
 .pair-ph:active { background: rgba(201,168,76,0.3); }
 
-.pair-rec-btn {
-  width: 100%; padding: 9px; border-radius: 9px;
+/* pair record — reuses trio styles, compact version */
+.pair-trio-row { display: flex; gap: 5px; }
+.pair-trio-btn {
+  flex: 1; padding: 8px 4px; border-radius: 8px;
   border: 1.5px solid var(--border); background: transparent;
-  color: var(--cream-dim); font-size: 11px; font-weight: 600;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  transition: all 0.13s;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; transition: all 0.15s;
 }
-.pair-rec-btn.recording { border-color: var(--coral); color: var(--coral); background: var(--coral-dim); }
+.pair-trio-btn .trio-icon  { font-size: 14px; }
+.pair-trio-btn .trio-label { font-size: 8px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--cream-dim); }
+.pair-trio-btn.model   { border-color: var(--coral); color: var(--coral); }
+.pair-trio-btn.model .trio-label { color: var(--coral); }
+.pair-trio-btn.playback { border-color: #9b7fd4; color: #c4a8f0; opacity: 0.3; pointer-events: none; }
+.pair-trio-btn.playback.ready { opacity: 1; pointer-events: auto; }
+.pair-trio-btn.record  { border-color: #e05c5c; color: #e05c5c; }
+.pair-trio-btn.record.recording { background: rgba(224,92,92,0.15); }
 
 .pair-rating { display: flex; flex-direction: column; gap: 5px; }
 .pair-rating-btn {
@@ -492,7 +522,7 @@ html, body {
     <!-- image -->
     <div class="card-img" id="sc-img-block">
       <div id="sc-img-inner"></div>
-      <button class="card-video-btn" id="sc-video-btn" style="display:none" onclick="openVideo()">🎬 See it</button>
+      <button class="card-video-btn" id="sc-video-btn" style="display:none" onclick="openVideo()">📹 Video reference</button>
     </div>
     <!-- illustration toggle (optional) -->
     <div class="illus-toggle" id="sc-illus-toggle" style="display:none">
@@ -511,20 +541,33 @@ html, body {
       <div class="slabel">Sounds</div>
       <div class="phoneme-tiles" id="sc-phonemes"></div>
     </div>
-    <!-- record -->
+    <!-- record — trio system -->
     <div>
       <div class="slabel">Say it</div>
-      <div class="record-block">
-        <div class="record-row">
-          <button class="record-btn" id="sc-rec-btn">⏺ Record</button>
-          <button class="record-playback" id="sc-play-btn">▶ Play back</button>
-          <div class="wave">
-            <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
-            <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
-            <div class="wbar"></div>
+      <div class="trio-wrap" id="sc-trio-wrap">
+        <div class="trio-row">
+          <button class="trio-btn model" id="sc-model-btn">
+            <span class="trio-icon">🔊</span>
+            <span class="trio-label">Model</span>
+          </button>
+          <button class="trio-btn playback" id="sc-play-btn">
+            <span class="trio-icon" id="sc-play-icon">▶</span>
+            <span class="trio-label">You</span>
+          </button>
+          <button class="trio-btn record" id="sc-rec-btn">
+            <span class="trio-icon" id="sc-rec-icon">🎤</span>
+            <span class="trio-label" id="sc-rec-label">Record</span>
+          </button>
+        </div>
+        <p class="trio-hint" id="sc-trio-hint">Hear the model, then record yourself.</p>
+        <div class="compare-card" id="sc-compare-card">
+          <button class="compare-play" id="sc-compare-play">▶</button>
+          <div class="compare-info">
+            <div class="compare-title">Compare with previous try</div>
+            <div class="compare-sub" id="sc-compare-sub"></div>
           </div>
         </div>
-        <div class="record-hint">Record yourself, then compare with the word audio above</div>
+        <div id="sc-history-wrap"></div>
       </div>
     </div>
     <!-- rating -->
@@ -1188,9 +1231,22 @@ function renderSingle() {
     currentVideoData = null;
   }
 
-  // Illustration toggle
+  // Illustration toggle — swaps between photo and illustration
   const ilToggle = document.getElementById('sc-illus-toggle');
+  const ilLabel  = document.getElementById('sc-illus-label');
   ilToggle.style.display = card.illustration ? '' : 'none';
+  let showingIllus = false;
+  ilToggle.onclick = () => {
+    showingIllus = !showingIllus;
+    const imgInner = document.getElementById('sc-img-inner');
+    const src = showingIllus ? card.illustration : (card.image || null);
+    if (src) {
+      imgInner.innerHTML = `<img src="${'${src}'}" alt="${'${card.word}'}" style="width:85%;height:85%;object-fit:contain;">`;
+    } else {
+      imgInner.innerHTML = `<span style="font-size:90px;">${'${card.emoji}'}</span>`;
+    }
+    ilLabel.textContent = showingIllus ? 'Show photo' : 'Show illustration';
+  };
 
   // Sentence
   const sentEl = document.getElementById('sc-sentence');
@@ -1214,8 +1270,10 @@ function renderSingle() {
   document.getElementById('sc-prev').disabled = i === 0;
   document.getElementById('sc-next').disabled = i === tot - 1;
 
-  // Reset recorder
-  resetRecorder('sc');
+  // Reset trio recorder
+  resetSCTrio();
+  // Wire buttons after DOM update
+  setTimeout(wireSCTrio, 0);
   document.getElementById('sc-scroll').scrollTop = 0;
 }
 
@@ -1317,7 +1375,17 @@ function buildPairHalfHTML(card, side) {
         ${phonemes.map(ph => `<button class="pair-ph" data-phoneme="${ph.s}">${ph.s}</button>`).join('')}
       </div>
     </div>
-    <button class="pair-rec-btn" onclick="togglePairRecord(this)">⏺ Record</button>
+    <div class="pair-trio-row" id="pair-trio-${side}-${word}">
+      <button class="pair-trio-btn model" onclick="playAudio(null,'${word}')">
+        <span class="trio-icon">🔊</span><span class="trio-label">Model</span>
+      </button>
+      <button class="pair-trio-btn playback" id="pair-play-${side}-${word}">
+        <span class="trio-icon">▶</span><span class="trio-label">You</span>
+      </button>
+      <button class="pair-trio-btn record" id="pair-rec-${side}-${word}" onclick="togglePairRec(this,'${word}','${side}')">
+        <span class="trio-icon">🎤</span><span class="trio-label">Record</span>
+      </button>
+    </div>
     ${video ? `<button style="background:var(--coral-dim);border:1.5px solid var(--coral);border-radius:var(--rpill);padding:6px 12px;color:var(--coral);font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;" onclick="openVideoData(${JSON.stringify(video).replace(/"/g,'&quot;')})">🎬 ${video.title}</button>` : ''}
     <div class="pair-rating">
       <button class="pair-rating-btn${rating==='got-it'?' got-it':''}" data-rate="got-it" data-side="${side}">✓ Got it</button>
@@ -1344,9 +1412,25 @@ function playAudio(url, fallbackTTS) {
   }
 }
 
+// Jolly Phonics filename map — same as shell PHONEME_FILE
+const PHONEME_FILE = {
+  'c':'ck','k':'k','ck':'ck','g':'g','j':'j','qu':'qu',
+  'x':'x','y':'y','z':'z','ng':'ng','sh':'sh','th':'thh',
+  'ch':'ch','ai':'ai','ee':'ee','ie':'ie','oa':'oa',
+  'oo':'ooo','or':'or','ur':'er','er':'er','ow':'ou','ou':'ou',
+  'oi':'oi','ear':'ar','air':'ar','ar':'ar','ue':'ue','thh':'thh',
+};
+const PHONEME_TTS_FALLBACK = {
+  'c':'cat','k':'kit','g':'got','j':'jam','qu':'quick',
+  'x':'fox','y':'yes','z':'zip','ng':'ring',
+};
+
 function playPhoneme(symbol) {
-  // Will use audio file when available; falls back to TTS
-  speakTTS(symbol);
+  const fileKey   = PHONEME_FILE[symbol] || symbol;
+  const audioFile = `../assets/phonemes/sound_${fileKey}.mp3`;
+  const a = new Audio(audioFile);
+  a.onerror = () => speakTTS(PHONEME_TTS_FALLBACK[symbol] || symbol);
+  a.play().catch(() => a.onerror());
 }
 
 function speakTTS(text) {
@@ -1358,69 +1442,234 @@ function speakTTS(text) {
 }
 
 /* ═══════════════════════════════════════════════
-   RECORDER
+   RECORDER — full trio system
+   Model / You / Re-record + compare card + history
 ═══════════════════════════════════════════════ */
-function resetRecorder(prefix) {
-  recordingActive = false;
-  recordedBlob    = null;
-  recordedChunks  = [];
-  const recBtn  = document.getElementById(prefix + '-rec-btn');
-  const playBtn = document.getElementById(prefix + '-play-btn');
-  if (recBtn)  { recBtn.textContent = '⏺ Record'; recBtn.className = 'record-btn'; }
-  if (playBtn) { playBtn.style.display = 'none'; }
+
+// Per-word recording history — stored in localStorage
+// key: 'vp_rec_{word}' → array of {ts, dataUrl} (last 3)
+const REC_MAX = 3;
+
+function recStorageKey(word) { return 'vp_rec_' + word; }
+
+function loadRecHistory(word) {
+  try { return JSON.parse(localStorage.getItem(recStorageKey(word)) || '[]'); }
+  catch(e) { return []; }
 }
 
-async function toggleRecord(prefix) {
-  if (recordingActive) {
-    // Stop
-    mediaRecorder && mediaRecorder.stop();
-    recordingActive = false;
-    const recBtn = document.getElementById(prefix + '-rec-btn');
-    if (recBtn) { recBtn.textContent = '⏺ Record again'; recBtn.classList.remove('recording'); }
-  } else {
-    // Start
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      recordedChunks = [];
-      mediaRecorder  = new MediaRecorder(stream);
-      mediaRecorder.ondataavailable = e => { if (e.data.size) recordedChunks.push(e.data); };
-      mediaRecorder.onstop = () => {
-        recordedBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-        stream.getTracks().forEach(t => t.stop());
-        const playBtn = document.getElementById(prefix + '-play-btn');
-        if (playBtn) playBtn.style.display = '';
-      };
-      mediaRecorder.start();
-      recordingActive = true;
-      const recBtn = document.getElementById(prefix + '-rec-btn');
-      if (recBtn) { recBtn.textContent = '⏹ Stop'; recBtn.classList.add('recording'); }
-    } catch(e) {
-      alert('Microphone access needed to record.');
-    }
+function saveRecToHistory(word, blob) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let history = loadRecHistory(word);
+      history.push({ ts: Date.now(), dataUrl: reader.result });
+      if (history.length > REC_MAX) history = history.slice(-REC_MAX);
+      localStorage.setItem(recStorageKey(word), JSON.stringify(history));
+      resolve(history);
+    };
+    reader.readAsDataURL(blob);
+  });
+}
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60)   return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+// Single card trio state
+let scModelAudio   = null;
+let scModelPlaying = false;
+let scSelfAudio    = null;
+let scSelfPlaying  = false;
+let scRecording    = false;
+let scRecBlob      = null;
+let scMediaRec     = null;
+
+function resetSCTrio() {
+  // Stop any active audio/recording
+  if (scMediaRec && scRecording) { try { scMediaRec.stop(); } catch(e) {} }
+  if (scModelAudio) { scModelAudio.pause(); scModelAudio = null; }
+  if (scSelfAudio)  { scSelfAudio.pause();  scSelfAudio = null; }
+  scModelPlaying = false; scSelfPlaying = false;
+  scRecording = false; scRecBlob = null; scMediaRec = null;
+
+  const modelBtn  = document.getElementById('sc-model-btn');
+  const playBtn   = document.getElementById('sc-play-btn');
+  const recBtn    = document.getElementById('sc-rec-btn');
+  const recIcon   = document.getElementById('sc-rec-icon');
+  const recLabel  = document.getElementById('sc-rec-label');
+  const hint      = document.getElementById('sc-trio-hint');
+  const compareCard = document.getElementById('sc-compare-card');
+  const histWrap  = document.getElementById('sc-history-wrap');
+
+  if (modelBtn) modelBtn.classList.remove('playing');
+  if (playBtn)  { playBtn.classList.remove('ready','playing'); }
+  if (recBtn)   { recBtn.classList.remove('recording'); }
+  if (recIcon)  recIcon.textContent = '🎤';
+  if (recLabel) recLabel.textContent = 'Record';
+  if (hint)     hint.textContent = 'Hear the model, then record yourself.';
+  if (compareCard) compareCard.style.display = 'none';
+
+  // Render history
+  if (histWrap) {
+    const word = singleCards[currentSingleIdx]?.word;
+    if (word) renderRecHistory(word, histWrap);
   }
 }
 
-function playRecording(prefix) {
-  if (!recordedBlob) return;
-  new Audio(URL.createObjectURL(recordedBlob)).play();
+function renderRecHistory(word, container) {
+  const history = loadRecHistory(word);
+  if (!history.length) { container.innerHTML = ''; return; }
+  container.innerHTML = `
+    <div class="rec-history" style="margin-top:4px;">
+      <div class="rec-history-head">Past recordings</div>
+      ${history.slice().reverse().map((r, i) => `
+        <div class="rec-history-row">
+          <span class="rec-history-num">${history.length - i}</span>
+          <span class="rec-history-time">${timeAgo(r.ts)}</span>
+          <button class="rec-history-play" onclick="playDataUrl('${r.dataUrl}')">▶</button>
+        </div>
+      `).join('')}
+    </div>`;
 }
 
-function togglePairRecord(btn) {
-  // Simple toggle for pair halves — no playback wired (V1)
-  const active = btn.classList.toggle('recording');
-  btn.textContent = active ? '⏹ Stop' : '⏺ Record';
+function playDataUrl(dataUrl) {
+  new Audio(dataUrl).play().catch(() => {});
 }
 
-document.getElementById('sc-rec-btn').addEventListener('click',  () => toggleRecord('sc'));
-document.getElementById('sc-play-btn').addEventListener('click', () => playRecording('sc'));
-document.getElementById('sc-word-audio').addEventListener('click', () => {
-  const card = singleCards[currentSingleIdx];
-  playAudio(card.wordAudio, card.word);
-});
-document.getElementById('sc-sentence-audio').addEventListener('click', () => {
-  const card = singleCards[currentSingleIdx];
-  playAudio(card.sentenceAudio, card.sentence);
-});
+// Wire trio buttons after DOM is ready
+function wireSCTrio() {
+  const modelBtn    = document.getElementById('sc-model-btn');
+  const playBtn     = document.getElementById('sc-play-btn');
+  const recBtn      = document.getElementById('sc-rec-btn');
+  const playIcon    = document.getElementById('sc-play-icon');
+  const recIcon     = document.getElementById('sc-rec-icon');
+  const recLabel    = document.getElementById('sc-rec-label');
+  const hint        = document.getElementById('sc-trio-hint');
+  const compareCard = document.getElementById('sc-compare-card');
+  const compareSub  = document.getElementById('sc-compare-sub');
+  const comparePlay = document.getElementById('sc-compare-play');
+  const wordAudioBtn = document.getElementById('sc-word-audio');
+  const sentAudioBtn = document.getElementById('sc-sentence-audio');
+
+  if (!modelBtn) return;
+
+  // Word + sentence audio
+  wordAudioBtn?.addEventListener('click', () => {
+    const card = singleCards[currentSingleIdx];
+    playAudio(card.wordAudio, card.word);
+  });
+  sentAudioBtn?.addEventListener('click', () => {
+    const card = singleCards[currentSingleIdx];
+    playAudio(card.sentenceAudio, card.sentence);
+  });
+
+  // Model button
+  modelBtn.addEventListener('click', () => {
+    const card = singleCards[currentSingleIdx];
+    if (scModelPlaying) {
+      scModelAudio?.pause();
+      scModelAudio = null;
+      window.speechSynthesis?.cancel();
+      scModelPlaying = false;
+      modelBtn.classList.remove('playing');
+      return;
+    }
+    stopSCSelf();
+    scModelPlaying = true;
+    modelBtn.classList.add('playing');
+    if (card.wordAudio) {
+      scModelAudio = new Audio(card.wordAudio);
+      scModelAudio.onended = () => { scModelPlaying = false; modelBtn.classList.remove('playing'); };
+      scModelAudio.onerror = () => { scModelPlaying = false; modelBtn.classList.remove('playing'); speakTTS(card.word); };
+      scModelAudio.play().catch(() => { scModelPlaying = false; speakTTS(card.word); });
+    } else {
+      const utt = new SpeechSynthesisUtterance(card.word);
+      utt.lang = 'en-GB'; utt.rate = 0.82;
+      utt.onend = () => { scModelPlaying = false; modelBtn.classList.remove('playing'); };
+      window.speechSynthesis?.cancel();
+      window.speechSynthesis?.speak(utt);
+    }
+  });
+
+  // You / playback button
+  function stopSCSelf() {
+    if (scSelfAudio) { scSelfAudio.pause(); scSelfAudio = null; }
+    scSelfPlaying = false;
+    playIcon.textContent = '▶';
+    playBtn.classList.remove('playing');
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (!scRecBlob) return;
+    if (scSelfPlaying) { stopSCSelf(); return; }
+    scSelfPlaying = true;
+    playIcon.textContent = '⏸';
+    playBtn.classList.add('playing');
+    const url = URL.createObjectURL(scRecBlob);
+    scSelfAudio = new Audio(url);
+    scSelfAudio.onended = () => { stopSCSelf(); URL.revokeObjectURL(url); };
+    scSelfAudio.onerror = () => { stopSCSelf(); URL.revokeObjectURL(url); };
+    scSelfAudio.play().catch(stopSCSelf);
+  });
+
+  // Record button
+  recBtn.addEventListener('click', async () => {
+    if (scRecording) {
+      scMediaRec?.stop();
+      return;
+    }
+    stopSCSelf();
+    window.speechSynthesis?.cancel();
+    scModelPlaying = false;
+    modelBtn.classList.remove('playing');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const chunks = [];
+      scMediaRec = new MediaRecorder(stream, { mimeType });
+      scMediaRec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      scMediaRec.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        scRecording = false;
+        recIcon.textContent  = '🎤';
+        recLabel.textContent = 'Re-record';
+        recBtn.classList.remove('recording');
+        scRecBlob = new Blob(chunks, { type: mimeType });
+        playBtn.classList.add('ready');
+        hint.textContent = 'Listen to both, then rate yourself.';
+
+        // Save to history
+        const card = singleCards[currentSingleIdx];
+        const history = await saveRecToHistory(card.word, scRecBlob);
+
+        // Show compare card if prior exists
+        if (history.length >= 2) {
+          const prev = history[history.length - 2];
+          compareSub.textContent = 'Recorded ' + timeAgo(prev.ts);
+          compareCard.style.display = 'flex';
+          comparePlay.onclick = () => new Audio(prev.dataUrl).play().catch(()=>{});
+        }
+
+        // Refresh history list
+        renderRecHistory(card.word, document.getElementById('sc-history-wrap'));
+      };
+      scMediaRec.start();
+      scRecording = true;
+      recIcon.textContent  = '⏹';
+      recLabel.textContent = 'Stop';
+      recBtn.classList.add('recording');
+      hint.textContent = 'Recording… tap ⏹ to stop.';
+    } catch(e) {
+      hint.textContent = '⚠️ Microphone access needed.';
+    }
+  });
+}
+
+// Audio buttons wired per-render inside wireSCTrio()
 
 /* ═══════════════════════════════════════════════
    VIDEO MODAL
@@ -1454,6 +1703,52 @@ function showScreen(id) {
 function goIndex() {
   showScreen('screen-index');
   buildGrid(); // refresh dots
+}
+
+/* ── Pair trio record ── */
+const pairRecBlobs = {}; // 'side_word' → blob
+
+async function togglePairRec(btn, word, side) {
+  const key = side + '_' + word;
+  const isRecording = btn.classList.contains('recording');
+  const playBtn = document.getElementById('pair-play-' + side + '-' + word);
+
+  if (isRecording) {
+    // stop handled by mediaRecorder.stop() via closure
+    btn._mediaRec?.stop();
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+    const chunks = [];
+    const mr = new MediaRecorder(stream, { mimeType });
+    btn._mediaRec = mr;
+    mr.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+    mr.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      btn.classList.remove('recording');
+      btn.querySelector('.trio-icon').textContent = '🎤';
+      btn.querySelector('.trio-label').textContent = 'Re-record';
+      pairRecBlobs[key] = new Blob(chunks, { type: mimeType });
+      if (playBtn) {
+        playBtn.classList.add('ready');
+        playBtn.onclick = () => {
+          const url = URL.createObjectURL(pairRecBlobs[key]);
+          new Audio(url).play().catch(() => {});
+        };
+      }
+      // Save to history
+      await saveRecToHistory(word, pairRecBlobs[key]);
+    };
+    mr.start();
+    btn.classList.add('recording');
+    btn.querySelector('.trio-icon').textContent = '⏹';
+    btn.querySelector('.trio-label').textContent = 'Stop';
+  } catch(e) {
+    btn.querySelector('.trio-label').textContent = 'No mic';
+  }
 }
 
 /* ── Boot ── */
