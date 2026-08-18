@@ -195,19 +195,37 @@ body {
 }
 
 /* Phoneme builder */
-.phoneme-list { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.ph-chip {
+.phoneme-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.ph-chip-full {
   background: var(--gold-d); border: 1px solid var(--gold);
-  border-radius: 7px; padding: 5px 10px;
-  font-size: 15px; color: var(--gold);
-  display: flex; align-items: center; gap: 6px;
+  border-radius: 9px; padding: 6px 8px;
+  display: flex; flex-direction: column; gap: 5px; min-width: 72px;
 }
+.ph-chip-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+}
+.ph-symbol { font-size: 17px; color: var(--gold); font-family: monospace; flex: 1; }
+.ph-preview {
+  background: none; border: none; color: var(--gold);
+  font-size: 11px; cursor: pointer; padding: 1px 3px; opacity: 0.7;
+}
+.ph-preview:hover { opacity: 1; }
 .ph-chip-del {
-  background: none; border: none; color: rgba(201,168,76,0.5);
-  font-size: 14px; cursor: pointer; padding: 0 2px; line-height: 1;
+  background: none; border: none; color: rgba(201,168,76,0.4);
+  font-size: 13px; cursor: pointer; padding: 0; line-height: 1;
 }
 .ph-chip-del:hover { color: var(--red); }
-.ph-add-row { display: flex; gap: 6px; align-items: center; }
+.ph-src-row { display: flex; gap: 3px; }
+.ph-src-btn {
+  flex: 1; padding: 3px 4px; border-radius: 5px; text-align: center;
+  font-size: 9px; font-weight: 600; cursor: pointer;
+  background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2);
+  color: rgba(201,168,76,0.5); transition: all 0.12s; white-space: nowrap;
+  font-family: inherit;
+}
+.ph-src-btn.active { background: var(--gold-d); border-color: var(--gold); color: var(--gold); }
+.ph-src-btn:hover  { border-color: var(--gold); color: var(--gold); }
+.ph-add-row { display: flex; gap: 6px; align-items: center; margin-top: 2px; }
 .ph-add-input {
   background: var(--bg); border: 1px solid var(--border2);
   border-radius: 7px; padding: 6px 10px;
@@ -780,20 +798,125 @@ function buildImgUpload(field, currentUrl, cardIdx) {
 }
 
 /* ── Phoneme editor ── */
+
+// IPA → Jolly Phonics grapheme (mirrors primer's IPA_TO_JP)
+const IPA_TO_JP = {
+  'æ':'a','ɑː':'ar','ɒ':'o','ɔː':'or','ə':'e','əʊ':'oa',
+  'eɪ':'ai','iː':'ee','ɪ':'i','uː':'ooo','ʊ':'oo',
+  'aɪ':'ie','aʊ':'ou','ɔɪ':'oi','ɜː':'er','ʌ':'u',
+  'juː':'ue','eə':'air','ɪə':'ear',
+  'b':'b','d':'d','f':'f','g':'g','h':'h','j':'j','k':'k',
+  'l':'l','m':'m','n':'n','p':'p','r':'r','s':'s','t':'t',
+  'v':'v','w':'w','x':'x','y':'y','z':'z',
+  'tʃ':'ch','dʒ':'j','ŋ':'ng','ʃ':'sh','θ':'th','ð':'thh',
+};
+const JP_BASE = 'https://redskin106.github.io/lesson-a/shell-v2/assets/phonemes/';
+const PHONEME_FILE = {
+  'c':'ck','k':'k','ck':'ck','g':'g','j':'j','qu':'qu',
+  'x':'x','y':'y','z':'z','ng':'ng','sh':'sh','th':'thh',
+  'ch':'ch','ai':'ai','ee':'ee','ie':'ie','oa':'oa',
+  'oo':'ooo','or':'or','ur':'er','er':'er','ow':'ou','ou':'ou',
+  'oi':'oi','ear':'ar','air':'ar','ar':'ar','ue':'ue','thh':'thh',
+  'a':'a','b':'b','d':'d','e':'e','f':'f','h':'h','i':'i',
+  'l':'l','m':'m','n':'n','o':'o','p':'p','r':'r','s':'s',
+  't':'t','u':'u','v':'v','w':'w',
+};
+
+function jpUrlForSymbol(symbol) {
+  const grapheme = IPA_TO_JP[symbol] || symbol;
+  const fileKey  = PHONEME_FILE[grapheme] || grapheme;
+  return JP_BASE + 'sound_' + fileKey + '.mp3';
+}
+
+function previewPhoneme(symbol, customUrl) {
+  const url = customUrl || jpUrlForSymbol(symbol);
+  const a = new Audio(url);
+  a.onerror = () => {
+    const utt = new SpeechSynthesisUtterance(symbol);
+    utt.lang = 'en-GB'; utt.rate = 0.8;
+    window.speechSynthesis?.speak(utt);
+  };
+  a.play().catch(() => a.onerror());
+}
+
 function buildPhonemeEditor(field, phonemes, cardIdx) {
-  const chips = (phonemes || []).map((ph, pi) =>
-    `<div class="ph-chip">
-      ${ph.s}
-      <button class="ph-chip-del" onclick="removePhoneme('${field}',${pi},${cardIdx})">×</button>
-    </div>`
-  ).join('');
+  const chips = (phonemes || []).map((ph, pi) => {
+    const jpUrl  = jpUrlForSymbol(ph.s);
+    const src    = ph.audioSrc || 'jp'; // 'jp' | 'el' | 'custom'
+    const hasEl  = !!ph.audio && ph.audioSrc === 'el';
+    const hasCus = !!ph.audio && ph.audioSrc === 'custom';
+    return `<div class="ph-chip-full" id="ph-chip-${field}-${pi}-${cardIdx}">
+      <div class="ph-chip-top">
+        <span class="ph-symbol">${ph.s}</span>
+        <button class="ph-preview" title="Preview audio"
+          onclick="previewPhoneme('${ph.s}','${ph.audio||''}')">▶</button>
+        <button class="ph-chip-del" onclick="removePhoneme('${field}',${pi},${cardIdx})">×</button>
+      </div>
+      <div class="ph-src-row">
+        <button class="ph-src-btn${src==='jp'?' active':''}"
+          onclick="setPhSrc('${field}',${pi},${cardIdx},'jp','')">
+          🎵 JP
+        </button>
+        <button class="ph-src-btn${hasEl?' active':''}"
+          onclick="genPhEl('${field}',${pi},${cardIdx},'${ph.s}')">
+          🎙 EL${hasEl?' ✓':''}
+        </button>
+        <label class="ph-src-btn${hasCus?' active':''}" title="Upload custom audio">
+          📂${hasCus?' ✓':''}
+          <input type="file" accept="audio/*" style="display:none"
+            onchange="setPhCustom('${field}',${pi},${cardIdx},this)">
+        </label>
+      </div>
+    </div>`;
+  }).join('');
+
   return `<div class="phoneme-list" id="ph-list-${field}-${cardIdx}">
     ${chips}
     <div class="ph-add-row">
-      <input class="ph-add-input" id="ph-input-${field}-${cardIdx}" placeholder="ɛ" title="IPA symbol" onkeydown="if(event.key==='Enter'){addPhoneme('${field}',${cardIdx});event.preventDefault();}">
-      <button class="btn sm gold" onclick="addPhoneme('${field}',${cardIdx})">＋</button>
+      <input class="ph-add-input" id="ph-input-${field}-${cardIdx}"
+        placeholder="ɛ" title="IPA symbol"
+        onkeydown="if(event.key==='Enter'){addPhoneme('${field}',${cardIdx});event.preventDefault();}">
+      <button class="btn sm gold" onclick="addPhoneme('${field}',${cardIdx})">＋ Add</button>
     </div>
   </div>`;
+}
+
+function setPhSrc(field, pi, cardIdx, src, url) {
+  if (!cards[cardIdx][field]) return;
+  cards[cardIdx][field][pi].audioSrc = src;
+  cards[cardIdx][field][pi].audio    = url;
+  markDirty();
+  renderEditor();
+}
+
+async function genPhEl(field, pi, cardIdx, symbol) {
+  const key = document.getElementById('el-key').value.trim();
+  if (!key) { toast('⚠️ Enter ElevenLabs API key first'); return; }
+  toast(`🎙 Generating phoneme "${symbol}"…`);
+  const blob = await elTTS(symbol);
+  if (!blob) return;
+  const url = URL.createObjectURL(blob);
+  if (!cards[cardIdx][field]) return;
+  cards[cardIdx][field][pi].audio    = url;
+  cards[cardIdx][field][pi].audioSrc = 'el';
+  markDirty();
+  renderEditor();
+  toast(`✅ Phoneme "${symbol}" ready`);
+}
+
+function setPhCustom(field, pi, cardIdx, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    if (!cards[cardIdx][field]) return;
+    cards[cardIdx][field][pi].audio    = e.target.result;
+    cards[cardIdx][field][pi].audioSrc = 'custom';
+    markDirty();
+    renderEditor();
+    toast('✅ Custom audio uploaded');
+  };
+  reader.readAsDataURL(file);
 }
 
 /* ── Audio section ── */
@@ -887,7 +1010,7 @@ function addPhoneme(field, cardIdx) {
   const sym = input.value.trim();
   if (!sym) return;
   if (!cards[cardIdx][field]) cards[cardIdx][field] = [];
-  cards[cardIdx][field].push({ s: sym });
+  cards[cardIdx][field].push({ s: sym, audio: '', audioSrc: 'jp' });
   input.value = '';
   markDirty();
   renderEditor();
@@ -996,7 +1119,8 @@ function buildDeckJSON() {
         sentence: card.sentence,
         phonemes: (card.phonemes || []).map((ph, pi) => ({
           s: ph.s,
-          audio: audioBlobs[`${cards.indexOf(card)}_audioPh_${pi}`] || ''
+          audio: ph.audio || audioBlobs[`${cards.indexOf(card)}_audioPh_${pi}`] || '',
+          audioSrc: ph.audioSrc || 'jp'
         })),
         wordAudio:     audioBlobs[`${cards.indexOf(card)}_audioWord`]     || '',
         sentenceAudio: audioBlobs[`${cards.indexOf(card)}_audioSentence`] || '',
@@ -1013,8 +1137,8 @@ function buildDeckJSON() {
         word1: card.word1, word2: card.word2,
         emoji1: card.emoji1, emoji2: card.emoji2,
         sentence1: card.sentence1, sentence2: card.sentence2,
-        phonemes1: (card.phonemes1||[]).map((ph,pi) => ({ s:ph.s, audio: audioBlobs[`${ci}_audio1Ph_${pi}`]||'' })),
-        phonemes2: (card.phonemes2||[]).map((ph,pi) => ({ s:ph.s, audio: audioBlobs[`${ci}_audio2Ph_${pi}`]||'' })),
+        phonemes1: (card.phonemes1||[]).map((ph,pi) => ({ s:ph.s, audio: ph.audio||audioBlobs[`${ci}_audio1Ph_${pi}`]||'', audioSrc: ph.audioSrc||'jp' })),
+        phonemes2: (card.phonemes2||[]).map((ph,pi) => ({ s:ph.s, audio: ph.audio||audioBlobs[`${ci}_audio2Ph_${pi}`]||'', audioSrc: ph.audioSrc||'jp' })),
         wordAudio1:     audioBlobs[`${ci}_audio1Word`]     || '',
         wordAudio2:     audioBlobs[`${ci}_audio2Word`]     || '',
         sentenceAudio1: audioBlobs[`${ci}_audio1Sentence`] || '',
