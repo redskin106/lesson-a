@@ -31,298 +31,140 @@ button, input, select, textarea { font-family: inherit; }
   --pill:     999px;
 }
 
-body {
-  background: var(--bg); color: var(--text);
-  font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 14px; line-height: 1.5;
-  min-height: 100vh;
-}
+body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-system,sans-serif; font-size: 14px; line-height: 1.5; min-height: 100vh; }
 
 /* ── Layout ── */
 .shell { display: flex; min-height: 100vh; }
-.sidebar {
-  width: 260px; flex-shrink: 0;
-  background: var(--panel); border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  position: sticky; top: 0; height: 100vh; overflow-y: auto;
-}
+.sidebar { width: 260px; flex-shrink: 0; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
 .main { flex: 1; padding: 28px; overflow-y: auto; }
 
 /* ── Sidebar ── */
-.sidebar-head {
-  padding: 18px 16px 12px;
-  border-bottom: 1px solid var(--border);
-}
-.sidebar-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
+.sidebar-head { padding: 18px 16px 12px; border-bottom: 1px solid var(--border); }
+.sidebar-title { font-size: 13px; font-weight: 700; color: var(--text); }
 .sidebar-sub   { font-size: 11px; color: var(--dim); margin-top: 2px; }
-
-.sidebar-section {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--dim);
-  padding: 14px 16px 6px;
-}
-
+.sidebar-section { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); padding: 14px 16px 6px; }
 .deck-list { padding: 0 8px 8px; }
-.deck-item {
-  padding: 8px 10px; border-radius: 8px; cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-  transition: background 0.12s; margin-bottom: 2px;
-}
+.deck-item { padding: 8px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.12s; margin-bottom: 2px; }
 .deck-item:hover { background: var(--faint); }
 .deck-item.active { background: var(--coral-d); }
 .deck-item-icon { font-size: 14px; flex-shrink: 0; }
-.deck-item-word { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
-.deck-item-tier {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; padding: 2px 6px; border-radius: var(--pill);
-}
-.tier-bronze { color: var(--gold);   background: var(--gold-d); }
-.tier-silver { color: var(--dim);    background: var(--faint); }
-.tier-gold   { color: #e8d07a;       background: rgba(232,208,122,0.12); }
-.deck-item-type {
-  font-size: 9px; color: var(--dim);
-  background: var(--faint); padding: 2px 5px; border-radius: 4px;
-}
-
+.deck-item-word { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.deck-item-tier { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: var(--pill); flex-shrink: 0; }
+.tier-bronze { color: var(--gold); background: var(--gold-d); }
+.tier-silver { color: var(--dim); background: var(--faint); }
+.tier-gold   { color: #e8d07a; background: rgba(232,208,122,0.12); }
+.deck-item-type { font-size: 9px; color: var(--dim); background: var(--faint); padding: 2px 5px; border-radius: 4px; flex-shrink: 0; }
 .sidebar-actions { padding: 8px; border-top: 1px solid var(--border); margin-top: auto; }
-.btn-full {
-  width: 100%; padding: 9px; border-radius: var(--radius);
-  border: 1.5px solid var(--border2); background: transparent;
-  color: var(--text); font-size: 12px; font-weight: 600;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  gap: 6px; margin-bottom: 6px; transition: background 0.12s;
-}
+.btn-full { width: 100%; padding: 9px; border-radius: var(--radius); border: 1.5px solid var(--border2); background: transparent; color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px; transition: background 0.12s; }
 .btn-full:hover { background: var(--faint); }
 .btn-full.primary { background: var(--coral-d); border-color: var(--coral); color: var(--coral); }
-.btn-full.primary:hover { background: rgba(232,115,74,0.25); }
-.btn-full.sage { background: var(--sage-d); border-color: var(--sage); color: var(--sage); }
+.btn-full.sage    { background: var(--sage-d);  border-color: var(--sage);  color: var(--sage);  }
+
+/* ── Buttons ── */
+.btn { padding: 8px 16px; border-radius: var(--radius); border: 1.5px solid var(--border2); background: transparent; color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: background 0.12s; }
+.btn:hover   { background: var(--faint); }
+.btn.coral   { border-color: var(--coral);  color: var(--coral);  background: var(--coral-d);  }
+.btn.sage    { border-color: var(--sage);   color: var(--sage);   background: var(--sage-d);   }
+.btn.purple  { border-color: var(--purple); color: var(--purple); background: var(--purple-d); }
+.btn.gold    { border-color: var(--gold);   color: var(--gold);   background: var(--gold-d);   }
+.btn.red     { border-color: var(--red);    color: var(--red);    background: var(--red-d);    }
+.btn.sm      { padding: 5px 11px; font-size: 11px; }
 
 /* ── Top bar ── */
-.topbar {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 24px; padding-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-}
+.topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
 .topbar-title { font-size: 18px; font-weight: 700; flex: 1; }
-.topbar-lesson input {
-  background: var(--card); border: 1px solid var(--border2);
-  border-radius: 8px; padding: 7px 12px;
-  color: var(--text); font-size: 13px; width: 220px;
-}
-.btn {
-  padding: 8px 16px; border-radius: var(--radius);
-  border: 1.5px solid var(--border2); background: transparent;
-  color: var(--text); font-size: 12px; font-weight: 600;
-  cursor: pointer; display: inline-flex; align-items: center;
-  gap: 5px; transition: background 0.12s, border-color 0.12s;
-}
-.btn:hover { background: var(--faint); }
-.btn.coral { border-color: var(--coral); color: var(--coral); background: var(--coral-d); }
-.btn.coral:hover { background: rgba(232,115,74,0.25); }
-.btn.sage { border-color: var(--sage); color: var(--sage); background: var(--sage-d); }
-.btn.purple { border-color: var(--purple); color: var(--purple); background: var(--purple-d); }
-.btn.gold  { border-color: var(--gold); color: var(--gold); background: var(--gold-d); }
-.btn.red   { border-color: var(--red);  color: var(--red);  background: var(--red-d); }
-.btn.sm { padding: 5px 11px; font-size: 11px; }
+.topbar input { background: var(--card); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 12px; color: var(--text); font-size: 13px; width: 220px; }
 
-/* ── Card editor ── */
-.editor-empty {
-  text-align: center; padding: 80px 24px;
-  color: var(--dim);
-}
-.editor-empty-icon { font-size: 48px; margin-bottom: 16px; }
+/* ── Config section ── */
+.config-section { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+.config-head { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.config-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.config-row { display: flex; gap: 8px; align-items: center; }
+.config-row label { font-size: 12px; color: var(--dim); width: 90px; flex-shrink: 0; }
+.config-row input { flex: 1; background: var(--bg); border: 1px solid var(--border2); border-radius: 7px; padding: 7px 10px; color: var(--text); font-size: 12px; font-family: monospace; }
+.config-row input:focus { outline: none; border-color: var(--sage); }
+
+/* ── Editor ── */
+.editor-empty { text-align: center; padding: 80px 24px; color: var(--dim); }
+.editor-empty-icon  { font-size: 48px; margin-bottom: 16px; }
 .editor-empty-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-
 .editor { display: flex; flex-direction: column; gap: 20px; }
-
-.field-group {
-  background: var(--card); border-radius: var(--radius);
-  border: 1px solid var(--border); overflow: hidden;
-}
-.field-group-head {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim);
-  display: flex; align-items: center; justify-content: space-between;
-}
+.field-group { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+.field-group-head { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); display: flex; align-items: center; justify-content: space-between; }
 .field-group-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
-
-/* Pair layout — two columns */
 .pair-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 14px; }
-.pair-col-head {
-  font-size: 11px; font-weight: 700; color: var(--dim);
-  text-transform: uppercase; letter-spacing: 0.08em;
-  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
-}
-
-/* Fields */
+.pair-col-head { font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
 .field { display: flex; flex-direction: column; gap: 4px; }
 .field label { font-size: 11px; font-weight: 600; color: var(--dim); letter-spacing: 0.04em; }
-.field input, .field textarea, .field select {
-  background: var(--bg); border: 1px solid var(--border2);
-  border-radius: 7px; padding: 8px 10px;
-  color: var(--text); font-size: 13px;
-  transition: border-color 0.12s;
-}
-.field input:focus, .field textarea:focus, .field select:focus {
-  outline: none; border-color: var(--coral);
-}
+.field input, .field textarea, .field select { background: var(--bg); border: 1px solid var(--border2); border-radius: 7px; padding: 8px 10px; color: var(--text); font-size: 13px; transition: border-color 0.12s; }
+.field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--coral); }
 .field textarea { resize: vertical; min-height: 64px; }
-.field select { cursor: pointer; }
-
-/* Inline row */
 .field-row { display: flex; gap: 10px; }
 .field-row .field { flex: 1; }
+.field-note { font-size: 10px; color: var(--dim); font-style: italic; margin-top: 2px; }
 
-/* Image upload */
-.img-upload {
-  border: 2px dashed var(--border2); border-radius: var(--radius);
-  padding: 20px; text-align: center; cursor: pointer;
-  transition: border-color 0.15s, background 0.15s; position: relative;
-}
+/* ── Image upload ── */
+.img-upload { border: 2px dashed var(--border2); border-radius: var(--radius); padding: 16px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; position: relative; }
 .img-upload:hover { border-color: var(--coral); background: var(--coral-d); }
-.img-upload input[type=file] {
-  position: absolute; inset: 0; opacity: 0; cursor: pointer;
-  background: none; border: none; padding: 0;
-}
-.img-upload-icon  { font-size: 28px; margin-bottom: 6px; }
+.img-upload input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; background: none; border: none; padding: 0; }
+.img-upload-icon  { font-size: 24px; margin-bottom: 4px; }
 .img-upload-label { font-size: 12px; color: var(--dim); }
-.img-upload-preview {
-  width: 100%; aspect-ratio: 1/1; object-fit: contain;
-  border-radius: 8px; background: var(--bg);
-  display: none;
-}
+.img-upload-spec  { font-size: 10px; color: rgba(201,168,76,0.7); margin-top: 4px; font-weight: 500; }
+.img-preview { width: 100%; aspect-ratio: 1/1; object-fit: contain; border-radius: 8px; background: var(--bg); display: block; }
 
-/* Phoneme builder */
+/* ── Colour swatch editor ── */
+.swatch-row { display: flex; align-items: center; gap: 10px; }
+.swatch-preview { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border2); flex-shrink: 0; }
+.swatch-input { background: var(--bg); border: 1px solid var(--border2); border-radius: 7px; padding: 7px 10px; color: var(--text); font-size: 13px; font-family: monospace; flex: 1; }
+
+/* ── Phoneme editor ── */
 .phoneme-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
-.ph-chip-full {
-  background: var(--gold-d); border: 1px solid var(--gold);
-  border-radius: 9px; padding: 6px 8px;
-  display: flex; flex-direction: column; gap: 5px; min-width: 72px;
-}
-.ph-chip-top {
-  display: flex; align-items: center; justify-content: space-between; gap: 4px;
-}
-.ph-symbol { font-size: 17px; color: var(--gold); font-family: monospace; flex: 1; }
-.ph-preview {
-  background: none; border: none; color: var(--gold);
-  font-size: 11px; cursor: pointer; padding: 1px 3px; opacity: 0.7;
-}
+.ph-chip-full { background: var(--gold-d); border: 1px solid var(--gold); border-radius: 9px; padding: 6px 8px; display: flex; flex-direction: column; gap: 5px; min-width: 72px; }
+.ph-chip-top  { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.ph-symbol    { font-size: 17px; color: var(--gold); font-family: monospace; flex: 1; }
+.ph-preview   { background: none; border: none; color: var(--gold); font-size: 11px; cursor: pointer; padding: 1px 3px; opacity: 0.7; }
 .ph-preview:hover { opacity: 1; }
-.ph-chip-del {
-  background: none; border: none; color: rgba(201,168,76,0.4);
-  font-size: 13px; cursor: pointer; padding: 0; line-height: 1;
-}
+.ph-chip-del  { background: none; border: none; color: rgba(201,168,76,0.4); font-size: 13px; cursor: pointer; padding: 0; line-height: 1; }
 .ph-chip-del:hover { color: var(--red); }
-.ph-src-row { display: flex; gap: 3px; }
-.ph-src-btn {
-  flex: 1; padding: 3px 4px; border-radius: 5px; text-align: center;
-  font-size: 9px; font-weight: 600; cursor: pointer;
-  background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2);
-  color: rgba(201,168,76,0.5); transition: all 0.12s; white-space: nowrap;
-  font-family: inherit;
-}
+.ph-src-row   { display: flex; gap: 3px; }
+.ph-src-btn   { flex: 1; padding: 3px 4px; border-radius: 5px; text-align: center; font-size: 9px; font-weight: 600; cursor: pointer; background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2); color: rgba(201,168,76,0.5); transition: all 0.12s; white-space: nowrap; font-family: inherit; }
 .ph-src-btn.active { background: var(--gold-d); border-color: var(--gold); color: var(--gold); }
 .ph-src-btn:hover  { border-color: var(--gold); color: var(--gold); }
-.ph-add-row { display: flex; gap: 6px; align-items: center; margin-top: 2px; }
-.ph-add-input {
-  background: var(--bg); border: 1px solid var(--border2);
-  border-radius: 7px; padding: 6px 10px;
-  color: var(--text); font-size: 14px; width: 80px;
-}
+.ph-add-row   { display: flex; gap: 6px; align-items: center; margin-top: 2px; }
+.ph-add-input { background: var(--bg); border: 1px solid var(--border2); border-radius: 7px; padding: 6px 10px; color: var(--text); font-size: 14px; width: 80px; }
 .ph-add-input:focus { outline: none; border-color: var(--gold); }
 
-/* ElevenLabs section */
+/* ── Audio section ── */
 .el-section { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
-.el-head {
-  padding: 10px 14px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
+.el-head    { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .el-head-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
-.el-key-row { display: flex; gap: 8px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-.el-key-row input {
-  flex: 1; background: var(--bg); border: 1px solid var(--border2);
-  border-radius: 7px; padding: 7px 10px; color: var(--text); font-size: 12px;
-  font-family: monospace;
-}
-.el-key-row input:focus { outline: none; border-color: var(--purple); }
 .el-audio-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
-.el-audio-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px; background: var(--bg);
-  border-radius: 8px; border: 1px solid var(--border);
-}
+.el-audio-row  { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); }
 .el-audio-label { flex: 1; font-size: 12px; color: var(--dim); }
 .el-audio-text  { font-size: 13px; font-weight: 600; color: var(--text); font-family: monospace; }
 .el-status { font-size: 11px; padding: 3px 8px; border-radius: var(--pill); white-space: nowrap; }
-.el-status.missing { background: var(--red-d); color: var(--red); }
-.el-status.ready   { background: var(--sage-d); color: var(--sage); }
-.el-status.loading { background: var(--gold-d); color: var(--gold); }
+.el-status.missing { background: var(--red-d);    color: var(--red);  }
+.el-status.ready   { background: var(--sage-d);   color: var(--sage); }
+.el-status.loading { background: var(--gold-d);   color: var(--gold); }
 
-/* GitHub push */
-.gh-section { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
-.gh-head { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-.gh-head-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
-.gh-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.gh-row { display: flex; gap: 8px; align-items: center; }
-.gh-row label { font-size: 12px; color: var(--dim); width: 80px; flex-shrink: 0; }
-.gh-row input {
-  flex: 1; background: var(--bg); border: 1px solid var(--border2);
-  border-radius: 7px; padding: 7px 10px; color: var(--text); font-size: 12px;
-  font-family: monospace;
-}
-.gh-row input:focus { outline: none; border-color: var(--sage); }
-
-/* Toast */
-.toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  background: #1e2330; border: 1px solid var(--border2);
-  border-radius: var(--pill); padding: 10px 20px;
-  font-size: 13px; font-weight: 500; color: var(--text);
-  z-index: 999; opacity: 0; transition: opacity 0.2s;
-  pointer-events: none;
-}
-.toast.show { opacity: 1; }
-
-/* Export modal */
-.modal-bg {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.8); z-index: 200;
-  align-items: center; justify-content: center; padding: 24px;
-}
+/* ── Export modal ── */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
 .modal-bg.open { display: flex; }
-.modal-box {
-  background: var(--panel); border: 1px solid var(--border2);
-  border-radius: 14px; width: 100%; max-width: 680px;
-  max-height: 80vh; display: flex; flex-direction: column;
-  overflow: hidden;
-}
-.modal-head {
-  padding: 14px 18px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
+.modal-box  { background: var(--panel); border: 1px solid var(--border2); border-radius: 14px; width: 100%; max-width: 680px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; }
+.modal-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .modal-head-title { font-size: 14px; font-weight: 700; }
-.modal-body { flex: 1; overflow-y: auto; padding: 0; }
-.modal-body pre {
-  padding: 18px; font-size: 12px; font-family: monospace;
-  color: #a8d8a8; white-space: pre-wrap; word-break: break-all;
-}
+.modal-body { flex: 1; overflow-y: auto; }
+.modal-body pre { padding: 18px; font-size: 12px; font-family: monospace; color: #a8d8a8; white-space: pre-wrap; word-break: break-all; }
 .modal-foot { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
 
-/* Drag handle */
-.deck-item-handle { color: var(--dim); cursor: grab; font-size: 14px; }
+/* ── Toast ── */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e2330; border: 1px solid var(--border2); border-radius: var(--pill); padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text); z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.toast.show { opacity: 1; }
 
-/* Status bar */
-.status-bar {
-  background: var(--panel); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 10px 14px;
-  display: flex; align-items: center; gap: 12px;
-  font-size: 12px; color: var(--dim);
-}
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sage); flex-shrink: 0; }
-.status-dot.warn { background: var(--gold); }
-.status-dot.err  { background: var(--red); }
+/* ── Colour toggle ── */
+.colour-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; }
+.colour-toggle input { cursor: pointer; }
+.colour-toggle label { font-size: 12px; color: var(--dim); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -332,56 +174,39 @@ body {
   <div class="sidebar">
     <div class="sidebar-head">
       <div class="sidebar-title">📚 Vocab Primer Builder</div>
-      <div class="sidebar-sub">SkillsXLab</div>
+      <div class="sidebar-sub">SkillsXLab · <span id="card-count">0</span> cards</div>
     </div>
-
-    <div class="sidebar-section">Cards <span id="card-count" style="color:var(--text);font-style:normal;">0</span></div>
+    <div class="sidebar-section">Deck</div>
     <div class="deck-list" id="deck-list"></div>
-
     <div class="sidebar-actions">
-      <button class="btn-full" onclick="addCard('single')">＋ Add single card</button>
-      <button class="btn-full" onclick="addCard('pair')">＋ Add opposite pair</button>
+      <button class="btn-full" onclick="addCard('single')">＋ Single card</button>
+      <button class="btn-full" onclick="addCard('pair')">＋ Opposite pair</button>
+      <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 8px;">
       <button class="btn-full primary" onclick="openExport()">⬇ Export DECK JSON</button>
-      <button class="btn-full sage" onclick="pushToGitHub()">🚀 Push to GitHub</button>
+      <button class="btn-full sage"    onclick="pushToGitHub()">🚀 Push to GitHub</button>
     </div>
   </div>
 
   <!-- ══ MAIN ══ -->
   <div class="main">
 
-    <!-- Top bar -->
     <div class="topbar">
       <div class="topbar-title">Card Editor</div>
-      <div class="topbar-lesson">
-        <input type="text" id="lesson-name" value="Objects Around Us" placeholder="Lesson name" oninput="markDirty()">
-      </div>
+      <input type="text" id="lesson-name" value="Objects Around Us" placeholder="Lesson name" oninput="markDirty()">
       <button class="btn coral" onclick="generateAllAudio()">🎙 Generate all audio</button>
     </div>
 
-    <!-- GitHub config -->
-    <div class="gh-section" style="margin-bottom:20px;">
-      <div class="gh-head"><span class="gh-head-title">GitHub & ElevenLabs</span></div>
-      <div class="gh-body">
-        <div class="gh-row">
-          <label>EL API Key</label>
-          <input type="password" id="el-key" placeholder="sk_... (rotated key)">
-        </div>
-        <div class="gh-row">
-          <label>GitHub PAT</label>
-          <input type="password" id="gh-pat" placeholder="github_pat_...">
-        </div>
-        <div class="gh-row">
-          <label>Repo</label>
-          <input type="text" id="gh-repo" value="redskin106/lesson-a">
-        </div>
-        <div class="gh-row">
-          <label>Primer path</label>
-          <input type="text" id="gh-path" value="vocab-primer/vocab-primer.html">
-        </div>
+    <!-- Config -->
+    <div class="config-section">
+      <div class="config-head">GitHub &amp; ElevenLabs</div>
+      <div class="config-body">
+        <div class="config-row"><label>EL API Key</label><input type="password" id="el-key" placeholder="sk_... (rotated key)"></div>
+        <div class="config-row"><label>GitHub PAT</label><input type="password" id="gh-pat" placeholder="github_pat_..."></div>
+        <div class="config-row"><label>Repo</label>      <input type="text"     id="gh-repo" value="redskin106/lesson-a"></div>
+        <div class="config-row"><label>Primer path</label><input type="text"    id="gh-path" value="vocab-primer/vocab-primer.html"></div>
       </div>
     </div>
 
-    <!-- Editor area -->
     <div id="editor-area">
       <div class="editor-empty">
         <div class="editor-empty-icon">🃏</div>
@@ -389,20 +214,16 @@ body {
         <div style="font-size:13px;color:var(--dim);margin-top:6px;">or add a new card using the sidebar</div>
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- Export modal -->
 <div class="modal-bg" id="export-modal">
   <div class="modal-box">
-    <div class="modal-head">
-      <span class="modal-head-title">DECK JSON — paste into vocab-primer.html</span>
-      <button class="btn sm" onclick="closeExport()">✕ Close</button>
-    </div>
+    <div class="modal-head"><span class="modal-head-title">DECK JSON</span><button class="btn sm" onclick="closeExport()">✕</button></div>
     <div class="modal-body"><pre id="export-pre"></pre></div>
     <div class="modal-foot">
-      <button class="btn coral" onclick="copyExport()">📋 Copy to clipboard</button>
+      <button class="btn coral" onclick="copyExport()">📋 Copy</button>
       <button class="btn" onclick="closeExport()">Done</button>
     </div>
   </div>
@@ -411,424 +232,19 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════
-   STATE
-═══════════════════════════════════════ */
-let cards = [];
-let activeIdx = null;
-let dirty = false;
-let audioBlobs = {}; // key → blob URL
-
-// Seed with existing Objects lesson data
-const SEED = [
-  { type:'pair', tier:'silver', word1:'heavy', word2:'light', emoji1:'🎒', emoji2:'🪶',
-    sentence1:'This bag is heavy.', sentence2:'A feather is light.',
-    phonemes1:[{s:'h'},{s:'ɛ'},{s:'v'},{s:'i'}], phonemes2:[{s:'l'},{s:'aɪ'},{s:'t'}],
-    video1Title:'Lifting a heavy box', video1Sub:'See what heavy feels like', video1Url:'',
-    audio1Word:'', audio1Sentence:'', audio1Ph:[],
-    audio2Word:'', audio2Sentence:'', audio2Ph:[] },
-  { type:'pair', tier:'silver', word1:'big', word2:'small', emoji1:'📦', emoji2:'📎',
-    sentence1:'The box is big.', sentence2:'A paper clip is small.',
-    phonemes1:[{s:'b'},{s:'ɪ'},{s:'g'}], phonemes2:[{s:'s'},{s:'m'},{s:'ɔː'},{s:'l'}],
-    audio1Word:'', audio1Sentence:'', audio1Ph:[],
-    audio2Word:'', audio2Sentence:'', audio2Ph:[] },
-  { type:'pair', tier:'silver', word1:'hard', word2:'soft', emoji1:'🧱', emoji2:'🧽',
-    sentence1:'The brick is hard.', sentence2:'The sponge is soft.',
-    phonemes1:[{s:'h'},{s:'ɑː'},{s:'d'}], phonemes2:[{s:'s'},{s:'ɒ'},{s:'f'},{s:'t'}],
-    video2Title:'Squishing a sponge', video2Sub:'See what soft feels like', video2Url:'',
-    audio1Word:'', audio1Sentence:'', audio1Ph:[],
-    audio2Word:'', audio2Sentence:'', audio2Ph:[] },
-  { type:'pair', tier:'gold', word1:'old', word2:'new', emoji1:'📰', emoji2:'✨',
-    sentence1:'This newspaper is old.', sentence2:'My pen is new.',
-    phonemes1:[{s:'əʊ'},{s:'l'},{s:'d'}], phonemes2:[{s:'n'},{s:'juː'}],
-    audio1Word:'', audio1Sentence:'', audio1Ph:[],
-    audio2Word:'', audio2Sentence:'', audio2Ph:[] },
-  { type:'single', tier:'bronze', word:'bag', emoji:'🎒',
-    sentence:'My bag is on the chair.', phonemes:[{s:'b'},{s:'æ'},{s:'g'}],
-    audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'bronze', word:'ball', emoji:'⚽',
-    sentence:'The ball is round.', phonemes:[{s:'b'},{s:'ɔː'},{s:'l'}],
-    audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'bronze', word:'phone', emoji:'📱',
-    sentence:'My phone is on the table.', phonemes:[{s:'f'},{s:'əʊ'},{s:'n'}],
-    videoTitle:'Using a phone', videoSub:'', videoUrl:'',
-    audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'bronze', word:'chair', emoji:'🪑',
-    sentence:'The chair is next to the table.', phonemes:[{s:'tʃ'},{s:'ɛ'},{s:'r'}],
-    audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'bronze', word:'book',   emoji:'📖', sentence:'I have a book in my bag.',
-    phonemes:[{s:'b'},{s:'ʊ'},{s:'k'}], audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'bronze', word:'cup',    emoji:'☕', sentence:'The cup is on the table.',
-    phonemes:[{s:'k'},{s:'ʌ'},{s:'p'}], audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'silver', word:'key',    emoji:'🔑', sentence:'The key is small and silver.',
-    phonemes:[{s:'k'},{s:'iː'}], audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'silver', word:'coin',   emoji:'🪙', sentence:'I have one coin in my pocket.',
-    phonemes:[{s:'k'},{s:'ɔɪ'},{s:'n'}], audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'silver', word:'bottle', emoji:'🍶', sentence:'My water bottle is empty.',
-    phonemes:[{s:'b'},{s:'ɒ'},{s:'t'},{s:'l'}], audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'gold', word:'table', emoji:'🪵', sentence:'Put your book on the table.',
-    phonemes:[{s:'t'},{s:'eɪ'},{s:'b'},{s:'l'}], audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'gold', word:'box',   emoji:'📦', sentence:'The box is big and heavy.',
-    phonemes:[{s:'b'},{s:'ɒ'},{s:'k'},{s:'s'}], audioWord:'', audioSentence:'', audioPh:[] },
-  { type:'single', tier:'gold', word:'pen',   emoji:'🖊️', sentence:'I write with my pen.',
-    phonemes:[{s:'p'},{s:'ɛ'},{s:'n'}], audioWord:'', audioSentence:'', audioPh:[] },
-];
-cards = SEED.map(c => ({...c}));
-
-/* ═══════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════ */
-function renderSidebar() {
-  const list = document.getElementById('deck-list');
-  document.getElementById('card-count').textContent = cards.length;
-  list.innerHTML = '';
-  cards.forEach((card, i) => {
-    const el = document.createElement('div');
-    el.className = 'deck-item' + (i === activeIdx ? ' active' : '');
-    el.onclick = () => selectCard(i);
-    const label = card.type === 'pair'
-      ? `${card.word1} / ${card.word2}`
-      : (card.word || 'Untitled');
-    const icon = card.type === 'pair'
-      ? (card.emoji1 || '⟺')
-      : (card.emoji || '🃏');
-    el.innerHTML = `
-      <span class="deck-item-handle">⠿</span>
-      <span class="deck-item-icon">${icon}</span>
-      <span class="deck-item-word">${label}</span>
-      <span class="deck-item-tier tier-${card.tier}">${card.tier[0].toUpperCase()}</span>
-      <span class="deck-item-type">${card.type === 'pair' ? 'pair' : '1'}</span>`;
-    list.appendChild(el);
-  });
-}
-
-function selectCard(i) {
-  activeIdx = i;
-  renderSidebar();
-  renderEditor();
-}
-
-function addCard(type) {
-  const newCard = type === 'pair'
-    ? { type:'pair', tier:'silver', word1:'', word2:'', emoji1:'', emoji2:'',
-        sentence1:'', sentence2:'', phonemes1:[], phonemes2:[],
-        audio1Word:'', audio1Sentence:'', audio1Ph:[],
-        audio2Word:'', audio2Sentence:'', audio2Ph:[] }
-    : { type:'single', tier:'bronze', word:'', emoji:'',
-        sentence:'', phonemes:[], audioWord:'', audioSentence:'', audioPh:[] };
-  cards.push(newCard);
-  selectCard(cards.length - 1);
-  markDirty();
-}
-
-function deleteCard(i) {
-  if (!confirm('Delete this card?')) return;
-  cards.splice(i, 1);
-  activeIdx = Math.min(activeIdx, cards.length - 1);
-  if (cards.length === 0) activeIdx = null;
-  renderSidebar();
-  renderEditor();
-  markDirty();
-}
-
-/* ═══════════════════════════════════════
-   EDITOR
-═══════════════════════════════════════ */
-function renderEditor() {
-  const area = document.getElementById('editor-area');
-  if (activeIdx === null || !cards[activeIdx]) {
-    area.innerHTML = `<div class="editor-empty">
-      <div class="editor-empty-icon">🃏</div>
-      <div class="editor-empty-title">Select a card to edit</div>
-      <div style="font-size:13px;color:var(--dim);margin-top:6px;">or add a new card using the sidebar</div>
-    </div>`;
-    return;
-  }
-  const card = cards[activeIdx];
-  area.innerHTML = card.type === 'single' ? buildSingleEditor(card, activeIdx) : buildPairEditor(card, activeIdx);
-  bindEditorEvents(card, activeIdx);
-}
-
-/* ── Single editor ── */
-function buildSingleEditor(card, i) {
-  return `
-  <div class="editor">
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:16px;font-weight:700;">Single Card</div>
-      <button class="btn red sm" onclick="deleteCard(${i})">🗑 Delete</button>
-    </div>
-
-    <!-- Core fields -->
-    <div class="field-group">
-      <div class="field-group-head">Word</div>
-      <div class="field-group-body">
-        <div class="field-row">
-          <div class="field">
-            <label>Word</label>
-            <input type="text" data-field="word" value="${esc(card.word)}" placeholder="e.g. phone">
-          </div>
-          <div class="field" style="max-width:90px;">
-            <label>Emoji</label>
-            <input type="text" data-field="emoji" value="${esc(card.emoji)}" placeholder="📱">
-          </div>
-          <div class="field" style="max-width:110px;">
-            <label>Tier</label>
-            <select data-field="tier">
-              <option value="bronze" ${card.tier==='bronze'?'selected':''}>Bronze</option>
-              <option value="silver" ${card.tier==='silver'?'selected':''}>Silver</option>
-              <option value="gold"   ${card.tier==='gold'  ?'selected':''}>Gold</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Images -->
-    <div class="field-group">
-      <div class="field-group-head">Images</div>
-      <div class="field-group-body">
-        <div class="field-row">
-          <div class="field">
-            <label>Photo</label>
-            ${buildImgUpload('img', card.image, i)}
-          </div>
-          <div class="field">
-            <label>Illustration (optional)</label>
-            ${buildImgUpload('illustration', card.illustration, i)}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sentence -->
-    <div class="field-group">
-      <div class="field-group-head">Example sentence</div>
-      <div class="field-group-body">
-        <div class="field">
-          <label>Sentence — use the exact word form</label>
-          <input type="text" data-field="sentence" value="${esc(card.sentence)}" placeholder="My phone is on the table.">
-        </div>
-      </div>
-    </div>
-
-    <!-- Phonemes -->
-    <div class="field-group">
-      <div class="field-group-head">Phonemes (IPA)</div>
-      <div class="field-group-body">
-        ${buildPhonemeEditor('phonemes', card.phonemes || [], i)}
-      </div>
-    </div>
-
-    <!-- Video -->
-    <div class="field-group">
-      <div class="field-group-head">Video (optional)</div>
-      <div class="field-group-body">
-        <div class="field-row">
-          <div class="field">
-            <label>Video URL</label>
-            <input type="text" data-field="videoUrl" value="${esc(card.videoUrl)}" placeholder="https://...">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>Video title</label>
-            <input type="text" data-field="videoTitle" value="${esc(card.videoTitle)}" placeholder="e.g. Using a phone">
-          </div>
-          <div class="field">
-            <label>Video subtitle</label>
-            <input type="text" data-field="videoSub" value="${esc(card.videoSub)}" placeholder="e.g. See a phone in action">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ElevenLabs audio -->
-    ${buildAudioSection(card, i, 'single')}
-
-  </div>`;
-}
-
-/* ── Pair editor ── */
-function buildPairEditor(card, i) {
-  return `
-  <div class="editor">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:16px;font-weight:700;">Opposite Pair</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <select class="btn sm" data-field="tier" style="cursor:pointer;">
-          <option value="bronze" ${card.tier==='bronze'?'selected':''}>Bronze</option>
-          <option value="silver" ${card.tier==='silver'?'selected':''}>Silver</option>
-          <option value="gold"   ${card.tier==='gold'  ?'selected':''}>Gold</option>
-        </select>
-        <button class="btn red sm" onclick="deleteCard(${i})">🗑 Delete</button>
-      </div>
-    </div>
-
-    <!-- Two column layout -->
-    <div class="field-group">
-      <div class="field-group-head">Words & Images</div>
-      <div class="pair-cols">
-        <!-- Word 1 -->
-        <div>
-          <div class="pair-col-head"><span style="color:var(--coral)">●</span> Word 1</div>
-          <div class="field" style="margin-bottom:10px;">
-            <label>Word</label>
-            <input type="text" data-field="word1" value="${esc(card.word1)}" placeholder="e.g. heavy">
-          </div>
-          <div class="field" style="margin-bottom:10px;">
-            <label>Emoji</label>
-            <input type="text" data-field="emoji1" value="${esc(card.emoji1)}" placeholder="🎒">
-          </div>
-          <div class="field" style="margin-bottom:10px;">
-            <label>Photo</label>
-            ${buildImgUpload('image1', card.image1, i)}
-          </div>
-          <div class="field">
-            <label>Illustration (optional)</label>
-            ${buildImgUpload('illustration1', card.illustration1, i)}
-          </div>
-        </div>
-        <!-- Word 2 -->
-        <div>
-          <div class="pair-col-head"><span style="color:var(--sage)">●</span> Word 2</div>
-          <div class="field" style="margin-bottom:10px;">
-            <label>Word</label>
-            <input type="text" data-field="word2" value="${esc(card.word2)}" placeholder="e.g. light">
-          </div>
-          <div class="field" style="margin-bottom:10px;">
-            <label>Emoji</label>
-            <input type="text" data-field="emoji2" value="${esc(card.emoji2)}" placeholder="🪶">
-          </div>
-          <div class="field" style="margin-bottom:10px;">
-            <label>Photo</label>
-            ${buildImgUpload('image2', card.image2, i)}
-          </div>
-          <div class="field">
-            <label>Illustration (optional)</label>
-            ${buildImgUpload('illustration2', card.illustration2, i)}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sentences -->
-    <div class="field-group">
-      <div class="field-group-head">Example sentences</div>
-      <div class="pair-cols">
-        <div class="field">
-          <label>Sentence for "${esc(card.word1)||'Word 1'}"</label>
-          <input type="text" data-field="sentence1" value="${esc(card.sentence1)}" placeholder="This bag is heavy.">
-        </div>
-        <div class="field">
-          <label>Sentence for "${esc(card.word2)||'Word 2'}"</label>
-          <input type="text" data-field="sentence2" value="${esc(card.sentence2)}" placeholder="A feather is light.">
-        </div>
-      </div>
-    </div>
-
-    <!-- Phonemes -->
-    <div class="field-group">
-      <div class="field-group-head">Phonemes (IPA)</div>
-      <div class="pair-cols">
-        <div>
-          <div class="pair-col-head" style="margin-bottom:8px;">Word 1 — ${esc(card.word1)||'—'}</div>
-          ${buildPhonemeEditor('phonemes1', card.phonemes1 || [], i)}
-        </div>
-        <div>
-          <div class="pair-col-head" style="margin-bottom:8px;">Word 2 — ${esc(card.word2)||'—'}</div>
-          ${buildPhonemeEditor('phonemes2', card.phonemes2 || [], i)}
-        </div>
-      </div>
-    </div>
-
-    <!-- Videos -->
-    <div class="field-group">
-      <div class="field-group-head">Videos (optional)</div>
-      <div class="pair-cols">
-        <div>
-          <div class="pair-col-head" style="margin-bottom:8px;">Video for Word 1</div>
-          <div class="field" style="margin-bottom:8px;">
-            <label>URL</label>
-            <input type="text" data-field="video1Url" value="${esc(card.video1Url)}" placeholder="https://...">
-          </div>
-          <div class="field" style="margin-bottom:8px;">
-            <label>Title</label>
-            <input type="text" data-field="video1Title" value="${esc(card.video1Title)}" placeholder="Video title">
-          </div>
-          <div class="field">
-            <label>Subtitle</label>
-            <input type="text" data-field="video1Sub" value="${esc(card.video1Sub)}" placeholder="Short description">
-          </div>
-        </div>
-        <div>
-          <div class="pair-col-head" style="margin-bottom:8px;">Video for Word 2</div>
-          <div class="field" style="margin-bottom:8px;">
-            <label>URL</label>
-            <input type="text" data-field="video2Url" value="${esc(card.video2Url)}" placeholder="https://...">
-          </div>
-          <div class="field" style="margin-bottom:8px;">
-            <label>Title</label>
-            <input type="text" data-field="video2Title" value="${esc(card.video2Title)}" placeholder="Video title">
-          </div>
-          <div class="field">
-            <label>Subtitle</label>
-            <input type="text" data-field="video2Sub" value="${esc(card.video2Sub)}" placeholder="Short description">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Audio -->
-    ${buildAudioSection(card, i, 'pair')}
-  </div>`;
-}
-
-/* ── Image upload widget ── */
-const IMG_SPEC = {
-  img:           { label: 'Photo',         note: 'Square · white bg · JPG/PNG · under 100KB' },
-  illustration:  { label: 'Illustration',  note: 'Square · transparent/white bg · PNG · under 100KB' },
-  image1:        { label: 'Photo (Word 1)',  note: 'Square · white bg · JPG/PNG · under 100KB' },
-  image2:        { label: 'Photo (Word 2)',  note: 'Square · white bg · JPG/PNG · under 100KB' },
-  illustration1: { label: 'Illus (Word 1)', note: 'Square · transparent/white bg · PNG · under 100KB' },
-  illustration2: { label: 'Illus (Word 2)', note: 'Square · transparent/white bg · PNG · under 100KB' },
-};
-
-function buildImgUpload(field, currentUrl, cardIdx) {
-  const id   = `img-${field}-${cardIdx}`;
-  const spec = IMG_SPEC[field] || { note: 'Square · JPG/PNG · under 100KB' };
-  const hasImg = currentUrl && currentUrl.length > 10;
-  return `<div class="img-upload" id="upload-${id}">
-    <input type="file" accept="image/*" data-imgfield="${field}" data-cardidx="${cardIdx}" onchange="handleImageUpload(this)">
-    ${hasImg
-      ? `<img class="img-upload-preview" src="${currentUrl}" style="display:block;" alt="">
-         <div style="font-size:10px;color:var(--dim);text-align:center;padding:4px 0;">${spec.note}</div>`
-      : `<div class="img-upload-icon">🖼</div>
-         <div class="img-upload-label">Tap to upload</div>
-         <div style="font-size:10px;color:var(--dim);margin-top:4px;">${spec.note}</div>`
-    }
-  </div>`;
-}
-
-/* ── Phoneme editor ── */
-
-// IPA → Jolly Phonics grapheme (mirrors primer's IPA_TO_JP)
+/* ═══════════════════════════════════
+   IPA / JP maps (mirrors primer)
+═══════════════════════════════════ */
 const IPA_TO_JP = {
-  'æ':'a','ɑː':'ar','ɒ':'o','ɔː':'or',
-  'ə':'er',  // schwa → sound_er.mp3
-  'ɛ':'e',   // BED/PEN → sound_e.mp3
-  'əʊ':'oa','eɪ':'ai','iː':'ee','ɪ':'i',
-  'i':'i',   // unstressed final → sound_i.mp3
-  'uː':'ooo',
-  'ʊ':'oo',  // FOOT (short) → sound_oo.mp3
-  'aɪ':'ie','aʊ':'ou','ɔɪ':'oi','ɜː':'er','ʌ':'u',
-  'juː':'ue','eə':'ar','ɪə':'er',
+  'æ':'a','ɑː':'ar','ɒ':'o','ɔː':'or','ə':'er','ɛ':'e','əʊ':'oa',
+  'eɪ':'ai','iː':'ee','ɪ':'i','i':'i','uː':'ooo','ʊ':'oo',
+  'aɪ':'ie','aʊ':'ou','ɔɪ':'oi','ɜː':'er','ʌ':'u','juː':'ue',
+  'eə':'ar','ɪə':'er',
   'b':'b','d':'d','f':'f','g':'g','h':'h','j':'j','k':'k',
   'l':'l','m':'m','n':'n','p':'p','r':'r','s':'s','t':'t',
   'v':'v','w':'w','x':'x','y':'y','z':'z',
   'tʃ':'ch','dʒ':'j','ŋ':'ng','ʃ':'sh','θ':'th','ð':'thh',
 };
-const JP_BASE = 'https://redskin106.github.io/lesson-a/shell-v2/assets/phonemes/';
 const PHONEME_FILE = {
   'c':'ck','k':'k','ck':'ck','g':'g','j':'j','qu':'qu',
   'x':'x','y':'y','z':'z','ng':'ng','sh':'sh','th':'thh',
@@ -839,335 +255,490 @@ const PHONEME_FILE = {
   'l':'l','m':'m','n':'n','o':'o','p':'p','r':'r','s':'s',
   't':'t','u':'u','v':'v','w':'w',
 };
+const JP_BASE = 'https://redskin106.github.io/lesson-a/shell-v2/assets/phonemes/';
 
-function jpUrlForSymbol(symbol) {
-  const grapheme = IPA_TO_JP[symbol] || symbol;
-  const fileKey  = PHONEME_FILE[grapheme] || grapheme;
-  return JP_BASE + 'sound_' + fileKey + '.mp3';
+function jpUrlForSymbol(sym) {
+  const g = IPA_TO_JP[sym] || sym;
+  const k = PHONEME_FILE[g] || g;
+  return JP_BASE + 'sound_' + k + '.mp3';
 }
-
-function previewPhoneme(symbol, customUrl) {
-  const url = customUrl || jpUrlForSymbol(symbol);
+function previewPhoneme(sym, customUrl) {
+  const url = customUrl || jpUrlForSymbol(sym);
   const a = new Audio(url);
-  a.onerror = () => {
-    const utt = new SpeechSynthesisUtterance(symbol);
-    utt.lang = 'en-GB'; utt.rate = 0.8;
-    window.speechSynthesis?.speak(utt);
-  };
+  a.onerror = () => { const u = new SpeechSynthesisUtterance(sym); u.lang='en-GB'; window.speechSynthesis?.speak(u); };
   a.play().catch(() => a.onerror());
 }
 
+/* ═══════════════════════════════════
+   STATE — seeded from live primer DECK
+═══════════════════════════════════ */
+const SEED = [{"type": "pair", "tier": "bronze", "word1": "big", "word2": "small", "emoji1": "\ud83d\udce6", "emoji2": "\ud83d\udcce", "sentence1": "The box is big.", "sentence2": "The coin is small.", "phonemes1": [{"s": "b"}, {"s": "\u026a"}, {"s": "g"}], "phonemes2": [{"s": "s"}, {"s": "m"}, {"s": "\u0254\u02d0"}, {"s": "l"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": []}, {"type": "pair", "tier": "bronze", "word1": "round", "word2": "flat", "emoji1": "\u26bd", "emoji2": "\ud83d\udcc4", "sentence1": "The ball is round.", "sentence2": "The book is flat.", "phonemes1": [{"s": "r"}, {"s": "a\u028a"}, {"s": "n"}, {"s": "d"}], "phonemes2": [{"s": "f"}, {"s": "l"}, {"s": "\u00e6"}, {"s": "t"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": []}, {"type": "pair", "tier": "bronze", "word1": "old", "word2": "new", "emoji1": "\ud83d\udddd\ufe0f", "emoji2": "\ud83d\udde2\ufe0f", "sentence1": "The key is old.", "sentence2": "The pen is new.", "phonemes1": [{"s": "\u0259\u028a"}, {"s": "l"}, {"s": "d"}], "phonemes2": [{"s": "n"}, {"s": "ju\u02d0"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": []}, {"type": "pair", "tier": "bronze", "word1": "clean", "word2": "dirty", "emoji1": "\ud83e\uddfc", "emoji2": "\ud83e\udea3", "sentence1": "The cup is clean.", "sentence2": "The bag is dirty.", "phonemes1": [{"s": "k"}, {"s": "l"}, {"s": "i\u02d0"}, {"s": "n"}], "phonemes2": [{"s": "d"}, {"s": "\u025c\u02d0"}, {"s": "t"}, {"s": "i"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": []}, {"type": "pair", "tier": "silver", "word1": "long", "word2": "short", "emoji1": "\ud83d\udccf", "emoji2": "\u270f\ufe0f", "sentence1": "The bottle is long.", "sentence2": "The coin is short.", "phonemes1": [{"s": "l"}, {"s": "\u0252"}, {"s": "\u014b"}], "phonemes2": [{"s": "\u0283"}, {"s": "\u0254\u02d0"}, {"s": "t"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": []}, {"type": "pair", "tier": "silver", "word1": "full", "word2": "empty", "emoji1": "\ud83e\udd5b", "emoji2": "\ud83e\udea3", "sentence1": "The cup is full.", "sentence2": "The bottle is empty.", "phonemes1": [{"s": "f"}, {"s": "\u028a"}, {"s": "l"}], "phonemes2": [{"s": "\u025b"}, {"s": "m"}, {"s": "p"}, {"s": "t"}, {"s": "i"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": []}, {"type": "pair", "tier": "silver", "word1": "beautiful", "word2": "ugly", "emoji1": "\ud83c\udf38", "emoji2": "\ud83d\uddd1\ufe0f", "sentence1": "The bag is beautiful.", "sentence2": "It's not beautiful. It's ugly.", "phonemes1": [{"s": "b"}, {"s": "ju\u02d0"}, {"s": "t"}, {"s": "\u026a"}, {"s": "f"}, {"s": "l"}], "phonemes2": [{"s": "\u028c"}, {"s": "g"}, {"s": "l"}, {"s": "i"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": [], "word2note": "A1 Movers \u2705"}, {"type": "pair", "tier": "gold", "word1": "soft", "word2": "hard", "emoji1": "\ud83e\uddc0", "emoji2": "\ud83e\uddf1", "sentence1": "The bag is soft.", "sentence2": "The key is hard.", "phonemes1": [{"s": "s"}, {"s": "\u0252"}, {"s": "f"}, {"s": "t"}], "phonemes2": [{"s": "h"}, {"s": "\u0251\u02d0"}, {"s": "d"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": [], "video1Url": "", "video1Title": "Squishing a sponge", "video1Sub": "See what soft feels like"}, {"type": "pair", "tier": "gold", "word1": "thin", "word2": "thick", "emoji1": "\ud83d\udde2\ufe0f", "emoji2": "\ud83d\udcda", "sentence1": "The pen is thin.", "sentence2": "The book is thick.", "phonemes1": [{"s": "\u03b8"}, {"s": "\u026a"}, {"s": "n"}], "phonemes2": [{"s": "\u03b8"}, {"s": "\u026a"}, {"s": "k"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": [], "word2note": "receptive only"}, {"type": "pair", "tier": "gold", "word1": "smooth", "word2": "rough", "emoji1": "\ud83d\udcf1", "emoji2": "\ud83e\udea8", "sentence1": "The phone screen is smooth.", "sentence2": "The coin feels rough.", "phonemes1": [{"s": "s"}, {"s": "m"}, {"s": "u\u02d0"}, {"s": "\u00f0"}], "phonemes2": [{"s": "r"}, {"s": "\u028c"}, {"s": "f"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": [], "word2note": "receptive only"}, {"type": "pair", "tier": "gold", "word1": "plastic", "word2": "metal", "emoji1": "\ud83e\udea3", "emoji2": "\ud83d\udd11", "sentence1": "The bottle is plastic.", "sentence2": "The key is metal.", "phonemes1": [{"s": "p"}, {"s": "l"}, {"s": "\u00e6"}, {"s": "s"}, {"s": "t"}, {"s": "\u026a"}, {"s": "k"}], "phonemes2": [{"s": "m"}, {"s": "\u025b"}, {"s": "t"}, {"s": "l"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": []}, {"type": "pair", "tier": "gold", "word1": "heavy", "word2": "light", "emoji1": "\ud83c\udf92", "emoji2": "\ud83e\udeb6", "sentence1": "The school bag is heavy.", "sentence2": "A feather is light.", "phonemes1": [{"s": "h"}, {"s": "\u025b"}, {"s": "v"}, {"s": "i"}], "phonemes2": [{"s": "l"}, {"s": "a\u026a"}, {"s": "t"}], "audio1Word": "", "audio1Sentence": "", "audio1Ph": [], "audio2Word": "", "audio2Sentence": "", "audio2Ph": [], "video1Url": "", "video1Title": "Lifting a heavy bag", "video1Sub": "See what heavy feels like"}, {"type": "single", "tier": "bronze", "word": "bag", "emoji": "\ud83c\udf92", "sentence": "My bag is on the chair.", "phonemes": [{"s": "b"}, {"s": "\u00e6"}, {"s": "g"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "ball", "emoji": "\u26bd", "sentence": "The ball is round.", "phonemes": [{"s": "b"}, {"s": "\u0254\u02d0"}, {"s": "l"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "book", "emoji": "\ud83d\udcd6", "sentence": "I have a book in my bag.", "phonemes": [{"s": "b"}, {"s": "\u028a"}, {"s": "k"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "box", "emoji": "\ud83d\udce6", "sentence": "The box is big and square.", "phonemes": [{"s": "b"}, {"s": "\u0252"}, {"s": "k"}, {"s": "s"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "chair", "emoji": "\ud83e\ude91", "sentence": "The classroom chair is not soft.", "phonemes": [{"s": "t\u0283"}, {"s": "\u025b"}, {"s": "r"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "cup", "emoji": "\u2615", "sentence": "The cup is on the table.", "phonemes": [{"s": "k"}, {"s": "\u028c"}, {"s": "p"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "pen", "emoji": "\ud83d\udde2\ufe0f", "sentence": "My pen is long and thin.", "phonemes": [{"s": "p"}, {"s": "\u025b"}, {"s": "n"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "phone", "emoji": "\ud83d\udcf1", "sentence": "My phone is on the table.", "phonemes": [{"s": "f"}, {"s": "\u0259\u028a"}, {"s": "n"}], "audioWord": "", "audioSentence": "", "audioPh": [], "videoUrl": "", "videoTitle": "Using a phone", "videoSub": "See a phone in action"}, {"type": "single", "tier": "silver", "word": "bottle", "emoji": "\ud83c\udf76", "sentence": "My water bottle is empty.", "phonemes": [{"s": "b"}, {"s": "\u0252"}, {"s": "t"}, {"s": "l"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "silver", "word": "coin", "emoji": "\ud83e\ude99", "sentence": "The coin is small and round.", "phonemes": [{"s": "k"}, {"s": "\u0254\u026a"}, {"s": "n"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "silver", "word": "key", "emoji": "\ud83d\udd11", "sentence": "The key is small and metal.", "phonemes": [{"s": "k"}, {"s": "i\u02d0"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "silver", "word": "table", "emoji": "\ud83e\udeb5", "sentence": "Put your book on the table.", "phonemes": [{"s": "t"}, {"s": "e\u026a"}, {"s": "b"}, {"s": "l"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "silver", "word": "circle", "emoji": "\u2b55", "sentence": "It is shaped like a circle.", "phonemes": [{"s": "s"}, {"s": "\u025c\u02d0"}, {"s": "k"}, {"s": "l"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "silver", "word": "rectangle", "emoji": "\u25ac", "sentence": "It is shaped like a rectangle.", "phonemes": [{"s": "r"}, {"s": "\u025b"}, {"s": "k"}, {"s": "t"}, {"s": "\u00e6"}, {"s": "\u014b"}, {"s": "g"}, {"s": "l"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "silver", "word": "triangle", "emoji": "\ud83d\udd3a", "sentence": "It is shaped like a triangle.", "phonemes": [{"s": "t"}, {"s": "r"}, {"s": "a\u026a"}, {"s": "\u00e6"}, {"s": "\u014b"}, {"s": "g"}, {"s": "l"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "red", "emoji": "\ud83d\udd34", "isColour": true, "swatch": "#E53935", "sentence": "The ball is red.", "phonemes": [{"s": "r"}, {"s": "\u025b"}, {"s": "d"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "blue", "emoji": "\ud83d\udd35", "isColour": true, "swatch": "#1E88E5", "sentence": "The pen is blue.", "phonemes": [{"s": "b"}, {"s": "l"}, {"s": "u\u02d0"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "yellow", "emoji": "\ud83d\udfe1", "isColour": true, "swatch": "#FDD835", "sentence": "The cup is yellow.", "phonemes": [{"s": "j"}, {"s": "\u025b"}, {"s": "l"}, {"s": "\u0259\u028a"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "green", "emoji": "\ud83d\udfe2", "isColour": true, "swatch": "#43A047", "sentence": "The bottle is green.", "phonemes": [{"s": "g"}, {"s": "r"}, {"s": "i\u02d0"}, {"s": "n"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "black", "emoji": "\u26ab", "isColour": true, "swatch": "#212121", "sentence": "The phone is black.", "phonemes": [{"s": "b"}, {"s": "l"}, {"s": "\u00e6"}, {"s": "k"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "white", "emoji": "\u26aa", "isColour": true, "swatch": "#E0E0E0", "sentence": "The chair is white.", "phonemes": [{"s": "w"}, {"s": "a\u026a"}, {"s": "t"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "pink", "emoji": "\ud83c\udf38", "isColour": true, "swatch": "#E91E8C", "sentence": "The bag is pink.", "phonemes": [{"s": "p"}, {"s": "\u026a"}, {"s": "\u014b"}, {"s": "k"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "bronze", "word": "brown", "emoji": "\ud83d\udfe7", "isColour": true, "swatch": "#6D4C41", "sentence": "The table is brown.", "phonemes": [{"s": "b"}, {"s": "r"}, {"s": "a\u028a"}, {"s": "n"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "silver", "word": "orange", "emoji": "\ud83d\udfe0", "isColour": true, "swatch": "#FF6D00", "sentence": "The ball is orange.", "phonemes": [{"s": "\u0252"}, {"s": "r"}, {"s": "\u026a"}, {"s": "n"}, {"s": "d\u0292"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "gold", "word": "purple", "emoji": "\ud83d\udfe3", "isColour": true, "swatch": "#7B1FA2", "sentence": "The bag is purple.", "phonemes": [{"s": "p"}, {"s": "\u025c\u02d0"}, {"s": "p"}, {"s": "l"}], "audioWord": "", "audioSentence": "", "audioPh": []}, {"type": "single", "tier": "silver", "word": "square", "emoji": "\ud83d\udfe6", "sentence": "It is shaped like a square.", "phonemes": [{"s": "s"}, {"s": "k"}, {"s": "w"}, {"s": "\u025b"}, {"s": "r"}], "audioWord": "", "audioSentence": "", "audioPh": []}];
+
+let cards = SEED.map(c => ({...c}));
+let activeIdx = null;
+let dirty = false;
+let audioBlobs = {};
+
+/* ═══════════════════════════════════
+   IMAGE SPEC
+═══════════════════════════════════ */
+const IMG_SPEC = {
+  img:           'Square · white bg · WebP/JPG · under 50KB',
+  illustration:  'Square · transparent/white bg · PNG/WebP · under 50KB',
+  image1:        'Square · white bg · WebP/JPG · under 50KB (Word 1)',
+  image2:        'Square · white bg · WebP/JPG · under 50KB (Word 2)',
+  illustration1: 'Square · transparent/white bg · PNG/WebP · under 50KB (Word 1)',
+  illustration2: 'Square · transparent/white bg · PNG/WebP · under 50KB (Word 2)',
+};
+
+/* ═══════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════ */
+function renderSidebar() {
+  const list = document.getElementById('deck-list');
+  document.getElementById('card-count').textContent = cards.length;
+  list.innerHTML = '';
+  cards.forEach((card, i) => {
+    const el = document.createElement('div');
+    el.className = 'deck-item' + (i === activeIdx ? ' active' : '');
+    el.onclick = () => selectCard(i);
+    const label = card.type === 'pair' ? `${card.word1} / ${card.word2}` : card.word || 'Untitled';
+    const icon  = card.isColour ? '🎨' : card.type === 'pair' ? (card.emoji1||'⟺') : (card.emoji||'🃏');
+    el.innerHTML = `
+      <span class="deck-item-icon">${icon}</span>
+      <span class="deck-item-word">${label}</span>
+      <span class="deck-item-tier tier-${card.tier}">${card.tier[0].toUpperCase()}</span>
+      <span class="deck-item-type">${card.type==='pair'?'pair':'1'}</span>`;
+    list.appendChild(el);
+  });
+}
+
+function selectCard(i) { activeIdx = i; renderSidebar(); renderEditor(); }
+function addCard(type) {
+  cards.push(type === 'pair'
+    ? { type:'pair', tier:'silver', word1:'', word2:'', emoji1:'', emoji2:'', sentence1:'', sentence2:'', phonemes1:[], phonemes2:[], audio1Word:'', audio1Sentence:'', audio1Ph:[], audio2Word:'', audio2Sentence:'', audio2Ph:[] }
+    : { type:'single', tier:'bronze', word:'', emoji:'', sentence:'', phonemes:[], audioWord:'', audioSentence:'', audioPh:[] });
+  selectCard(cards.length - 1);
+  markDirty();
+}
+function deleteCard(i) {
+  if (!confirm('Delete this card?')) return;
+  cards.splice(i, 1);
+  activeIdx = cards.length ? Math.min(activeIdx, cards.length-1) : null;
+  renderSidebar(); renderEditor(); markDirty();
+}
+
+/* ═══════════════════════════════════
+   EDITOR
+═══════════════════════════════════ */
+function renderEditor() {
+  const area = document.getElementById('editor-area');
+  if (activeIdx === null || !cards[activeIdx]) {
+    area.innerHTML = `<div class="editor-empty"><div class="editor-empty-icon">🃏</div><div class="editor-empty-title">Select a card to edit</div></div>`;
+    return;
+  }
+  const card = cards[activeIdx];
+  area.innerHTML = card.type === 'single' ? buildSingleEditor(card, activeIdx) : buildPairEditor(card, activeIdx);
+  bindEditorEvents(card, activeIdx);
+}
+
+function tierSelect(current) {
+  return `<select data-field="tier">
+    <option value="bronze" ${current==='bronze'?'selected':''}>Bronze</option>
+    <option value="silver" ${current==='silver'?'selected':''}>Silver</option>
+    <option value="gold"   ${current==='gold'  ?'selected':''}>Gold</option>
+  </select>`;
+}
+
+function buildSingleEditor(card, i) {
+  const isColour = card.isColour;
+  return `<div class="editor">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:16px;font-weight:700;">${isColour ? '🎨 Colour Card' : 'Single Card'}</div>
+      <button class="btn red sm" onclick="deleteCard(${i})">🗑 Delete</button>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-head">Word</div>
+      <div class="field-group-body">
+        <div class="field-row">
+          <div class="field"><label>Word</label><input type="text" data-field="word" value="${esc(card.word)}" placeholder="e.g. phone"></div>
+          <div class="field" style="max-width:80px;"><label>Emoji</label><input type="text" data-field="emoji" value="${esc(card.emoji)}" placeholder="📱"></div>
+          <div class="field" style="max-width:110px;"><label>Tier</label>${tierSelect(card.tier)}</div>
+        </div>
+        <div class="colour-toggle">
+          <input type="checkbox" id="is-colour-${i}" ${isColour?'checked':''} onchange="toggleColour(${i},this.checked)">
+          <label for="is-colour-${i}">Colour card — show CSS swatch instead of image</label>
+        </div>
+        ${isColour ? `
+        <div class="field"><label>Swatch hex</label>
+          <div class="swatch-row">
+            <div class="swatch-preview" id="swatch-preview-${i}" style="background:${esc(card.swatch||'#888')}"></div>
+            <input class="swatch-input" type="text" data-field="swatch" value="${esc(card.swatch||'')}" placeholder="#E53935" oninput="updateSwatch(${i},this.value)">
+          </div>
+        </div>` : `
+        <div class="field-row">
+          <div class="field"><label>Photo</label>${buildImgUpload('img', card.image, i)}</div>
+          <div class="field"><label>Illustration (optional)</label>${buildImgUpload('illustration', card.illustration, i)}</div>
+        </div>`}
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-head">Example sentence</div>
+      <div class="field-group-body">
+        <div class="field"><input type="text" data-field="sentence" value="${esc(card.sentence)}" placeholder="My phone is on the table."></div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-head">Phonemes (IPA)</div>
+      <div class="field-group-body">${buildPhonemeEditor('phonemes', card.phonemes||[], i)}</div>
+    </div>
+
+    ${!isColour ? `
+    <div class="field-group">
+      <div class="field-group-head">Video (optional)</div>
+      <div class="field-group-body">
+        <div class="field-row">
+          <div class="field"><label>URL</label><input type="text" data-field="videoUrl" value="${esc(card.videoUrl)}" placeholder="https://..."></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Title</label><input type="text" data-field="videoTitle" value="${esc(card.videoTitle)}" placeholder="Using a phone"></div>
+          <div class="field"><label>Subtitle</label><input type="text" data-field="videoSub" value="${esc(card.videoSub)}" placeholder="Short description"></div>
+        </div>
+      </div>
+    </div>` : ''}
+
+    ${buildAudioSection(card, i, 'single')}
+  </div>`;
+}
+
+function buildPairEditor(card, i) {
+  return `<div class="editor">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:16px;font-weight:700;">Opposite Pair</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        ${tierSelect(card.tier).replace('<select','<select class="btn sm"')}
+        <button class="btn red sm" onclick="deleteCard(${i})">🗑 Delete</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-head">Words &amp; Images</div>
+      <div class="pair-cols">
+        <div>
+          <div class="pair-col-head"><span style="color:var(--coral)">●</span> Word 1</div>
+          <div class="field" style="margin-bottom:10px;"><label>Word</label><input type="text" data-field="word1" value="${esc(card.word1)}" placeholder="e.g. heavy"></div>
+          <div class="field" style="margin-bottom:10px;"><label>Emoji</label><input type="text" data-field="emoji1" value="${esc(card.emoji1)}" placeholder="🎒"></div>
+          <div class="field" style="margin-bottom:10px;"><label>Photo</label>${buildImgUpload('image1', card.image1, i)}</div>
+          <div class="field"><label>Illustration (opt.)</label>${buildImgUpload('illustration1', card.illustration1, i)}</div>
+        </div>
+        <div>
+          <div class="pair-col-head"><span style="color:var(--sage)">●</span> Word 2</div>
+          <div class="field" style="margin-bottom:10px;"><label>Word</label><input type="text" data-field="word2" value="${esc(card.word2)}" placeholder="e.g. light"></div>
+          <div class="field" style="margin-bottom:10px;">
+            <label>Emoji</label><input type="text" data-field="emoji2" value="${esc(card.emoji2)}" placeholder="🪶">
+            ${card.word2note ? `<div class="field-note">* ${esc(card.word2note)}</div>` : ''}
+          </div>
+          <div class="field" style="margin-bottom:10px;"><label>Photo</label>${buildImgUpload('image2', card.image2, i)}</div>
+          <div class="field"><label>Illustration (opt.)</label>${buildImgUpload('illustration2', card.illustration2, i)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-head">Example sentences</div>
+      <div class="pair-cols">
+        <div class="field"><label>${esc(card.word1||'Word 1')}</label><input type="text" data-field="sentence1" value="${esc(card.sentence1)}" placeholder="The bag is heavy."></div>
+        <div class="field"><label>${esc(card.word2||'Word 2')}</label><input type="text" data-field="sentence2" value="${esc(card.sentence2)}" placeholder="A feather is light."></div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-head">Phonemes (IPA)</div>
+      <div class="pair-cols">
+        <div><div class="pair-col-head" style="margin-bottom:8px;">${esc(card.word1||'Word 1')}</div>${buildPhonemeEditor('phonemes1', card.phonemes1||[], i)}</div>
+        <div><div class="pair-col-head" style="margin-bottom:8px;">${esc(card.word2||'Word 2')}</div>${buildPhonemeEditor('phonemes2', card.phonemes2||[], i)}</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-group-head">Videos (optional)</div>
+      <div class="pair-cols">
+        <div>
+          <div class="pair-col-head" style="margin-bottom:8px;">Video for ${esc(card.word1||'Word 1')}</div>
+          <div class="field" style="margin-bottom:8px;"><label>URL</label><input type="text" data-field="video1Url" value="${esc(card.video1Url)}" placeholder="https://..."></div>
+          <div class="field" style="margin-bottom:8px;"><label>Title</label><input type="text" data-field="video1Title" value="${esc(card.video1Title)}" placeholder="Video title"></div>
+          <div class="field"><label>Subtitle</label><input type="text" data-field="video1Sub" value="${esc(card.video1Sub)}" placeholder="Short description"></div>
+        </div>
+        <div>
+          <div class="pair-col-head" style="margin-bottom:8px;">Video for ${esc(card.word2||'Word 2')}</div>
+          <div class="field" style="margin-bottom:8px;"><label>URL</label><input type="text" data-field="video2Url" value="${esc(card.video2Url)}" placeholder="https://..."></div>
+          <div class="field" style="margin-bottom:8px;"><label>Title</label><input type="text" data-field="video2Title" value="${esc(card.video2Title)}" placeholder="Video title"></div>
+          <div class="field"><label>Subtitle</label><input type="text" data-field="video2Sub" value="${esc(card.video2Sub)}" placeholder="Short description"></div>
+        </div>
+      </div>
+    </div>
+
+    ${buildAudioSection(card, i, 'pair')}
+  </div>`;
+}
+
+/* ═══════════════════════════════════
+   IMAGE UPLOAD
+═══════════════════════════════════ */
+function buildImgUpload(field, currentUrl, cardIdx) {
+  const spec = IMG_SPEC[field] || 'Square · WebP/JPG · under 50KB';
+  const hasImg = currentUrl && currentUrl.length > 10;
+  return `<div class="img-upload" id="upload-${field}-${cardIdx}">
+    <input type="file" accept="image/*" data-imgfield="${field}" data-cardidx="${cardIdx}" onchange="handleImageUpload(this)">
+    ${hasImg
+      ? `<img class="img-preview" src="${currentUrl}" alt=""><div class="img-upload-spec">${spec}</div>`
+      : `<div class="img-upload-icon">🖼</div><div class="img-upload-label">Tap to upload</div><div class="img-upload-spec">${spec}</div>`}
+  </div>`;
+}
+
+function handleImageUpload(input) {
+  const file = input.files[0]; if (!file) return;
+  const field = input.dataset.imgfield, cardIdx = parseInt(input.dataset.cardidx);
+  const reader = new FileReader();
+  reader.onload = e => {
+    cards[cardIdx][field] = e.target.result; markDirty();
+    const w = input.closest('.img-upload');
+    const spec = IMG_SPEC[field] || 'Square · WebP/JPG · under 50KB';
+    w.innerHTML = `<input type="file" accept="image/*" data-imgfield="${field}" data-cardidx="${cardIdx}" onchange="handleImageUpload(this)">
+      <img class="img-preview" src="${e.target.result}" alt=""><div class="img-upload-spec">${spec}</div>`;
+    w.querySelector('input').addEventListener('change', function(){ handleImageUpload(this); });
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ═══════════════════════════════════
+   COLOUR CARD
+═══════════════════════════════════ */
+function toggleColour(cardIdx, on) {
+  cards[cardIdx].isColour = on;
+  if (on && !cards[cardIdx].swatch) cards[cardIdx].swatch = '#888888';
+  markDirty(); renderEditor();
+}
+function updateSwatch(cardIdx, val) {
+  cards[cardIdx].swatch = val;
+  const prev = document.getElementById('swatch-preview-' + cardIdx);
+  if (prev) prev.style.background = val;
+  markDirty();
+}
+
+/* ═══════════════════════════════════
+   PHONEMES
+═══════════════════════════════════ */
 function buildPhonemeEditor(field, phonemes, cardIdx) {
-  const chips = (phonemes || []).map((ph, pi) => {
-    const jpUrl  = jpUrlForSymbol(ph.s);
-    const src    = ph.audioSrc || 'jp'; // 'jp' | 'el' | 'custom'
-    const hasEl  = !!ph.audio && ph.audioSrc === 'el';
-    const hasCus = !!ph.audio && ph.audioSrc === 'custom';
-    return `<div class="ph-chip-full" id="ph-chip-${field}-${pi}-${cardIdx}">
+  const chips = (phonemes||[]).map((ph, pi) => {
+    const src = ph.audioSrc || 'jp';
+    const hasEl  = ph.audio && ph.audioSrc === 'el';
+    const hasCus = ph.audio && ph.audioSrc === 'custom';
+    return `<div class="ph-chip-full">
       <div class="ph-chip-top">
         <span class="ph-symbol">${ph.s}</span>
-        <button class="ph-preview" title="Preview audio"
-          onclick="previewPhoneme('${ph.s}','${ph.audio||''}')">▶</button>
+        <button class="ph-preview" onclick="previewPhoneme('${ph.s}','${ph.audio||''}')" title="Preview">▶</button>
         <button class="ph-chip-del" onclick="removePhoneme('${field}',${pi},${cardIdx})">×</button>
       </div>
       <div class="ph-src-row">
-        <button class="ph-src-btn${src==='jp'?' active':''}"
-          onclick="setPhSrc('${field}',${pi},${cardIdx},'jp','')">
-          🎵 JP
-        </button>
-        <button class="ph-src-btn${hasEl?' active':''}"
-          onclick="genPhEl('${field}',${pi},${cardIdx},'${ph.s}')">
-          🎙 EL${hasEl?' ✓':''}
-        </button>
-        <label class="ph-src-btn${hasCus?' active':''}" title="Upload custom audio">
-          📂${hasCus?' ✓':''}
-          <input type="file" accept="audio/*" style="display:none"
-            onchange="setPhCustom('${field}',${pi},${cardIdx},this)">
+        <button class="ph-src-btn${src==='jp'?' active':''}" onclick="setPhSrc('${field}',${pi},${cardIdx},'jp','')">🎵 JP</button>
+        <button class="ph-src-btn${hasEl?' active':''}"      onclick="genPhEl('${field}',${pi},${cardIdx},'${ph.s}')">🎙 EL${hasEl?' ✓':''}</button>
+        <label  class="ph-src-btn${hasCus?' active':''}">📂${hasCus?' ✓':''}
+          <input type="file" accept="audio/*" style="display:none" onchange="setPhCustom('${field}',${pi},${cardIdx},this)">
         </label>
       </div>
     </div>`;
   }).join('');
-
   return `<div class="phoneme-list" id="ph-list-${field}-${cardIdx}">
     ${chips}
     <div class="ph-add-row">
-      <input class="ph-add-input" id="ph-input-${field}-${cardIdx}"
-        placeholder="ɛ" title="IPA symbol"
+      <input class="ph-add-input" id="ph-input-${field}-${cardIdx}" placeholder="ɛ" title="IPA symbol"
         onkeydown="if(event.key==='Enter'){addPhoneme('${field}',${cardIdx});event.preventDefault();}">
-      <button class="btn sm gold" onclick="addPhoneme('${field}',${cardIdx})">＋ Add</button>
+      <button class="btn sm gold" onclick="addPhoneme('${field}',${cardIdx})">＋</button>
     </div>
   </div>`;
 }
 
+function addPhoneme(field, cardIdx) {
+  const input = document.getElementById(`ph-input-${field}-${cardIdx}`);
+  const sym = input.value.trim(); if (!sym) return;
+  if (!cards[cardIdx][field]) cards[cardIdx][field] = [];
+  cards[cardIdx][field].push({ s:sym, audio:'', audioSrc:'jp' });
+  input.value = ''; markDirty(); renderEditor();
+}
+function removePhoneme(field, pi, cardIdx) {
+  cards[cardIdx][field].splice(pi, 1); markDirty(); renderEditor();
+}
 function setPhSrc(field, pi, cardIdx, src, url) {
   if (!cards[cardIdx][field]) return;
   cards[cardIdx][field][pi].audioSrc = src;
   cards[cardIdx][field][pi].audio    = url;
-  markDirty();
-  renderEditor();
+  markDirty(); renderEditor();
 }
-
 async function genPhEl(field, pi, cardIdx, symbol) {
   const key = document.getElementById('el-key').value.trim();
   if (!key) { toast('⚠️ Enter ElevenLabs API key first'); return; }
-  toast(`🎙 Generating phoneme "${symbol}"…`);
+  toast(`🎙 Generating "${symbol}"…`);
   const blob = await elTTS(symbol);
   if (!blob) return;
   const url = URL.createObjectURL(blob);
   if (!cards[cardIdx][field]) return;
   cards[cardIdx][field][pi].audio    = url;
   cards[cardIdx][field][pi].audioSrc = 'el';
-  markDirty();
-  renderEditor();
-  toast(`✅ Phoneme "${symbol}" ready`);
+  markDirty(); renderEditor(); toast(`✅ "${symbol}" ready`);
 }
-
 function setPhCustom(field, pi, cardIdx, input) {
-  const file = input.files[0];
-  if (!file) return;
+  const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
     if (!cards[cardIdx][field]) return;
     cards[cardIdx][field][pi].audio    = e.target.result;
     cards[cardIdx][field][pi].audioSrc = 'custom';
-    markDirty();
-    renderEditor();
-    toast('✅ Custom audio uploaded');
+    markDirty(); renderEditor(); toast('✅ Custom audio uploaded');
   };
   reader.readAsDataURL(file);
 }
 
-/* ── Audio section ── */
+/* ═══════════════════════════════════
+   AUDIO SECTION
+═══════════════════════════════════ */
 function buildAudioSection(card, i, type) {
   const rows = type === 'single'
-    ? [
-        { key:'audioWord',     label:'Word audio',     text: card.word,     field:'audioWord'     },
-        { key:'audioSentence', label:'Sentence audio', text: card.sentence, field:'audioSentence' },
-        ...(card.phonemes||[]).map((ph,pi) => ({
-          key:`audioPh_${pi}`, label:`Phoneme "${ph.s}"`, text:ph.s, field:`audioPh[${pi}]`
-        }))
-      ]
-    : [
-        { key:'audio1Word',     label:'Word 1 audio',     text:card.word1,     field:'audio1Word'     },
-        { key:'audio1Sentence', label:'Sentence 1 audio', text:card.sentence1, field:'audio1Sentence' },
-        { key:'audio2Word',     label:'Word 2 audio',     text:card.word2,     field:'audio2Word'     },
-        { key:'audio2Sentence', label:'Sentence 2 audio', text:card.sentence2, field:'audio2Sentence' },
-        ...(card.phonemes1||[]).map((ph,pi) => ({
-          key:`audio1Ph_${pi}`, label:`Ph1 "${ph.s}"`, text:ph.s, field:`audio1Ph[${pi}]`
-        })),
-        ...(card.phonemes2||[]).map((ph,pi) => ({
-          key:`audio2Ph_${pi}`, label:`Ph2 "${ph.s}"`, text:ph.s, field:`audio2Ph[${pi}]`
-        }))
-      ];
+    ? [ { key:'audioWord', label:'Word audio', text:card.word },
+        { key:'audioSentence', label:'Sentence audio', text:card.sentence },
+        ...(card.phonemes||[]).map((ph,pi) => ({ key:`audioPh_${pi}`, label:`Phoneme "${ph.s}"`, text:ph.s })) ]
+    : [ { key:'audio1Word', label:`${card.word1} audio`, text:card.word1 },
+        { key:'audio1Sentence', label:`${card.word1} sentence`, text:card.sentence1 },
+        { key:'audio2Word', label:`${card.word2} audio`, text:card.word2 },
+        { key:'audio2Sentence', label:`${card.word2} sentence`, text:card.sentence2 },
+        ...(card.phonemes1||[]).map((ph,pi) => ({ key:`audio1Ph_${pi}`, label:`${card.word1} "${ph.s}"`, text:ph.s })),
+        ...(card.phonemes2||[]).map((ph,pi) => ({ key:`audio2Ph_${pi}`, label:`${card.word2} "${ph.s}"`, text:ph.s })) ];
 
   const rowsHtml = rows.map(r => {
-    const hasAudio = audioBlobs[`${i}_${r.key}`];
+    const blobKey = `${i}_${r.key}`;
+    const has = !!audioBlobs[blobKey];
     return `<div class="el-audio-row">
       <span class="el-audio-label">${r.label}</span>
       <span class="el-audio-text">${esc(r.text||'—')}</span>
-      <span class="el-status ${hasAudio?'ready':'missing'}" id="el-status-${i}-${r.key}">
-        ${hasAudio ? '✓ ready' : '○ missing'}
-      </span>
+      <span class="el-status ${has?'ready':'missing'}" id="el-st-${i}-${r.key}">${has?'✓ ready':'○ missing'}</span>
       <button class="btn sm" onclick="generateOne(${i},'${r.key}','${esc(r.text||'')}')">🎙</button>
-      ${hasAudio ? `<button class="btn sm sage" onclick="playBlob('${i}_${r.key}')">▶</button>` : ''}
+      ${has?`<button class="btn sm sage" onclick="playBlob('${blobKey}')">▶</button>`:''}
     </div>`;
   }).join('');
 
   return `<div class="el-section">
     <div class="el-head">
       <span class="el-head-title">🎙 ElevenLabs Audio</span>
-      <button class="btn sm coral" onclick="generateCardAudio(${i})">Generate all for this card</button>
+      <button class="btn sm coral" onclick="generateCardAudio(${i})">Generate all</button>
     </div>
     <div class="el-audio-list">${rowsHtml}</div>
   </div>`;
 }
 
-/* ── Bind editor events ── */
+/* ═══════════════════════════════════
+   BIND FIELDS
+═══════════════════════════════════ */
 function bindEditorEvents(card, i) {
-  // Text / select fields
   document.querySelectorAll('[data-field]').forEach(el => {
-    el.addEventListener('input', () => {
+    const ev = el.tagName === 'SELECT' ? 'change' : 'input';
+    el.addEventListener(ev, () => {
       cards[i][el.dataset.field] = el.value;
-      markDirty();
-      renderSidebar();
-    });
-    el.addEventListener('change', () => {
-      cards[i][el.dataset.field] = el.value;
-      markDirty();
-      renderSidebar();
+      markDirty(); renderSidebar();
     });
   });
 }
 
-/* ═══════════════════════════════════════
-   IMAGE UPLOAD
-═══════════════════════════════════════ */
-function handleImageUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const field    = input.dataset.imgfield;
-  const cardIdx  = parseInt(input.dataset.cardidx);
-  const reader   = new FileReader();
-  reader.onload  = e => {
-    cards[cardIdx][field] = e.target.result;
-    markDirty();
-    // Update preview
-    const wrapper = input.closest('.img-upload');
-    wrapper.innerHTML = `<input type="file" accept="image/*" data-imgfield="${field}" data-cardidx="${cardIdx}" onchange="handleImageUpload(this)">
-      <img class="img-upload-preview" src="${e.target.result}" style="display:block;width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:8px;" alt="">`;
-    wrapper.querySelector('input').addEventListener('change', function(){ handleImageUpload(this); });
-  };
-  reader.readAsDataURL(file);
-}
-
-/* ═══════════════════════════════════════
-   PHONEMES
-═══════════════════════════════════════ */
-function addPhoneme(field, cardIdx) {
-  const input = document.getElementById(`ph-input-${field}-${cardIdx}`);
-  const sym = input.value.trim();
-  if (!sym) return;
-  if (!cards[cardIdx][field]) cards[cardIdx][field] = [];
-  cards[cardIdx][field].push({ s: sym, audio: '', audioSrc: 'jp' });
-  input.value = '';
-  markDirty();
-  renderEditor();
-}
-
-function removePhoneme(field, pi, cardIdx) {
-  cards[cardIdx][field].splice(pi, 1);
-  markDirty();
-  renderEditor();
-}
-
-/* ═══════════════════════════════════════
-   ELEVENLABS AUDIO
-═══════════════════════════════════════ */
-async function elTTS(text, voiceId) {
+/* ═══════════════════════════════════
+   ELEVENLABS
+═══════════════════════════════════ */
+async function elTTS(text) {
   const key = document.getElementById('el-key').value.trim();
   if (!key) { toast('⚠️ Enter ElevenLabs API key first'); return null; }
-  const vid = voiceId || 'EXAVITQu4vr4xnSDxMaL'; // Sarah — clear, warm
-  const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`, {
+  const resp = await fetch('https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL', {
     method: 'POST',
     headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      text,
-      model_id: 'eleven_flash_v2',
-      voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 0.85 }
-    })
+    body: JSON.stringify({ text, model_id:'eleven_flash_v2', voice_settings:{ stability:0.5, similarity_boost:0.75, speed:0.85 } })
   });
   if (!resp.ok) { toast('❌ ElevenLabs error: ' + resp.status); return null; }
-  return await resp.blob();
+  return resp.blob();
 }
 
 async function generateOne(cardIdx, key, text) {
-  if (!text || text === '—') { toast('No text to generate'); return; }
+  if (!text || text==='—') { toast('No text'); return; }
   updateElStatus(cardIdx, key, 'loading');
   const blob = await elTTS(text);
   if (!blob) { updateElStatus(cardIdx, key, 'missing'); return; }
   const blobKey = `${cardIdx}_${key}`;
   audioBlobs[blobKey] = URL.createObjectURL(blob);
-  storeAudioOnCard(cardIdx, key, audioBlobs[blobKey]);
   updateElStatus(cardIdx, key, 'ready');
-  toast(`✓ Audio ready: ${text}`);
+  toast(`✓ ${text}`);
 }
 
 async function generateCardAudio(cardIdx) {
   const card = cards[cardIdx];
-  toast('🎙 Generating audio…');
   const jobs = card.type === 'single'
-    ? [
-        { key:'audioWord',     text: card.word     },
-        { key:'audioSentence', text: card.sentence },
-        ...(card.phonemes||[]).map((ph,pi) => ({ key:`audioPh_${pi}`, text:ph.s }))
-      ]
-    : [
-        { key:'audio1Word',     text: card.word1     },
-        { key:'audio1Sentence', text: card.sentence1 },
-        { key:'audio2Word',     text: card.word2     },
-        { key:'audio2Sentence', text: card.sentence2 },
-        ...(card.phonemes1||[]).map((ph,pi) => ({ key:`audio1Ph_${pi}`, text:ph.s })),
-        ...(card.phonemes2||[]).map((ph,pi) => ({ key:`audio2Ph_${pi}`, text:ph.s }))
-      ];
-  for (const job of jobs) {
-    await generateOne(cardIdx, job.key, job.text);
-    await sleep(300); // rate limit buffer
-  }
-  toast('✅ All audio generated for this card');
-  renderEditor();
+    ? [ {key:'audioWord',text:card.word}, {key:'audioSentence',text:card.sentence},
+        ...(card.phonemes||[]).map((ph,pi)=>({key:`audioPh_${pi}`,text:ph.s})) ]
+    : [ {key:'audio1Word',text:card.word1}, {key:'audio1Sentence',text:card.sentence1},
+        {key:'audio2Word',text:card.word2}, {key:'audio2Sentence',text:card.sentence2},
+        ...(card.phonemes1||[]).map((ph,pi)=>({key:`audio1Ph_${pi}`,text:ph.s})),
+        ...(card.phonemes2||[]).map((ph,pi)=>({key:`audio2Ph_${pi}`,text:ph.s})) ];
+  toast('🎙 Generating…');
+  for (const job of jobs) { await generateOne(cardIdx, job.key, job.text); await sleep(300); }
+  toast('✅ Done'); renderEditor();
 }
 
 async function generateAllAudio() {
-  toast('🎙 Generating all audio — this may take a moment…');
-  for (let i = 0; i < cards.length; i++) {
-    await generateCardAudio(i);
-  }
+  toast('🎙 Generating all audio…');
+  for (let i = 0; i < cards.length; i++) await generateCardAudio(i);
   toast('✅ All audio complete');
 }
 
-function storeAudioOnCard(cardIdx, key, url) {
-  // Store blob URL on card for export reference
-  cards[cardIdx]['_audio_' + key] = url;
-}
-
 function updateElStatus(cardIdx, key, state) {
-  const el = document.getElementById(`el-status-${cardIdx}-${key}`);
+  const el = document.getElementById(`el-st-${cardIdx}-${key}`);
   if (!el) return;
   el.className = `el-status ${state}`;
-  el.textContent = state === 'loading' ? '⏳ …' : state === 'ready' ? '✓ ready' : '○ missing';
+  el.textContent = state==='loading'?'⏳ …':state==='ready'?'✓ ready':'○ missing';
 }
 
-function playBlob(blobKey) {
-  const url = audioBlobs[blobKey];
-  if (url) new Audio(url).play();
-}
+function playBlob(blobKey) { if (audioBlobs[blobKey]) new Audio(audioBlobs[blobKey]).play(); }
 
-/* ═══════════════════════════════════════
-   EXPORT
-═══════════════════════════════════════ */
+/* ═══════════════════════════════════
+   EXPORT / PUSH
+═══════════════════════════════════ */
 function buildDeckJSON() {
   const lessonName = document.getElementById('lesson-name').value;
-  const exportCards = cards.map(card => {
+  const exportCards = cards.map((card, ci) => {
     if (card.type === 'single') {
-      const out = {
-        type: 'single',
-        tier: card.tier,
-        word: card.word,
-        emoji: card.emoji,
-        sentence: card.sentence,
-        phonemes: (card.phonemes || []).map((ph, pi) => ({
-          s: ph.s,
-          audio: ph.audio || audioBlobs[`${cards.indexOf(card)}_audioPh_${pi}`] || '',
-          audioSrc: ph.audioSrc || 'jp'
-        })),
-        wordAudio:     audioBlobs[`${cards.indexOf(card)}_audioWord`]     || '',
-        sentenceAudio: audioBlobs[`${cards.indexOf(card)}_audioSentence`] || '',
-      };
-      if (card.image)         out.image = card.image;
-      if (card.illustration)  out.illustration = card.illustration;
-      if (card.videoUrl)      out.video = { url: card.videoUrl, title: card.videoTitle||'', subtitle: card.videoSub||'' };
+      const out = { type:'single', tier:card.tier, word:card.word, emoji:card.emoji, sentence:card.sentence,
+        phonemes:(card.phonemes||[]).map((ph,pi)=>({ s:ph.s, audio:ph.audio||audioBlobs[`${ci}_audioPh_${pi}`]||'', audioSrc:ph.audioSrc||'jp' })),
+        wordAudio:     audioBlobs[`${ci}_audioWord`]||'',
+        sentenceAudio: audioBlobs[`${ci}_audioSentence`]||'' };
+      if (card.isColour)     out.isColour = true, out.swatch = card.swatch;
+      if (card.image)        out.image = card.image;
+      if (card.illustration) out.illustration = card.illustration;
+      if (card.videoUrl)     out.video = { url:card.videoUrl, title:card.videoTitle||'', subtitle:card.videoSub||'' };
       return out;
     } else {
-      const ci = cards.indexOf(card);
-      const out = {
-        type: 'pair',
-        tier: card.tier,
-        word1: card.word1, word2: card.word2,
-        emoji1: card.emoji1, emoji2: card.emoji2,
-        sentence1: card.sentence1, sentence2: card.sentence2,
-        phonemes1: (card.phonemes1||[]).map((ph,pi) => ({ s:ph.s, audio: ph.audio||audioBlobs[`${ci}_audio1Ph_${pi}`]||'', audioSrc: ph.audioSrc||'jp' })),
-        phonemes2: (card.phonemes2||[]).map((ph,pi) => ({ s:ph.s, audio: ph.audio||audioBlobs[`${ci}_audio2Ph_${pi}`]||'', audioSrc: ph.audioSrc||'jp' })),
-        wordAudio1:     audioBlobs[`${ci}_audio1Word`]     || '',
-        wordAudio2:     audioBlobs[`${ci}_audio2Word`]     || '',
-        sentenceAudio1: audioBlobs[`${ci}_audio1Sentence`] || '',
-        sentenceAudio2: audioBlobs[`${ci}_audio2Sentence`] || '',
-      };
-      if (card.image1)       out.image1 = card.image1;
-      if (card.image2)       out.image2 = card.image2;
+      const out = { type:'pair', tier:card.tier,
+        word1:card.word1, word2:card.word2, emoji1:card.emoji1, emoji2:card.emoji2,
+        sentence1:card.sentence1, sentence2:card.sentence2,
+        phonemes1:(card.phonemes1||[]).map((ph,pi)=>({ s:ph.s, audio:ph.audio||audioBlobs[`${ci}_audio1Ph_${pi}`]||'', audioSrc:ph.audioSrc||'jp' })),
+        phonemes2:(card.phonemes2||[]).map((ph,pi)=>({ s:ph.s, audio:ph.audio||audioBlobs[`${ci}_audio2Ph_${pi}`]||'', audioSrc:ph.audioSrc||'jp' })),
+        wordAudio1:     audioBlobs[`${ci}_audio1Word`]||'',
+        wordAudio2:     audioBlobs[`${ci}_audio2Word`]||'',
+        sentenceAudio1: audioBlobs[`${ci}_audio1Sentence`]||'',
+        sentenceAudio2: audioBlobs[`${ci}_audio2Sentence`]||'' };
+      if (card.word2note)     out.word2note = card.word2note;
+      if (card.image1)        out.image1 = card.image1;
+      if (card.image2)        out.image2 = card.image2;
       if (card.illustration1) out.illustration1 = card.illustration1;
       if (card.illustration2) out.illustration2 = card.illustration2;
-      if (card.video1Url)    out.video1 = { url:card.video1Url, title:card.video1Title||'', subtitle:card.video1Sub||'' };
-      if (card.video2Url)    out.video2 = { url:card.video2Url, title:card.video2Title||'', subtitle:card.video2Sub||'' };
+      if (card.video1Url)     out.video1 = { url:card.video1Url, title:card.video1Title||'', subtitle:card.video1Sub||'' };
+      if (card.video2Url)     out.video2 = { url:card.video2Url, title:card.video2Title||'', subtitle:card.video2Sub||'' };
       return out;
     }
   });
@@ -1176,92 +747,56 @@ function buildDeckJSON() {
 
 function openExport() {
   const deck = buildDeckJSON();
-  const js = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
-  document.getElementById('export-pre').textContent = js;
+  document.getElementById('export-pre').textContent = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
   document.getElementById('export-modal').classList.add('open');
 }
 function closeExport() { document.getElementById('export-modal').classList.remove('open'); }
-function copyExport() {
-  const text = document.getElementById('export-pre').textContent;
-  navigator.clipboard.writeText(text).then(() => toast('📋 Copied!'));
-}
+function copyExport() { navigator.clipboard.writeText(document.getElementById('export-pre').textContent).then(()=>toast('📋 Copied!')); }
 
-/* ═══════════════════════════════════════
-   GITHUB PUSH
-═══════════════════════════════════════ */
 async function pushToGitHub() {
   const pat  = document.getElementById('gh-pat').value.trim();
   const repo = document.getElementById('gh-repo').value.trim();
   const path = document.getElementById('gh-path').value.trim();
-  if (!pat || !repo || !path) { toast('⚠️ Fill in GitHub fields first'); return; }
-
-  toast('⏳ Fetching current file…');
-
-  // Get current SHA
-  let sha = '';
+  if (!pat||!repo||!path) { toast('⚠️ Fill in GitHub fields first'); return; }
+  toast('⏳ Fetching primer…');
+  let sha = '', primerHTML = '';
   try {
-    const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`,
-      { headers: { Authorization: `token ${pat}` } });
-    if (r.ok) { const d = await r.json(); sha = d.sha; }
-  } catch(e) {}
+    const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { headers:{Authorization:`token ${pat}`} });
+    const d = await r.json(); sha = d.sha;
+    primerHTML = atob(d.content.replace(/\n/g,''));
+  } catch(e) { toast('❌ Could not fetch primer'); return; }
 
-  // Fetch current primer HTML
-  toast('⏳ Building updated primer…');
-  let primerHTML = '';
-  try {
-    const r = await fetch(`https://raw.githubusercontent.com/${repo}/main/${path}`);
-    primerHTML = await r.text();
-  } catch(e) { toast('❌ Could not fetch primer HTML'); return; }
+  const deck    = buildDeckJSON();
+  const newJS   = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
+  const updated = primerHTML.replace(/const DECK = \{[\s\S]*?\};/, newJS);
+  if (updated === primerHTML) { toast('⚠️ Could not locate DECK — export manually'); return; }
 
-  // Replace the DECK object
-  const deck   = buildDeckJSON();
-  const newJS  = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
-  const updated = primerHTML.replace(/const DECK = \{[\s\S]*?\};(\s*\/\*|$)/, newJS + '\n');
-
-  if (updated === primerHTML) { toast('⚠️ Could not locate DECK in primer — export manually'); return; }
-
-  // Push
-  // btoa fails on multibyte chars (e.g. emoji in dataURLs) — use TextEncoder
   const encoded = new TextEncoder().encode(updated);
-  // Chunk to avoid call stack limit on large files
   let binary = '';
-  const bytes = new Uint8Array(encoded);
-  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  new Uint8Array(encoded).forEach(b => binary += String.fromCharCode(b));
   const content = btoa(binary);
-  const payload = { message: 'Builder: update DECK data', content, ...(sha ? { sha } : {}) };
 
-  toast('⏳ Pushing to GitHub…');
+  toast('⏳ Pushing…');
   const resp = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-    method: 'PUT',
-    headers: { Authorization: `token ${pat}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    method:'PUT', headers:{Authorization:`token ${pat}`,'Content-Type':'application/json'},
+    body: JSON.stringify({ message:'Builder: update DECK', content, sha })
   });
-
-  if (resp.ok) {
-    dirty = false;
-    toast('✅ Pushed! Live in ~30 seconds.');
-  } else {
-    const err = await resp.json();
-    toast('❌ Push failed: ' + (err.message || resp.status));
-  }
+  if (resp.ok) { dirty=false; toast('✅ Pushed! Live in ~30s.'); }
+  else { const err=await resp.json(); toast('❌ '+( err.message||resp.status)); }
 }
 
-/* ═══════════════════════════════════════
+/* ═══════════════════════════════════
    UTILS
-═══════════════════════════════════════ */
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+═══════════════════════════════════ */
+function esc(str) { return str ? String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 function markDirty() { dirty = true; }
-function sleep(ms)   { return new Promise(r => setTimeout(r, ms)); }
-
-let toastTimer;
+function sleep(ms)   { return new Promise(r=>setTimeout(r,ms)); }
+let _toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>el.classList.remove('show'), 3200);
 }
 
 /* ── Boot ── */
