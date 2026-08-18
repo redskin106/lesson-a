@@ -1428,11 +1428,28 @@ const PHONEME_FILE = {
 // IPA symbol → Jolly Phonics grapheme (for primer's IPA-keyed phonemes)
 const IPA_TO_JP = {
   // vowels
-  'æ':'a', 'ɑː':'ar', 'ɒ':'o', 'ɔː':'or', 'ə':'e', 'əʊ':'oa',
-  'eɪ':'ai', 'iː':'ee', 'ɪ':'i', 'uː':'ooo', 'ʊ':'oo',
-  'aɪ':'ie', 'aʊ':'ou', 'ɔɪ':'oi', 'ɜː':'er', 'ʌ':'u',
-  'juː':'ue', 'eə':'air', 'ɪə':'ear',
-  // consonants (IPA = grapheme)
+  'æ':'a',    // CAT  → sound_a.mp3
+  'ɑː':'ar',  // CAR  → sound_ar.mp3
+  'ɒ':'o',    // LOT  → sound_o.mp3
+  'ɔː':'or',  // CORN → sound_or.mp3
+  'ə':'e',    // schwa → sound_e.mp3 (closest available)
+  'ɛ':'e',    // BED/PEN/HEAVY → sound_e.mp3
+  'əʊ':'oa',  // GOAT → sound_oa.mp3
+  'eɪ':'ai',  // FACE → sound_ai.mp3
+  'iː':'ee',  // FLEECE → sound_ee.mp3
+  'ɪ':'i',    // KIT  → sound_i.mp3
+  'i':'i',    // unstressed final (happy) → sound_i.mp3
+  'uː':'ooo', // GOOSE (long) → sound_ooo.mp3
+  'ʊ':'oo',   // FOOT (short) → sound_oo.mp3  ← was wrongly ooo
+  'aɪ':'ie',  // PRICE → sound_ie.mp3
+  'aʊ':'ou',  // MOUTH → sound_ou.mp3
+  'ɔɪ':'oi',  // CHOICE → sound_oi.mp3
+  'ɜː':'er',  // NURSE → sound_er.mp3
+  'ʌ':'u',    // STRUT → sound_u.mp3
+  'juː':'ue', // CUTE → sound_ue.mp3
+  'eə':'ar',  // SQUARE → sound_ar.mp3 (closest)
+  'ɪə':'ar',  // NEAR → sound_ar.mp3 (closest)
+  // consonants
   'b':'b','d':'d','f':'f','g':'g','h':'h','j':'j','k':'k',
   'l':'l','m':'m','n':'n','p':'p','r':'r','s':'s','t':'t',
   'v':'v','w':'w','x':'x','y':'y','z':'z',
