@@ -183,17 +183,12 @@ html, body {
 
 /* Word hero */
 .word-hero {
-  position: relative; text-align: center; padding: 4px 0;
+  text-align: center; padding: 4px 0;
 }
-.word-ghost {
-  font-family: 'Fraunces', serif;
-  font-size: clamp(54px, 17vw, 80px); font-weight: 700;
-  color: rgba(240,234,216,0.04); line-height: 1;
-  letter-spacing: -0.03em; user-select: none;
-}
+.word-ghost { display: none; }
 .word-main {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 8px 0;
 }
 .word-text {
   font-family: 'Fraunces', serif;
@@ -1432,7 +1427,7 @@ const IPA_TO_JP = {
   'ɑː':'ar',  // CAR  → sound_ar.mp3
   'ɒ':'o',    // LOT  → sound_o.mp3
   'ɔː':'or',  // CORN → sound_or.mp3
-  'ə':'e',    // schwa → sound_e.mp3 (closest available)
+  'ə':'er',   // schwa → sound_er.mp3 (unstressed central, closer to 'butter' than 'egg')
   'ɛ':'e',    // BED/PEN/HEAVY → sound_e.mp3
   'əʊ':'oa',  // GOAT → sound_oa.mp3
   'eɪ':'ai',  // FACE → sound_ai.mp3
@@ -1448,7 +1443,7 @@ const IPA_TO_JP = {
   'ʌ':'u',    // STRUT → sound_u.mp3
   'juː':'ue', // CUTE → sound_ue.mp3
   'eə':'ar',  // SQUARE → sound_ar.mp3 (closest)
-  'ɪə':'ar',  // NEAR → sound_ar.mp3 (closest)
+  'ɪə':'er',  // NEAR → sound_er.mp3 (closer than ar)
   // consonants
   'b':'b','d':'d','f':'f','g':'g','h':'h','j':'j','k':'k',
   'l':'l','m':'m','n':'n','p':'p','r':'r','s':'s','t':'t',
