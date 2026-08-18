@@ -40,6 +40,16 @@ html, body {
 .screen.active { display: flex; }
 ::-webkit-scrollbar { width: 0; }
 
+/* ── Colour swatch ── */
+.colour-swatch {
+  width: 100%; aspect-ratio: 1/1; border-radius: var(--rcard) var(--rcard) 0 0;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.gc-swatch {
+  width: 100%; min-height: 60px; flex: 1;
+  border-radius: var(--rcard) var(--rcard) 0 0;
+}
+
 /* ── Shared ── */
 .slabel {
   font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
@@ -635,7 +645,7 @@ const DECK = {
       "emoji1": "📦",
       "emoji2": "📎",
       "sentence1": "The box is big.",
-      "sentence2": "A paper clip is small.",
+      "sentence2": "The coin is small.",
       "phonemes1": [
         {
           "s": "b"
@@ -669,12 +679,54 @@ const DECK = {
     {
       "type": "pair",
       "tier": "bronze",
+      "word1": "round",
+      "word2": "flat",
+      "emoji1": "⚽",
+      "emoji2": "📄",
+      "sentence1": "The ball is round.",
+      "sentence2": "The book is flat.",
+      "phonemes1": [
+        {
+          "s": "r"
+        },
+        {
+          "s": "aʊ"
+        },
+        {
+          "s": "n"
+        },
+        {
+          "s": "d"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "f"
+        },
+        {
+          "s": "l"
+        },
+        {
+          "s": "æ"
+        },
+        {
+          "s": "t"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "bronze",
       "word1": "old",
       "word2": "new",
-      "emoji1": "📰",
-      "emoji2": "✨",
-      "sentence1": "This newspaper is old.",
-      "sentence2": "My pen is new.",
+      "emoji1": "🗝️",
+      "emoji2": "🖊️",
+      "sentence1": "The key is old.",
+      "sentence2": "The pen is new.",
       "phonemes1": [
         {
           "s": "əʊ"
@@ -743,13 +795,49 @@ const DECK = {
     },
     {
       "type": "pair",
-      "tier": "bronze",
+      "tier": "silver",
+      "word1": "long",
+      "word2": "short",
+      "emoji1": "📏",
+      "emoji2": "✏️",
+      "sentence1": "The bottle is long.",
+      "sentence2": "The coin is short.",
+      "phonemes1": [
+        {
+          "s": "l"
+        },
+        {
+          "s": "ɒ"
+        },
+        {
+          "s": "ŋ"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "ʃ"
+        },
+        {
+          "s": "ɔː"
+        },
+        {
+          "s": "t"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "silver",
       "word1": "full",
       "word2": "empty",
       "emoji1": "🥛",
       "emoji2": "🪣",
-      "sentence1": "The bottle is full.",
-      "sentence2": "The cup is empty.",
+      "sentence1": "The cup is full.",
+      "sentence2": "The bottle is empty.",
       "phonemes1": [
         {
           "s": "f"
@@ -785,147 +873,17 @@ const DECK = {
     },
     {
       "type": "pair",
-      "tier": "bronze",
-      "word1": "round",
-      "word2": "flat",
-      "emoji1": "⚽",
-      "emoji2": "📄",
-      "sentence1": "A ball is round.",
-      "sentence2": "A piece of paper is flat.",
-      "phonemes1": [
-        {
-          "s": "r"
-        },
-        {
-          "s": "aʊ"
-        },
-        {
-          "s": "n"
-        },
-        {
-          "s": "d"
-        }
-      ],
-      "phonemes2": [
-        {
-          "s": "f"
-        },
-        {
-          "s": "l"
-        },
-        {
-          "s": "æ"
-        },
-        {
-          "s": "t"
-        }
-      ],
-      "wordAudio1": "",
-      "wordAudio2": "",
-      "sentenceAudio1": "",
-      "sentenceAudio2": ""
-    },
-    {
-      "type": "pair",
-      "tier": "bronze",
-      "word1": "heavy",
-      "word2": "light",
-      "emoji1": "🎒",
-      "emoji2": "🪶",
-      "sentence1": "This school bag is heavy.",
-      "sentence2": "A feather is light.",
-      "phonemes1": [
-        {
-          "s": "h"
-        },
-        {
-          "s": "ɛ"
-        },
-        {
-          "s": "v"
-        },
-        {
-          "s": "i"
-        }
-      ],
-      "phonemes2": [
-        {
-          "s": "l"
-        },
-        {
-          "s": "aɪ"
-        },
-        {
-          "s": "t"
-        }
-      ],
-      "wordAudio1": "",
-      "wordAudio2": "",
-      "sentenceAudio1": "",
-      "sentenceAudio2": "",
-      "video1": {
-        "url": "",
-        "title": "Lifting a heavy bag",
-        "subtitle": "See what heavy feels like"
-      }
-    },
-    {
-      "type": "pair",
       "tier": "silver",
-      "word1": "long",
-      "word2": "short",
-      "emoji1": "📏",
-      "emoji2": "✏️",
-      "sentence1": "The ruler is long.",
-      "sentence2": "The pencil is short.",
+      "word1": "square",
+      "word2": "straight",
+      "emoji1": "📐",
+      "emoji2": "📏",
+      "sentence1": "The box is square.",
+      "sentence2": "The pen is straight.",
       "phonemes1": [
         {
-          "s": "l"
+          "s": "s"
         },
-        {
-          "s": "ɒ"
-        },
-        {
-          "s": "ŋ"
-        }
-      ],
-      "phonemes2": [
-        {
-          "s": "ʃ"
-        },
-        {
-          "s": "ɔː"
-        },
-        {
-          "s": "t"
-        }
-      ],
-      "wordAudio1": "",
-      "wordAudio2": "",
-      "sentenceAudio1": "",
-      "sentenceAudio2": ""
-    },
-    {
-      "type": "pair",
-      "tier": "silver",
-      "word1": "loud",
-      "word2": "quiet",
-      "emoji1": "📣",
-      "emoji2": "🤫",
-      "sentence1": "The music is loud.",
-      "sentence2": "The library is quiet.",
-      "phonemes1": [
-        {
-          "s": "l"
-        },
-        {
-          "s": "aʊ"
-        },
-        {
-          "s": "d"
-        }
-      ],
-      "phonemes2": [
         {
           "s": "k"
         },
@@ -933,137 +891,122 @@ const DECK = {
           "s": "w"
         },
         {
-          "s": "aɪ"
+          "s": "ɛ"
+        },
+        {
+          "s": "r"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "s"
+        },
+        {
+          "s": "t"
+        },
+        {
+          "s": "r"
+        },
+        {
+          "s": "eɪ"
+        },
+        {
+          "s": "t"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "silver",
+      "word1": "beautiful",
+      "word2": "ugly",
+      "emoji1": "🌸",
+      "emoji2": "🗑️",
+      "sentence1": "The bag is beautiful.",
+      "sentence2": "It's not beautiful. It's ugly.",
+      "phonemes1": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "juː"
+        },
+        {
+          "s": "t"
         },
         {
           "s": "ɪ"
         },
         {
-          "s": "t"
-        }
-      ],
-      "wordAudio1": "",
-      "wordAudio2": "",
-      "sentenceAudio1": "",
-      "sentenceAudio2": ""
-    },
-    {
-      "type": "pair",
-      "tier": "silver",
-      "word1": "hot",
-      "word2": "cold",
-      "emoji1": "☀️",
-      "emoji2": "🧊",
-      "sentence1": "The cup of tea is hot.",
-      "sentence2": "The bottle of water is cold.",
-      "phonemes1": [
-        {
-          "s": "h"
+          "s": "f"
         },
         {
-          "s": "ɒ"
-        },
-        {
-          "s": "t"
+          "s": "l"
         }
       ],
       "phonemes2": [
         {
-          "s": "k"
+          "s": "ʌ"
         },
         {
-          "s": "əʊ"
+          "s": "g"
         },
         {
           "s": "l"
         },
         {
-          "s": "d"
-        }
-      ],
-      "wordAudio1": "",
-      "wordAudio2": "",
-      "sentenceAudio1": "",
-      "sentenceAudio2": ""
-    },
-    {
-      "type": "pair",
-      "tier": "silver",
-      "word1": "fast",
-      "word2": "slow",
-      "emoji1": "🚀",
-      "emoji2": "🐢",
-      "sentence1": "The phone is fast.",
-      "sentence2": "The computer is slow.",
-      "phonemes1": [
-        {
-          "s": "f"
-        },
-        {
-          "s": "ɑː"
-        },
-        {
-          "s": "s"
-        },
-        {
-          "s": "t"
-        }
-      ],
-      "phonemes2": [
-        {
-          "s": "s"
-        },
-        {
-          "s": "l"
-        },
-        {
-          "s": "əʊ"
-        }
-      ],
-      "wordAudio1": "",
-      "wordAudio2": "",
-      "sentenceAudio1": "",
-      "sentenceAudio2": ""
-    },
-    {
-      "type": "pair",
-      "tier": "gold",
-      "word1": "hard",
-      "word2": "soft",
-      "emoji1": "🧱",
-      "emoji2": "🧽",
-      "sentence1": "The brick wall is hard.",
-      "sentence2": "The sponge feels soft.",
-      "phonemes1": [
-        {
-          "s": "h"
-        },
-        {
-          "s": "ɑː"
-        },
-        {
-          "s": "d"
-        }
-      ],
-      "phonemes2": [
-        {
-          "s": "s"
-        },
-        {
-          "s": "ɒ"
-        },
-        {
-          "s": "f"
-        },
-        {
-          "s": "t"
+          "s": "i"
         }
       ],
       "wordAudio1": "",
       "wordAudio2": "",
       "sentenceAudio1": "",
       "sentenceAudio2": "",
-      "video2": {
+      "word2note": "A1 Movers ✅"
+    },
+    {
+      "type": "pair",
+      "tier": "gold",
+      "word1": "soft",
+      "word2": "hard",
+      "emoji1": "🧽",
+      "emoji2": "🧱",
+      "sentence1": "The bag is soft.",
+      "sentence2": "The key is hard.",
+      "phonemes1": [
+        {
+          "s": "s"
+        },
+        {
+          "s": "ɒ"
+        },
+        {
+          "s": "f"
+        },
+        {
+          "s": "t"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "h"
+        },
+        {
+          "s": "ɑː"
+        },
+        {
+          "s": "d"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "video1": {
         "url": "",
         "title": "Squishing a sponge",
         "subtitle": "See what soft feels like"
@@ -1073,11 +1016,11 @@ const DECK = {
       "type": "pair",
       "tier": "gold",
       "word1": "thin",
-      "word2": "wide",
-      "emoji1": "📐",
-      "emoji2": "🛣️",
+      "word2": "thick",
+      "emoji1": "🖊️",
+      "emoji2": "📚",
       "sentence1": "The pen is thin.",
-      "sentence2": "The table is wide.",
+      "sentence2": "The book is thick.",
       "phonemes1": [
         {
           "s": "θ"
@@ -1091,19 +1034,60 @@ const DECK = {
       ],
       "phonemes2": [
         {
-          "s": "w"
+          "s": "θ"
         },
         {
-          "s": "aɪ"
+          "s": "ɪ"
         },
         {
-          "s": "d"
+          "s": "k"
         }
       ],
       "wordAudio1": "",
       "wordAudio2": "",
       "sentenceAudio1": "",
-      "sentenceAudio2": ""
+      "sentenceAudio2": "",
+      "word2note": "receptive only"
+    },
+    {
+      "type": "pair",
+      "tier": "gold",
+      "word1": "smooth",
+      "word2": "rough",
+      "emoji1": "📱",
+      "emoji2": "🪨",
+      "sentence1": "The phone screen is smooth.",
+      "sentence2": "The coin feels rough.",
+      "phonemes1": [
+        {
+          "s": "s"
+        },
+        {
+          "s": "m"
+        },
+        {
+          "s": "uː"
+        },
+        {
+          "s": "ð"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "r"
+        },
+        {
+          "s": "ʌ"
+        },
+        {
+          "s": "f"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "word2note": "receptive only"
     },
     {
       "type": "pair",
@@ -1149,45 +1133,6 @@ const DECK = {
         },
         {
           "s": "l"
-        }
-      ],
-      "wordAudio1": "",
-      "wordAudio2": "",
-      "sentenceAudio1": "",
-      "sentenceAudio2": ""
-    },
-    {
-      "type": "pair",
-      "tier": "gold",
-      "word1": "smooth",
-      "word2": "rough",
-      "emoji1": "🪞",
-      "emoji2": "🧱",
-      "sentence1": "The phone screen is smooth.",
-      "sentence2": "The brick wall feels rough.",
-      "phonemes1": [
-        {
-          "s": "s"
-        },
-        {
-          "s": "m"
-        },
-        {
-          "s": "uː"
-        },
-        {
-          "s": "ð"
-        }
-      ],
-      "phonemes2": [
-        {
-          "s": "r"
-        },
-        {
-          "s": "ʌ"
-        },
-        {
-          "s": "f"
         }
       ],
       "wordAudio1": "",
@@ -1260,7 +1205,7 @@ const DECK = {
       "tier": "bronze",
       "word": "box",
       "emoji": "📦",
-      "sentence": "The box is big and heavy.",
+      "sentence": "The box is big and square.",
       "phonemes": [
         {
           "s": "b"
@@ -1391,7 +1336,7 @@ const DECK = {
       "tier": "silver",
       "word": "coin",
       "emoji": "🪙",
-      "sentence": "I have one coin in my pocket.",
+      "sentence": "The coin is small and round.",
       "phonemes": [
         {
           "s": "k"
@@ -1445,9 +1390,371 @@ const DECK = {
       ],
       "wordAudio": "",
       "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "circle",
+      "emoji": "⭕",
+      "sentence": "It is shaped like a circle.",
+      "phonemes": [
+        {
+          "s": "s"
+        },
+        {
+          "s": "ɜː"
+        },
+        {
+          "s": "k"
+        },
+        {
+          "s": "l"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "rectangle",
+      "emoji": "▬",
+      "sentence": "It is shaped like a rectangle.",
+      "phonemes": [
+        {
+          "s": "r"
+        },
+        {
+          "s": "ɛ"
+        },
+        {
+          "s": "k"
+        },
+        {
+          "s": "t"
+        },
+        {
+          "s": "æ"
+        },
+        {
+          "s": "ŋ"
+        },
+        {
+          "s": "g"
+        },
+        {
+          "s": "l"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "triangle",
+      "emoji": "🔺",
+      "sentence": "It is shaped like a triangle.",
+      "phonemes": [
+        {
+          "s": "t"
+        },
+        {
+          "s": "r"
+        },
+        {
+          "s": "aɪ"
+        },
+        {
+          "s": "æ"
+        },
+        {
+          "s": "ŋ"
+        },
+        {
+          "s": "g"
+        },
+        {
+          "s": "l"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "gold",
+      "word": "heavy",
+      "emoji": "🎒",
+      "sentence": "The school bag is heavy.",
+      "phonemes": [
+        {
+          "s": "h"
+        },
+        {
+          "s": "ɛ"
+        },
+        {
+          "s": "v"
+        },
+        {
+          "s": "i"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "video": {
+        "url": "",
+        "title": "Lifting a heavy bag",
+        "subtitle": "See what heavy feels like"
+      }
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "red",
+      "emoji": "🔴",
+      "isColour": true,
+      "swatch": "#E53935",
+      "sentence": "The ball is red.",
+      "phonemes": [
+        {
+          "s": "r"
+        },
+        {
+          "s": "ɛ"
+        },
+        {
+          "s": "d"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "blue",
+      "emoji": "🔵",
+      "isColour": true,
+      "swatch": "#1E88E5",
+      "sentence": "The pen is blue.",
+      "phonemes": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "l"
+        },
+        {
+          "s": "uː"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "yellow",
+      "emoji": "🟡",
+      "isColour": true,
+      "swatch": "#FDD835",
+      "sentence": "The cup is yellow.",
+      "phonemes": [
+        {
+          "s": "j"
+        },
+        {
+          "s": "ɛ"
+        },
+        {
+          "s": "l"
+        },
+        {
+          "s": "əʊ"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "green",
+      "emoji": "🟢",
+      "isColour": true,
+      "swatch": "#43A047",
+      "sentence": "The bottle is green.",
+      "phonemes": [
+        {
+          "s": "g"
+        },
+        {
+          "s": "r"
+        },
+        {
+          "s": "iː"
+        },
+        {
+          "s": "n"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "black",
+      "emoji": "⚫",
+      "isColour": true,
+      "swatch": "#212121",
+      "sentence": "The phone is black.",
+      "phonemes": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "l"
+        },
+        {
+          "s": "æ"
+        },
+        {
+          "s": "k"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "white",
+      "emoji": "⚪",
+      "isColour": true,
+      "swatch": "#E0E0E0",
+      "sentence": "The chair is white.",
+      "phonemes": [
+        {
+          "s": "w"
+        },
+        {
+          "s": "aɪ"
+        },
+        {
+          "s": "t"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "pink",
+      "emoji": "🌸",
+      "isColour": true,
+      "swatch": "#E91E8C",
+      "sentence": "The bag is pink.",
+      "phonemes": [
+        {
+          "s": "p"
+        },
+        {
+          "s": "ɪ"
+        },
+        {
+          "s": "ŋ"
+        },
+        {
+          "s": "k"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "brown",
+      "emoji": "🟫",
+      "isColour": true,
+      "swatch": "#6D4C41",
+      "sentence": "The table is brown.",
+      "phonemes": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "r"
+        },
+        {
+          "s": "aʊ"
+        },
+        {
+          "s": "n"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "orange",
+      "emoji": "🟠",
+      "isColour": true,
+      "swatch": "#FF6D00",
+      "sentence": "The ball is orange.",
+      "phonemes": [
+        {
+          "s": "ɒ"
+        },
+        {
+          "s": "r"
+        },
+        {
+          "s": "ɪ"
+        },
+        {
+          "s": "n"
+        },
+        {
+          "s": "dʒ"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "gold",
+      "word": "purple",
+      "emoji": "🟣",
+      "isColour": true,
+      "swatch": "#7B1FA2",
+      "sentence": "The bag is purple.",
+      "phonemes": [
+        {
+          "s": "p"
+        },
+        {
+          "s": "ɜː"
+        },
+        {
+          "s": "p"
+        },
+        {
+          "s": "l"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
     }
   ]
-};;;
+};;;;
 
 /* ═══════════════════════════════════════════════
    STATE
@@ -1510,13 +1817,24 @@ function buildGrid() {
   }
 
   if (singleCards.length) {
-    const sLabel = document.createElement('div');
-    sLabel.style.cssText = 'grid-column:span 2;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim);padding:8px 0 4px;';
-    sLabel.textContent = 'Single words';
-    grid.appendChild(sLabel);
-
-    singleCards.forEach((card, i) => {
-      grid.appendChild(buildSingleGridCard(card, i));
+    // Group singles by category for section labels
+    const groups = [
+      { label: 'Nouns',   filter: c => !c.isColour && ['bag','ball','book','box','chair','cup','pen','phone','coin','key','table','bottle'].includes(c.word) },
+      { label: 'Shapes',  filter: c => !c.isColour && ['circle','rectangle','triangle'].includes(c.word) },
+      { label: 'Colours', filter: c => c.isColour },
+      { label: 'Gold',    filter: c => !c.isColour && c.tier === 'gold' && !['circle','rectangle','triangle'].includes(c.word) },
+    ];
+    groups.forEach(group => {
+      const cards = singleCards.filter(group.filter);
+      if (!cards.length) return;
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'grid-column:span 2;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim);padding:8px 0 4px;';
+      lbl.textContent = group.label;
+      grid.appendChild(lbl);
+      cards.forEach(card => {
+        const i = singleCards.indexOf(card);
+        grid.appendChild(buildSingleGridCard(card, i));
+      });
     });
   }
 }
@@ -1611,11 +1929,17 @@ function renderSingle() {
 
   document.getElementById('sc-word').textContent = card.word;
 
-  // Image
+  // Image — colour cards show CSS swatch
   const imgInner = document.getElementById('sc-img-inner');
-  imgInner.innerHTML = card.image
-    ? `<img src="${card.image}" alt="${card.word}" style="width:85%;height:85%;object-fit:contain;">`
-    : `<span style="font-size:90px;">${card.emoji}</span>`;
+  if (card.isColour) {
+    imgInner.style.cssText = `width:100%;height:100%;background:${card.swatch};border-radius:12px;`;
+    imgInner.innerHTML = '';
+  } else {
+    imgInner.style.cssText = '';
+    imgInner.innerHTML = card.image
+      ? `<img src="${card.image}" alt="${card.word}" style="width:85%;height:85%;object-fit:contain;">`
+      : `<span style="font-size:90px;">${card.emoji}</span>`;
+  }
 
   // Video btn
   const vBtn = document.getElementById('sc-video-btn');
@@ -1770,7 +2094,7 @@ function buildPairHalfHTML(card, side) {
   return `
   <div class="pair-card-half">
     <div class="pair-word-row">
-      <div class="pair-word-text">${word}</div>
+      <div class="pair-word-text">${word}${card['word'+side+'note'] ? `<span style="font-size:9px;color:var(--cream-dim);font-family:'Inter',sans-serif;font-weight:400;margin-left:4px;">*</span>` : ''}</div>
       <button class="pair-word-audio" onclick="playAudio(null,'${word}')">🔊</button>
     </div>
     <div class="pair-card-img">${imgContent}</div>
