@@ -598,123 +598,421 @@ html, body {
    }
 ═══════════════════════════════════════════════════ */
 const DECK = {
-  lessonName: "Objects Around Us",
-  cards: [
-    /* ── PAIRS ── */
+  "lessonName": "Objects Around Us",
+  "cards": [
     {
-      type: 'pair', tier: 'silver',
-      word1: 'heavy', word2: 'light',
-      emoji1: '🎒', emoji2: '🪶',
-      sentence1: 'This bag is heavy.',
-      sentence2: 'A feather is light.',
-      phonemes1: [{s:'h'},{s:'ɛ'},{s:'v'},{s:'i'}],
-      phonemes2: [{s:'l'},{s:'aɪ'},{s:'t'}],
-      video1: { title: 'Lifting a heavy box', subtitle: 'See what heavy feels like' }
+      "type": "pair",
+      "tier": "silver",
+      "word1": "heavy",
+      "word2": "light",
+      "emoji1": "🎒",
+      "emoji2": "🪶",
+      "sentence1": "This bag is heavy.",
+      "sentence2": "A feather is light.",
+      "phonemes1": [
+        {
+          "s": "h"
+        },
+        {
+          "s": "ɛ"
+        },
+        {
+          "s": "v"
+        },
+        {
+          "s": "i"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "l"
+        },
+        {
+          "s": "aɪ"
+        },
+        {
+          "s": "t"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "video1": {
+        "url": "",
+        "title": "Lifting a heavy box",
+        "subtitle": "See what heavy feels like"
+      }
     },
     {
-      type: 'pair', tier: 'silver',
-      word1: 'big', word2: 'small',
-      emoji1: '📦', emoji2: '📎',
-      sentence1: 'The box is big.',
-      sentence2: 'A paper clip is small.',
-      phonemes1: [{s:'b'},{s:'ɪ'},{s:'g'}],
-      phonemes2: [{s:'s'},{s:'m'},{s:'ɔː'},{s:'l'}],
+      "type": "pair",
+      "tier": "silver",
+      "word1": "big",
+      "word2": "small",
+      "emoji1": "📦",
+      "emoji2": "📎",
+      "sentence1": "The box is big.",
+      "sentence2": "A paper clip is small.",
+      "phonemes1": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "ɪ"
+        },
+        {
+          "s": "g"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "s"
+        },
+        {
+          "s": "m"
+        },
+        {
+          "s": "ɔː"
+        },
+        {
+          "s": "l"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": ""
     },
     {
-      type: 'pair', tier: 'silver',
-      word1: 'hard', word2: 'soft',
-      emoji1: '🧱', emoji2: '🧽',
-      sentence1: 'The brick is hard.',
-      sentence2: 'The sponge is soft.',
-      phonemes1: [{s:'h'},{s:'ɑː'},{s:'d'}],
-      phonemes2: [{s:'s'},{s:'ɒ'},{s:'f'},{s:'t'}],
-      video2: { title: 'Squishing a sponge', subtitle: 'See what soft feels like' }
+      "type": "pair",
+      "tier": "silver",
+      "word1": "hard",
+      "word2": "soft",
+      "emoji1": "🧱",
+      "emoji2": "🧽",
+      "sentence1": "The brick is hard.",
+      "sentence2": "The sponge is soft.",
+      "phonemes1": [
+        {
+          "s": "h"
+        },
+        {
+          "s": "ɑː"
+        },
+        {
+          "s": "d"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "s"
+        },
+        {
+          "s": "ɒ"
+        },
+        {
+          "s": "f"
+        },
+        {
+          "s": "t"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "video2": {
+        "url": "",
+        "title": "Squishing a sponge",
+        "subtitle": "See what soft feels like"
+      }
     },
     {
-      type: 'pair', tier: 'gold',
-      word1: 'old', word2: 'new',
-      emoji1: '📰', emoji2: '✨',
-      sentence1: 'This newspaper is old.',
-      sentence2: 'My pen is new.',
-      phonemes1: [{s:'əʊ'},{s:'l'},{s:'d'}],
-      phonemes2: [{s:'n'},{s:'juː'}],
-    },
-    /* ── SINGLES ── */
-    {
-      type: 'single', tier: 'bronze',
-      word: 'bag', emoji: '🎒',
-      sentence: 'My bag is on the chair.',
-      phonemes: [{s:'b'},{s:'æ'},{s:'g'}],
-    },
-    {
-      type: 'single', tier: 'bronze',
-      word: 'ball', emoji: '⚽',
-      sentence: 'The ball is round.',
-      phonemes: [{s:'b'},{s:'ɔː'},{s:'l'}],
-    },
-    {
-      type: 'single', tier: 'bronze',
-      word: 'phone', emoji: '📱',
-      sentence: 'My phone is on the table.',
-      phonemes: [{s:'f'},{s:'əʊ'},{s:'n'}],
-      video: { title: 'Using a phone', subtitle: 'See a phone in action' }
-    },
-    {
-      type: 'single', tier: 'bronze',
-      word: 'chair', emoji: '🪑',
-      sentence: 'The chair is next to the table.',
-      phonemes: [{s:'tʃ'},{s:'ɛ'},{s:'r'}],
+      "type": "pair",
+      "tier": "gold",
+      "word1": "old",
+      "word2": "new",
+      "emoji1": "📰",
+      "emoji2": "✨",
+      "sentence1": "This newspaper is old.",
+      "sentence2": "My pen is new.",
+      "phonemes1": [
+        {
+          "s": "əʊ"
+        },
+        {
+          "s": "l"
+        },
+        {
+          "s": "d"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "n"
+        },
+        {
+          "s": "juː"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": ""
     },
     {
-      type: 'single', tier: 'bronze',
-      word: 'book', emoji: '📖',
-      sentence: 'I have a book in my bag.',
-      phonemes: [{s:'b'},{s:'ʊ'},{s:'k'}],
+      "type": "single",
+      "tier": "bronze",
+      "word": "bag",
+      "emoji": "🎒",
+      "sentence": "My bag is on the chair.",
+      "phonemes": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "æ"
+        },
+        {
+          "s": "g"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
     },
     {
-      type: 'single', tier: 'bronze',
-      word: 'cup', emoji: '☕',
-      sentence: 'The cup is on the table.',
-      phonemes: [{s:'k'},{s:'ʌ'},{s:'p'}],
+      "type": "single",
+      "tier": "bronze",
+      "word": "ball",
+      "emoji": "⚽",
+      "sentence": "The ball is round.",
+      "phonemes": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "ɔː"
+        },
+        {
+          "s": "l"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
     },
     {
-      type: 'single', tier: 'silver',
-      word: 'key', emoji: '🔑',
-      sentence: 'The key is small and silver.',
-      phonemes: [{s:'k'},{s:'iː'}],
+      "type": "single",
+      "tier": "bronze",
+      "word": "phone",
+      "emoji": "📱",
+      "sentence": "My phone is on the table.",
+      "phonemes": [
+        {
+          "s": "f"
+        },
+        {
+          "s": "əʊ"
+        },
+        {
+          "s": "n"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "video": {
+        "url": "",
+        "title": "Using a phone",
+        "subtitle": "See a phone in action"
+      }
     },
     {
-      type: 'single', tier: 'silver',
-      word: 'coin', emoji: '🪙',
-      sentence: 'I have one coin in my pocket.',
-      phonemes: [{s:'k'},{s:'ɔɪ'},{s:'n'}],
+      "type": "single",
+      "tier": "bronze",
+      "word": "chair",
+      "emoji": "🪑",
+      "sentence": "The chair is next to the table.",
+      "phonemes": [
+        {
+          "s": "tʃ"
+        },
+        {
+          "s": "ɛ"
+        },
+        {
+          "s": "r"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
     },
     {
-      type: 'single', tier: 'silver',
-      word: 'bottle', emoji: '🍶',
-      sentence: 'My water bottle is empty.',
-      phonemes: [{s:'b'},{s:'ɒ'},{s:'t'},{s:'l'}],
+      "type": "single",
+      "tier": "bronze",
+      "word": "book",
+      "emoji": "📖",
+      "sentence": "I have a book in my bag.",
+      "phonemes": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "ʊ"
+        },
+        {
+          "s": "k"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
     },
     {
-      type: 'single', tier: 'gold',
-      word: 'table', emoji: '🪵',
-      sentence: 'Put your book on the table.',
-      phonemes: [{s:'t'},{s:'eɪ'},{s:'b'},{s:'l'}],
+      "type": "single",
+      "tier": "bronze",
+      "word": "cup",
+      "emoji": "☕",
+      "sentence": "The cup is on the table.",
+      "phonemes": [
+        {
+          "s": "k"
+        },
+        {
+          "s": "ʌ"
+        },
+        {
+          "s": "p"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
     },
     {
-      type: 'single', tier: 'gold',
-      word: 'box', emoji: '📦',
-      sentence: 'The box is big and heavy.',
-      phonemes: [{s:'b'},{s:'ɒ'},{s:'k'},{s:'s'}],
+      "type": "single",
+      "tier": "silver",
+      "word": "key",
+      "emoji": "🔑",
+      "sentence": "The key is small and silver.",
+      "phonemes": [
+        {
+          "s": "k"
+        },
+        {
+          "s": "iː"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
     },
     {
-      type: 'single', tier: 'gold',
-      word: 'pen', emoji: '🖊️',
-      sentence: 'I write with my pen.',
-      phonemes: [{s:'p'},{s:'ɛ'},{s:'n'}],
+      "type": "single",
+      "tier": "silver",
+      "word": "coin",
+      "emoji": "🪙",
+      "sentence": "I have one coin in my pocket.",
+      "phonemes": [
+        {
+          "s": "k"
+        },
+        {
+          "s": "ɔɪ"
+        },
+        {
+          "s": "n"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
     },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "bottle",
+      "emoji": "🍶",
+      "sentence": "My water bottle is empty.",
+      "phonemes": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "ɒ"
+        },
+        {
+          "s": "t"
+        },
+        {
+          "s": "l"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "gold",
+      "word": "table",
+      "emoji": "🪵",
+      "sentence": "Put your book on the table.",
+      "phonemes": [
+        {
+          "s": "t"
+        },
+        {
+          "s": "eɪ"
+        },
+        {
+          "s": "b"
+        },
+        {
+          "s": "l"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "gold",
+      "word": "box",
+      "emoji": "📦",
+      "sentence": "The box is big and heavy.",
+      "phonemes": [
+        {
+          "s": "b"
+        },
+        {
+          "s": "ɒ"
+        },
+        {
+          "s": "k"
+        },
+        {
+          "s": "s"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "gold",
+      "word": "pen",
+      "emoji": "🖊️",
+      "sentence": "I write with my pen.",
+      "phonemes": [
+        {
+          "s": "p"
+        },
+        {
+          "s": "ɛ"
+        },
+        {
+          "s": "n"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    }
   ]
-};
+};;
 
 /* ═══════════════════════════════════════════════
    STATE
