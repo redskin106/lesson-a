@@ -2235,20 +2235,32 @@ const PHONEME_TTS_FALLBACK = {
   'x':'fox','y':'yes','z':'zip','ng':'ring',
 };
 
+// Module-level reference prevents GC killing short audio clips mid-play
+let _activePhonemeAudio = null;
+
 // Play phoneme — accepts IPA symbol OR grapheme, with custom URL override
 function playPhoneme(symbol, customUrl) {
-  if (customUrl) {
-    const a = new Audio(customUrl);
-    a.play().catch(() => {});
-    return;
+  // Stop any currently playing phoneme first
+  if (_activePhonemeAudio) {
+    _activePhonemeAudio.pause();
+    _activePhonemeAudio.currentTime = 0;
   }
-  const grapheme  = IPA_TO_JP[symbol] || symbol;
-  const fileKey   = PHONEME_FILE[grapheme] || grapheme;
-  const audioFile = `../shell-v2/assets/phonemes/sound_${fileKey}.mp3`;
-  const a = new Audio(audioFile);
-  // onerror fires when file doesn't exist/can't load → fall back to TTS
-  a.addEventListener('error', () => speakTTS(PHONEME_TTS_FALLBACK[grapheme] || symbol));
-  // play() rejection (autoplay policy) is separate — just swallow it
+
+  const src = customUrl || (() => {
+    const grapheme = IPA_TO_JP[symbol] || symbol;
+    const fileKey  = PHONEME_FILE[grapheme] || grapheme;
+    return `../shell-v2/assets/phonemes/sound_${fileKey}.mp3`;
+  })();
+
+  const a = new Audio(src);
+  _activePhonemeAudio = a; // hold reference so GC can't collect it
+
+  a.addEventListener('error', () => {
+    _activePhonemeAudio = null;
+    if (!customUrl) speakTTS(PHONEME_TTS_FALLBACK[IPA_TO_JP[symbol]||symbol] || symbol);
+  });
+  a.addEventListener('ended', () => { _activePhonemeAudio = null; });
+
   a.play().catch(() => {});
 }
 
