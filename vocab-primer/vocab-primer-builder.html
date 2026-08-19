@@ -266,11 +266,17 @@ function jpUrlForSymbol(sym) {
   const k = PHONEME_FILE[g] || g;
   return JP_BASE + 'sound_' + k + '.mp3';
 }
+const _builderPhRefs = [];
 function previewPhoneme(sym, customUrl) {
   const url = customUrl || jpUrlForSymbol(sym);
   const a = new Audio(url);
-  a.onerror = () => { const u = new SpeechSynthesisUtterance(sym); u.lang='en-GB'; window.speechSynthesis?.speak(u); };
-  a.play().catch(() => a.onerror());
+  _builderPhRefs.push(a);
+  a.addEventListener('ended', () => { const i=_builderPhRefs.indexOf(a); if(i>-1) _builderPhRefs.splice(i,1); });
+  a.addEventListener('error', () => {
+    const i=_builderPhRefs.indexOf(a); if(i>-1) _builderPhRefs.splice(i,1);
+    const u = new SpeechSynthesisUtterance(sym); u.lang='en-GB'; window.speechSynthesis?.speak(u);
+  });
+  a.play().catch(() => {});
 }
 
 /* ═══════════════════════════════════
