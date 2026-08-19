@@ -2379,13 +2379,16 @@ function resetSCTrio() {
       renderRecHistory(word, histWrap);
       const hist = loadRecHistory(word);
       if (hist.length) {
-        fetch(hist[hist.length-1].dataUrl).then(r=>r.blob()).then(blob=>{
+        // Use atob() not fetch() — fetch(dataUrl) fails on some mobile browsers
+        try {
+          const dataUrl = hist[hist.length-1].dataUrl;
+          const blob = dataUrlToBlob(dataUrl);
           scRecBlob = blob;
           const pb = document.getElementById('sc-play-btn');
           const rl = document.getElementById('sc-rec-label');
           if (pb) pb.classList.add('ready');
           if (rl) rl.textContent = 'Re-record';
-        }).catch(()=>{});
+        } catch(e) {}
       }
     }
   }
@@ -2415,6 +2418,15 @@ function renderRecHistory(word, container) {
 
 function playDataUrl(dataUrl) {
   new Audio(dataUrl).play().catch(() => {});
+}
+
+function dataUrlToBlob(dataUrl) {
+  const [header, b64] = dataUrl.split(',');
+  const mime = header.match(/:(.*?);/)[1];
+  const bytes = atob(b64);
+  const arr = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+  return new Blob([arr], { type: mime });
 }
 
 // Wire trio buttons after DOM is ready
@@ -2587,7 +2599,7 @@ function togglePairRec(btn, word, side) {
     const mr = new MediaRecorder(stream,{mimeType:mime});
     btn._mr = mr;
     mr.ondataavailable = e=>{ if(e.data.size) chunks.push(e.data); };
-    mr.onstop = async ()=>{
+    mr.onstop = async () => {
       stream.getTracks().forEach(t=>t.stop());
       btn.classList.remove('recording');
       if(recIcon) recIcon.textContent='&#127908;';
@@ -2628,12 +2640,13 @@ function renderPairHistory(history, el) {
 function initPairYouBtn(word, side) {
   const hist = loadRecHistory(word);
   if (!hist.length) return;
-  fetch(hist[hist.length-1].dataUrl).then(r=>r.blob()).then(blob=>{
+  try {
+    const blob = dataUrlToBlob(hist[hist.length-1].dataUrl);
     const youBtn=document.getElementById('pair-you-'+side+'-'+word);
     const histEl=document.getElementById('pair-hist-'+side+'-'+word);
     if(youBtn){ youBtn.classList.add('ready'); youBtn.onclick=()=>new Audio(URL.createObjectURL(blob)).play().catch(()=>{}); }
     if(histEl) renderPairHistory(hist,histEl);
-  }).catch(()=>{});
+  } catch(e) {}
 }
 
 
