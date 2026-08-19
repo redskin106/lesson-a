@@ -857,43 +857,54 @@ async function pushToGitHub() {
   const pat  = document.getElementById('gh-pat').value.trim();
   const repo = document.getElementById('gh-repo').value.trim();
   const path = document.getElementById('gh-path').value.trim();
-  if (!pat||!repo||!path) { toast('⚠️ Fill in GitHub fields first'); return; }
-  toast('⏳ Fetching primer…');
-  let sha = '', primerHTML = '';
+  if (!pat||!repo||!path) { toast('Fill in GitHub fields first'); return; }
+  toast('Fetching primer...');
+
+  // Fetch — keep raw base64 from GitHub API
+  let sha = '', rawB64 = '';
   try {
-    const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { headers:{Authorization:`token ${pat}`} });
-    const d = await r.json(); sha = d.sha;
-    primerHTML = atob(d.content.replace(/\n/g,''));
-  } catch(e) { toast('❌ Could not fetch primer'); return; }
+    const r = await fetch('https://api.github.com/repos/'+repo+'/contents/'+path,
+      { headers:{Authorization:'token '+pat, Accept:'application/vnd.github.v3+json'} });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    sha    = d.sha;
+    rawB64 = d.content.replace(/\n/g, '');
+  } catch(e) { toast('Could not fetch primer: ' + e.message); return; }
 
-  const deck    = buildDeckJSON();
-  const newJS   = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
-  // Robust replace: handles both JS single-quote and JSON double-quote DECK formats
-  const deckRx = /const DECK = [\s\S]*?(?=\n\s*\/\*|\n\s*\/\/|\nlet |\nconst [^D]|\nfunction )/;
-  let updated = primerHTML.replace(deckRx, newJS + '\n');
-  if (updated === primerHTML) {
-    // Fallback: simpler pattern
-    updated = primerHTML.replace(/const DECK = \{[\s\S]*?\};/, newJS);
+  // Decode safely via TextDecoder (handles UTF-8/emoji correctly)
+  let primerHTML = '';
+  try {
+    const bytes = Uint8Array.from(atob(rawB64), ch => ch.charCodeAt(0));
+    primerHTML  = new TextDecoder('utf-8').decode(bytes);
+  } catch(e) { toast('Could not decode primer: ' + e.message); return; }
+
+  if (!primerHTML.includes('const DECK')) {
+    toast('Decoded file looks wrong — aborting'); return;
   }
-  if (updated === primerHTML) { toast('⚠️ Could not locate DECK — export manually'); return; }
 
-  const encoded = new TextEncoder().encode(updated);
+  // Replace DECK block
+  const deck  = buildDeckJSON();
+  const newJS = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
+  const updated = primerHTML.replace(/const DECK = \{[\s\S]*?\};/, newJS);
+  if (updated === primerHTML) { toast('Could not locate DECK — export manually'); return; }
+
+  // Re-encode in chunks (avoids call-stack limit on large files)
+  const enc = new TextEncoder().encode(updated);
   let binary = '';
-  new Uint8Array(encoded).forEach(b => binary += String.fromCharCode(b));
+  for (let i = 0; i < enc.length; i += 8192) {
+    binary += String.fromCharCode(...enc.subarray(i, Math.min(i+8192, enc.length)));
+  }
   const content = btoa(binary);
 
-  toast('⏳ Pushing…');
-  const resp = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-    method:'PUT', headers:{Authorization:`token ${pat}`,'Content-Type':'application/json'},
+  toast('Pushing...');
+  const resp = await fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
+    method: 'PUT',
+    headers: {Authorization:'token '+pat, 'Content-Type':'application/json'},
     body: JSON.stringify({ message:'Builder: update DECK', content, sha })
   });
-  if (resp.ok) { dirty=false; toast('✅ Pushed! Live in ~30s.'); }
-  else { const err=await resp.json(); toast('❌ '+( err.message||resp.status)); }
+  if (resp.ok) { dirty=false; toast('Pushed! Live in ~30s.'); }
+  else { const err=await resp.json(); toast('Push failed: '+(err.message||resp.status)); }
 }
-
-/* ═══════════════════════════════════
-   UTILS
-═══════════════════════════════════ */
 function esc(str) { return str ? String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 function markDirty() { dirty = true; }
 
