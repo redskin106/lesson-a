@@ -2236,34 +2236,47 @@ const PHONEME_TTS_FALLBACK = {
 };
 
 // Module-level reference prevents GC killing short audio clips mid-play
-// Phoneme audio — keep array of refs so GC can't kill short clips
-const _phonemeRefs = [];
+// Phoneme queue — play tiles one at a time, queue next if busy
+let _phAudio   = null;  // currently playing Audio object
+let _phQueue   = [];    // pending {src, symbol, useJP} items
+let _phPlaying = false;
+
+function _phNext() {
+  if (_phQueue.length === 0) { _phPlaying = false; _phAudio = null; return; }
+  _phPlaying = true;
+  const { src, symbol, useJP } = _phQueue.shift();
+  const a = new Audio();
+  _phAudio = a;
+
+  a.addEventListener('canplaythrough', () => {
+    a.play().catch(() => _phNext());
+  }, { once: true });
+
+  a.addEventListener('ended', _phNext, { once: true });
+
+  a.addEventListener('error', () => {
+    if (useJP) {
+      const grapheme = IPA_TO_JP[symbol] || symbol;
+      speakTTS(PHONEME_TTS_FALLBACK[grapheme] || symbol);
+    }
+    _phNext();
+  }, { once: true });
+
+  a.preload = 'auto';
+  a.src = src;
+  a.load();
+}
 
 function playPhoneme(symbol, customUrl) {
-  const useJP = !customUrl; // empty string or undefined → use JP file
+  const useJP = !customUrl;
   const src = useJP ? (() => {
     const grapheme = IPA_TO_JP[symbol] || symbol;
     const fileKey  = PHONEME_FILE[grapheme] || grapheme;
     return `https://redskin106.github.io/lesson-a/shell-v2/assets/phonemes/sound_${fileKey}.mp3`;
   })() : customUrl;
 
-  const a = new Audio(src);
-  _phonemeRefs.push(a); // keep reference alive for duration of playback
-
-  a.addEventListener('ended', () => {
-    const i = _phonemeRefs.indexOf(a);
-    if (i > -1) _phonemeRefs.splice(i, 1);
-  });
-  a.addEventListener('error', () => {
-    const i = _phonemeRefs.indexOf(a);
-    if (i > -1) _phonemeRefs.splice(i, 1);
-    if (useJP) {
-      const grapheme = IPA_TO_JP[symbol] || symbol;
-      speakTTS(PHONEME_TTS_FALLBACK[grapheme] || symbol);
-    }
-  });
-
-  a.play().catch(() => {});
+  _phQueue.push({ src, symbol, useJP });
+  if (!_phPlaying) _phNext();
 }
 
 function speakTTS(text) {
