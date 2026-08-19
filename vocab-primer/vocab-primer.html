@@ -2260,24 +2260,31 @@ function _phNext() {
   const { src, symbol, useJP } = _phQueue.shift();
   const a = new Audio();
   _phAudio = a;
+  let played = false;
 
-  a.addEventListener('canplaythrough', () => {
-    a.play().catch(() => _phNext());
-  }, { once: true });
+  function doPlay() {
+    if (played) return;
+    played = true;
+    a.play().catch(() => { _phPlaying = false; _phAudio = null; _phNext(); });
+  }
 
-  a.addEventListener('ended', _phNext, { once: true });
-
+  a.addEventListener('canplaythrough', doPlay, { once: true });
+  a.addEventListener('ended', () => { _phPlaying = false; _phAudio = null; _phNext(); }, { once: true });
   a.addEventListener('error', () => {
+    _phPlaying = false; _phAudio = null;
     if (useJP) {
       const grapheme = IPA_TO_JP[symbol] || symbol;
       speakTTS(PHONEME_TTS_FALLBACK[grapheme] || symbol);
+    } else {
+      _phNext();
     }
-    _phNext();
   }, { once: true });
 
   a.preload = 'auto';
   a.src = src;
   a.load();
+  // Fallback: if canplaythrough never fires (cached file), play after 300ms
+  setTimeout(() => doPlay(), 300);
 }
 
 function playPhoneme(symbol, customUrl) {
@@ -2346,6 +2353,7 @@ let scSelfPlaying  = false;
 let scRecording    = false;
 let scRecBlob      = null;
 let scMediaRec     = null;
+const scBlobMap    = {}; // word → latest Blob, survives card navigation
 
 function resetSCTrio() {
   // Stop any active audio/recording
@@ -2378,17 +2386,24 @@ function resetSCTrio() {
     if (word) {
       renderRecHistory(word, histWrap);
       const hist = loadRecHistory(word);
-      if (hist.length) {
-        // Use atob() not fetch() — fetch(dataUrl) fails on some mobile browsers
+      // Check in-memory map first (fastest, no conversion needed)
+      if (scBlobMap[word]) {
+        scRecBlob = scBlobMap[word];
+        const pb = document.getElementById('sc-play-btn');
+        const rl = document.getElementById('sc-rec-label');
+        if (pb) pb.classList.add('ready');
+        if (rl) rl.textContent = 'Re-record';
+      } else if (hist.length) {
+        // Fall back to localStorage — convert dataUrl → Blob
         try {
-          const dataUrl = hist[hist.length-1].dataUrl;
-          const blob = dataUrlToBlob(dataUrl);
+          const blob = dataUrlToBlob(hist[hist.length-1].dataUrl);
           scRecBlob = blob;
+          scBlobMap[word] = blob;
           const pb = document.getElementById('sc-play-btn');
           const rl = document.getElementById('sc-rec-label');
           if (pb) pb.classList.add('ready');
           if (rl) rl.textContent = 'Re-record';
-        } catch(e) {}
+        } catch(e) { console.warn('Could not restore recording:', e); }
       }
     }
   }
@@ -2481,7 +2496,8 @@ function wireSCTrio() {
     modelBtn.classList.remove('playing');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const mimeType = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg']
+        .find(t => { try { return MediaRecorder.isTypeSupported(t); } catch(e) { return false; } }) || '';
       const chunks = [];
       scMediaRec = new MediaRecorder(stream, { mimeType });
       scMediaRec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
@@ -2492,6 +2508,9 @@ function wireSCTrio() {
         recLabel.textContent = 'Re-record';
         recBtn.classList.remove('recording');
         scRecBlob = new Blob(chunks, { type: mimeType });
+        // Also key by word so You button survives navigation
+        const _w = singleCards[currentSingleIdx]?.word;
+        if (_w) scBlobMap[_w] = scRecBlob;
         playBtn.classList.add('ready');
         hint.textContent = 'Listen to both, then rate yourself.';
 
@@ -2595,8 +2614,12 @@ function togglePairRec(btn, word, side) {
   const histEl  = document.getElementById('pair-hist-' + side + '-' + word);
   if (btn.classList.contains('recording')) { btn._mr?.stop(); return; }
   navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
-    const mime='audio/webm'; const chunks=[];
-    const mr = new MediaRecorder(stream,{mimeType:mime});
+    // Detect supported MIME — webm fails on iOS Safari
+    const mime = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg']
+      .find(t => { try { return MediaRecorder.isTypeSupported(t); } catch(e) { return false; } })
+      || '';
+    const chunks=[];
+    const mr = new MediaRecorder(stream, mime ? {mimeType:mime} : {});
     btn._mr = mr;
     mr.ondataavailable = e=>{ if(e.data.size) chunks.push(e.data); };
     mr.onstop = async () => {
