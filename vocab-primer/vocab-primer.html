@@ -604,7 +604,17 @@ html, body {
 <div class="modal-bg" id="video-modal" onclick="closeVideo()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-video">
-      <div class="modal-play">▶</div>
+      <video id="modal-video-el" controls playsinline
+        style="width:100%;aspect-ratio:16/9;background:#000;display:none;">
+      </video>
+      <iframe id="modal-iframe-el"
+        style="width:100%;aspect-ratio:16/9;border:none;display:none;"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+      <div id="modal-no-url" style="width:100%;aspect-ratio:16/9;background:#111;
+        display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);
+        font-size:13px;">No video URL set</div>
     </div>
     <div class="modal-footer">
       <div>
@@ -2517,11 +2527,40 @@ function openVideo() {
 }
 function openVideoData(data) {
   if (!data) return;
-  document.getElementById('modal-title').textContent = data.title || '';
+  document.getElementById('modal-title').textContent = data.title    || '';
   document.getElementById('modal-sub').textContent   = data.subtitle || '';
+
+  const videoEl  = document.getElementById('modal-video-el');
+  const iframeEl = document.getElementById('modal-iframe-el');
+  const noUrl    = document.getElementById('modal-no-url');
+  const url = (typeof data === 'object' ? data.url : data) || '';
+
+  videoEl.style.display  = 'none';
+  iframeEl.style.display = 'none';
+  noUrl.style.display    = 'none';
+
+  if (!url) {
+    noUrl.style.display = 'flex';
+  } else if (/youtube\.com|youtu\.be|vimeo\.com/.test(url)) {
+    let embed = url
+      .replace(/watch\?v=([\w-]+)/, 'embed/$1')
+      .replace(/youtu\.be\/([\w-]+)/, 'youtube.com/embed/$1');
+    if (!embed.includes('/embed/')) embed = 'https://www.youtube.com/embed/' + url.split('/').pop();
+    iframeEl.src = embed + (embed.includes('?') ? '&' : '?') + 'autoplay=1';
+    iframeEl.style.display = 'block';
+  } else {
+    videoEl.src = url;
+    videoEl.style.display = 'block';
+    videoEl.load();
+    videoEl.play().catch(() => {});
+  }
   document.getElementById('video-modal').classList.add('open');
 }
+
 function closeVideo() {
+  const videoEl  = document.getElementById('modal-video-el');
+  const iframeEl = document.getElementById('modal-iframe-el');
+  videoEl.pause(); videoEl.src = ''; iframeEl.src = '';
   document.getElementById('video-modal').classList.remove('open');
 }
 
