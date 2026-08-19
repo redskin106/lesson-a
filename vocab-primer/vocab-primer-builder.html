@@ -628,15 +628,20 @@ function buildAudioSection(card, i, type) {
       <span class="el-audio-label">${r.label}</span>
       <span class="el-audio-text">${esc(r.text||'—')}</span>
       <span class="el-status ${has?'ready':'missing'}" id="el-st-${i}-${r.key}">${has?'✓ ready':'○ missing'}</span>
-      <button class="btn sm" onclick="generateOne(${i},'${r.key}','${esc(r.text||'')}')">🎙</button>
+      <button class="btn sm" onclick="generateOne(${i},'${r.key}','${esc(r.text||'')}',true)" title="Generate (overwrites existing)">🎙</button>
       ${has?`<button class="btn sm sage" onclick="playBlob('${blobKey}')">▶</button>`:''}
+      ${has?`<button class="btn sm red" onclick="clearOneAudio(${i},'${r.key}')" title="Clear → revert to TTS">✕</button>`:''}
     </div>`;
   }).join('');
 
   return `<div class="el-section">
     <div class="el-head">
       <span class="el-head-title">🎙 ElevenLabs Audio</span>
-      <button class="btn sm coral" onclick="generateCardAudio(${i})">Generate all</button>
+      <div style="display:flex;gap:5px;">
+        <button class="btn sm coral" onclick="generateCardAudio(${i})" title="Skip if already generated">Generate missing</button>
+        <button class="btn sm coral" onclick="generateCardAudio(${i},false,true)" title="Regenerate everything">↺ Regen</button>
+        <button class="btn sm red"   onclick="clearCardAudio(${i})" title="Remove all EL audio → reverts to TTS">✕ Clear all</button>
+      </div>
     </div>
     <div class="el-audio-list">${rowsHtml}</div>
   </div>`;
@@ -670,24 +675,27 @@ async function elTTS(text) {
   return resp.blob();
 }
 
-async function generateOne(cardIdx, key, text) {
+async function generateOne(cardIdx, key, text, force) {
   if (!text || text==='—') { toast('No text'); return; }
+  const card = cards[cardIdx];
+  // Skip if already generated and not forcing regeneration
+  if (!force) {
+    const existing = card[key] || audioBlobs[`${cardIdx}_${key}`];
+    if (existing) { updateElStatus(cardIdx, key, 'ready'); return; }
+  }
   updateElStatus(cardIdx, key, 'loading');
   const blob = await elTTS(text);
   if (!blob) { updateElStatus(cardIdx, key, 'missing'); return; }
-  // Store as data URL so it persists in session state and exports correctly
   const reader = new FileReader();
   reader.onload = e => {
     const dataUrl = e.target.result;
     audioBlobs[`${cardIdx}_${key}`] = dataUrl;
-    // Write directly onto card so export picks it up and primer plays it
-    const card = cards[cardIdx];
-    if      (key === 'audioWord')      card.audioWord     = dataUrl;
-    else if (key === 'audioSentence')  card.audioSentence = dataUrl;
-    else if (key === 'audio1Word')     card.audio1Word    = dataUrl;
-    else if (key === 'audio1Sentence') card.audio1Sentence= dataUrl;
-    else if (key === 'audio2Word')     card.audio2Word    = dataUrl;
-    else if (key === 'audio2Sentence') card.audio2Sentence= dataUrl;
+    if      (key === 'audioWord')       card.audioWord      = dataUrl;
+    else if (key === 'audioSentence')   card.audioSentence  = dataUrl;
+    else if (key === 'audio1Word')      card.audio1Word     = dataUrl;
+    else if (key === 'audio1Sentence')  card.audio1Sentence = dataUrl;
+    else if (key === 'audio2Word')      card.audio2Word     = dataUrl;
+    else if (key === 'audio2Sentence')  card.audio2Sentence = dataUrl;
     updateElStatus(cardIdx, key, 'ready');
     toast(`✓ ${text}`);
     saveSession();
@@ -695,7 +703,7 @@ async function generateOne(cardIdx, key, text) {
   reader.readAsDataURL(blob);
 }
 
-async function generateCardAudio(cardIdx, skipPhonemes) {
+async function generateCardAudio(cardIdx, skipPhonemes, force) {
   const card = cards[cardIdx];
   // Core jobs: word + sentence only
   let jobs = card.type === 'single'
@@ -715,7 +723,7 @@ async function generateCardAudio(cardIdx, skipPhonemes) {
     }
   }
   toast('🎙 Generating…');
-  for (const job of jobs) { await generateOne(cardIdx, job.key, job.text); await sleep(300); }
+  for (const job of jobs) { await generateOne(cardIdx, job.key, job.text, force); await sleep(300); }
   toast('✅ Done'); renderEditor();
 }
 
@@ -909,6 +917,27 @@ function toast(msg) {
   el.textContent = msg; el.classList.add('show');
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(()=>el.classList.remove('show'), 3200);
+}
+
+/* ── Clear audio (reset to TTS) ── */
+function clearCardAudio(cardIdx) {
+  if (!confirm('Remove all EL audio for this card? It will revert to TTS.')) return;
+  const card = cards[cardIdx];
+  const audioFields = ['audioWord','audioSentence','audio1Word','audio1Sentence',
+                       'audio2Word','audio2Sentence'];
+  audioFields.forEach(f => { if (card[f]) card[f] = ''; });
+  // Clear blob cache for this card
+  Object.keys(audioBlobs).forEach(k => { if (k.startsWith(cardIdx+'_')) delete audioBlobs[k]; });
+  markDirty(); saveSession(); renderEditor();
+  toast('✅ Audio cleared — will use TTS');
+}
+
+function clearOneAudio(cardIdx, key) {
+  const card = cards[cardIdx];
+  card[key] = '';
+  delete audioBlobs[`${cardIdx}_${key}`];
+  markDirty(); saveSession(); renderEditor();
+  toast('✅ Cleared → TTS');
 }
 
 /* ── Boot ── */
