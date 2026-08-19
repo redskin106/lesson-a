@@ -882,11 +882,24 @@ async function pushToGitHub() {
     toast('Decoded file looks wrong — aborting'); return;
   }
 
-  // Replace DECK block
-  const deck  = buildDeckJSON();
-  const newJS = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
-  const updated = primerHTML.replace(/const DECK = \{[\s\S]*?\};/, newJS);
-  if (updated === primerHTML) { toast('Could not locate DECK — export manually'); return; }
+  // Replace DECK block — use brace counting for reliable boundary detection
+  const deck   = buildDeckJSON();
+  const newJS  = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
+  const deckStart = primerHTML.indexOf('const DECK =');
+  if (deckStart === -1) { toast('Could not locate DECK — export manually'); return; }
+  // Find closing brace via brace counting (immune to semicolons/formatting)
+  let depth = 0, deckEnd = -1;
+  for (let i = deckStart; i < primerHTML.length; i++) {
+    if (primerHTML[i] === '{') depth++;
+    else if (primerHTML[i] === '}') { depth--; if (depth === 0) { deckEnd = i+1; break; } }
+  }
+  if (deckEnd === -1) { toast('Could not find end of DECK — export manually'); return; }
+  // Verify we found a real DECK (sanity check)
+  const oldBlock = primerHTML.slice(deckStart, deckEnd);
+  if (!oldBlock.includes('"lessonName"') && !oldBlock.includes("'lessonName'")) {
+    toast('DECK block looks wrong — export manually'); return;
+  }
+  const updated = primerHTML.slice(0, deckStart) + newJS + primerHTML.slice(deckEnd);
 
   // Re-encode in chunks (avoids call-stack limit on large files)
   const enc = new TextEncoder().encode(updated);
