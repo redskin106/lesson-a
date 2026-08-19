@@ -2394,17 +2394,23 @@ function resetSCTrio() {
 function renderRecHistory(word, container) {
   const history = loadRecHistory(word);
   if (!history.length) { container.innerHTML = ''; return; }
-  container.innerHTML = `
-    <div class="rec-history" style="margin-top:4px;">
-      <div class="rec-history-head">Past recordings</div>
-      ${history.slice().reverse().map((r, i) => `
-        <div class="rec-history-row">
-          <span class="rec-history-num">${history.length - i}</span>
-          <span class="rec-history-time">${timeAgo(r.ts)}</span>
-          <button class="rec-history-play" onclick="playDataUrl('${r.dataUrl}')">▶</button>
-        </div>
-      `).join('')}
-    </div>`;
+  const reversed = history.slice().reverse();
+  container.innerHTML =
+    '<div class="rec-history" style="margin-top:4px;">' +
+    '<div class="rec-history-head">Past recordings</div>' +
+    reversed.map((r, i) =>
+      '<div class="rec-history-row">' +
+      '<span class="rec-history-num">' + (history.length - i) + '</span>' +
+      '<span class="rec-history-time">' + timeAgo(r.ts) + '</span>' +
+      '<button class="rec-history-play">&#9654;</button>' +
+      '</div>'
+    ).join('') +
+    '</div>';
+  // Wire buttons via listeners — never embed dataUrls in HTML attributes
+  const btns = container.querySelectorAll('.rec-history-play');
+  reversed.forEach((r, i) => {
+    if (btns[i]) btns[i].addEventListener('click', () => playDataUrl(r.dataUrl));
+  });
 }
 
 function playDataUrl(dataUrl) {
@@ -2601,13 +2607,22 @@ function togglePairRec(btn, word, side) {
 }
 
 function renderPairHistory(history, el) {
-  if (!history.length) { el.innerHTML=''; return; }
-  el.innerHTML = '<div class="rec-history" style="margin-top:4px;"><div class="rec-history-head">Past recordings</div>' +
-    history.slice().reverse().map((r,i)=>
-      '<div class="rec-history-row"><span class="rec-history-num">'+(history.length-i)+'</span>' +
-      '<span class="rec-history-time">'+timeAgo(r.ts)+'</span>' +
-      '<button class="rec-history-play" onclick="playDataUrl(''+r.dataUrl+'')">&#9654;</button></div>'
+  if (!history.length) { el.innerHTML = ''; return; }
+  const reversed = history.slice().reverse();
+  el.innerHTML =
+    '<div class="rec-history" style="margin-top:4px;">' +
+    '<div class="rec-history-head">Past recordings</div>' +
+    reversed.map((r, i) =>
+      '<div class="rec-history-row">' +
+      '<span class="rec-history-num">' + (history.length - i) + '</span>' +
+      '<span class="rec-history-time">' + timeAgo(r.ts) + '</span>' +
+      '<button class="rec-history-play">&#9654;</button>' +
+      '</div>'
     ).join('') + '</div>';
+  const btns = el.querySelectorAll('.rec-history-play');
+  reversed.forEach((r, i) => {
+    if (btns[i]) btns[i].addEventListener('click', () => playDataUrl(r.dataUrl));
+  });
 }
 
 function initPairYouBtn(word, side) {
