@@ -2249,7 +2249,7 @@ function playPhoneme(symbol, customUrl) {
   const src = customUrl || (() => {
     const grapheme = IPA_TO_JP[symbol] || symbol;
     const fileKey  = PHONEME_FILE[grapheme] || grapheme;
-    return `../shell-v2/assets/phonemes/sound_${fileKey}.mp3`;
+    return `https://redskin106.github.io/lesson-a/shell-v2/assets/phonemes/sound_${fileKey}.mp3`;
   })();
 
   const a = new Audio(src);
