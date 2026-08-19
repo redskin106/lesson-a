@@ -2236,30 +2236,32 @@ const PHONEME_TTS_FALLBACK = {
 };
 
 // Module-level reference prevents GC killing short audio clips mid-play
-let _activePhonemeAudio = null;
+// Phoneme audio — keep array of refs so GC can't kill short clips
+const _phonemeRefs = [];
 
-// Play phoneme — accepts IPA symbol OR grapheme, with custom URL override
 function playPhoneme(symbol, customUrl) {
-  // Stop any currently playing phoneme first
-  if (_activePhonemeAudio) {
-    _activePhonemeAudio.pause();
-    _activePhonemeAudio.currentTime = 0;
-  }
-
-  const src = customUrl || (() => {
+  const useJP = !customUrl; // empty string or undefined → use JP file
+  const src = useJP ? (() => {
     const grapheme = IPA_TO_JP[symbol] || symbol;
     const fileKey  = PHONEME_FILE[grapheme] || grapheme;
     return `https://redskin106.github.io/lesson-a/shell-v2/assets/phonemes/sound_${fileKey}.mp3`;
-  })();
+  })() : customUrl;
 
   const a = new Audio(src);
-  _activePhonemeAudio = a; // hold reference so GC can't collect it
+  _phonemeRefs.push(a); // keep reference alive for duration of playback
 
-  a.addEventListener('error', () => {
-    _activePhonemeAudio = null;
-    if (!customUrl) speakTTS(PHONEME_TTS_FALLBACK[IPA_TO_JP[symbol]||symbol] || symbol);
+  a.addEventListener('ended', () => {
+    const i = _phonemeRefs.indexOf(a);
+    if (i > -1) _phonemeRefs.splice(i, 1);
   });
-  a.addEventListener('ended', () => { _activePhonemeAudio = null; });
+  a.addEventListener('error', () => {
+    const i = _phonemeRefs.indexOf(a);
+    if (i > -1) _phonemeRefs.splice(i, 1);
+    if (useJP) {
+      const grapheme = IPA_TO_JP[symbol] || symbol;
+      speakTTS(PHONEME_TTS_FALLBACK[grapheme] || symbol);
+    }
+  });
 
   a.play().catch(() => {});
 }
