@@ -2625,7 +2625,7 @@ function togglePairRec(btn, word, side) {
     mr.onstop = async () => {
       stream.getTracks().forEach(t=>t.stop());
       btn.classList.remove('recording');
-      if(recIcon) recIcon.textContent='&#127908;';
+      if(recIcon) recIcon.textContent='🎤';
       if(recLbl)  recLbl.textContent='Re-record';
       const blob = new Blob(chunks,{type:mime});
       if(youBtn){ youBtn.classList.add('ready'); youBtn.onclick=()=>new Audio(URL.createObjectURL(blob)).play().catch(()=>{}); }
@@ -2635,7 +2635,7 @@ function togglePairRec(btn, word, side) {
     };
     mr.start();
     btn.classList.add('recording');
-    if(recIcon) recIcon.textContent='&#9209;';
+    if(recIcon) recIcon.textContent='⏹';
     if(recLbl)  recLbl.textContent='Stop';
     if(hint)    hint.textContent='Recording... tap Stop.';
   }).catch(()=>{ if(recLbl) recLbl.textContent='No mic'; });
