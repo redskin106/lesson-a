@@ -2569,9 +2569,7 @@ function goIndex() {
 }
 
 /* ── Pair trio record ── */
-const pairRecBlobs = {}; // 'side_word' → blob
-
-async function togglePairRec(btn, word, side) {
+function togglePairRec(btn, word, side) {
   const youBtn  = document.getElementById('pair-you-'  + side + '-' + word);
   const recIcon = document.getElementById('pair-ri-'   + side + '-' + word);
   const recLbl  = document.getElementById('pair-rl-'   + side + '-' + word);
