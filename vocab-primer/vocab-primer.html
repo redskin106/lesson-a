@@ -604,17 +604,7 @@ html, body {
 <div class="modal-bg" id="video-modal" onclick="closeVideo()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-video">
-      <video id="modal-video-el" controls playsinline
-        style="width:100%;aspect-ratio:16/9;background:#000;display:none;">
-      </video>
-      <iframe id="modal-iframe-el"
-        style="width:100%;aspect-ratio:16/9;border:none;display:none;"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
-      </iframe>
-      <div id="modal-no-url" style="width:100%;aspect-ratio:16/9;background:#111;
-        display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);
-        font-size:13px;">No video URL set</div>
+      <div class="modal-play">▶</div>
     </div>
     <div class="modal-footer">
       <div>
@@ -2095,7 +2085,7 @@ function renderPair() {
   layout.innerHTML = buildPairHalfHTML(card, 1) + buildPairHalfHTML(card, 2);
 
   // Pre-load You buttons from history
-  [1, 2].forEach(side => {
+  ['1','2'].forEach(side => {
     const word = pairCards[currentPairIdx]['word' + side];
     if (word) initPairYouBtn(word, side);
   });
@@ -2133,8 +2123,6 @@ function buildPairHalfHTML(card, side) {
   const sentence  = card['sentence' + side];
   const phonemes  = card['phonemes' + side] || [];
   const video     = card['video'    + side];
-  const wordAudio = card['wordAudio'+ side] || '';
-  const sentAudio = card['sentenceAudio'+ side] || '';
   const key       = `pair_${word}_word${side}`;
   const rating    = progress[key] || '';
 
@@ -2142,28 +2130,15 @@ function buildPairHalfHTML(card, side) {
     ? `<img src="${image}" alt="${word}">`
     : `<span style="font-size:48px;">${emoji}</span>`;
 
-  // Load recording history for this word
-  const history = loadRecHistory(word);
-  const histHTML = history.length ? `
-    <div class="rec-history" style="margin-top:4px;">
-      <div class="rec-history-head">Past recordings</div>
-      ${history.slice().reverse().map((r,i) => `
-        <div class="rec-history-row">
-          <span class="rec-history-num">${history.length-i}</span>
-          <span class="rec-history-time">${timeAgo(r.ts)}</span>
-          <button class="rec-history-play" onclick="playDataUrl('${r.dataUrl}')">&#9654;</button>
-        </div>`).join('')}
-    </div>` : '';
-
   return `
   <div class="pair-card-half">
     <div class="pair-word-row">
       <div class="pair-word-text">${word}${card['word'+side+'note'] ? `<span style="font-size:9px;color:var(--cream-dim);font-family:'Inter',sans-serif;font-weight:400;margin-left:4px;">*</span>` : ''}</div>
-      <button class="pair-word-audio" onclick="playAudio('${wordAudio}','${word}')">&#128266;</button>
+      <button class="pair-word-audio" onclick="playAudio('${card['wordAudio'+side]||''}','${word}')">🔊</button>
     </div>
     <div class="pair-card-img">${imgContent}</div>
     <div class="pair-sentence">
-      <span class="pair-s-audio" onclick="playAudio('${sentAudio}','${sentence}')">&#128266;</span>
+      <span class="pair-s-audio" onclick="playAudio('${card['sentenceAudio'+side]||''}','${sentence}')">🔊</span>
       <span>${highlightWord(sentence, word)}</span>
     </div>
     <div>
@@ -2172,34 +2147,32 @@ function buildPairHalfHTML(card, side) {
         ${phonemes.map(ph => `<button class="pair-ph" data-phoneme="${ph.s}" data-audio="${ph.audio||''}">${ph.s}</button>`).join('')}
       </div>
     </div>
-    <div class="slabel" style="margin-top:4px;">Say it</div>
-    <div class="trio-wrap" id="pair-trio-wrap-${side}-${word}" style="padding:10px;">
+    <div class="trio-wrap" id="pair-wrap-${side}-${word}" style="padding:10px;margin-top:4px;">
       <div class="trio-row">
         <button class="trio-btn model" style="font-size:11px;"
-          onclick="pairPlayModel('${wordAudio}','${word}',this)">
-          <span class="trio-icon">&#128266;</span>
-          <span class="trio-label">Model</span>
+          onclick="playAudio('','${word}')">
+          <span class="trio-icon">&#128266;</span><span class="trio-label">Model</span>
         </button>
         <button class="trio-btn playback" id="pair-you-${side}-${word}" style="font-size:11px;">
-          <span class="trio-icon">&#9654;</span>
-          <span class="trio-label">You</span>
+          <span class="trio-icon">&#9654;</span><span class="trio-label">You</span>
         </button>
         <button class="trio-btn record" id="pair-rec-${side}-${word}" style="font-size:11px;"
           onclick="togglePairRec(this,'${word}','${side}')">
-          <span class="trio-icon" id="pair-rec-icon-${side}-${word}">&#127908;</span>
-          <span class="trio-label" id="pair-rec-label-${side}-${word}">Record</span>
+          <span class="trio-icon" id="pair-ri-${side}-${word}">&#127908;</span>
+          <span class="trio-label" id="pair-rl-${side}-${word}">Record</span>
         </button>
       </div>
-      <p class="trio-hint" id="pair-hint-${side}-${word}" style="font-size:10px;">Hear the model, then record.</p>
-      ${histHTML}
+      <p class="trio-hint" id="pair-hint-${side}-${word}" style="font-size:10px;margin-top:6px;">Hear the model, then record.</p>
+      <div id="pair-hist-${side}-${word}"></div>
     </div>
-    ${video ? `<button style="background:var(--coral-dim);border:1.5px solid var(--coral);border-radius:var(--rpill);padding:6px 12px;color:var(--coral);font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;" onclick="openVideoData(${JSON.stringify(video).replace(/"/g,'&quot;')})">&#127902; ${video.title||'Video'}</button>` : ''}
+    ${video ? `<button style="background:var(--coral-dim);border:1.5px solid var(--coral);border-radius:var(--rpill);padding:6px 12px;color:var(--coral);font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;" onclick="openVideoData(${JSON.stringify(video).replace(/"/g,'&quot;')})">🎬 ${video.title}</button>` : ''}
     <div class="pair-rating">
       <button class="pair-rating-btn${rating==='got-it'?' got-it':''}" data-rate="got-it" data-side="${side}">Got it</button>
       <button class="pair-rating-btn${rating==='practicing'?' practicing':''}" data-rate="practicing" data-side="${side}">Still practising</button>
     </div>
   </div>`;
 }
+
 function stepPair(dir) {
   const next = currentPairIdx + dir;
   if (next >= pairCards.length && singleCards.length > 0) {
@@ -2399,25 +2372,20 @@ function resetSCTrio() {
   if (hint)     hint.textContent = 'Hear the model, then record yourself.';
   if (compareCard) compareCard.style.display = 'none';
 
-  // Pre-load latest recording from history so You button works immediately
+  // Render history + pre-load latest recording into You button
   if (histWrap) {
     const word = singleCards[currentSingleIdx]?.word;
     if (word) {
       renderRecHistory(word, histWrap);
-      const history = loadRecHistory(word);
-      if (history.length > 0) {
-        // Load latest into scRecBlob equivalent as dataUrl
-        const latest = history[history.length - 1];
-        // Convert dataUrl back so playBtn works
-        fetch(latest.dataUrl)
-          .then(r => r.blob())
-          .then(blob => {
-            scRecBlob = blob;
-            const playBtn = document.getElementById('sc-play-btn');
-            const recLabel = document.getElementById('sc-rec-label');
-            if (playBtn) playBtn.classList.add('ready');
-            if (recLabel) recLabel.textContent = 'Re-record';
-          }).catch(() => {});
+      const hist = loadRecHistory(word);
+      if (hist.length) {
+        fetch(hist[hist.length-1].dataUrl).then(r=>r.blob()).then(blob=>{
+          scRecBlob = blob;
+          const pb = document.getElementById('sc-play-btn');
+          const rl = document.getElementById('sc-rec-label');
+          if (pb) pb.classList.add('ready');
+          if (rl) rl.textContent = 'Re-record';
+        }).catch(()=>{});
       }
     }
   }
@@ -2574,40 +2542,11 @@ function openVideo() {
 }
 function openVideoData(data) {
   if (!data) return;
-  document.getElementById('modal-title').textContent = data.title    || '';
+  document.getElementById('modal-title').textContent = data.title || '';
   document.getElementById('modal-sub').textContent   = data.subtitle || '';
-
-  const videoEl  = document.getElementById('modal-video-el');
-  const iframeEl = document.getElementById('modal-iframe-el');
-  const noUrl    = document.getElementById('modal-no-url');
-  const url = (typeof data === 'object' ? data.url : data) || '';
-
-  videoEl.style.display  = 'none';
-  iframeEl.style.display = 'none';
-  noUrl.style.display    = 'none';
-
-  if (!url) {
-    noUrl.style.display = 'flex';
-  } else if (/youtube\.com|youtu\.be|vimeo\.com/.test(url)) {
-    let embed = url
-      .replace(/watch\?v=([\w-]+)/, 'embed/$1')
-      .replace(/youtu\.be\/([\w-]+)/, 'youtube.com/embed/$1');
-    if (!embed.includes('/embed/')) embed = 'https://www.youtube.com/embed/' + url.split('/').pop();
-    iframeEl.src = embed + (embed.includes('?') ? '&' : '?') + 'autoplay=1';
-    iframeEl.style.display = 'block';
-  } else {
-    videoEl.src = url;
-    videoEl.style.display = 'block';
-    videoEl.load();
-    videoEl.play().catch(() => {});
-  }
   document.getElementById('video-modal').classList.add('open');
 }
-
 function closeVideo() {
-  const videoEl  = document.getElementById('modal-video-el');
-  const iframeEl = document.getElementById('modal-iframe-el');
-  videoEl.pause(); videoEl.src = ''; iframeEl.src = '';
   document.getElementById('video-modal').classList.remove('open');
 }
 
@@ -2632,115 +2571,61 @@ function goIndex() {
 /* ── Pair trio record ── */
 const pairRecBlobs = {}; // 'side_word' → blob
 
-// pairPlayModel — plays model audio for pair word
-function pairPlayModel(wordAudio, word, btn) {
-  if (btn.classList.contains('playing')) {
-    window.speechSynthesis?.cancel();
-    btn.classList.remove('playing');
-    return;
-  }
-  btn.classList.add('playing');
-  const done = () => btn.classList.remove('playing');
-  playAudio(wordAudio || '', word);
-  setTimeout(done, 2000); // rough duration fallback
-}
-
-// togglePairRec — full trio with history, mirrors single card
-const pairRecBlobs = {};
-
 async function togglePairRec(btn, word, side) {
-  const key      = side + '_' + word;
-  const youBtn   = document.getElementById('pair-you-' + side + '-' + word);
-  const recIcon  = document.getElementById('pair-rec-icon-' + side + '-' + word);
-  const recLabel = document.getElementById('pair-rec-label-' + side + '-' + word);
-  const hint     = document.getElementById('pair-hint-' + side + '-' + word);
-
-  if (btn.classList.contains('recording')) {
-    btn._mediaRec?.stop();
-    return;
-  }
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-    const chunks = [];
-    const mr = new MediaRecorder(stream, { mimeType });
-    btn._mediaRec = mr;
-
-    mr.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-    mr.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
+  const youBtn  = document.getElementById('pair-you-'  + side + '-' + word);
+  const recIcon = document.getElementById('pair-ri-'   + side + '-' + word);
+  const recLbl  = document.getElementById('pair-rl-'   + side + '-' + word);
+  const hint    = document.getElementById('pair-hint-' + side + '-' + word);
+  const histEl  = document.getElementById('pair-hist-' + side + '-' + word);
+  if (btn.classList.contains('recording')) { btn._mr?.stop(); return; }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
+    const mime='audio/webm'; const chunks=[];
+    const mr = new MediaRecorder(stream,{mimeType:mime});
+    btn._mr = mr;
+    mr.ondataavailable = e=>{ if(e.data.size) chunks.push(e.data); };
+    mr.onstop = async ()=>{
+      stream.getTracks().forEach(t=>t.stop());
       btn.classList.remove('recording');
-      if (recIcon)  recIcon.textContent  = '🎤';
-      if (recLabel) recLabel.textContent = 'Re-record';
-
-      const blob = new Blob(chunks, { type: mimeType });
-      pairRecBlobs[key] = blob;
-
-      // Save to history
-      const history = await saveRecToHistory(word, blob);
-
-      // Wire You button
-      if (youBtn) {
-        youBtn.classList.add('ready');
-        youBtn.onclick = () => {
-          if (pairRecBlobs[key]) {
-            new Audio(URL.createObjectURL(pairRecBlobs[key])).play().catch(() => {});
-          }
-        };
-      }
-
-      if (hint) hint.textContent = 'Listen to both, then rate yourself.';
-
-      // Refresh history in the wrap
-      const wrap = document.getElementById('pair-trio-wrap-' + side + '-' + word);
-      if (wrap) {
-        const histSection = wrap.querySelector('.rec-history');
-        if (histSection) histSection.remove();
-        const histDiv = document.createElement('div');
-        histDiv.className = 'rec-history';
-        histDiv.style.marginTop = '4px';
-        histDiv.innerHTML = '<div class="rec-history-head">Past recordings</div>' +
-          history.slice().reverse().map((r,i) =>
-            '<div class="rec-history-row">' +
-            '<span class="rec-history-num">' + (history.length-i) + '</span>' +
-            '<span class="rec-history-time">' + timeAgo(r.ts) + '</span>' +
-            '<button class="rec-history-play" onclick="playDataUrl(\'' + r.dataUrl + '\')">▶</button>' +
-            '</div>'
-          ).join('');
-        wrap.appendChild(histDiv);
-      }
+      if(recIcon) recIcon.textContent='&#127908;';
+      if(recLbl)  recLbl.textContent='Re-record';
+      const blob = new Blob(chunks,{type:mime});
+      if(youBtn){ youBtn.classList.add('ready'); youBtn.onclick=()=>new Audio(URL.createObjectURL(blob)).play().catch(()=>{}); }
+      const hist = await saveRecToHistory(word,blob);
+      if(histEl) renderPairHistory(hist,histEl);
+      if(hint) hint.textContent='Listen to both, then rate yourself.';
     };
-
     mr.start();
     btn.classList.add('recording');
-    if (recIcon)  recIcon.textContent  = '⏹';
-    if (recLabel) recLabel.textContent = 'Stop';
-    if (hint)     hint.textContent     = 'Recording... tap Stop when done.';
-
-  } catch(e) {
-    if (recLabel) recLabel.textContent = 'No mic';
-  }
+    if(recIcon) recIcon.textContent='&#9209;';
+    if(recLbl)  recLbl.textContent='Stop';
+    if(hint)    hint.textContent='Recording... tap Stop.';
+  }).catch(()=>{ if(recLbl) recLbl.textContent='No mic'; });
 }
 
-// On pair card open, pre-load latest recording into You button
+function renderPairHistory(history, el) {
+  if (!history.length) { el.innerHTML=''; return; }
+  el.innerHTML = '<div class="rec-history" style="margin-top:4px;"><div class="rec-history-head">Past recordings</div>' +
+    history.slice().reverse().map((r,i)=>
+      '<div class="rec-history-row"><span class="rec-history-num">'+(history.length-i)+'</span>' +
+      '<span class="rec-history-time">'+timeAgo(r.ts)+'</span>' +
+      '<button class="rec-history-play" onclick="playDataUrl(''+r.dataUrl+'')">&#9654;</button></div>'
+    ).join('') + '</div>';
+}
+
 function initPairYouBtn(word, side) {
-  const history = loadRecHistory(word);
-  if (!history.length) return;
-  const latest = history[history.length - 1];
-  fetch(latest.dataUrl)
-    .then(r => r.blob())
-    .then(blob => {
-      const key    = side + '_' + word;
-      pairRecBlobs[key] = blob;
-      const youBtn = document.getElementById('pair-you-' + side + '-' + word);
-      if (youBtn) {
-        youBtn.classList.add('ready');
-        youBtn.onclick = () => {
-          new Audio(URL.createObjectURL(blob)).play().catch(() => {});
-        };
-      }
-    }).catch(() => {});
+  const hist = loadRecHistory(word);
+  if (!hist.length) return;
+  fetch(hist[hist.length-1].dataUrl).then(r=>r.blob()).then(blob=>{
+    const youBtn=document.getElementById('pair-you-'+side+'-'+word);
+    const histEl=document.getElementById('pair-hist-'+side+'-'+word);
+    if(youBtn){ youBtn.classList.add('ready'); youBtn.onclick=()=>new Audio(URL.createObjectURL(blob)).play().catch(()=>{}); }
+    if(histEl) renderPairHistory(hist,histEl);
+  }).catch(()=>{});
 }
 
 
+/* ── Boot ── */
+init();
+</script>
+</body>
+</html>
