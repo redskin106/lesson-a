@@ -624,7 +624,7 @@ function buildVideoFields(prefix, card) {
       <label>URL</label>
       <input type="text" data-field="${prefix}Url" value="${esc(url)}" placeholder="https://youtu.be/...  or  https://www.youtube.com/watch?v=...">
     </div>
-    <div class="field-row" style="margin-bottom:8px;">
+    <div class="field-row" style="margin-bottom:4px;">
       <div class="field" style="max-width:120px;">
         <label>Start <span style="font-weight:400;color:var(--dim);">(seconds)</span></label>
         <input type="number" min="0" step="1" data-field="${prefix}Start" value="${esc(String(startVal))}" placeholder="0">
@@ -635,6 +635,7 @@ function buildVideoFields(prefix, card) {
       </div>
       ${showPreview ? `<div class="field" style="align-self:flex-end;padding-bottom:2px;font-size:10px;color:var(--dim);font-family:monospace;word-break:break-all;">${esc(previewUrl)}</div>` : ''}
     </div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ YouTube's <code>end</code> counts from the <em>start of the video</em>, not from your start time. e.g. clip 0:45–1:10 = start&nbsp;45, end&nbsp;70.</div>
     <div class="field-row">
       <div class="field"><label>Title</label><input type="text" data-field="${prefix}Title" value="${esc(title)}" placeholder="Short clip title"></div>
       <div class="field"><label>Subtitle</label><input type="text" data-field="${prefix}Sub" value="${esc(sub)}" placeholder="Short description"></div>
