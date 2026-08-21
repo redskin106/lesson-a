@@ -30,6 +30,39 @@ button { font-family: inherit; cursor: pointer; }
   --rpill:       999px;
 }
 
+/* ── Collapsible category groups ── */
+.cat-group-header {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0 4px;
+  cursor: pointer;
+  user-select: none;
+}
+.cat-group-toggle {
+  font-size: 9px;
+  color: var(--cream-dim);
+  width: 12px;
+  flex-shrink: 0;
+}
+.cat-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  flex: 1;
+}
+.cat-group-count {
+  font-size: 10px;
+  color: var(--cream-dim);
+  background: var(--cream-faint);
+  padding: 1px 7px;
+  border-radius: var(--rpill);
+}
+
+
 html, body {
   height: 100%; background: var(--bg);
   color: var(--cream); font-family: 'Inter', sans-serif;
@@ -697,25 +730,75 @@ function buildGrid() {
   }
 
   if (singleCards.length) {
-    // Group singles by category for section labels
-    const groups = [
-      { label: 'Nouns',   filter: c => !c.isColour && ['bag','ball','book','box','chair','cup','pen','phone','coin','key','table','bottle'].includes(c.word) },
-      { label: 'Shapes',  filter: c => !c.isColour && ['circle','rectangle','triangle','square'].includes(c.word) },
-      { label: 'Colours', filter: c => c.isColour },
-      { label: 'Gold',    filter: c => !c.isColour && c.tier === 'gold' && !['circle','rectangle','triangle','square'].includes(c.word) },
-    ];
-    groups.forEach(group => {
-      const cards = singleCards.filter(group.filter);
-      if (!cards.length) return;
-      const lbl = document.createElement('div');
-      lbl.style.cssText = 'grid-column:span 2;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim);padding:8px 0 4px;';
-      lbl.textContent = group.label;
-      grid.appendChild(lbl);
-      cards.forEach(card => {
+    // Group singles by DECK.categories order; fallback for old decks
+    const deckCats = (DECK.categories && DECK.categories.length)
+      ? DECK.categories
+      : (() => {
+          const AUTO = ['Nouns','Shapes','Colours','Other'];
+          const seen = new Set(singleCards.map(c =>
+            c.category || (c.isColour ? 'Colours' : ['circle','rectangle','triangle','square'].includes(c.word) ? 'Shapes' : 'Nouns')
+          ));
+          return AUTO.filter(g => seen.has(g));
+        })();
+
+    function resolveCategory(card) {
+      if (card.category) return card.category;
+      if (card.isColour) return 'Colours';
+      if (['circle','rectangle','triangle','square'].includes(card.word)) return 'Shapes';
+      return 'Nouns';
+    }
+
+    const _collapsed = {};
+    const rendered = new Set();
+
+    deckCats.forEach(label => {
+      if (label === 'Opposite Pairs') return;
+      const groupCards = singleCards.filter(c => resolveCategory(c) === label);
+      if (!groupCards.length) return;
+
+      // Header (toggle)
+      const header = document.createElement('div');
+      header.className = 'cat-group-header';
+      header.innerHTML = `<span class="cat-group-toggle">▼</span><span class="cat-group-label">${label}</span><span class="cat-group-count">${groupCards.length}</span>`;
+      header.onclick = () => {
+        _collapsed[label] = !_collapsed[label];
+        const toggle = header.querySelector('.cat-group-toggle');
+        toggle.textContent = _collapsed[label] ? '▶' : '▼';
+        body.forEach(el => { el.style.display = _collapsed[label] ? 'none' : ''; });
+      };
+      grid.appendChild(header);
+
+      // Cards
+      const body = [];
+      groupCards.forEach(card => {
+        rendered.add(card);
         const i = singleCards.indexOf(card);
-        grid.appendChild(buildSingleGridCard(card, i));
+        const el = buildSingleGridCard(card, i);
+        grid.appendChild(el);
+        body.push(el);
       });
     });
+
+    // Safety net — uncategorised cards
+    const uncategorised = singleCards.filter(c => !rendered.has(c));
+    if (uncategorised.length) {
+      const header = document.createElement('div');
+      header.className = 'cat-group-header';
+      header.innerHTML = `<span class="cat-group-toggle">▼</span><span class="cat-group-label">Other</span><span class="cat-group-count">${uncategorised.length}</span>`;
+      const body = [];
+      header.onclick = () => {
+        const collapsed = header.querySelector('.cat-group-toggle').textContent === '▼';
+        header.querySelector('.cat-group-toggle').textContent = collapsed ? '▶' : '▼';
+        body.forEach(el => { el.style.display = collapsed ? 'none' : ''; });
+      };
+      grid.appendChild(header);
+      uncategorised.forEach(card => {
+        const i = singleCards.indexOf(card);
+        const el = buildSingleGridCard(card, i);
+        grid.appendChild(el);
+        body.push(el);
+      });
+    }
   }
 }
 
