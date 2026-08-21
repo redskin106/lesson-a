@@ -167,6 +167,19 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
 .modal-body { flex: 1; overflow-y: auto; }
 .modal-body pre { padding: 18px; font-size: 12px; font-family: monospace; color: #a8d8a8; white-space: pre-wrap; word-break: break-all; }
 .modal-foot { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+/* ── Push confirm dialog ── */
+.push-confirm-box { background: var(--panel); border: 1px solid var(--border2); border-radius: 14px; width: 100%; max-width: 420px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+.push-confirm-box h3 { font-size: 14px; font-weight: 700; margin: 0; }
+.push-confirm-row { display: flex; justify-content: space-between; font-size: 12px; }
+.push-confirm-row span:first-child { color: var(--dim); }
+.push-confirm-row span:last-child { color: var(--text); font-weight: 600; font-family: monospace; }
+.push-confirm-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+/* ── Push progress bar ── */
+.push-progress-wrap { display: none; flex-direction: column; gap: 8px; }
+.push-progress-wrap.visible { display: flex; }
+.push-progress-label { font-size: 12px; color: var(--dim); }
+.push-progress-track { height: 6px; background: var(--border2); border-radius: 99px; overflow: hidden; }
+.push-progress-fill  { height: 100%; width: 0%; background: var(--sage); border-radius: 99px; transition: width 0.35s ease; }
 
 /* ── Toast ── */
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e2330; border: 1px solid var(--border2); border-radius: var(--pill); padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text); z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
@@ -255,6 +268,27 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Push confirm dialog -->
+<div class="modal-bg" id="push-modal">
+  <div class="push-confirm-box">
+    <h3>🚀 Push to GitHub</h3>
+    <div class="push-confirm-row"><span>Target file</span><span id="push-info-path">—</span></div>
+    <div class="push-confirm-row"><span>Cards</span><span id="push-info-cards">—</span></div>
+    <div class="push-confirm-row"><span>Pairs</span><span id="push-info-pairs">—</span></div>
+    <div class="push-confirm-row"><span>Singles</span><span id="push-info-singles">—</span></div>
+    <div class="push-confirm-row"><span>Audio slots filled</span><span id="push-info-audio">—</span></div>
+    <!-- Progress bar (shown after confirm) -->
+    <div class="push-progress-wrap" id="push-progress">
+      <div class="push-progress-label" id="push-progress-label">Fetching primer…</div>
+      <div class="push-progress-track"><div class="push-progress-fill" id="push-progress-fill"></div></div>
+    </div>
+    <div class="push-confirm-actions" id="push-confirm-actions">
+      <button class="btn" onclick="closePushModal()">Cancel</button>
+      <button class="btn sage" onclick="confirmPush()">Push →</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ═══════════════════════════════════
@@ -1047,14 +1081,64 @@ function importDeck() {
   input.click();
 }
 
-async function pushToGitHub() {
+function pushToGitHub() {
   const pat  = document.getElementById('gh-pat').value.trim();
   const repo = document.getElementById('gh-repo').value.trim();
   const path = document.getElementById('gh-path').value.trim();
   if (!pat||!repo||!path) { toast('Fill in GitHub fields first'); return; }
-  toast('Fetching primer...');
 
-  // Fetch — keep raw base64 from GitHub API
+  // Count audio slots filled
+  let audioFilled = 0, audioTotal = 0;
+  cards.forEach(c => {
+    if (c.type === 'pair') {
+      ['wordAudio1','sentenceAudio1','wordAudio2','sentenceAudio2'].forEach(k => {
+        audioTotal++;
+        if (c[k] || audioBlobs[`${cards.indexOf(c)}_${k}`]) audioFilled++;
+      });
+    } else {
+      ['wordAudio','sentenceAudio'].forEach(k => {
+        audioTotal++;
+        if (c[k] || audioBlobs[`${cards.indexOf(c)}_${k}`]) audioFilled++;
+      });
+    }
+  });
+
+  const pairs   = cards.filter(c => c.type === 'pair').length;
+  const singles = cards.filter(c => c.type !== 'pair').length;
+
+  document.getElementById('push-info-path').textContent    = path;
+  document.getElementById('push-info-cards').textContent   = cards.length;
+  document.getElementById('push-info-pairs').textContent   = pairs;
+  document.getElementById('push-info-singles').textContent = singles;
+  document.getElementById('push-info-audio').textContent   = `${audioFilled} / ${audioTotal}`;
+
+  // Reset progress bar
+  setPushProgress(0, '');
+  document.getElementById('push-progress').classList.remove('visible');
+  document.getElementById('push-confirm-actions').style.display = 'flex';
+  document.getElementById('push-modal').classList.add('open');
+}
+
+function closePushModal() {
+  document.getElementById('push-modal').classList.remove('open');
+}
+
+function setPushProgress(pct, label) {
+  document.getElementById('push-progress-fill').style.width  = pct + '%';
+  document.getElementById('push-progress-label').textContent = label;
+}
+
+async function confirmPush() {
+  const pat  = document.getElementById('gh-pat').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const path = document.getElementById('gh-path').value.trim();
+
+  // Hide buttons, show progress
+  document.getElementById('push-confirm-actions').style.display = 'none';
+  document.getElementById('push-progress').classList.add('visible');
+
+  // Step 1 — Fetch primer
+  setPushProgress(15, 'Fetching primer from GitHub…');
   let sha = '', rawB64 = '';
   try {
     const r = await fetch('https://api.github.com/repos/'+repo+'/contents/'+path,
@@ -1063,39 +1147,40 @@ async function pushToGitHub() {
     const d = await r.json();
     sha    = d.sha;
     rawB64 = d.content.replace(/\n/g, '');
-  } catch(e) { toast('Could not fetch primer: ' + e.message); return; }
+  } catch(e) { toast('Could not fetch primer: ' + e.message); closePushModal(); return; }
 
-  // Decode safely via TextDecoder (handles UTF-8/emoji correctly)
+  // Step 2 — Decode
+  setPushProgress(35, 'Decoding file…');
   let primerHTML = '';
   try {
     const bytes = Uint8Array.from(atob(rawB64), ch => ch.charCodeAt(0));
     primerHTML  = new TextDecoder('utf-8').decode(bytes);
-  } catch(e) { toast('Could not decode primer: ' + e.message); return; }
+  } catch(e) { toast('Could not decode primer: ' + e.message); closePushModal(); return; }
 
   if (!primerHTML.includes('const DECK')) {
-    toast('Decoded file looks wrong — aborting'); return;
+    toast('Decoded file looks wrong — aborting'); closePushModal(); return;
   }
 
-  // Replace DECK block — use brace counting for reliable boundary detection
+  // Step 3 — Inject DECK
+  setPushProgress(55, 'Injecting new deck…');
   const deck   = buildDeckJSON();
   const newJS  = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
   const deckStart = primerHTML.indexOf('const DECK =');
-  if (deckStart === -1) { toast('Could not locate DECK — export manually'); return; }
-  // Find closing brace via brace counting (immune to semicolons/formatting)
+  if (deckStart === -1) { toast('Could not locate DECK — export manually'); closePushModal(); return; }
   let depth = 0, deckEnd = -1;
   for (let i = deckStart; i < primerHTML.length; i++) {
     if (primerHTML[i] === '{') depth++;
     else if (primerHTML[i] === '}') { depth--; if (depth === 0) { deckEnd = i+1; break; } }
   }
-  if (deckEnd === -1) { toast('Could not find end of DECK — export manually'); return; }
-  // Verify we found a real DECK (sanity check)
+  if (deckEnd === -1) { toast('Could not find end of DECK — export manually'); closePushModal(); return; }
   const oldBlock = primerHTML.slice(deckStart, deckEnd);
   if (!oldBlock.includes('"lessonName"') && !oldBlock.includes("'lessonName'")) {
-    toast('DECK block looks wrong — export manually'); return;
+    toast('DECK block looks wrong — export manually'); closePushModal(); return;
   }
   const updated = primerHTML.slice(0, deckStart) + newJS + primerHTML.slice(deckEnd);
 
-  // Re-encode in chunks (avoids call-stack limit on large files)
+  // Step 4 — Re-encode
+  setPushProgress(75, 'Encoding…');
   const enc = new TextEncoder().encode(updated);
   let binary = '';
   for (let i = 0; i < enc.length; i += 8192) {
@@ -1103,14 +1188,23 @@ async function pushToGitHub() {
   }
   const content = btoa(binary);
 
-  toast('Pushing...');
+  // Step 5 — Push
+  setPushProgress(90, 'Pushing to GitHub…');
   const resp = await fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
     method: 'PUT',
     headers: {Authorization:'token '+pat, 'Content-Type':'application/json'},
     body: JSON.stringify({ message:'Builder: update DECK', content, sha })
   });
-  if (resp.ok) { dirty=false; toast('Pushed! Live in ~30s.'); }
-  else { const err=await resp.json(); toast('Push failed: '+(err.message||resp.status)); }
+
+  if (resp.ok) {
+    setPushProgress(100, '✅ Done! Live in ~30s.');
+    dirty = false;
+    setTimeout(closePushModal, 1800);
+  } else {
+    const err = await resp.json();
+    toast('Push failed: ' + (err.message || resp.status));
+    closePushModal();
+  }
 }
 function esc(str) { return str ? String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 function markDirty() { dirty = true; }
