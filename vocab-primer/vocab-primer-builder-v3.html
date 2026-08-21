@@ -998,6 +998,7 @@ function buildDeckJSON() {
         phonemes:(card.phonemes||[]).map((ph,pi)=>({ s:ph.s, audio:ph.audio||audioBlobs[`${ci}_audioPh_${pi}`]||'', audioSrc:ph.audioSrc||'jp' })),
         wordAudio:     audioBlobs[`${ci}_audioWord`]||'',
         sentenceAudio: audioBlobs[`${ci}_audioSentence`]||'' };
+      if (card.category)     out.category = card.category;
       if (card.isColour)     out.isColour = true, out.swatch = card.swatch;
       if (card.image)        out.image = card.image;
       if (card.illustration) out.illustration = card.illustration;
@@ -1013,6 +1014,7 @@ function buildDeckJSON() {
         wordAudio2:     audioBlobs[`${ci}_audio2Word`]||'',
         sentenceAudio1: audioBlobs[`${ci}_audio1Sentence`]||'',
         sentenceAudio2: audioBlobs[`${ci}_audio2Sentence`]||'' };
+      if (card.category)      out.category = card.category;
       if (card.word2note)     out.word2note = card.word2note;
       if (card.image1)        out.image1 = card.image1;
       if (card.image2)        out.image2 = card.image2;
