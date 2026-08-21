@@ -1850,55 +1850,25 @@ function buildGrid() {
   }
 
   if (singleCards.length) {
-    // Group singles by category — driven by DECK.categories order
-    // Fallback for old decks without categories[]: auto-detect from card data
-    const deckCats = (DECK.categories && DECK.categories.length)
-      ? DECK.categories
-      : (() => {
-          const AUTO = ['Nouns','Shapes','Colours','Other'];
-          const seen = new Set(singleCards.map(c =>
-            c.category || (c.isColour ? 'Colours' : ['circle','rectangle','triangle','square'].includes(c.word) ? 'Shapes' : 'Nouns')
-          ));
-          return AUTO.filter(g => seen.has(g));
-        })();
-
-    // Resolve each single card's display category
-    function resolveCategory(card) {
-      if (card.category) return card.category;
-      if (card.isColour) return 'Colours';
-      if (['circle','rectangle','triangle','square'].includes(card.word)) return 'Shapes';
-      return 'Nouns';
-    }
-
-    // Render each group in deck order
-    const rendered = new Set();
-    deckCats.forEach(label => {
-      if (label === 'Opposite Pairs') return; // pairs handled above
-      const groupCards = singleCards.filter(c => resolveCategory(c) === label);
-      if (!groupCards.length) return;
+    // Group singles by category for section labels
+    const groups = [
+      { label: 'Nouns',   filter: c => !c.isColour && ['bag','ball','book','box','chair','cup','pen','phone','coin','key','table','bottle'].includes(c.word) },
+      { label: 'Shapes',  filter: c => !c.isColour && ['circle','rectangle','triangle','square'].includes(c.word) },
+      { label: 'Colours', filter: c => c.isColour },
+      { label: 'Gold',    filter: c => !c.isColour && c.tier === 'gold' && !['circle','rectangle','triangle','square'].includes(c.word) },
+    ];
+    groups.forEach(group => {
+      const cards = singleCards.filter(group.filter);
+      if (!cards.length) return;
       const lbl = document.createElement('div');
       lbl.style.cssText = 'grid-column:span 2;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim);padding:8px 0 4px;';
-      lbl.textContent = label;
+      lbl.textContent = group.label;
       grid.appendChild(lbl);
-      groupCards.forEach(card => {
-        rendered.add(card);
+      cards.forEach(card => {
         const i = singleCards.indexOf(card);
         grid.appendChild(buildSingleGridCard(card, i));
       });
     });
-
-    // Catch any cards not covered by categories[] (safety net)
-    const uncategorised = singleCards.filter(c => !rendered.has(c));
-    if (uncategorised.length) {
-      const lbl = document.createElement('div');
-      lbl.style.cssText = 'grid-column:span 2;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim);padding:8px 0 4px;';
-      lbl.textContent = 'Other';
-      grid.appendChild(lbl);
-      uncategorised.forEach(card => {
-        const i = singleCards.indexOf(card);
-        grid.appendChild(buildSingleGridCard(card, i));
-      });
-    }
   }
 }
 
