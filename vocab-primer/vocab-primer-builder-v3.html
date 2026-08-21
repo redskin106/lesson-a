@@ -862,13 +862,16 @@ function buildAudioSection(card, i, type) {
   const rowsHtml = rows.map(r => {
     const blobKey = `${i}_${r.key}`;
     const has = !!audioBlobs[blobKey];
+    const uid = `upl-${i}-${r.key}`;
     return `<div class="el-audio-row">
       <span class="el-audio-label">${r.label}</span>
       <span class="el-audio-text">${esc(r.text||'—')}</span>
       <span class="el-status ${has?'ready':'missing'}" id="el-st-${i}-${r.key}">${has?'✓ ready':'○ missing'}</span>
-      <button class="btn sm" onclick="generateOne(${i},'${r.key}','${esc(r.text||'')}',true)" title="Generate (overwrites existing)">🎙</button>
-      ${has?`<button class="btn sm sage" onclick="playBlob('${blobKey}')">▶</button>`:''}
-      ${has?`<button class="btn sm red" onclick="clearOneAudio(${i},'${r.key}')" title="Clear → revert to TTS">✕</button>`:''}
+      <button class="btn sm" onclick="generateOne(${i},'${r.key}','${esc(r.text||'')}',true)" title="Generate via ElevenLabs">🎙 EL</button>
+      <label class="btn sm" for="${uid}" title="Upload mp3/wav/ogg" style="cursor:pointer;">📂</label>
+      <input type="file" id="${uid}" accept="audio/*" style="display:none" onchange="uploadOneAudio(${i},'${r.key}',this)">
+      <button class="btn sm sage" onclick="playBlob('${blobKey}')" title="Play" ${has?'':'disabled style="opacity:0.35"'}>▶</button>
+      <button class="btn sm red"  onclick="clearOneAudio(${i},'${r.key}')" title="Clear → revert to TTS" ${has?'':'disabled style="opacity:0.35"'}>✕</button>
     </div>`;
   }).join('');
 
@@ -1266,6 +1269,19 @@ function clearOneAudio(cardIdx, key) {
   delete audioBlobs[`${cardIdx}_${key}`];
   markDirty(); saveSession(); renderEditor();
   toast('✅ Cleared → TTS');
+}
+
+function uploadOneAudio(cardIdx, key, input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    audioBlobs[`${cardIdx}_${key}`] = dataUrl;
+    cards[cardIdx][key] = dataUrl;
+    markDirty(); saveSession(); renderEditor();
+    toast(`✅ Uploaded: ${key}`);
+  };
+  reader.readAsDataURL(file);
 }
 
 /* ── Boot ── */
