@@ -64,6 +64,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
 .deck-group-count { font-size: 10px; color: var(--dim); background: var(--faint); padding: 1px 6px; border-radius: var(--pill); flex-shrink: 0; }
 .deck-group-body { padding: 0 0 4px 0; }
 .deck-group-body.collapsed { display: none; }
+.deck-group-remove { background:none; border:none; color:var(--dim); cursor:pointer; font-size:14px; padding:0 2px; line-height:1; flex-shrink:0; }
+.deck-group-remove:hover { color:var(--coral); }
 .btn-full { width: 100%; padding: 9px; border-radius: var(--radius); border: 1.5px solid var(--border2); background: transparent; color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px; transition: background 0.12s; }
 .btn-full:hover { background: var(--faint); }
 .btn-full.primary { background: var(--coral-d); border-color: var(--coral); color: var(--coral); }
@@ -306,6 +308,7 @@ let cards = SEED.map(c => ({...c}));
 let activeIdx = null;
 let dirty = false;
 let audioBlobs = {};
+let categories = []; // ordered deck-level list; seeded from auto-detect on first load
 
 /* ═══════════════════════════════════
    IMAGE SPEC
@@ -322,57 +325,83 @@ const IMG_SPEC = {
 /* ═══════════════════════════════════
    SIDEBAR
 ═══════════════════════════════════ */
-// ── Sidebar grouping ────────────────────────────────
-const NOUN_WORDS = new Set(['bag','ball','book','box','chair','cup','pen','phone','bottle','coin','key','table']);
+const NOUN_WORDS  = new Set(['bag','ball','book','box','chair','cup','pen','phone','bottle','coin','key','table']);
 const SHAPE_WORDS = new Set(['circle','square','rectangle','triangle']);
-// Track collapsed state per group label (persisted across renders)
+const AUTO_ORDER  = ['Opposite Pairs','Nouns','Shapes','Colours','Other'];
 const _groupCollapsed = {};
 
 function getAutoCategory(card) {
-  if (card.type === 'pair')   return 'Opposite Pairs';
-  if (card.isColour)          return 'Colours';
-  if (SHAPE_WORDS.has(card.word)) return 'Shapes';
-  if (NOUN_WORDS.has(card.word))  return 'Nouns';
+  if (card.type === 'pair')        return 'Opposite Pairs';
+  if (card.isColour)               return 'Colours';
+  if (SHAPE_WORDS.has(card.word))  return 'Shapes';
+  if (NOUN_WORDS.has(card.word))   return 'Nouns';
   return 'Other';
 }
-
 function getCardCategory(card) {
   return (card.category && card.category.trim()) ? card.category.trim() : getAutoCategory(card);
 }
 
-// Desired display order for auto-detected groups
-const AUTO_ORDER = ['Opposite Pairs','Nouns','Shapes','Colours','Other'];
+// Seed categories[] from auto-detected groups if empty
+function initCategories() {
+  if (categories.length) return;
+  const seen = new Set();
+  cards.forEach(c => seen.add(getAutoCategory(c)));
+  AUTO_ORDER.forEach(g => { if (seen.has(g)) categories.push(g); });
+}
+
+// All known category names in sidebar order (categories[] first, then any orphan auto groups)
+function orderedGroupLabels(groupMap) {
+  const inList = new Set(categories);
+  const orphans = Object.keys(groupMap).filter(k => !inList.has(k));
+  // Keep orphans in AUTO_ORDER sequence
+  const orderedOrphans = AUTO_ORDER.filter(k => orphans.includes(k))
+    .concat(orphans.filter(k => !AUTO_ORDER.includes(k)));
+  return [...categories, ...orderedOrphans];
+}
+
+function addCategory() {
+  const name = prompt('Category name:');
+  if (!name || !name.trim()) return;
+  const trimmed = name.trim();
+  if (categories.includes(trimmed)) { toast('Category already exists'); return; }
+  categories.push(trimmed);
+  markDirty(); saveSession(); renderSidebar();
+  toast(`✅ Category "${trimmed}" added`);
+}
+
+function removeCategory(label) {
+  // Only allow removal if empty
+  const inUse = cards.some(c => getCardCategory(c) === label);
+  if (inUse) { toast('❌ Move all cards out before removing'); return; }
+  categories = categories.filter(c => c !== label);
+  markDirty(); saveSession(); renderSidebar();
+  toast(`Removed "${label}"`);
+}
 
 function renderSidebar() {
   const list = document.getElementById('deck-list');
   document.getElementById('card-count').textContent = cards.length;
   list.innerHTML = '';
 
-  // Build group map preserving insertion order for custom categories
-  const groupMap = {}; // label -> [{card, idx}]
+  // Build group map
+  const groupMap = {};
   cards.forEach((card, i) => {
     const cat = getCardCategory(card);
     if (!groupMap[cat]) groupMap[cat] = [];
     groupMap[cat].push({ card, i });
   });
 
-  // Separate custom vs auto-detected groups
-  const autoSet = new Set(AUTO_ORDER);
-  const customGroups = Object.keys(groupMap).filter(k => !autoSet.has(k));
-  const autoGroups   = AUTO_ORDER.filter(k => groupMap[k]);
+  // Include empty categories from categories[] too
+  categories.forEach(c => { if (!groupMap[c]) groupMap[c] = []; });
 
-  const orderedGroups = [...customGroups, ...autoGroups];
+  const labels = orderedGroupLabels(groupMap);
 
-  orderedGroups.forEach(label => {
-    const items = groupMap[label];
-    const containsActive = items.some(({i}) => i === activeIdx);
-    // Default: expand the group that contains the active card; otherwise collapsed
-    if (_groupCollapsed[label] === undefined) {
-      _groupCollapsed[label] = !containsActive;
-    }
-    // Always force-expand the active card's group
-    if (containsActive) _groupCollapsed[label] = false;
+  labels.forEach(label => {
+    const items = groupMap[label] || [];
+    if (_groupCollapsed[label] === undefined) _groupCollapsed[label] = true;
     const collapsed = _groupCollapsed[label];
+    const isEmpty   = items.length === 0;
+    const isAuto    = AUTO_ORDER.includes(label);
 
     const group = document.createElement('div');
     group.className = 'deck-group';
@@ -382,11 +411,9 @@ function renderSidebar() {
     header.innerHTML = `
       <span class="deck-group-toggle">${collapsed ? '▶' : '▼'}</span>
       <span class="deck-group-label">${esc(label)}</span>
-      <span class="deck-group-count">${items.length}</span>`;
-    header.onclick = () => {
-      _groupCollapsed[label] = !_groupCollapsed[label];
-      renderSidebar();
-    };
+      <span class="deck-group-count">${items.length}</span>
+      ${isEmpty && !isAuto ? `<button class="deck-group-remove" title="Remove empty category" onclick="event.stopPropagation();removeCategory('${esc(label)}')">×</button>` : ''}`;
+    header.onclick = () => { _groupCollapsed[label] = !_groupCollapsed[label]; renderSidebar(); };
 
     const body = document.createElement('div');
     body.className = 'deck-group-body' + (collapsed ? ' collapsed' : '');
@@ -396,7 +423,7 @@ function renderSidebar() {
       el.className = 'deck-item' + (i === activeIdx ? ' active' : '');
       el.onclick = () => selectCard(i);
       const cardLabel = card.type === 'pair' ? `${card.word1||'?'} / ${card.word2||'?'}` : card.word || 'Untitled';
-      const icon  = card.isColour ? '🎨' : card.type === 'pair' ? (card.emoji1||'⟺') : (card.emoji||'🃏');
+      const icon = card.isColour ? '🎨' : card.type === 'pair' ? (card.emoji1||'⟺') : (card.emoji||'🃏');
       el.innerHTML = `
         <span class="deck-item-icon">${icon}</span>
         <span class="deck-item-word">${esc(cardLabel)}</span>
@@ -409,6 +436,14 @@ function renderSidebar() {
     group.appendChild(body);
     list.appendChild(group);
   });
+
+  // "+ Add Category" button at bottom of list
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn-full';
+  addBtn.style.cssText = 'margin:8px;width:calc(100% - 16px);font-size:11px;';
+  addBtn.textContent = '+ Add Category';
+  addBtn.onclick = addCategory;
+  list.appendChild(addBtn);
 }
 
 function selectCard(i) { activeIdx = i; renderSidebar(); renderEditor(); }
@@ -464,8 +499,11 @@ function buildSingleEditor(card, i) {
           <div class="field" style="max-width:80px;"><label>Emoji</label><input type="text" data-field="emoji" value="${esc(card.emoji)}" placeholder="📱"></div>
           <div class="field" style="max-width:110px;"><label>Tier</label>${tierSelect(card.tier)}</div>
         </div>
-        <div class="field"><label>Category <span style="font-weight:400;color:var(--dim);">(optional — overrides auto-group)</span></label>
-          <input type="text" data-field="category" value="${esc(card.category||'')}" placeholder="e.g. Materials  (leave blank for auto)">
+        <div class="field"><label>Category</label>
+          <select data-field="category">
+            <option value="">Auto (${esc(getAutoCategory(card))})</option>
+            ${categories.map(c=>`<option value="${esc(c)}" ${card.category===c?'selected':''}>${esc(c)}</option>`).join('')}
+          </select>
         </div>
         <div class="colour-toggle">
           <input type="checkbox" id="is-colour-${i}" ${isColour?'checked':''} onchange="toggleColour(${i},this.checked)">
@@ -521,8 +559,11 @@ function buildPairEditor(card, i) {
     <div class="field-group">
       <div class="field-group-head">Group</div>
       <div class="field-group-body">
-        <div class="field"><label>Category <span style="font-weight:400;color:var(--dim);">(optional — overrides auto-group)</span></label>
-          <input type="text" data-field="category" value="${esc(card.category||'')}" placeholder="leave blank → auto: Opposite Pairs">
+        <div class="field"><label>Category</label>
+          <select data-field="category">
+            <option value="">Auto (${esc(getAutoCategory(card))})</option>
+            ${categories.map(c=>`<option value="${esc(c)}" ${card.category===c?'selected':''}>${esc(c)}</option>`).join('')}
+          </select>
         </div>
       </div>
     </div>
@@ -931,7 +972,7 @@ function buildDeckJSON() {
       return out;
     }
   });
-  return { lessonName, cards: exportCards };
+  return { lessonName, categories, cards: exportCards };
 }
 
 function openExport() {
@@ -981,6 +1022,7 @@ function importDeck() {
           }
         });
         if (deck.lessonName) document.getElementById('lesson-name').value = deck.lessonName;
+        if (deck.categories?.length) categories = deck.categories; else { categories = []; initCategories(); }
         activeIdx = null; renderSidebar(); renderEditor();
         saveSession();
         toast(`✅ Imported ${cards.length} cards`);
@@ -1064,7 +1106,7 @@ function saveSession() {
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify({
       lessonName: document.getElementById('lesson-name')?.value || '',
-      cards, activeIdx
+      cards, activeIdx, categories
     }));
   } catch(e) {}
 }
@@ -1075,6 +1117,7 @@ function loadSession() {
     const s = JSON.parse(raw);
     if (s.cards?.length) {
       cards = s.cards; activeIdx = s.activeIdx ?? null;
+      if (s.categories?.length) categories = s.categories;
       if (s.lessonName) document.getElementById('lesson-name').value = s.lessonName;
       return true;
     }
@@ -1084,7 +1127,7 @@ function loadSession() {
 function clearSession() {
   if (!confirm('Reset to seed data? This cannot be undone.')) return;
   localStorage.removeItem(SESSION_KEY);
-  cards = SEED.map(c=>({...c})); activeIdx = null;
+  cards = SEED.map(c=>({...c})); activeIdx = null; categories = []; initCategories();
   renderSidebar(); renderEditor(); toast('✅ Reset to seed');
 }
 function sleep(ms)   { return new Promise(r=>setTimeout(r,ms)); }
@@ -1119,9 +1162,9 @@ function clearOneAudio(cardIdx, key) {
 
 /* ── Boot ── */
 if (!loadSession()) {
-  // No saved session — use seed
   cards = SEED.map(c => ({...c}));
 }
+initCategories(); // seed categories[] if not restored from session
 renderSidebar();
 renderEditor();
 // Auto-save every 30s
