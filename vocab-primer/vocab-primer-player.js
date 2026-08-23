@@ -226,7 +226,6 @@ function buildSingleGridCard(card, i) {
       <span class="gc-word">${card.word}</span>
       <div style="display:flex;align-items:center;gap:6px;">
         ${card.video ? `<span class="gc-video-pip">🎬</span>` : ''}
-        <button class="gc-play" onclick="event.stopPropagation();playAudio(null,'${card.word}')">🔊</button>
       </div>
     </div>`;
   return el;
@@ -478,7 +477,7 @@ function buildPairHalfHTML(card, side) {
     <div class="trio-wrap" id="pair-wrap-${side}-${word}" style="padding:10px;margin-top:4px;">
       <div class="trio-row">
         <button class="trio-btn model" style="font-size:11px;"
-          onclick="playAudio('','${word}')">
+          onclick="playAudio('${card['wordAudio'+side]||''}','${word}')">
           <span class="trio-icon">&#128266;</span><span class="trio-label">Model</span>
         </button>
         <button class="trio-btn playback" id="pair-you-${side}-${word}" style="font-size:11px;">
