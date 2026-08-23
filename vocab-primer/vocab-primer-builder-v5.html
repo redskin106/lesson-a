@@ -1257,6 +1257,17 @@ function importDeck() {
         });
         if (deck.lessonName) document.getElementById('lesson-name').value = deck.lessonName;
         if (deck.categories?.length) categories = deck.categories; else { categories = []; initCategories(); }
+        // Repopulate audioBlobs from card data so play/download buttons activate correctly
+        const AUDIO_FIELDS_SINGLE = ['audioWord','audioSentence'];
+        const AUDIO_FIELDS_PAIR   = ['audio1Word','audio1Sentence','audio2Word','audio2Sentence'];
+        cards.forEach((card, ci) => {
+          const fields = card.type === 'pair' ? AUDIO_FIELDS_PAIR : AUDIO_FIELDS_SINGLE;
+          fields.forEach(f => { if (card[f]) audioBlobs[`${ci}_${f}`] = card[f]; });
+          // Phoneme audio
+          (card.phonemes ||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audioPh_${pi}`]  = ph.audio; });
+          (card.phonemes1||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audio1Ph_${pi}`] = ph.audio; });
+          (card.phonemes2||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audio2Ph_${pi}`] = ph.audio; });
+        });
         activeIdx = null; renderSidebar(); renderEditor();
         saveSession();
         toast(`✅ Imported ${cards.length} cards`);
@@ -1413,6 +1424,16 @@ function loadSession() {
       cards = s.cards; activeIdx = s.activeIdx ?? null;
       if (s.categories?.length) categories = s.categories;
       if (s.lessonName) document.getElementById('lesson-name').value = s.lessonName;
+      // Repopulate audioBlobs so play/download buttons activate after page reload
+      const AUDIO_FIELDS_SINGLE = ['audioWord','audioSentence'];
+      const AUDIO_FIELDS_PAIR   = ['audio1Word','audio1Sentence','audio2Word','audio2Sentence'];
+      cards.forEach((card, ci) => {
+        const fields = card.type === 'pair' ? AUDIO_FIELDS_PAIR : AUDIO_FIELDS_SINGLE;
+        fields.forEach(f => { if (card[f]) audioBlobs[`${ci}_${f}`] = card[f]; });
+        (card.phonemes ||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audioPh_${pi}`]  = ph.audio; });
+        (card.phonemes1||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audio1Ph_${pi}`] = ph.audio; });
+        (card.phonemes2||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audio2Ph_${pi}`] = ph.audio; });
+      });
       return true;
     }
   } catch(e) {}
