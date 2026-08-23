@@ -47,11 +47,10 @@ button { font-family: inherit; cursor: pointer; }
   flex-shrink: 0;
 }
 .cat-group-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--cream-dim);
+  font-size: 16px;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  color: var(--cream);
   flex: 1;
 }
 .cat-group-count {
@@ -718,14 +717,25 @@ function buildGrid() {
 
   // Pairs section label
   if (pairCards.length) {
-    // Pairs section label inside grid
-    const pairLabel = document.createElement('div');
-    pairLabel.style.cssText = 'grid-column:span 2;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim);padding:2px 0 4px;';
-    pairLabel.textContent = 'Pairs';
-    grid.appendChild(pairLabel);
+    // Pairs section — collapsible, starts collapsed
+    let pairsCollapsed = true;
+    const pairBody = [];
+
+    const pairHeader = document.createElement('div');
+    pairHeader.className = 'cat-group-header';
+    pairHeader.innerHTML = `<span class="cat-group-toggle">▶</span><span class="cat-group-label">Pairs</span><span class="cat-group-count">${pairCards.length}</span>`;
+    pairHeader.onclick = () => {
+      pairsCollapsed = !pairsCollapsed;
+      pairHeader.querySelector('.cat-group-toggle').textContent = pairsCollapsed ? '▶' : '▼';
+      pairBody.forEach(el => { el.style.display = pairsCollapsed ? 'none' : ''; });
+    };
+    grid.appendChild(pairHeader);
 
     pairCards.forEach((card, i) => {
-      grid.appendChild(buildPairGridCard(card, i));
+      const el = buildPairGridCard(card, i);
+      el.style.display = 'none'; // start collapsed
+      grid.appendChild(el);
+      pairBody.push(el);
     });
   }
 
@@ -759,7 +769,8 @@ function buildGrid() {
       // Header (toggle)
       const header = document.createElement('div');
       header.className = 'cat-group-header';
-      header.innerHTML = `<span class="cat-group-toggle">▼</span><span class="cat-group-label">${label}</span><span class="cat-group-count">${groupCards.length}</span>`;
+      _collapsed[label] = true; // start collapsed
+      header.innerHTML = `<span class="cat-group-toggle">▶</span><span class="cat-group-label">${label}</span><span class="cat-group-count">${groupCards.length}</span>`;
       header.onclick = () => {
         _collapsed[label] = !_collapsed[label];
         const toggle = header.querySelector('.cat-group-toggle');
@@ -768,12 +779,13 @@ function buildGrid() {
       };
       grid.appendChild(header);
 
-      // Cards
+      // Cards — start collapsed
       const body = [];
       groupCards.forEach(card => {
         rendered.add(card);
         const i = singleCards.indexOf(card);
         const el = buildSingleGridCard(card, i);
+        el.style.display = 'none';
         grid.appendChild(el);
         body.push(el);
       });
