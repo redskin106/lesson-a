@@ -339,7 +339,17 @@ html, body {
 .compare-title { font-size: 11px; font-weight: 600; color: var(--cream); }
 .compare-sub   { font-size: 10px; color: var(--cream-dim); margin-top: 1px; }
 /* Recording history */
-.rec-history { display: none; }
+.rec-history { display: block; }
+.rec-history-toggle-btn {
+  background: none; border: none;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--cream-dim);
+  cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px;
+  margin-top: 4px;
+}
+.rec-history-toggle-btn:active { opacity: 0.7; }
+.rec-history-body { display: none; margin-top: 4px; }
+.rec-history-body.open { display: block; }
 .rec-history-head { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cream-dim); }
 .rec-history-row {
   display: flex; align-items: center; gap: 8px;
@@ -505,9 +515,35 @@ html, body {
   border-radius: var(--rpill); padding: 7px 16px;
   color: var(--cream-dim); font-size: 12px; font-weight: 600;
 }
+
+/* ── Loading overlay ── */
+#loading-overlay {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 18px;
+  z-index: 9999;
+  transition: opacity 0.4s ease;
+}
+#loading-overlay.hidden { opacity: 0; pointer-events: none; }
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--cream-faint);
+  border-top-color: var(--coral);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-label {
+  font-family: 'Fraunces', serif;
+  font-size: 16px; color: var(--cream-dim);
+}
 </style>
 </head>
 <body>
+<div id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-label">Loading deck…</div>
+</div>
 <div class="app">
 
 <!-- ══════════════════════
@@ -1025,6 +1061,7 @@ function renderPair() {
 
   const layout = document.getElementById('pair-card-layout');
   layout.innerHTML = buildPairHalfHTML(card, 1) + buildPairHalfHTML(card, 2);
+  lazyLoadImages(layout);
 
   // Pre-load You buttons from history
   ['1','2'].forEach(side => {
@@ -1069,7 +1106,7 @@ function buildPairHalfHTML(card, side) {
   const rating    = progress[key] || '';
 
   const imgContent = image
-    ? `<img src="${image}" alt="${word}">`
+    ? `<img data-src="${image}" alt="${word}" style="opacity:0;transition:opacity 0.3s;">`
     : `<span style="font-size:48px;">${emoji}</span>`;
 
   return `
@@ -1355,9 +1392,11 @@ function renderRecHistory(word, container) {
   const history = loadRecHistory(word);
   if (!history.length) { container.innerHTML = ''; return; }
   const reversed = history.slice().reverse();
+  const bodyId = 'rh-body-' + word.replace(/[^a-z0-9]/gi, '_');
   container.innerHTML =
-    '<div class="rec-history" style="margin-top:4px;">' +
-    '<div class="rec-history-head">Past recordings</div>' +
+    '<div class="rec-history">' +
+    '<button class="rec-history-toggle-btn" onclick="toggleRecHistory('' + bodyId + '', this)">▶ ' + history.length + ' past recording' + (history.length > 1 ? 's' : '') + '</button>' +
+    '<div class="rec-history-body" id="' + bodyId + '">' +
     reversed.map((r, i) =>
       '<div class="rec-history-row">' +
       '<span class="rec-history-num">' + (history.length - i) + '</span>' +
@@ -1365,12 +1404,19 @@ function renderRecHistory(word, container) {
       '<button class="rec-history-play">&#9654;</button>' +
       '</div>'
     ).join('') +
-    '</div>';
-  // Wire buttons via listeners — never embed dataUrls in HTML attributes
+    '</div></div>';
   const btns = container.querySelectorAll('.rec-history-play');
   reversed.forEach((r, i) => {
     if (btns[i]) btns[i].addEventListener('click', () => playDataUrl(r.dataUrl));
   });
+}
+
+function toggleRecHistory(bodyId, btn) {
+  const body = document.getElementById(bodyId);
+  if (!body) return;
+  const open = body.classList.toggle('open');
+  const count = body.querySelectorAll('.rec-history-row').length;
+  btn.textContent = (open ? '▼ ' : '▶ ') + count + ' past recording' + (count > 1 ? 's' : '');
 }
 
 function playDataUrl(dataUrl) {
@@ -1586,16 +1632,18 @@ function togglePairRec(btn, word, side) {
 function renderPairHistory(history, el) {
   if (!history.length) { el.innerHTML = ''; return; }
   const reversed = history.slice().reverse();
+  const bodyId = 'rph-body-' + Date.now();
   el.innerHTML =
-    '<div class="rec-history" style="margin-top:4px;">' +
-    '<div class="rec-history-head">Past recordings</div>' +
+    '<div class="rec-history">' +
+    '<button class="rec-history-toggle-btn" onclick="toggleRecHistory('' + bodyId + '', this)">▶ ' + history.length + ' past recording' + (history.length > 1 ? 's' : '') + '</button>' +
+    '<div class="rec-history-body" id="' + bodyId + '">' +
     reversed.map((r, i) =>
       '<div class="rec-history-row">' +
       '<span class="rec-history-num">' + (history.length - i) + '</span>' +
       '<span class="rec-history-time">' + timeAgo(r.ts) + '</span>' +
       '<button class="rec-history-play">&#9654;</button>' +
       '</div>'
-    ).join('') + '</div>';
+    ).join('') + '</div></div>';
   const btns = el.querySelectorAll('.rec-history-play');
   reversed.forEach((r, i) => {
     if (btns[i]) btns[i].addEventListener('click', () => playDataUrl(r.dataUrl));
@@ -1617,6 +1665,27 @@ function initPairYouBtn(word, side) {
 
 /* ── Boot ── */
 init();
+
+/* dismiss loading overlay */
+(function dismissOverlay() {
+  const overlay = document.getElementById('loading-overlay');
+  if (!overlay) return;
+  overlay.classList.add('hidden');
+  setTimeout(() => { overlay.remove(); }, 450);
+})();
+
+/* lazy image decode for pair card images */
+function lazyLoadImages(root) {
+  const imgs = (root || document).querySelectorAll('img[data-src]');
+  imgs.forEach(img => {
+    const src = img.getAttribute('data-src');
+    if (!src) return;
+    img.removeAttribute('data-src');
+    const tmp = new Image();
+    tmp.onload = () => { img.src = tmp.src; img.style.opacity = '1'; };
+    tmp.src = src;
+  });
+}
 </script>
 </body>
 </html>
