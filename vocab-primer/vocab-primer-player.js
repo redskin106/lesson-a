@@ -744,7 +744,7 @@ function renderRecHistory(word, container) {
   const bodyId = 'rh-body-' + word.replace(/[^a-z0-9]/gi, '_');
   container.innerHTML =
     '<div class="rec-history">' +
-    '<button class="rec-history-toggle-btn" onclick="toggleRecHistory('' + bodyId + '', this)">▶ ' + history.length + ' past recording' + (history.length > 1 ? 's' : '') + '</button>' +
+    '<button class="rec-history-toggle-btn" onclick="toggleRecHistory(\'' + bodyId + '\', this)">▶ ' + history.length + ' past recording' + (history.length > 1 ? 's' : '') + '</button>' +
     '<div class="rec-history-body" id="' + bodyId + '">' +
     reversed.map((r, i) =>
       '<div class="rec-history-row">' +
@@ -984,7 +984,7 @@ function renderPairHistory(history, el) {
   const bodyId = 'rph-body-' + Date.now();
   el.innerHTML =
     '<div class="rec-history">' +
-    '<button class="rec-history-toggle-btn" onclick="toggleRecHistory('' + bodyId + '', this)">▶ ' + history.length + ' past recording' + (history.length > 1 ? 's' : '') + '</button>' +
+    '<button class="rec-history-toggle-btn" onclick="toggleRecHistory(\'' + bodyId + '\', this)">▶ ' + history.length + ' past recording' + (history.length > 1 ? 's' : '') + '</button>' +
     '<div class="rec-history-body" id="' + bodyId + '">' +
     reversed.map((r, i) =>
       '<div class="rec-history-row">' +
