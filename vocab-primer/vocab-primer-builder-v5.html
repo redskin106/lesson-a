@@ -1023,7 +1023,7 @@ async function generateOne(cardIdx, key, text, force) {
     else if (key === 'audio2Sentence')  card.audio2Sentence = dataUrl;
     updateElStatus(cardIdx, key, 'ready');
     toast(`✓ ${text}`);
-    saveSession();
+    saveSession(); renderEditor();
   };
   reader.readAsDataURL(blob);
 }
