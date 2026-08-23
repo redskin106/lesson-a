@@ -461,11 +461,11 @@ function buildPairHalfHTML(card, side) {
   <div class="pair-card-half">
     <div class="pair-word-row">
       <div class="pair-word-text">${word}${card['word'+side+'note'] ? `<span style="font-size:9px;color:var(--cream-dim);font-family:'Inter',sans-serif;font-weight:400;margin-left:4px;">*</span>` : ''}</div>
-      <button class="pair-word-audio" onclick="playAudio('${card['wordAudio'+side]||''}','${qa(word)}')">🔊</button>
+      <button class="pair-word-audio" data-audio="${card['wordAudio'+side]||''}" data-tts="${qa(word)}" onclick="playAudio(this.dataset.audio,this.dataset.tts)">🔊</button>
     </div>
     <div class="pair-card-img">${imgContent}</div>
     <div class="pair-sentence">
-      <span class="pair-s-audio" onclick="playAudio('${card['sentenceAudio'+side]||''}','${qa(sentence)}')">🔊</span>
+      <span class="pair-s-audio" data-audio="${card['sentenceAudio'+side]||''}" data-tts="${qa(sentence)}" onclick="playAudio(this.dataset.audio,this.dataset.tts)">🔊</span>
       <span>${highlightWord(sentence, word)}</span>
     </div>
     <div>
@@ -477,7 +477,8 @@ function buildPairHalfHTML(card, side) {
     <div class="trio-wrap" id="pair-wrap-${side}-${word}" style="padding:10px;margin-top:4px;">
       <div class="trio-row">
         <button class="trio-btn model" style="font-size:11px;"
-          onclick="playAudio('${card['wordAudio'+side]||''}','${qa(word)}')">
+          data-audio="${card['wordAudio'+side]||''}" data-tts="${qa(word)}"
+          onclick="playAudio(this.dataset.audio,this.dataset.tts)">
           <span class="trio-icon">&#128266;</span><span class="trio-label">Model</span>
         </button>
         <button class="trio-btn playback" id="pair-you-${side}-${word}" style="font-size:11px;">
