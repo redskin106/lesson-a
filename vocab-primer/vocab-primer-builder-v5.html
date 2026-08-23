@@ -212,12 +212,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
       <button class="btn-full" onclick="addCard('single')">＋ Single card</button>
       <button class="btn-full" onclick="addCard('pair')">＋ Opposite pair</button>
       <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 8px;">
-      <button class="btn-full primary teacher-only" onclick="openExport()" style="display:none;">⬇ View DECK JSON</button>
-      <button class="btn-full primary teacher-only" onclick="downloadDeckJSON()" style="display:none;">💾 Save deck.json</button>
-      <button class="btn-full teacher-only" onclick="importDeck()" style="display:none;">📂 Import deck.json</button>
-      <button class="btn-full sage teacher-only"    onclick="pushToGitHub()" style="display:none;">🚀 Push to GitHub</button>
+      <button class="btn-full primary" onclick="openExport()">⬇ View DECK JSON</button>
+      <button class="btn-full primary" onclick="downloadDeckJSON()">💾 Save deck.json</button>
+      <button class="btn-full" onclick="importDeck()">📂 Import deck.json</button>
+      <button class="btn-full sage" onclick="pushToGitHub()">🚀 Push to GitHub</button>
       <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 8px;">
-      <button class="btn-full teacher-only" onclick="clearSession()" style="color:var(--red);display:none;">↺ Reset to seed</button>
+      <button class="btn-full" onclick="clearSession()" style="color:var(--red);">↺ Reset to seed</button>
     </div>
   </div>
 
@@ -231,7 +231,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
     </div>
 
     <!-- Config -->
-    <div class="config-section teacher-only" style="display:none;">
+    <div class="config-section">
       <div class="config-head">GitHub &amp; ElevenLabs</div>
       <div class="config-body">
         <div class="config-row"><label>EL API Key</label><input type="password" id="el-key" placeholder="sk_... (rotated key)"></div>
@@ -1365,14 +1365,6 @@ function uploadOneAudio(cardIdx, key, input) {
   };
   reader.readAsDataURL(file);
 }
-
-/* ── Teacher mode ── */
-(function initTeacherMode() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('teacher') === '1') {
-    document.querySelectorAll('.teacher-only').forEach(el => el.style.display = '');
-  }
-})();
 
 /* ── EL credit check ── */
 async function checkELCredits() {
