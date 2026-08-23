@@ -1,0 +1,1571 @@
+{
+  "lessonName": "Objects Around Us",
+  "cards": [
+    {
+      "type": "pair",
+      "tier": "bronze",
+      "word1": "big",
+      "word2": "small",
+      "emoji1": "📦",
+      "emoji2": "📎",
+      "sentence1": "The elephant is big.",
+      "sentence2": "The mouse is small.",
+      "phonemes1": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "m",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɔː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "bronze",
+      "word1": "round",
+      "word2": "flat",
+      "emoji1": "⚽",
+      "emoji2": "📄",
+      "sentence1": "The ball is round.",
+      "sentence2": "The phone is flat.",
+      "phonemes1": [
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "aʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "d",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "f",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "æ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "bronze",
+      "word1": "old",
+      "word2": "new",
+      "emoji1": "🗝️",
+      "emoji2": "🖊️",
+      "sentence1": "The car is old.",
+      "sentence2": "The motorbike is new.",
+      "phonemes1": [
+        {
+          "s": "əʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "d",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "juː",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "bronze",
+      "word1": "clean",
+      "word2": "dirty",
+      "emoji1": "🧼",
+      "emoji2": "🪣",
+      "sentence1": "The plate is clean.",
+      "sentence2": "The cups are dirty.",
+      "phonemes1": [
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "iː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "d",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɜː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "i",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "silver",
+      "word1": "long",
+      "word2": "short",
+      "emoji1": "📏",
+      "emoji2": "✏️",
+      "sentence1": "Her hair is long.",
+      "sentence2": "Her hair is short.",
+      "phonemes1": [
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɒ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ŋ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "ʃ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɔː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "silver",
+      "word1": "full",
+      "word2": "empty",
+      "emoji1": "🥛",
+      "emoji2": "🪣",
+      "sentence1": "The glass is full.",
+      "sentence2": "The wallet is empty.",
+      "phonemes1": [
+        {
+          "s": "f",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "m",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "p",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "i",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "silver",
+      "word1": "beautiful",
+      "word2": "ugly",
+      "emoji1": "🌸",
+      "emoji2": "🗑️",
+      "sentence1": "The woman is beautiful.",
+      "sentence2": "It's not beautiful. It's ugly.",
+      "phonemes1": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "juː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "f",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "ʌ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "i",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "word2note": "A1 Movers ✅",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "gold",
+      "word1": "soft",
+      "word2": "hard",
+      "emoji1": "🧽",
+      "emoji2": "🧱",
+      "sentence1": "The toys are soft.",
+      "sentence2": "The wall is hard.",
+      "phonemes1": [
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɒ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "f",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "h",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɑː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "d",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "gold",
+      "word1": "thin",
+      "word2": "thick",
+      "emoji1": "🖊️",
+      "emoji2": "📚",
+      "sentence1": "The tablet is thin.",
+      "sentence2": "The books are thick.",
+      "phonemes1": [
+        {
+          "s": "θ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "θ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "word2note": "receptive only",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "gold",
+      "word1": "smooth",
+      "word2": "rough",
+      "emoji1": "📱",
+      "emoji2": "🪨",
+      "sentence1": "The balloon is smooth.",
+      "sentence2": "The tree trunk feels rough.",
+      "phonemes1": [
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "m",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "uː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ð",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ʌ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "f",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "word2note": "receptive only",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "gold",
+      "word1": "plastic",
+      "word2": "metal",
+      "emoji1": "🪣",
+      "emoji2": "🔑",
+      "sentence1": "The ducky is plastic.",
+      "sentence2": "The fork and spoon are metal.",
+      "phonemes1": [
+        {
+          "s": "p",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "æ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "m",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "gold",
+      "word1": "wood",
+      "word2": "glass",
+      "emoji1": "🪵",
+      "emoji2": "🪟",
+      "sentence1": "The cubes are made of wood.",
+      "sentence2": "The bottles are made of glass.",
+      "phonemes1": [
+        {
+          "s": "w",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "d",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɑː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "gold",
+      "word1": "heavy",
+      "word2": "light",
+      "emoji1": "🎒",
+      "emoji2": "🪶",
+      "sentence1": "The dumbbells are heavy.",
+      "sentence2": "A feather is light.",
+      "phonemes1": [
+        {
+          "s": "h",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "v",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "i",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "aɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "",
+      "wordAudio2": "",
+      "sentenceAudio1": "",
+      "sentenceAudio2": "",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "bag",
+      "emoji": "🎒",
+      "sentence": "My bag is on the desk.",
+      "phonemes": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "æ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "ball",
+      "emoji": "⚽",
+      "sentence": "The ball is round.",
+      "phonemes": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɔː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "book",
+      "emoji": "📖",
+      "sentence": "There is a book on the table.",
+      "phonemes": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "box",
+      "emoji": "📦",
+      "sentence": "The box is big and square.",
+      "phonemes": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɒ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "chair",
+      "emoji": "🪑",
+      "sentence": "The chair is not soft.",
+      "phonemes": [
+        {
+          "s": "tʃ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "cup",
+      "emoji": "☕",
+      "sentence": "The cup is on the table.",
+      "phonemes": [
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ʌ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "p",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "pen",
+      "emoji": "🖊️",
+      "sentence": "My pen is long and thin.",
+      "phonemes": [
+        {
+          "s": "p",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "phone",
+      "emoji": "📱",
+      "sentence": "My phone is on the table.",
+      "phonemes": [
+        {
+          "s": "f",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "əʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "bottle",
+      "emoji": "🍶",
+      "sentence": "My water bottle is empty.",
+      "phonemes": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɒ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "coin",
+      "emoji": "🪙",
+      "sentence": "The coin is small and round.",
+      "phonemes": [
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɔɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "key",
+      "emoji": "🔑",
+      "sentence": "The key is small and metal.",
+      "phonemes": [
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "iː",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "table",
+      "emoji": "🪵",
+      "sentence": "Put your book on the table.",
+      "phonemes": [
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "eɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "image": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "circle",
+      "emoji": "⭕",
+      "sentence": "It is shaped like a circle.",
+      "phonemes": [
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɜː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "rectangle",
+      "emoji": "▬",
+      "sentence": "It is shaped like a rectangle.",
+      "phonemes": [
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "æ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ŋ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "triangle",
+      "emoji": "🔺",
+      "sentence": "It is shaped like a triangle.",
+      "phonemes": [
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "aɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ŋ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "red",
+      "emoji": "🔴",
+      "sentence": "The ball is red.",
+      "phonemes": [
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "d",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#E53935"
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "blue",
+      "emoji": "🔵",
+      "sentence": "The pen is blue.",
+      "phonemes": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "uː",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#1E88E5"
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "yellow",
+      "emoji": "🟡",
+      "sentence": "The cup is yellow.",
+      "phonemes": [
+        {
+          "s": "y",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "əʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#FDD835"
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "green",
+      "emoji": "🟢",
+      "sentence": "The bottle is green.",
+      "phonemes": [
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "iː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#43A047"
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "black",
+      "emoji": "⚫",
+      "sentence": "The phone is black.",
+      "phonemes": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "æ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#212121"
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "white",
+      "emoji": "⚪",
+      "sentence": "The chair is white.",
+      "phonemes": [
+        {
+          "s": "w",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "aɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#E0E0E0"
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "pink",
+      "emoji": "🌸",
+      "sentence": "The bag is pink.",
+      "phonemes": [
+        {
+          "s": "p",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ŋ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#E91E8C"
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "brown",
+      "emoji": "🟫",
+      "sentence": "The table is brown.",
+      "phonemes": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "aʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#6D4C41"
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "orange",
+      "emoji": "🟠",
+      "sentence": "The ball is orange.",
+      "phonemes": [
+        {
+          "s": "ɒ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "dʒ",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#FF6D00"
+    },
+    {
+      "type": "single",
+      "tier": "gold",
+      "word": "purple",
+      "emoji": "🟣",
+      "sentence": "The bag is purple.",
+      "phonemes": [
+        {
+          "s": "p",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɜː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "p",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": "",
+      "isColour": true,
+      "swatch": "#7B1FA2"
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "square",
+      "emoji": "🟦",
+      "sentence": "It is shaped like a square.",
+      "phonemes": [
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "w",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "",
+      "sentenceAudio": ""
+    }
+  ]
+}

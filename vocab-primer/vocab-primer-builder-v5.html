@@ -251,7 +251,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
         <div class="config-row"><label>Sent. speed</label><input type="number" id="el-speed-sent" value="0.85" min="0.5" max="1.2" step="0.05" style="width:70px;flex:none;"></div>
         <div class="config-row"><label>GitHub PAT</label><input type="password" id="gh-pat" placeholder="github_pat_..."></div>
         <div class="config-row"><label>Repo</label>      <input type="text"     id="gh-repo" value="redskin106/lesson-a"></div>
-        <div class="config-row"><label>Primer path</label><input type="text"    id="gh-path" value="vocab-primer/vocab-primer.html"></div>
+        <div class="config-row"><label>Deck JSON path</label><input type="text" id="gh-path" value="vocab-primer/vocab-describe-objects.json" placeholder="path/to/deck.json"></div>
         <div class="config-row"><label>Image folder</label><input type="text" id="gh-img-folder" value="vocab-primer-v2/images" placeholder="path/in/repo"><span style="font-size:10px;color:var(--dim);margin-left:6px;">no trailing /</span></div>
         <div class="config-row"><label>Audio folder</label><input type="text" id="gh-audio-folder" value="vocab-primer-v2/audio" placeholder="path/in/repo"><span style="font-size:10px;color:var(--dim);margin-left:6px;">no trailing /</span></div>
       </div>
@@ -294,7 +294,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
     <div class="push-confirm-row"><span>Already hosted</span><span id="push-info-hosted">—</span></div>
     <!-- Progress bar (shown after confirm) -->
     <div class="push-progress-wrap" id="push-progress">
-      <div class="push-progress-label" id="push-progress-label">Fetching primer…</div>
+      <div class="push-progress-label" id="push-progress-label">Uploading audio…</div>
       <div class="push-progress-track"><div class="push-progress-fill" id="push-progress-fill"></div></div>
     </div>
     <div class="push-confirm-actions" id="push-confirm-actions">
@@ -1400,67 +1400,43 @@ async function confirmPush() {
     renderEditor(); // refresh play buttons to show hosted URLs
   }
 
-  // Step 2 — Fetch primer (check size first)
-  setPushProgress(40, 'Fetching primer from GitHub…');
-  let sha = '', rawB64 = '';
+  // Step 2 — Fetch current JSON sha (needed for PUT update)
+  setPushProgress(40, 'Fetching deck JSON from GitHub…');
+  let sha = '';
   try {
     const r = await fetch('https://api.github.com/repos/'+repo+'/contents/'+path,
       { headers:{Authorization:'token '+pat, Accept:'application/vnd.github.v3+json'} });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const d = await r.json();
-    if (d.encoding === 'none' || !d.content) {
-      toast('⚠️ Primer file is too large for the GitHub API (>1MB). Use ⬇ View DECK JSON → copy the JSON, then paste it into the primer file manually via github.com.');
-      closePushModal(); return;
+    if (r.ok) {
+      const d = await r.json();
+      sha = d.sha || '';  // empty sha = create new file
+    } else if (r.status !== 404) {
+      throw new Error('HTTP ' + r.status);
     }
-    sha    = d.sha;
-    rawB64 = d.content.replace(/\n/g, '');
-  } catch(e) { toast('Could not fetch primer: ' + e.message); closePushModal(); return; }
+    // 404 is fine — means new file, sha stays ''
+  } catch(e) { toast('Could not fetch deck JSON: ' + e.message); closePushModal(); return; }
 
-  // Step 3 — Decode
-  setPushProgress(58, 'Decoding file…');
-  let primerHTML = '';
-  try {
-    const bytes = Uint8Array.from(atob(rawB64), ch => ch.charCodeAt(0));
-    primerHTML  = new TextDecoder('utf-8').decode(bytes);
-  } catch(e) { toast('Could not decode primer: ' + e.message); closePushModal(); return; }
+  // Step 3 — Build JSON payload
+  setPushProgress(62, 'Building deck JSON…');
+  const deck = buildDeckJSON();
+  const deckStr = JSON.stringify(deck, null, 2);
 
-  if (!primerHTML.includes('const DECK')) {
-    toast('Decoded file looks wrong — aborting'); closePushModal(); return;
-  }
-
-  // Step 4 — Inject DECK (now with hosted audio URLs)
-  setPushProgress(70, 'Injecting new deck…');
-  const deck   = buildDeckJSON();
-  const newJS  = 'const DECK = ' + JSON.stringify(deck, null, 2) + ';';
-  const deckStart = primerHTML.indexOf('const DECK =');
-  if (deckStart === -1) { toast('Could not locate DECK — export manually'); closePushModal(); return; }
-  let depth = 0, deckEnd = -1;
-  for (let i = deckStart; i < primerHTML.length; i++) {
-    if (primerHTML[i] === '{') depth++;
-    else if (primerHTML[i] === '}') { depth--; if (depth === 0) { deckEnd = i+1; break; } }
-  }
-  if (deckEnd === -1) { toast('Could not find end of DECK — export manually'); closePushModal(); return; }
-  const oldBlock = primerHTML.slice(deckStart, deckEnd);
-  if (!oldBlock.includes('"lessonName"') && !oldBlock.includes("'lessonName'")) {
-    toast('DECK block looks wrong — export manually'); closePushModal(); return;
-  }
-  const updated = primerHTML.slice(0, deckStart) + newJS + primerHTML.slice(deckEnd);
-
-  // Step 5 — Re-encode
-  setPushProgress(82, 'Encoding…');
-  const enc = new TextEncoder().encode(updated);
+  // Step 4 — Encode
+  setPushProgress(75, 'Encoding…');
+  const enc = new TextEncoder().encode(deckStr);
   let binary = '';
   for (let i = 0; i < enc.length; i += 8192) {
     binary += String.fromCharCode(...enc.subarray(i, Math.min(i+8192, enc.length)));
   }
   const content = btoa(binary);
 
-  // Step 6 — Push primer
-  setPushProgress(92, 'Pushing primer to GitHub…');
+  // Step 5 — Push JSON
+  setPushProgress(88, 'Pushing deck JSON to GitHub…');
+  const putBody = { message: 'Builder: update deck', content };
+  if (sha) putBody.sha = sha;
   const resp = await fetch('https://api.github.com/repos/'+repo+'/contents/'+path, {
     method: 'PUT',
     headers: {Authorization:'token '+pat, 'Content-Type':'application/json'},
-    body: JSON.stringify({ message:'Builder: update DECK', content, sha })
+    body: JSON.stringify(putBody)
   });
 
   if (resp.ok) {
