@@ -461,11 +461,11 @@ function buildPairHalfHTML(card, side) {
   <div class="pair-card-half">
     <div class="pair-word-row">
       <div class="pair-word-text">${word}${card['word'+side+'note'] ? `<span style="font-size:9px;color:var(--cream-dim);font-family:'Inter',sans-serif;font-weight:400;margin-left:4px;">*</span>` : ''}</div>
-      <button class="pair-word-audio" onclick="playAudio('${card['wordAudio'+side]||''}','${word}')">🔊</button>
+      <button class="pair-word-audio" onclick="playAudio('${card['wordAudio'+side]||''}','${qa(word)}')">🔊</button>
     </div>
     <div class="pair-card-img">${imgContent}</div>
     <div class="pair-sentence">
-      <span class="pair-s-audio" onclick="playAudio('${card['sentenceAudio'+side]||''}','${sentence}')">🔊</span>
+      <span class="pair-s-audio" onclick="playAudio('${card['sentenceAudio'+side]||''}','${qa(sentence)}')">🔊</span>
       <span>${highlightWord(sentence, word)}</span>
     </div>
     <div>
@@ -477,14 +477,14 @@ function buildPairHalfHTML(card, side) {
     <div class="trio-wrap" id="pair-wrap-${side}-${word}" style="padding:10px;margin-top:4px;">
       <div class="trio-row">
         <button class="trio-btn model" style="font-size:11px;"
-          onclick="playAudio('${card['wordAudio'+side]||''}','${word}')">
+          onclick="playAudio('${card['wordAudio'+side]||''}','${qa(word)}')">
           <span class="trio-icon">&#128266;</span><span class="trio-label">Model</span>
         </button>
         <button class="trio-btn playback" id="pair-you-${side}-${word}" style="font-size:11px;">
           <span class="trio-icon">&#9654;</span><span class="trio-label">You</span>
         </button>
         <button class="trio-btn record" id="pair-rec-${side}-${word}" style="font-size:11px;"
-          onclick="togglePairRec(this,'${word}','${side}')">
+          onclick="togglePairRec(this,'${qa(word)}','${side}')">
           <span class="trio-icon" id="pair-ri-${side}-${word}">&#127908;</span>
           <span class="trio-label" id="pair-rl-${side}-${word}">Record</span>
         </button>
@@ -516,6 +516,9 @@ function stepPair(dir) {
 /* ═══════════════════════════════════════════════
    AUDIO
 ═══════════════════════════════════════════════ */
+/* Escape single quotes for safe use inside onclick='...' attributes */
+function qa(str) { return str ? String(str).replace(/'/g, '&#39;') : ''; }
+
 function playAudio(url, fallbackTTS) {
   if (url) {
     const a = new Audio(url);
