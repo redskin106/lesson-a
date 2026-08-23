@@ -31,10 +31,19 @@ function initPlayer() {
 
 async function loadDeck() {
   const overlay = document.getElementById('loading-overlay');
+  const label   = document.getElementById('loading-label');
+  const bar     = document.getElementById('loading-bar-fill');
+  function setLoad(pct, txt) {
+    if (bar)   bar.style.width = pct + '%';
+    if (label) label.textContent = txt;
+  }
   try {
-    const res = await fetch(DECK_URL, { cache: 'no-cache' });
+    setLoad(20, 'Fetching deck…');
+    const res = await fetch(DECK_URL);
     if (!res.ok) throw new Error('HTTP ' + res.status);
+    setLoad(60, 'Parsing…');
     DECK = await res.json();
+    setLoad(90, 'Building cards…');
   } catch (e) {
     if (overlay) overlay.innerHTML =
       '<div style="color:#e05c5c;font-family:Inter,sans-serif;padding:32px;text-align:center;line-height:1.8">'
