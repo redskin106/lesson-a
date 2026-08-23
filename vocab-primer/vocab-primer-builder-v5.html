@@ -933,14 +933,11 @@ function setPhCustom(field, pi, cardIdx, input) {
 function buildAudioSection(card, i, type) {
   const rows = type === 'single'
     ? [ { key:'audioWord', label:'Word audio', text:card.word },
-        { key:'audioSentence', label:'Sentence audio', text:card.sentence },
-        ...(card.phonemes||[]).map((ph,pi) => ({ key:`audioPh_${pi}`, label:`Phoneme "${ph.s}"`, text:ph.s })) ]
+        { key:'audioSentence', label:'Sentence audio', text:card.sentence } ]
     : [ { key:'audio1Word', label:`${card.word1} audio`, text:card.word1 },
         { key:'audio1Sentence', label:`${card.word1} sentence`, text:card.sentence1 },
         { key:'audio2Word', label:`${card.word2} audio`, text:card.word2 },
-        { key:'audio2Sentence', label:`${card.word2} sentence`, text:card.sentence2 },
-        ...(card.phonemes1||[]).map((ph,pi) => ({ key:`audio1Ph_${pi}`, label:`${card.word1} "${ph.s}"`, text:ph.s })),
-        ...(card.phonemes2||[]).map((ph,pi) => ({ key:`audio2Ph_${pi}`, label:`${card.word2} "${ph.s}"`, text:ph.s })) ];
+        { key:'audio2Sentence', label:`${card.word2} sentence`, text:card.sentence2 } ];
 
   const rowsHtml = rows.map(r => {
     const blobKey = `${i}_${r.key}`;
@@ -1217,12 +1214,16 @@ function openExport() {
 function downloadDeckJSON() {
   const deck = buildDeckJSON();
   const json = JSON.stringify(deck, null, 2);
+  const sizeKB = Math.round(json.length / 1024);
+  if (sizeKB > 2048) {
+    toast(`⚠️ JSON is ${Math.round(sizeKB/1024)}MB — audio data embedded. Download audio ZIP separately for safe backup.`);
+  }
   const blob = new Blob([json], {type:'application/json'});
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href = url; a.download = 'vocab-deck.json'; a.click();
   URL.revokeObjectURL(url);
-  toast('✅ vocab-deck.json downloaded');
+  if (sizeKB <= 2048) toast('✅ vocab-deck.json downloaded');
 }
 function closeExport() { document.getElementById('export-modal').classList.remove('open'); }
 function copyExport() { navigator.clipboard.writeText(document.getElementById('export-pre').textContent).then(()=>toast('📋 Copied!')); }
@@ -1334,7 +1335,7 @@ async function confirmPush() {
   document.getElementById('push-confirm-actions').style.display = 'none';
   document.getElementById('push-progress').classList.add('visible');
 
-  // Step 1 — Fetch primer
+  // Step 1 — Fetch primer (check size first)
   setPushProgress(15, 'Fetching primer from GitHub…');
   let sha = '', rawB64 = '';
   try {
@@ -1342,6 +1343,11 @@ async function confirmPush() {
       { headers:{Authorization:'token '+pat, Accept:'application/vnd.github.v3+json'} });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
+    // GitHub contents API returns encoding:'none' and empty content for files >1MB
+    if (d.encoding === 'none' || !d.content) {
+      toast('⚠️ Primer file is too large for the GitHub API (>1MB). Use ⬇ View DECK JSON → copy the JSON, then paste it into the primer file manually via github.com.');
+      closePushModal(); return;
+    }
     sha    = d.sha;
     rawB64 = d.content.replace(/\n/g, '');
   } catch(e) { toast('Could not fetch primer: ' + e.message); closePushModal(); return; }
@@ -1403,7 +1409,7 @@ async function confirmPush() {
     closePushModal();
   }
 }
-function esc(str) { return str ? String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+function esc(str) { return str ? String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 function markDirty() { dirty = true; }
 
 const SESSION_KEY = 'vp_builder_session';
