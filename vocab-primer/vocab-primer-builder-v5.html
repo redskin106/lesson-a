@@ -196,6 +196,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
 .colour-toggle input { cursor: pointer; }
 .colour-toggle label { font-size: 12px; color: var(--dim); cursor: pointer; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 <div class="shell">
@@ -218,6 +219,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
       <button class="btn-full sage" onclick="pushToGitHub()">🚀 Push to GitHub</button>
       <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 8px;">
       <button class="btn-full" onclick="clearSession()" style="color:var(--red);">↺ Reset to seed</button>
+      <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 8px;">
+      <button class="btn-full" id="btn-dl-all-audio" onclick="downloadAllAudio()" style="color:var(--sage);">💾 Download all audio</button>
     </div>
   </div>
 
@@ -951,6 +954,7 @@ function buildAudioSection(card, i, type) {
       <label class="btn sm" for="${uid}" title="Upload mp3/wav/ogg" style="cursor:pointer;">📂</label>
       <input type="file" id="${uid}" accept="audio/*" style="display:none" onchange="uploadOneAudio(${i},'${r.key}',this)">
       <button class="btn sm sage" onclick="playBlob('${blobKey}')" title="Play" ${has?'':'disabled style="opacity:0.35"'}>▶</button>
+      <button class="btn sm" onclick="downloadOneAudio('${blobKey}','${r.label}')" title="Download" ${has?'':'disabled style="opacity:0.35"'}>💾</button>
       <button class="btn sm red"  onclick="clearOneAudio(${i},'${r.key}')" title="Clear → revert to TTS" ${has?'':'disabled style="opacity:0.35"'}>✕</button>
     </div>`;
   }).join('');
@@ -961,6 +965,7 @@ function buildAudioSection(card, i, type) {
       <div style="display:flex;gap:5px;">
         <button class="btn sm coral" onclick="generateCardAudio(${i})" title="Skip if already generated">Generate missing</button>
         <button class="btn sm coral" onclick="generateCardAudio(${i},false,true)" title="Regenerate everything">↺ Regen</button>
+        <button class="btn sm" onclick="downloadCardAudio(${i})" title="Download all audio for this card as ZIP">💾 ZIP</button>
         <button class="btn sm red"   onclick="clearCardAudio(${i})" title="Remove all EL audio → reverts to TTS">✕ Clear all</button>
       </div>
     </div>
@@ -1066,6 +1071,102 @@ function updateElStatus(cardIdx, key, state) {
 }
 
 function playBlob(blobKey) { if (audioBlobs[blobKey]) new Audio(audioBlobs[blobKey]).play(); }
+
+/* ── Audio download helpers ── */
+function audioFilename(label) {
+  // label e.g. "big word", "big sentence", "big \"b\"" → big_word.mp3
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') + '.mp3';
+}
+
+function dataUrlToUint8(dataUrl) {
+  const b64 = dataUrl.split(',')[1];
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return arr;
+}
+
+function cardCategory(card) {
+  return card.category || getAutoCategory(card) || 'Uncategorised';
+}
+
+function triggerZipDownload(zip, filename) {
+  zip.generateAsync({ type: 'blob' }).then(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+}
+
+// Single slot download
+function downloadOneAudio(blobKey, label) {
+  const data = audioBlobs[blobKey];
+  if (!data) return;
+  const a = document.createElement('a');
+  a.href = data;
+  a.download = audioFilename(label);
+  a.click();
+}
+
+// Per-card ZIP — categorised folder
+function downloadCardAudio(cardIdx) {
+  const card = cards[cardIdx];
+  const cat  = cardCategory(card);
+  const zip  = new JSZip();
+  const folder = zip.folder(cat);
+
+  const slots = card.type === 'single'
+    ? [ { key: 'audioWord',     label: `${card.word}_word` },
+        { key: 'audioSentence', label: `${card.word}_sentence` } ]
+    : [ { key: 'audio1Word',     label: `${card.word1}_word` },
+        { key: 'audio1Sentence', label: `${card.word1}_sentence` },
+        { key: 'audio2Word',     label: `${card.word2}_word` },
+        { key: 'audio2Sentence', label: `${card.word2}_sentence` } ];
+
+  let count = 0;
+  slots.forEach(s => {
+    const data = audioBlobs[`${cardIdx}_${s.key}`];
+    if (data) { folder.file(audioFilename(s.label), dataUrlToUint8(data)); count++; }
+  });
+
+  if (!count) { toast('⚠️ No audio to download for this card'); return; }
+  const zipName = card.type === 'single'
+    ? `${card.word}-audio.zip`
+    : `${card.word1}-${card.word2}-audio.zip`;
+  triggerZipDownload(zip, zipName);
+}
+
+// Global deck ZIP — one folder per category
+function downloadAllAudio() {
+  const zip = new JSZip();
+  let count = 0;
+
+  cards.forEach((card, ci) => {
+    const cat    = cardCategory(card);
+    const folder = zip.folder(cat);
+
+    const slots = card.type === 'single'
+      ? [ { key: 'audioWord',     label: `${card.word}_word` },
+          { key: 'audioSentence', label: `${card.word}_sentence` } ]
+      : [ { key: 'audio1Word',     label: `${card.word1}_word` },
+          { key: 'audio1Sentence', label: `${card.word1}_sentence` },
+          { key: 'audio2Word',     label: `${card.word2}_word` },
+          { key: 'audio2Sentence', label: `${card.word2}_sentence` } ];
+
+    slots.forEach(s => {
+      const data = audioBlobs[`${ci}_${s.key}`];
+      if (data) { folder.file(audioFilename(s.label), dataUrlToUint8(data)); count++; }
+    });
+  });
+
+  if (!count) { toast('⚠️ No audio generated yet'); return; }
+  const lessonName = (document.getElementById('lesson-name').value || 'deck')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  triggerZipDownload(zip, `${lessonName}-audio.zip`);
+  toast(`💾 Zipping ${count} audio files…`);
+}
 
 /* ═══════════════════════════════════
    EXPORT / PUSH
