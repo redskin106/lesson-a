@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Describing People — Vocab Primer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vocab-primer-player.css?v=2">
+</head>
+<body>
+<div id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-label">Loading deck…</div>
+  <div class="loading-bar-track"><div class="loading-bar-fill" id="loading-bar-fill"></div></div>
+</div>
+<div class="app">
+
+<!-- ══════════════════════
+     INDEX
+══════════════════════ -->
+<div class="screen active" id="screen-index">
+  <div class="idx-header">
+    <div class="idx-eyebrow" id="idx-lesson-name">Describing People</div>
+    <div class="idx-title">Today's words</div>
+    <div class="idx-sub">Study at your own pace. Tap any word to begin.</div>
+  </div>
+  <div class="idx-progress">
+    <div class="prog-row">
+      <span class="prog-label">Your progress</span>
+      <span class="prog-count" id="prog-count">0 confident</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="card-grid" id="card-grid"></div>
+</div>
+
+<!-- ══════════════════════
+     SINGLE CARD
+══════════════════════ -->
+<div class="screen" id="screen-single">
+  <div class="top-nav">
+    <button class="nav-back" onclick="goIndex()">Home</button>
+    <span class="nav-counter" id="sc-counter"></span>
+    <span class="nav-tier" id="sc-tier"></span>
+  </div>
+  <div class="card-scroll" id="sc-scroll">
+    <div class="word-hero">
+      <div class="word-text" id="sc-word"></div>
+      <button class="word-audio" id="sc-word-audio" onclick="playWordAudio()">🔊</button>
+    </div>
+    <div class="card-img" id="sc-img-block">
+      <div id="sc-img-inner"></div>
+      <button class="card-video-btn" id="sc-video-btn" style="display:none" onclick="openVideo()">📹 Video reference</button>
+    </div>
+    <div class="illus-toggle" id="sc-illus-toggle" style="display:none">
+      <span>💡</span><span id="sc-illus-label">Show illustration</span>
+    </div>
+    <div>
+      <div class="slabel">Example</div>
+      <div class="sentence-block">
+        <div class="sentence-text" id="sc-sentence"></div>
+        <button class="sentence-audio" id="sc-sentence-audio" onclick="playSentenceAudio()">🔊</button>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">Sounds</div>
+      <div class="phoneme-tiles" id="sc-phonemes"></div>
+    </div>
+    <div>
+      <div class="slabel">Say it</div>
+      <div class="trio-wrap" id="sc-trio-wrap">
+        <div class="trio-row">
+          <button class="trio-btn model" id="sc-model-btn" onclick="playModelAudio()">
+            <span class="trio-icon">🔊</span>
+            <span class="trio-label">Model</span>
+          </button>
+          <button class="trio-btn playback" id="sc-play-btn">
+            <span class="trio-icon" id="sc-play-icon">▶</span>
+            <span class="trio-label">You</span>
+          </button>
+          <button class="trio-btn record" id="sc-rec-btn">
+            <span class="trio-icon" id="sc-rec-icon">🎤</span>
+            <span class="trio-label" id="sc-rec-label">Record</span>
+          </button>
+        </div>
+        <p class="trio-hint" id="sc-trio-hint">Hear the model, then record yourself.</p>
+        <div class="compare-card" id="sc-compare-card">
+          <button class="compare-play" id="sc-compare-play">▶</button>
+          <div class="compare-info">
+            <div class="compare-title">Compare with previous try</div>
+            <div class="compare-sub" id="sc-compare-sub"></div>
+          </div>
+        </div>
+        <div id="sc-history-wrap"></div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">How did it go?</div>
+      <div class="rating-row">
+        <button class="rating-btn" id="sc-got-it"     onclick="rateCard('got-it')">Got it</button>
+        <button class="rating-btn" id="sc-practicing" onclick="rateCard('practicing')">Still practising</button>
+      </div>
+    </div>
+  </div>
+  <div class="card-arrows">
+    <button class="arrow-btn" id="sc-prev" onclick="stepCard(-1)">&larr; Prev</button>
+    <button class="arrow-btn" id="sc-next" onclick="stepCard(1)">Next &rarr;</button>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     PAIR CARD
+══════════════════════ -->
+<div class="screen" id="screen-pair">
+  <div class="top-nav">
+    <button class="nav-back" onclick="goIndex()">Home</button>
+    <span class="nav-counter" id="pc-counter"></span>
+    <span class="nav-tier" id="pc-tier"></span>
+  </div>
+  <div class="rotate-nudge">↔ Rotate for more space</div>
+  <div class="pair-card-layout" id="pair-card-layout"></div>
+  <div class="card-arrows">
+    <button class="arrow-btn" id="pc-prev" onclick="stepPair(-1)">&larr; Prev</button>
+    <button class="arrow-btn" id="pc-next" onclick="stepPair(1)">Next &rarr;</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- VIDEO MODAL -->
+<div class="modal-bg" id="video-modal" onclick="closeVideo()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-video">
+      <div class="modal-play">▶</div>
+    </div>
+    <div class="modal-footer">
+      <div>
+        <div class="modal-info-title" id="modal-title"></div>
+        <div class="modal-info-sub"   id="modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeVideo()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>const DECK_URL = 'vocab-describe-people.json';</script>
+<script src="vocab-primer-player.js?v=3"></script>
+</body>
+</html>
