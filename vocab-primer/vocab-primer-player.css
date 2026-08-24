@@ -225,6 +225,10 @@ html, body {
 .word-audio:active { background: rgba(232,115,74,0.35); }
 
 /* Card image */
+/* Wrapper is the flex child — percentage padding resolves against its block width */
+.card-img-wrap {
+  width: 100%; display: block;
+}
 .card-img {
   border-radius: 14px; overflow: hidden; background: #272320;
   width: 100%; padding-bottom: 100%; height: 0; position: relative;
