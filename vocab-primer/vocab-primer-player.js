@@ -308,9 +308,9 @@ function renderSingle() {
   ilToggle.onclick = () => {
     showingIllus = !showingIllus;
     const imgInner = document.getElementById('sc-img-inner');
-    const src = showingIllus ? card.illustration : (card.image || null);
+    imgInner.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;';
     if (src) {
-      imgInner.innerHTML = `<img src="${'${src}'}" alt="${'${card.word}'}" style="width:85%;height:85%;object-fit:contain;">`;
+      imgInner.innerHTML = `<img src="${'${src}'}" alt="${'${card.word}'}" style="width:100%;height:100%;object-fit:cover;">`;  
     } else {
       imgInner.innerHTML = `<span style="font-size:90px;">${'${card.emoji}'}</span>`;
     }
