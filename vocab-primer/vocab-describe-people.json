@@ -484,7 +484,7 @@
       "wordAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/tall_word.mp3",
       "wordAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/short_word.mp3",
       "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/tall_sentence.mp3",
-      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/short_sentence.mp3",
+      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/short_build_sentence.mp3",
       "category": "Build",
       "image1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/tall.png",
       "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/images/short.png"
@@ -1036,7 +1036,7 @@
         }
       ],
       "wordAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/long_word.mp3",
-      "sentenceAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/long_sentence.mp3",
+      "sentenceAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/long_face_sentence.mp3",
       "category": "Face",
       "image": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/images/long.png"
     },
@@ -1268,8 +1268,8 @@
       ],
       "wordAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/long_word.mp3",
       "wordAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/short_word.mp3",
-      "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/long_sentence.mp3",
-      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/short_sentence.mp3",
+      "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/long_hair_sentence.mp3",
+      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/short_hair_sentence.mp3",
       "category": "Hair",
       "image1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/long.png",
       "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/short.webp"
@@ -1391,7 +1391,7 @@
       "wordAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/neat_word.mp3",
       "wordAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/messy_word.mp3",
       "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/neat_sentence.mp3",
-      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/messy_sentence.mp3",
+      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/messy_hair_sentence.mp3",
       "category": "Hair",
       "image1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/neat.png",
       "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/messy.png"
@@ -1441,8 +1441,8 @@
       ],
       "wordAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/dark_word.mp3",
       "wordAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/light_word.mp3",
-      "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/dark_sentence.mp3",
-      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/light_sentence.mp3",
+      "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/dark_hair_sentence.mp3",
+      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/light_hair_sentence.mp3",
       "category": "Hair",
       "image1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/images/dark.png",
       "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/images/light.png"
@@ -1851,7 +1851,7 @@
       "wordAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/dark_word.mp3",
       "wordAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/light_word.mp3",
       "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/dark_sentence.mp3",
-      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/light_sentence.mp3",
+      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/light_skin_sentence.mp3",
       "category": "Skin",
       "image1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/dark.webp",
       "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/light.png"
