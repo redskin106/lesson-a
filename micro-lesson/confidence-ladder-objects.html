@@ -1133,7 +1133,7 @@ function pickTransactional(idx) {
 
   if (z.transactional[idx].correct) {
     btns[idx].classList.add('correct');
-    showFeedback('correct', '✓ Good. That's exactly the right question.');
+    showFeedback('correct', '✓ Good. That\u2019s exactly the right question.');
     setTimeout(() => { currentStep = 1; renderZone(); }, 1000);
   } else {
     btns[idx].classList.add('wrong');
