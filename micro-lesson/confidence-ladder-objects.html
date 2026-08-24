@@ -6,1525 +6,951 @@
 <title>Confidence Ladder — Objects</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@600;700&display=swap');
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg:         #ffffff;
-  --surface:    #f7f7f5;
-  --card:       #ffffff;
-  --border:     rgba(0,0,0,0.08);
-  --border2:    rgba(0,0,0,0.14);
-  --text:       #1a1a1a;
-  --dim:        rgba(26,26,26,0.45);
-  --faint:      rgba(26,26,26,0.05);
-
-  /* Tile colours */
-  --tile-colour:   #e53935;
-  --tile-size:     #d81b60;
-  --tile-shape:    #388e3c;
-  --tile-noun:     #1565c0;
-  --tile-detail:   #e65100;
-  --tile-material: #424242;
-  --tile-texture:  #6a1b9a;
-  --tile-reason:   #311b92;
-  --tile-default:  #455a64;
-
-  /* Pyramid tiers */
-  --bronze: #c9a84c;
-  --silver: #78909c;
-  --gold:   #e8a020;
-
-  --coral:  #e8734a;
-  --sage:   #5a9e7c;
-  --radius: 14px;
-  --pill:   999px;
-
-  /* Notebook */
-  --notebook-bg: #fdf8ed;
-  --notebook-border: rgba(201,168,76,0.3);
-  --notebook-text: #6b5a2e;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--surface:#f7f7f5;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1a1a;--dim:rgba(26,26,26,0.45);--faint:rgba(26,26,26,0.05);
+  --coral:#e8734a;--sage:#5a9e7c;--gold:#c9a84c;--radius:14px;--pill:999px;
+  --nb-bg:#fdf8ed;--nb-border:rgba(201,168,76,0.3);--nb-text:#6b5a2e;
 }
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;font-size:16px;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+.shell{max-width:600px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+/* Header */
+.hdr{padding:16px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10}
+.hdr-back{background:none;border:none;color:var(--dim);cursor:pointer;font-size:20px;padding:4px;line-height:1}
+.hdr-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;flex:1}
+.hdr-zone{font-size:11px;font-weight:600;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+.replay{background:none;border:1px solid var(--border2);border-radius:var(--pill);color:var(--dim);cursor:pointer;font-size:12px;padding:5px 10px}
+.replay:hover{border-color:var(--coral);color:var(--coral)}
 
-/* ── Shell ── */
-.shell {
-  max-width: 600px;
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+/* Content */
+.content{flex:1;padding:20px;display:flex;flex-direction:column;gap:16px}
 
-/* ── Header ── */
-.header {
-  padding: 20px 24px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--bg);
-  z-index: 10;
-}
-.header-back { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 18px; padding: 4px; line-height: 1; }
-.header-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; flex: 1; }
-.header-zone  { font-size: 11px; font-weight: 600; color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; }
-.replay-btn   { background: none; border: 1px solid var(--border2); border-radius: var(--pill); color: var(--dim); cursor: pointer; font-size: 13px; padding: 5px 10px; display: flex; align-items: center; gap: 4px; }
-.replay-btn:hover { border-color: var(--coral); color: var(--coral); }
+/* Corner image */
+.corner-img{position:fixed;bottom:20px;right:16px;width:68px;height:68px;border-radius:12px;border:2px solid var(--border2);object-fit:cover;background:var(--surface);box-shadow:0 4px 16px rgba(0,0,0,.12);display:none;z-index:5}
+.corner-img.on{display:block}
 
-/* ── Content area ── */
-.content {
-  flex: 1;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+/* Typography */
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.ex-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 
-/* ── Object anchor image ── */
-.obj-image-corner {
-  position: fixed;
-  bottom: 24px;
-  right: 20px;
-  width: 72px;
-  height: 72px;
-  border-radius: 12px;
-  border: 2px solid var(--border2);
-  object-fit: cover;
-  background: var(--surface);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  display: none;
-  z-index: 5;
-}
-.obj-image-corner.visible { display: block; }
+/* Model card */
+.model-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:18px 20px;display:flex;align-items:flex-start;gap:12px}
+.model-text{font-family:'Fraunces',serif;font-size:22px;font-weight:600;line-height:1.3;flex:1}
+.model-play{background:none;border:none;font-size:20px;cursor:pointer;flex-shrink:0;opacity:.5;margin-top:2px}
+.model-play:hover{opacity:1}
 
-/* ── Zone label ── */
-.zone-eyebrow {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--dim);
-  margin-bottom: -8px;
-}
+/* Hero image zone 0 */
+.hero-img{width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border)}
 
-/* ── Model sentence card ── */
-.model-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 20px 22px;
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
-.model-sentence {
-  font-family: 'Fraunces', serif;
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.3;
-  flex: 1;
-  color: var(--text);
-}
-.model-play {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-top: 2px;
-  opacity: 0.5;
-  transition: opacity 0.15s;
-}
-.model-play:hover { opacity: 1; }
+/* Word display zone 0 */
+.word-box{text-align:center;padding:24px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}
+.word-big{font-family:'Fraunces',serif;font-size:48px;font-weight:700;letter-spacing:-.02em}
+.hear-btn{background:none;border:2px solid var(--border2);border-radius:var(--pill);padding:10px 20px;font-size:14px;font-weight:600;color:var(--dim);cursor:pointer;margin-top:14px;display:inline-flex;align-items:center;gap:6px}
+.hear-btn:hover{border-color:var(--coral);color:var(--coral)}
 
-/* ── Hero image (zone 0) ── */
-.hero-image {
-  width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: contain;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
+/* Tile drop zone */
+.drop-zone{min-height:54px;background:var(--surface);border:2px dashed var(--border2);border-radius:var(--radius);padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.drop-zone.has-tiles{border-style:solid;border-color:var(--border);background:var(--bg)}
+.drop-zone.ok{border-color:var(--sage)!important;background:rgba(90,158,124,.06)!important}
+.drop-zone.bad{border-color:var(--coral)!important}
 
-/* ── Word display (zone 0) ── */
-.word-display {
-  text-align: center;
-  padding: 24px;
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-}
-.word-big {
-  font-family: 'Fraunces', serif;
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.02em;
-}
-.word-play {
-  background: none;
-  border: 2px solid var(--border2);
-  border-radius: var(--pill);
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--dim);
-  cursor: pointer;
-  margin-top: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s;
-}
-.word-play:hover { border-color: var(--coral); color: var(--coral); }
+/* Tile bank */
+.tile-bank{display:flex;flex-wrap:wrap;gap:8px}
 
-/* ── Exercise label ── */
-.ex-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
-
-/* ── Tile drop zone ── */
-.tile-drop-zone {
-  min-height: 56px;
-  background: var(--surface);
-  border: 2px dashed var(--border2);
-  border-radius: var(--radius);
-  padding: 10px 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  transition: border-color 0.15s;
-}
-.tile-drop-zone.has-tiles { border-style: solid; border-color: var(--border); background: var(--bg); }
-.tile-drop-zone.correct   { border-color: var(--sage); background: rgba(90,158,124,0.06); }
-.tile-drop-zone.wrong     { border-color: var(--coral); background: rgba(232,115,74,0.06); }
-
-/* ── Tile bank ── */
-.tile-bank {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* ── Tile chip ── */
-.tile {
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  border: none;
-  color: #fff;
-  transition: transform 0.1s, opacity 0.15s;
-  position: relative;
-}
-.tile:active { transform: scale(0.95); }
-.tile.placed { opacity: 0.35; cursor: default; pointer-events: none; }
-.tile.preplaced { opacity: 0.65; cursor: default; pointer-events: none; border: 2px dashed rgba(255,255,255,0.4); }
-
-/* Tile placed in drop zone — removable */
-.placed-tile {
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: transform 0.1s;
-}
-.placed-tile:active { transform: scale(0.95); }
-.placed-tile-remove { font-size: 12px; opacity: 0.6; }
+/* Tiles */
+.tile{padding:9px 15px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;color:#fff;transition:transform .1s,opacity .15s;-webkit-tap-highlight-color:transparent}
+.tile:active{transform:scale(.93)}
+.tile.used{opacity:.3;pointer-events:none}
+.placed-tile{padding:8px 10px 8px 13px;border-radius:10px;font-size:14px;font-weight:600;color:#fff;display:inline-flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.placed-tile.fixed{cursor:default}
+.placed-tile-x{font-size:12px;opacity:.7;background:none;border:none;color:inherit;cursor:pointer;padding:0;line-height:1}
 
 /* Tile colours */
-.tc-colour   { background: var(--tile-colour); }
-.tc-size     { background: var(--tile-size); }
-.tc-shape    { background: var(--tile-shape); }
-.tc-noun     { background: var(--tile-noun); }
-.tc-detail   { background: var(--tile-detail); }
-.tc-material { background: var(--tile-material); }
-.tc-texture  { background: var(--tile-texture); }
-.tc-reason   { background: var(--tile-reason); }
-.tc-default  { background: var(--tile-default); }
+.tc-noun    {background:#1565c0}
+.tc-colour  {background:#e53935}
+.tc-size    {background:#d81b60}
+.tc-shape   {background:#388e3c}
+.tc-detail  {background:#e65100}
+.tc-material{background:#424242}
+.tc-texture {background:#6a1b9a}
+.tc-reason  {background:#311b92}
+.tc-default {background:#455a64}
 
-/* ── Check button ── */
-.check-btn {
-  width: 100%;
-  padding: 16px;
-  border-radius: var(--radius);
-  border: none;
-  background: var(--text);
-  color: var(--bg);
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
-  letter-spacing: 0.01em;
-}
-.check-btn:hover { opacity: 0.85; }
-.check-btn:active { transform: scale(0.98); }
-.check-btn:disabled { opacity: 0.3; cursor: default; }
+/* Buttons */
+.check-btn{width:100%;padding:16px;border-radius:var(--radius);border:none;background:var(--text);color:var(--bg);font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.01em;-webkit-tap-highlight-color:transparent}
+.check-btn:hover{opacity:.85}
+.check-btn:active{transform:scale(.98)}
+.check-btn:disabled{opacity:.3;cursor:default}
+.cont-btn{width:100%;padding:16px;border-radius:var(--radius);border:2px solid var(--border2);background:transparent;color:var(--text);font-size:16px;font-weight:700;cursor:pointer}
+.cont-btn:hover{border-color:var(--text)}
+.cont-btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
 
-/* ── Continue button ── */
-.continue-btn {
-  width: 100%;
-  padding: 16px;
-  border-radius: var(--radius);
-  border: 2px solid var(--border2);
-  background: transparent;
-  color: var(--text);
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.continue-btn:hover { border-color: var(--text); }
-.continue-btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+/* Feedback */
+.feedback{border-radius:var(--radius);padding:12px 16px;font-size:14px;font-weight:500;display:none}
+.feedback.ok  {display:block;background:rgba(90,158,124,.1);border:1px solid rgba(90,158,124,.3);color:#2d6b4f}
+.feedback.hint{display:block;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:#6b5a2e}
 
-/* ── Feedback ── */
-.feedback {
-  border-radius: var(--radius);
-  padding: 14px 18px;
-  font-size: 14px;
-  font-weight: 500;
-  display: none;
-}
-.feedback.correct { background: rgba(90,158,124,0.1); border: 1px solid rgba(90,158,124,0.3); color: #2d6b4f; }
-.feedback.hint    { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3); color: #6b5a2e; }
-.feedback.visible { display: block; }
+/* Colour swatches */
+.swatches{display:flex;gap:14px;justify-content:center;padding:8px 0}
+.swatch{width:64px;height:64px;border-radius:12px;cursor:pointer;border:3px solid transparent;transition:transform .15s,border-color .15s}
+.swatch:hover{transform:scale(1.08)}
+.swatch.selected{border-color:var(--text)}
+.swatch.correct {border-color:var(--sage)}
+.swatch.wrong   {border-color:var(--coral);opacity:.5}
 
-/* ── Colour choice (zone 2 step 1) ── */
-.colour-choices {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  padding: 8px 0;
-}
-.colour-chip {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 3px solid transparent;
-  transition: transform 0.15s, border-color 0.15s;
-  position: relative;
-}
-.colour-chip:hover { transform: scale(1.08); }
-.colour-chip.selected { border-color: var(--text); }
-.colour-chip.correct-pick  { border-color: var(--sage); }
-.colour-chip.wrong-pick    { border-color: var(--coral); opacity: 0.5; }
+/* Yes/No */
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.q-text{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin-bottom:16px}
+.yn-row{display:flex;gap:10px}
+.yn-btn{flex:1;padding:14px;border-radius:var(--radius);border:2px solid var(--border2);background:transparent;font-size:16px;font-weight:700;cursor:pointer}
+.yn-btn:hover{border-color:var(--text)}
+.yn-btn.ok  {background:rgba(90,158,124,.1);border-color:var(--sage);color:#2d6b4f}
+.yn-btn.bad {background:rgba(232,115,74,.08);border-color:var(--coral);color:var(--coral)}
 
-/* ── Yes/No questions (zone 4) ── */
-.question-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 22px;
-}
-.question-text {
-  font-family: 'Fraunces', serif;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 16px;
-}
-.yn-buttons { display: flex; gap: 10px; }
-.yn-btn {
-  flex: 1;
-  padding: 14px;
-  border-radius: var(--radius);
-  border: 2px solid var(--border2);
-  background: transparent;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.yn-btn:hover { border-color: var(--text); }
-.yn-btn.correct { background: rgba(90,158,124,0.1); border-color: var(--sage); color: #2d6b4f; }
-.yn-btn.wrong   { background: rgba(232,115,74,0.08); border-color: var(--coral); color: var(--coral); }
+/* Silhouette */
+.silhouette-wrap{position:relative;width:100%;aspect-ratio:4/3;border-radius:var(--radius);overflow:hidden;background:var(--surface);border:1px solid var(--border)}
+.silhouette-img{width:100%;height:100%;object-fit:contain;transition:filter 1s ease}
+.silhouette-label{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(255,255,255,.8);background:rgba(0,0,0,.4);padding:3px 10px;border-radius:var(--pill)}
 
-/* ── Silhouette reveal (zone 4) ── */
-.silhouette-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4/3;
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-.silhouette-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: brightness(0);
-  transition: filter 1s ease;
-}
-.silhouette-progress {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 11px;
-  color: rgba(255,255,255,0.7);
-  background: rgba(0,0,0,0.4);
-  padding: 3px 10px;
-  border-radius: var(--pill);
+/* Choices */
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice-btn{width:100%;text-align:left;padding:14px 18px;border-radius:var(--radius);border:2px solid var(--border2);background:var(--bg);font-size:15px;font-weight:500;cursor:pointer;color:var(--text)}
+.choice-btn:hover{border-color:var(--text);background:var(--surface)}
+.choice-btn.ok    {background:rgba(90,158,124,.1);border-color:var(--sage);color:#2d6b4f}
+.choice-btn.bad   {background:rgba(232,115,74,.08);border-color:var(--coral);color:var(--coral);opacity:.6}
+.choice-btn.allok {background:rgba(90,158,124,.1);border-color:var(--sage);color:#2d6b4f}
+
+/* Beat */
+.beat{text-align:center;padding:40px 20px}
+.beat-text{font-family:'Fraunces',serif;font-size:24px;font-weight:600;line-height:1.3}
+
+/* Notebook */
+.nb{background:var(--nb-bg);border:1px solid var(--nb-border);border-radius:var(--radius);padding:16px 18px;display:flex;gap:12px;align-items:flex-start}
+.nb-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.nb-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(107,90,46,.5);margin-bottom:2px}
+.nb-text{font-size:15px;font-weight:500;color:var(--nb-text);line-height:1.5}
+
+/* Pyramid */
+.pyramid{display:flex;flex-direction:column;gap:6px}
+.p-tier{border-radius:10px;padding:14px 18px;font-size:15px;font-weight:500;line-height:1.4;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s;color:#fff}
+.p-tier.on{opacity:1;transform:translateY(0)}
+.p-tier.bronze{background:#c9a84c}
+.p-tier.silver{background:#78909c}
+.p-tier.gold  {background:#e8a020}
+.p-tier-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.7;margin-bottom:3px;display:block}
+
+/* Zone 5 frames */
+.frame-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px 22px}
+.frame-text{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin-bottom:6px}
+.frame-counter{font-size:12px;color:var(--dim);margin-bottom:14px}
+
+/* Landing */
+#landing{padding:32px 20px;max-width:600px;margin:0 auto}
+.land-title{font-family:'Fraunces',serif;font-size:28px;font-weight:700;margin-bottom:6px}
+.land-sub{font-size:14px;color:var(--dim);margin-bottom:28px}
+.name-row{display:flex;gap:10px;margin-bottom:32px}
+.name-input{flex:1;padding:14px 16px;border-radius:var(--radius);border:1.5px solid var(--border2);background:var(--surface);font-size:16px;color:var(--text)}
+.name-input:focus{outline:none;border-color:var(--text)}
+.start-btn{padding:14px 22px;border-radius:var(--radius);border:none;background:var(--text);color:var(--bg);font-size:15px;font-weight:700;cursor:pointer}
+.obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.obj-card{border:1.5px solid var(--border2);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:border-color .15s,transform .12s;background:var(--bg)}
+.obj-card:hover{border-color:var(--text);transform:translateY(-2px)}
+.obj-card.done{border-color:var(--sage)}
+.obj-emoji{font-size:48px;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--surface)}
+.obj-name{padding:10px 12px;font-size:14px;font-weight:600}
+.obj-done{font-size:11px;color:var(--sage);font-weight:600}
+
+/* Word guide */
+.guide-btn{position:fixed;bottom:100px;right:16px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--pill);padding:8px 12px;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1);z-index:6;display:none}
+.guide-btn.on{display:flex;align-items:center;gap:4px}
+.guide-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;display:none;align-items:flex-end}
+.guide-overlay.on{display:flex}
+.guide-panel{background:var(--bg);border-radius:18px 18px 0 0;padding:24px;width:100%;max-width:600px;margin:0 auto;max-height:70vh;overflow-y:auto}
+.guide-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:16px}
+.guide-table{width:100%;border-collapse:collapse}
+.guide-table td{padding:8px 10px;font-size:14px;border-bottom:1px solid var(--border)}
+.guide-table td:first-child{font-weight:700}
+.swatch-dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.guide-close{width:100%;margin-top:16px;padding:14px;border-radius:var(--radius);border:1.5px solid var(--border2);background:transparent;font-size:15px;font-weight:600;cursor:pointer}
+
+/* Dark mode */
+@media(prefers-color-scheme:dark){
+  :root{--bg:#0f1117;--surface:#171b24;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#e8eaf0;--dim:rgba(232,234,240,.45);--faint:rgba(232,234,240,.07);--nb-bg:rgba(201,168,76,.07);--nb-border:rgba(201,168,76,.2);--nb-text:#c9a84c}
+  .check-btn{background:#e8eaf0;color:#0f1117}
+  .cont-btn.primary{background:#e8eaf0;color:#0f1117;border-color:#e8eaf0}
+  .start-btn{background:#e8eaf0;color:#0f1117}
 }
 
-/* ── Multiple choice options ── */
-.choice-list { display: flex; flex-direction: column; gap: 10px; }
-.choice-btn {
-  width: 100%;
-  text-align: left;
-  padding: 14px 18px;
-  border-radius: var(--radius);
-  border: 2px solid var(--border2);
-  background: var(--bg);
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  color: var(--text);
-}
-.choice-btn:hover { border-color: var(--text); background: var(--surface); }
-.choice-btn.correct { background: rgba(90,158,124,0.1); border-color: var(--sage); color: #2d6b4f; }
-.choice-btn.wrong   { background: rgba(232,115,74,0.08); border-color: var(--coral); color: var(--coral); opacity: 0.6; }
-.choice-btn.all-good { background: rgba(90,158,124,0.1); border-color: var(--sage); color: #2d6b4f; }
-
-/* ── Zone transition beat ── */
-.zone-beat {
-  text-align: center;
-  padding: 40px 24px;
-}
-.zone-beat-text {
-  font-family: 'Fraunces', serif;
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--text);
-}
-
-/* ── Notebook prompt ── */
-.notebook-prompt {
-  background: var(--notebook-bg);
-  border: 1px solid var(--notebook-border);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-}
-.notebook-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
-.notebook-text {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--notebook-text);
-  line-height: 1.5;
-}
-.notebook-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(107,90,46,0.5);
-  margin-bottom: 4px;
-}
-
-/* ── Zone 6 — Pyramid reveal ── */
-.pyramid-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 8px 0;
-}
-.pyramid-tier {
-  border-radius: 10px;
-  padding: 14px 18px;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.4;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  color: #fff;
-}
-.pyramid-tier.visible { opacity: 1; transform: translateY(0); }
-.pyramid-tier.bronze  { background: var(--bronze); }
-.pyramid-tier.silver  { background: var(--silver); }
-.pyramid-tier.gold    { background: var(--gold); }
-
-.reveal-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0.7;
-  margin-bottom: 4px;
-  display: block;
-}
-.reveal-final {
-  text-align: center;
-  padding: 20px;
-  font-family: 'Fraunces', serif;
-  font-size: 18px;
-  color: var(--dim);
-}
-
-/* ── Word guide ── */
-.word-guide-btn {
-  position: fixed;
-  bottom: 108px;
-  right: 20px;
-  background: var(--bg);
-  border: 1px solid var(--border2);
-  border-radius: var(--pill);
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--dim);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  z-index: 6;
-  display: none;
-}
-.word-guide-btn.visible { display: flex; align-items: center; gap: 4px; }
-
-.guide-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 50; display: none; align-items: flex-end; }
-.guide-overlay.open { display: flex; }
-.guide-panel { background: var(--bg); border-radius: 18px 18px 0 0; padding: 24px; width: 100%; max-height: 70vh; overflow-y: auto; }
-.guide-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; }
-.guide-table { width: 100%; border-collapse: collapse; }
-.guide-table td { padding: 8px 10px; font-size: 14px; border-bottom: 1px solid var(--border); }
-.guide-table td:first-child { font-weight: 700; }
-.guide-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
-.guide-close { width: 100%; margin-top: 16px; padding: 14px; border-radius: var(--radius); border: 1.5px solid var(--border2); background: transparent; font-size: 15px; font-weight: 600; cursor: pointer; }
-
-/* ── Landing page ── */
-#landing { padding: 32px 24px; }
-.landing-title { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 700; margin-bottom: 6px; }
-.landing-sub { font-size: 14px; color: var(--dim); margin-bottom: 28px; }
-.name-input-wrap { display: flex; gap: 10px; margin-bottom: 32px; }
-.name-input { flex: 1; padding: 14px 16px; border-radius: var(--radius); border: 1.5px solid var(--border2); background: var(--surface); font-size: 16px; color: var(--text); }
-.name-input:focus { outline: none; border-color: var(--text); }
-.start-btn { padding: 14px 22px; border-radius: var(--radius); border: none; background: var(--text); color: var(--bg); font-size: 15px; font-weight: 700; cursor: pointer; }
-
-.obj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.obj-card {
-  border: 1.5px solid var(--border2);
-  border-radius: var(--radius);
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color 0.15s, transform 0.12s;
-  background: var(--bg);
-}
-.obj-card:hover { border-color: var(--text); transform: translateY(-2px); }
-.obj-card.done  { border-color: var(--sage); }
-.obj-card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 48px; }
-.obj-card-label { padding: 10px 12px; font-size: 14px; font-weight: 600; }
-.obj-card-done { font-size: 11px; color: var(--sage); font-weight: 600; }
-
-/* ── Animations ── */
-@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-.fade-up { animation: fadeUp 0.35s ease both; }
-
-/* ── Dark mode ── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:       #0f1117;
-    --surface:  #171b24;
-    --card:     #1e2330;
-    --border:   rgba(255,255,255,0.08);
-    --border2:  rgba(255,255,255,0.14);
-    --text:     #e8eaf0;
-    --dim:      rgba(232,234,240,0.45);
-    --faint:    rgba(232,234,240,0.07);
-    --notebook-bg: rgba(201,168,76,0.07);
-    --notebook-border: rgba(201,168,76,0.2);
-    --notebook-text: #c9a84c;
-  }
-  .check-btn  { background: #e8eaf0; color: #0f1117; }
-  .continue-btn.primary { background: #e8eaf0; color: #0f1117; border-color: #e8eaf0; }
-  .start-btn  { background: #e8eaf0; color: #0f1117; }
-  .silhouette-img { filter: brightness(0.15); }
-  .silhouette-img.revealed-full { filter: brightness(1); }
-}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .3s ease both}
 </style>
 </head>
 <body>
 
-<!-- ── Landing page ── -->
 <div id="landing">
-  <div class="landing-title">Let's describe things.</div>
-  <div class="landing-sub">One step at a time.</div>
-  <div class="name-input-wrap">
+  <div class="land-title">Let's describe things.</div>
+  <div class="land-sub">One step at a time.</div>
+  <div class="name-row">
     <input class="name-input" id="name-input" type="text" placeholder="Your first name" maxlength="30" autocomplete="off">
-    <button class="start-btn" onclick="startLanding()">Start →</button>
+    <button class="start-btn" id="start-btn" onclick="doStart()">Start →</button>
   </div>
-  <div style="font-size:12px;color:var(--dim);margin-bottom:10px;">Or tap an object below to begin</div>
   <div class="obj-grid" id="obj-grid"></div>
 </div>
 
-<!-- ── Lesson shell ── -->
-<div id="lesson-shell" style="display:none;">
+<div id="lesson" style="display:none">
   <div class="shell">
-    <div class="header">
-      <button class="header-back" onclick="goLanding()">←</button>
-      <div class="header-title" id="header-title">Bag</div>
-      <div class="header-zone"  id="header-zone">Zone 0</div>
-      <button class="replay-btn" id="replay-btn" onclick="replayAudio()">🔊 Replay</button>
+    <div class="hdr">
+      <button class="hdr-back" onclick="goHome()">←</button>
+      <div class="hdr-title" id="hdr-title">Bag</div>
+      <div class="hdr-zone"  id="hdr-zone">Zone 0</div>
+      <button class="replay" onclick="replayAudio()">🔊 Replay</button>
     </div>
-    <div class="content" id="screen-content"></div>
+    <div class="content" id="content"></div>
   </div>
 </div>
 
-<!-- ── Pinned object image ── -->
-<img id="obj-corner" class="obj-image-corner" src="" alt="">
+<img id="corner" class="corner-img" src="" alt="">
+<button class="guide-btn" id="guide-btn" onclick="openGuide()">❓ Word guide</button>
 
-<!-- ── Word guide button ── -->
-<button class="word-guide-btn" id="word-guide-btn" onclick="openGuide()">❓ Word guide</button>
-
-<!-- ── Word guide overlay ── -->
 <div class="guide-overlay" id="guide-overlay" onclick="closeGuide()">
   <div class="guide-panel" onclick="event.stopPropagation()">
     <div class="guide-title">Word Guide</div>
-    <table class="guide-table">
-      <tbody>
-        <tr><td><span class="guide-swatch" style="background:var(--tile-colour)"></span>colour</td><td style="color:var(--dim)">colour adjective</td></tr>
-        <tr><td><span class="guide-swatch" style="background:var(--tile-size)"></span>big / small</td><td style="color:var(--dim)">size adjective</td></tr>
-        <tr><td><span class="guide-swatch" style="background:var(--tile-shape)"></span>shape</td><td style="color:var(--dim)">shape adjective</td></tr>
-        <tr><td><span class="guide-swatch" style="background:var(--tile-noun)"></span>the thing</td><td style="color:var(--dim)">noun</td></tr>
-        <tr><td><span class="guide-swatch" style="background:var(--tile-detail)"></span>something special</td><td style="color:var(--dim)">detail</td></tr>
-        <tr><td><span class="guide-swatch" style="background:var(--tile-material)"></span>what it's made of</td><td style="color:var(--dim)">material noun</td></tr>
-        <tr><td><span class="guide-swatch" style="background:var(--tile-texture)"></span>how it feels</td><td style="color:var(--dim)">texture adjective</td></tr>
-        <tr><td><span class="guide-swatch" style="background:var(--tile-reason)"></span>because…</td><td style="color:var(--dim)">reason clause</td></tr>
-      </tbody>
-    </table>
+    <table class="guide-table"><tbody>
+      <tr><td><span class="swatch-dot" style="background:#1565c0"></span>the thing</td><td style="color:var(--dim)">noun</td></tr>
+      <tr><td><span class="swatch-dot" style="background:#e53935"></span>colour</td><td style="color:var(--dim)">colour adjective</td></tr>
+      <tr><td><span class="swatch-dot" style="background:#d81b60"></span>big / small</td><td style="color:var(--dim)">size adjective</td></tr>
+      <tr><td><span class="swatch-dot" style="background:#388e3c"></span>shape</td><td style="color:var(--dim)">shape adjective</td></tr>
+      <tr><td><span class="swatch-dot" style="background:#e65100"></span>special detail</td><td style="color:var(--dim)">feature</td></tr>
+      <tr><td><span class="swatch-dot" style="background:#424242"></span>what it's made of</td><td style="color:var(--dim)">material</td></tr>
+      <tr><td><span class="swatch-dot" style="background:#6a1b9a"></span>how it feels</td><td style="color:var(--dim)">texture</td></tr>
+      <tr><td><span class="swatch-dot" style="background:#311b92"></span>because…</td><td style="color:var(--dim)">reason clause</td></tr>
+    </tbody></table>
     <button class="guide-close" onclick="closeGuide()">Close</button>
   </div>
 </div>
 
 <script>
-// ──────────────────────────────────────────────
-//  DATA
-// ──────────────────────────────────────────────
-
-const STUDENT_NAME = () => localStorage.getItem('cl_name') || 'You';
-
-// Tile colour lookup
+// ── Tile colour map ──
 const TC = {
-  "It's":"tc-default","It":"tc-default","a":"tc-default","the":"tc-default",
   "bag":"tc-noun","zip":"tc-detail","strap":"tc-detail","handle":"tc-detail",
   "big":"tc-size","flat":"tc-size","small":"tc-size","heavy":"tc-size","light":"tc-size",
-  "black":"tc-colour","dirty":"tc-colour",
+  "black":"tc-colour","dirty":"tc-colour","white":"tc-colour",
   "smooth":"tc-texture","rough":"tc-texture","soft":"tc-texture",
-  "old":"tc-default","looks":"tc-default","feels":"tc-default",
-  "because":"tc-reason","it's":"tc-default","when":"tc-default","you":"tc-default","touch":"tc-default","it":"tc-default",
-  "has":"tc-default","doesn't":"tc-default","have":"tc-default",
-  "Is":"tc-default","it":"tc-default","big?":"tc-size",
-  "shaped":"tc-shape","like":"tc-default","rectangle":"tc-shape",
-  "Do":"tc-default","use":"tc-default","at":"tc-default","school?":"tc-default",
+  "shaped":"tc-shape","rectangle":"tc-shape",
+  "because":"tc-reason",
 };
-function tileClass(word) { return TC[word] || 'tc-default'; }
+function tc(word){ return TC[word] || "tc-default"; }
 
-// Lesson data — bag
-const BAG = {
-  id: 'bag',
-  name: 'Bag',
-  emoji: '🎒',
-  // image: provide a real URL or leave as placeholder
-  image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80',
+// ── Safe string for HTML attribute (avoids apostrophe issues) ──
+function eid(n){ return "t_"+n; }
 
-  zones: {
-    z0: {
-      word: 'bag',
-      notebook: 'Write the word. Draw the bag.'
-    },
-    z1: {
-      model: "It's a bag.",
-      build: { tiles: ["It's","a","bag"], preplaced: ["It's"] },
-      fixit: {
-        broken: "Bag a it's.",
-        prompt: "Something is wrong. Can you fix it?",
-        correct: "It's a bag.",
-        correctTiles: ["It's","a","bag"],
-        hints: [
-          { text: "It starts with It's.", preplaceExtra: [] },
-          { text: "A comes next.", preplaceExtra: ["a"] },
-          { text: "Now add the last word.", preplaceExtra: ["bag"] },
-        ]
-      },
-      notebook: "Write the sentence. It's a ___."
-    },
-    z2: {
-      model: "It's a big, flat, black bag.",
-      colourChoices: [
-        { colour: '#1565c0', label: 'blue', correct: false },
-        { colour: '#212121', label: 'black', correct: true },
-        { colour: '#e53935', label: 'red', correct: false },
-      ],
-      build: { tiles: ["It's","a","big","flat","black","bag"], preplaced: ["It's","a"] },
-      fixit: {
-        broken: "It's a black big flat bag.",
-        prompt: "Something is wrong. Can you fix it?",
-        correct: "It's a big, flat, black bag.",
-        correctTiles: ["It's","a","big","flat","black","bag"],
-        hints: [
-          { text: "Size comes first." },
-          { text: "Shape comes second." },
-          { text: "Colour comes third." },
-        ]
-      },
-      notebook: "Write the full sentence. Describe the colour, size and shape."
-    },
-    z3: {
-      model: "It has a zip.",
-      build: { tiles: ["It","has","a","zip"], preplaced: ["It","has"] },
-      fixit: {
-        broken: "It doesn't have a zip.",
-        prompt: "Look at the image. Is this correct?",
-        correct: "It has a zip.",
-        correctTiles: ["It","has","a","zip"],
-        hints: [
-          { text: "Look at the image. Can you see a zip?" },
-          { text: "It has a zip — not doesn't have." },
-          { text: "Try: It has a ___." },
-        ]
-      },
-      stretch: { sentence: "It doesn't have a strap.", tiles: ["It","doesn't","have","a","strap"] },
-      notebook: "Write one thing that is special about the bag."
-    },
-    z3b: {
-      model: "It looks old because it's dirty.",
-      build: { tiles: ["It","looks","old","because","it's","dirty"], preplaced: ["It"] },
-      fixit: {
-        broken: "It looks dirty because it's old.",
-        prompt: "Look at the image first. What do you see?",
-        correct: "It looks old because it's dirty.",
-        correctTiles: ["It","looks","old","because","it's","dirty"],
-        hints: [
-          { text: "The feeling comes first." },
-          { text: "It looks ___ old ___ because ___." },
-          { text: "It looks old because it's ___." },
-        ]
-      },
-      stretch: { sentence: "It feels smooth when you touch it.", tiles: ["It","feels","smooth","when","you","touch","it"] },
-      notebook: "Write how the bag makes you feel and why."
-    },
-    z4a: {
-      questions: [
-        { q: "Is it big?",   answer: "yes" },
-        { q: "Is it flat?",  answer: "yes" },
-        { q: "Is it black?", answer: "yes" },
-        { q: "Is it round?", answer: "no" },
-        { q: "Is it heavy?", answer: "no", extra: "No — it's light." },
-      ],
-      build: { sentence: "Is it big?", tiles: ["Is","it","big?"], hints: ["Questions start with Is.", "The thing comes next.", "Now add the describing word."] },
-      notebook: "Write two questions about the bag."
-    },
-    z4b: {
-      questions: [
-        { q: "Does it make a sound?",    answer: "no" },
-        { q: "Can it open and close?",   answer: "yes" },
-        { q: "Do you use it at school?", answer: "yes" },
-        { q: "Is it made of plastic?",   answer: "no", extra: "No — it's made of cloth." },
-      ],
-      build: { sentence: "Do you use it at school?", tiles: ["Do","you","use","it","at","school?"], hints: ["Questions can start with Do.", "Who uses it?", "Where do you use it?"] },
-      notebook: "Write two more questions about the bag."
-    },
-    z4c: {
-      scenario: "You are in a shop. You want this bag. You don't understand the price.",
-      transactional: [
-        { text: "How much is it?", correct: true },
-        { text: "Where is it?",    correct: false },
-        { text: "What is it?",     correct: false },
-      ],
-      repair: [
-        "Can you say that again?",
-        "Can you show me?",
-        "Can you write it down?",
-      ],
-      notebook: "Write your two most useful questions."
-    },
-    z5: {
-      frames: [
-        { frame: "It's like a ___.",       optionA: "suitcase",      optionB: "apple"     },
-        { frame: "It's bigger than a ___.", optionA: "coin",          optionB: "building"  },
-        { frame: "It's used for ___.",      optionA: "carrying things",optionB: "cooking"  },
-        { frame: "Same colour as ___.",     optionA: "the sky at night", optionB: "the sun" },
-      ]
-    },
-    z6: {
-      sentences: [
-        { tier: 'bronze', text: "It's a bag." },
-        { tier: 'silver', text: "It's a big, flat, black bag." },
-        { tier: 'silver', text: "It has a zip." },
-        { tier: 'gold',   text: "It looks old because it's dirty." },
-      ],
-      notebook: "Draw the bag. Write the full description around it. Use your sentences from today."
-    }
+// ── Lesson data ──
+const LESSONS = [
+  {
+    id:"bag", name:"Bag", emoji:"🎒",
+    image:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80",
+    zones:[
+      // z0 — Meet it
+      { type:"z0", word:"bag", notebook:"Write the word. Draw the bag." },
+
+      // z1 — What is it?
+      { type:"build",
+        eyebrow:"What is it?",
+        model:"It's a bag.",
+        tiles:["It's","a","bag"],
+        fixed:["It's"],
+        notebook:"Write the sentence: It's a ___." },
+      { type:"fixit",
+        eyebrow:"What is it?",
+        model:"It's a bag.",
+        broken:"Bag a it's.",
+        prompt:"Something is wrong. Can you fix it?",
+        tiles:["It's","a","bag"],
+        hints:["It starts with It\u2019s.","A comes next.","Now add the last word."],
+        notebook:null },
+      { type:"beat", text:"Good. What does it look like?", next:"z2" },
+
+      // z2 — Colour pick
+      { type:"colour",
+        eyebrow:"What does it look like?",
+        model:"It's a big, flat, black bag.",
+        swatches:[
+          {bg:"#1565c0", label:"blue",  correct:false},
+          {bg:"#212121", label:"black", correct:true},
+          {bg:"#e53935", label:"red",   correct:false},
+        ] },
+      // z2 — Build
+      { type:"build",
+        eyebrow:"What does it look like?",
+        model:"It's a big, flat, black bag.",
+        tiles:["It's","a","big","flat","black","bag"],
+        fixed:["It's","a"],
+        notebook:null },
+      // z2 — Fixit
+      { type:"fixit",
+        eyebrow:"What does it look like?",
+        model:"It's a big, flat, black bag.",
+        broken:"It's a black big flat bag.",
+        prompt:"Something is wrong. Can you fix it?",
+        tiles:["It's","a","big","flat","black","bag"],
+        hints:["Size comes first.","Shape comes second.","Colour comes third."],
+        notebook:"Write the full sentence. Describe colour, size and shape." },
+      { type:"beat", text:"Good. Now tell us something special about it.", next:"z3" },
+
+      // z3 — What makes it special?
+      { type:"build",
+        eyebrow:"What makes it special?",
+        model:"It has a zip.",
+        tiles:["It","has","a","zip"],
+        fixed:["It","has"],
+        notebook:null },
+      { type:"fixit",
+        eyebrow:"What makes it special?",
+        model:"It has a zip.",
+        broken:"It doesn't have a zip.",
+        prompt:"Look at the image. Is this correct?",
+        tiles:["It","has","a","zip"],
+        hints:["Look at the image. Can you see a zip?","It has a zip \u2014 not doesn\u2019t have.","Try: It has a ___."],
+        notebook:"Write one thing that is special about the bag." },
+      { type:"beat", text:"One more thing. How does it make you feel?", next:"z3b" },
+
+      // z3b — How does it feel?
+      { type:"build",
+        eyebrow:"How does it make you feel?",
+        model:"It looks old because it's dirty.",
+        tiles:["It","looks","old","because","it's","dirty"],
+        fixed:["It"],
+        notebook:null },
+      { type:"fixit",
+        eyebrow:"How does it make you feel?",
+        model:"It looks old because it's dirty.",
+        broken:"It looks dirty because it's old.",
+        prompt:"Look at the image first. What do you see?",
+        tiles:["It","looks","old","because","it's","dirty"],
+        hints:["The feeling comes first.","Then say why.","It looks old because it\u2019s ___."],
+        notebook:"Write how the bag makes you feel and why." },
+      { type:"beat", text:"Now let's ask some questions.", next:"z4a" },
+
+      // z4a — Physical questions
+      { type:"yn",
+        eyebrow:"Physical questions",
+        silhouetteStart:0,
+        silhouetteEnd:0.7,
+        questions:[
+          {q:"Is it big?",   a:"yes"},
+          {q:"Is it flat?",  a:"yes"},
+          {q:"Is it black?", a:"yes"},
+          {q:"Is it round?", a:"no"},
+          {q:"Is it heavy?", a:"no", extra:"No \u2014 it\u2019s light."},
+        ] },
+      { type:"build",
+        eyebrow:"Physical questions",
+        model:"Is it big?",
+        tiles:["Is","it","big?"],
+        fixed:[],
+        hints:["Questions start with Is.","The thing comes next.","Now add the describing word."],
+        notebook:"Write two questions about the bag." },
+      { type:"beat", text:"Can you say even more? Let's try.", next:"z4b" },
+
+      // z4b — Behaviour questions
+      { type:"yn",
+        eyebrow:"Behaviour questions",
+        silhouetteStart:0.7,
+        silhouetteEnd:1,
+        questions:[
+          {q:"Does it make a sound?",    a:"no"},
+          {q:"Can it open and close?",   a:"yes"},
+          {q:"Do you use it at school?", a:"yes"},
+          {q:"Is it made of plastic?",   a:"no", extra:"No \u2014 it\u2019s made of cloth."},
+        ] },
+      { type:"build",
+        eyebrow:"Behaviour questions",
+        model:"Do you use it at school?",
+        tiles:["Do","you","use","it","at","school?"],
+        fixed:[],
+        hints:["Questions can start with Do.","Who uses it?","Where do you use it?"],
+        notebook:"Write two more questions about the bag." },
+      { type:"beat", text:"Now for a real situation.", next:"z4c" },
+
+      // z4c — Real world
+      { type:"transact",
+        eyebrow:"Real world survival",
+        scenario:"You are in a shop. You want this bag. You don\u2019t understand the price.",
+        options:[
+          {text:"How much is it?", correct:true},
+          {text:"Where is it?",    correct:false},
+          {text:"What is it?",     correct:false},
+        ] },
+      { type:"repair",
+        eyebrow:"Real world survival",
+        prompt:"The person speaks too fast. What do you say?",
+        options:["Can you say that again?","Can you show me?","Can you write it down?"],
+        notebook:"Write your two most useful questions." },
+      { type:"beat", text:"Look how far you\u2019ve come. Can you say even more?", next:"z5" },
+
+      // z5 — Comparison
+      { type:"frames",
+        eyebrow:"Can you say more?",
+        frames:[
+          {frame:"It\u2019s like a ___.",        a:"suitcase",       b:"apple"},
+          {frame:"It\u2019s bigger than a ___.", a:"coin",           b:"building"},
+          {frame:"It\u2019s used for ___.",      a:"carrying things",b:"cooking"},
+          {frame:"Same colour as ___.",          a:"the sky at night",b:"the sun"},
+        ] },
+
+      // z6 — Reveal
+      { type:"z6",
+        tiers:[
+          {tier:"bronze", text:"It\u2019s a bag."},
+          {tier:"silver", text:"It\u2019s a big, flat, black bag."},
+          {tier:"silver", text:"It has a zip."},
+          {tier:"gold",   text:"It looks old because it\u2019s dirty."},
+        ],
+        notebook:"Draw the bag. Write the full description around it." },
+    ]
   }
-};
+];
 
-const OBJECTS = [BAG];
+// ── State ──
+let obj       = null;
+let stepIdx   = 0;
+let ynIdx     = 0;
+let frameIdx  = 0;
+let placed    = [];   // words currently in drop zone (in order)
+let fixed     = [];   // words that are pre-placed and can't be moved
+let hintCount = 0;
+let lastSpeak = "";
 
-// ──────────────────────────────────────────────
-//  STATE
-// ──────────────────────────────────────────────
-
-let currentObj    = null;
-let currentZone   = null;
-let currentStep   = 0; // sub-steps within a zone
-let hintCount     = 0;
-let placedTiles   = [];
-let preplaced     = [];
-let lastAudioText = '';
-
-// ──────────────────────────────────────────────
-//  LANDING
-// ──────────────────────────────────────────────
-
-function renderLanding() {
-  const grid = document.getElementById('obj-grid');
-  grid.innerHTML = OBJECTS.map(o => {
-    const done = localStorage.getItem(`cl_done_${o.id}`);
-    return `<div class="obj-card ${done?'done':''}" onclick="startLesson('${o.id}')">
-      <div class="obj-card-img">${o.emoji}</div>
-      <div class="obj-card-label">
-        ${o.name}
-        ${done?'<div class="obj-card-done">✓ Completed</div>':''}
-      </div>
-    </div>`;
-  }).join('');
-
-  const saved = localStorage.getItem('cl_name');
-  if (saved) document.getElementById('name-input').value = saved;
+// ── Landing ──
+function renderLanding(){
+  const grid = document.getElementById("obj-grid");
+  grid.innerHTML = LESSONS.map(o=>{
+    const done = localStorage.getItem("cl_done_"+o.id);
+    return '<div class="obj-card'+(done?" done":"")+'" onclick="startLesson(\''+o.id+'\')">'
+      +'<div class="obj-emoji">'+o.emoji+'</div>'
+      +'<div class="obj-name">'+o.name+(done?'<div class="obj-done">\u2713 Completed</div>':'')+'</div>'
+      +'</div>';
+  }).join("");
+  const saved = localStorage.getItem("cl_name");
+  if(saved) document.getElementById("name-input").value = saved;
 }
 
-function startLanding() {
-  const name = document.getElementById('name-input').value.trim();
-  if (name) localStorage.setItem('cl_name', name);
-  // If only one object, launch it directly
-  if (OBJECTS.length === 1) {
-    startLesson(OBJECTS[0].id);
-  }
+function doStart(){
+  const name = document.getElementById("name-input").value.trim();
+  if(name) localStorage.setItem("cl_name", name);
+  if(LESSONS.length===1) startLesson(LESSONS[0].id);
 }
 
-function goLanding() {
-  document.getElementById('lesson-shell').style.display = 'none';
-  document.getElementById('landing').style.display = 'block';
-  document.getElementById('obj-corner').classList.remove('visible');
-  document.getElementById('word-guide-btn').classList.remove('visible');
+function startLesson(id){
+  obj      = LESSONS.find(o=>o.id===id);
+  stepIdx  = 0;
+  ynIdx    = 0;
+  frameIdx = 0;
+  placed   = [];
+  fixed    = [];
+  hintCount= 0;
+  document.getElementById("landing").style.display = "none";
+  document.getElementById("lesson").style.display  = "block";
+  document.getElementById("hdr-title").textContent = obj.name;
+  document.getElementById("guide-btn").classList.add("on");
+  renderStep();
+}
+
+function goHome(){
+  document.getElementById("lesson").style.display  = "none";
+  document.getElementById("landing").style.display = "block";
+  document.getElementById("corner").classList.remove("on");
+  document.getElementById("guide-btn").classList.remove("on");
   renderLanding();
 }
 
-// ──────────────────────────────────────────────
-//  LESSON START
-// ──────────────────────────────────────────────
+// ── Step router ──
+function renderStep(){
+  const step = obj.zones[stepIdx];
+  if(!step){ finishLesson(); return; }
 
-function startLesson(id) {
-  currentObj  = OBJECTS.find(o => o.id === id);
-  currentZone = 'z0';
-  currentStep = 0;
-  hintCount   = 0;
-  placedTiles = [];
-  preplaced   = [];
+  // Update header zone label
+  const eyebrow = step.eyebrow || step.type || "";
+  document.getElementById("hdr-zone").textContent = eyebrow;
 
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('lesson-shell').style.display = 'block';
-  document.getElementById('header-title').textContent = currentObj.name;
-  document.getElementById('word-guide-btn').classList.add('visible');
-
-  renderZone();
-}
-
-// ──────────────────────────────────────────────
-//  ZONE ROUTER
-// ──────────────────────────────────────────────
-
-function renderZone() {
-  hintCount   = 0;
-  placedTiles = [];
-  preplaced   = [];
-
-  const zoneLabels = {
-    z0:'Zone 0', z1:'Zone 1', z2:'Zone 2 · Step 1', z3:'Zone 3', z3b:'Zone 3b',
-    z4a:'Zone 4a', z4b:'Zone 4b', z4c:'Zone 4c', z5:'Zone 5 · Can you say more?', z6:'Zone 6'
-  };
-  document.getElementById('header-zone').textContent = zoneLabels[currentZone] || '';
-
-  // Show pinned image from zone 1 onward
-  if (currentZone !== 'z0') {
-    const img = document.getElementById('obj-corner');
-    img.src = currentObj.image;
-    img.classList.add('visible');
+  // Show corner image from step 1 onward
+  if(stepIdx > 0){
+    const img = document.getElementById("corner");
+    img.src = obj.image;
+    img.classList.add("on");
   }
 
-  switch(currentZone) {
-    case 'z0':   renderZ0();   break;
-    case 'z1':   renderZ1();   break;
-    case 'z2':   renderZ2();   break;
-    case 'z3':   renderZ3();   break;
-    case 'z3b':  renderZ3b();  break;
-    case 'z4a':  renderZ4a();  break;
-    case 'z4b':  renderZ4b();  break;
-    case 'z4c':  renderZ4c();  break;
-    case 'z5':   renderZ5();   break;
-    case 'z6':   renderZ6();   break;
-  }
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 0 — MEET IT
-// ──────────────────────────────────────────────
-
-function renderZ0() {
-  const z = currentObj.zones.z0;
-  setContent(`
-    <div class="zone-eyebrow fade-up">Meet it</div>
-    <img class="hero-image fade-up" src="${currentObj.image}" alt="${currentObj.name}" onerror="this.style.display='none'">
-    <div class="word-display fade-up">
-      <div class="word-big">${z.word}</div>
-      <button class="word-play" onclick="speak('${z.word}', true)">🔊 Hear it</button>
-    </div>
-    ${notebook(z.notebook)}
-    <button class="continue-btn primary fade-up" onclick="nextZone()">Let's go →</button>
-  `);
-  speak(z.word, true);
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 1 — WHAT IS IT?
-// ──────────────────────────────────────────────
-
-function renderZ1() {
-  const z = currentObj.zones.z1;
-  if (currentStep === 0) renderBuildIt('z1', z.build, z.model, 0);
-  else if (currentStep === 1) renderFixIt('z1', z.fixit, 1);
-  else renderZoneDone('z1', z.notebook, "Now let's describe it. What does it look like?", 'z2');
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 2 — WHAT DOES IT LOOK LIKE?
-// ──────────────────────────────────────────────
-
-function renderZ2() {
-  const z = currentObj.zones.z2;
-  if (currentStep === 0) renderColourPick(z);
-  else if (currentStep === 1) renderBuildIt('z2', z.build, z.model, 1);
-  else if (currentStep === 2) renderFixIt('z2', z.fixit, 2);
-  else renderZoneDone('z2', z.notebook, "Good. Now tell us something special about it.", 'z3');
-}
-
-function renderColourPick(z) {
-  setContent(`
-    <div class="zone-eyebrow fade-up">What does it look like?</div>
-    ${modelCard(z.model)}
-    <div class="ex-label fade-up">Pick the right colour</div>
-    <div class="colour-choices fade-up" id="colour-choices">
-      ${z.colourChoices.map((c,i) => `
-        <div class="colour-chip" style="background:${c.colour}" onclick="pickColour(${i})" data-correct="${c.correct}" title="${c.label}"></div>
-      `).join('')}
-    </div>
-    <div class="feedback" id="feedback"></div>
-  `);
-  speak(z.model, false);
-}
-
-function pickColour(idx) {
-  const chips = document.querySelectorAll('.colour-chip');
-  const chip  = chips[idx];
-  const correct = chip.dataset.correct === 'true';
-  chips.forEach(c => c.onclick = null);
-  if (correct) {
-    chip.classList.add('correct-pick');
-    showFeedback('correct', '✓ Good eye.');
-    setTimeout(() => { currentStep = 1; renderZone(); }, 900);
-  } else {
-    chip.classList.add('wrong-pick');
-    showFeedback('hint', 'Look at the bag. What colour is it?');
-    setTimeout(() => {
-      chip.classList.remove('wrong-pick');
-      chips.forEach((c,i) => c.onclick = () => pickColour(i));
-    }, 1000);
-  }
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 3 — WHAT MAKES IT SPECIAL?
-// ──────────────────────────────────────────────
-
-function renderZ3() {
-  const z = currentObj.zones.z3;
-  if (currentStep === 0) renderBuildIt('z3', z.build, z.model, 0);
-  else if (currentStep === 1) renderFixIt('z3', z.fixit, 1);
-  else renderZoneDone('z3', z.notebook, "One more thing. How does it make you feel?", 'z3b');
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 3b — HOW DOES IT FEEL?
-// ──────────────────────────────────────────────
-
-function renderZ3b() {
-  const z = currentObj.zones.z3b;
-  if (currentStep === 0) renderBuildIt('z3b', z.build, z.model, 0);
-  else if (currentStep === 1) renderFixIt('z3b', z.fixit, 1);
-  else renderZoneDone('z3b', z.notebook, "Now let's ask some questions about it.", 'z4a');
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 4a — PHYSICAL QUESTIONS
-// ──────────────────────────────────────────────
-
-let z4aIndex = 0;
-
-function renderZ4a() {
-  const z = currentObj.zones.z4a;
-  if (currentStep === 0) { z4aIndex = 0; renderQ4a(z); }
-  else if (currentStep === 1) renderBuildIt('z4a', z.build, z.build.sentence, 0, z.build.hints);
-  else renderZoneDone('z4a', z.notebook, "Can you say even more? Let's try.", 'z4b');
-}
-
-function renderQ4a(z) {
-  const q = z.questions[z4aIndex];
-  const total = z.questions.length;
-  // Silhouette brightness based on progress
-  const pct = z4aIndex / total;
-  const brightness = 0 + pct * 100; // 0 to 100%
-
-  setContent(`
-    <div class="zone-eyebrow fade-up">Physical questions</div>
-    <div class="silhouette-wrap fade-up">
-      <img class="silhouette-img" id="silhouette" src="${currentObj.image}" alt="" style="filter:brightness(${pct})">
-      <div class="silhouette-progress">${z4aIndex}/${total} revealed</div>
-    </div>
-    <div class="question-card fade-up">
-      <div class="question-text">${q.q}</div>
-      <div class="yn-buttons">
-        <button class="yn-btn" onclick="answerQ4('${q.answer}','yes','z4a')">Yes</button>
-        <button class="yn-btn" onclick="answerQ4('${q.answer}','no','z4a')">No</button>
-      </div>
-    </div>
-    <div class="feedback" id="feedback"></div>
-  `);
-}
-
-function answerQ4(correct, chosen, zone) {
-  const z = currentObj.zones[zone];
-  const qs = z.questions;
-  const isCorrect = chosen === correct || (correct !== 'yes' && correct !== 'no' && chosen === 'no');
-  const btns = document.querySelectorAll('.yn-btn');
-  btns.forEach(b => b.onclick = null);
-
-  if (isCorrect) {
-    btns[chosen === 'yes' ? 0 : 1].classList.add('correct');
-    const q = qs[zone === 'z4a' ? z4aIndex : z4bIndex];
-    const extra = q.extra || (correct === 'yes' ? 'Yes!' : 'No.');
-    showFeedback('correct', extra);
-    setTimeout(() => {
-      if (zone === 'z4a') {
-        z4aIndex++;
-        if (z4aIndex >= qs.length) { currentStep = 1; renderZone(); }
-        else renderQ4a(z);
-      } else {
-        z4bIndex++;
-        if (z4bIndex >= qs.length) { currentStep = 1; renderZone(); }
-        else renderQ4b(z);
-      }
-    }, 900);
-  } else {
-    btns[chosen === 'yes' ? 0 : 1].classList.add('wrong');
-    showFeedback('hint', 'Look again. Think about the bag.');
-    setTimeout(() => {
-      btns.forEach(b => { b.classList.remove('wrong','correct'); });
-      btns[0].onclick = () => answerQ4(correct, 'yes', zone);
-      btns[1].onclick = () => answerQ4(correct, 'no', zone);
-    }, 900);
-  }
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 4b — BEHAVIOUR QUESTIONS
-// ──────────────────────────────────────────────
-
-let z4bIndex = 0;
-
-function renderZ4b() {
-  const z = currentObj.zones.z4b;
-  if (currentStep === 0) { z4bIndex = 0; renderQ4b(z); }
-  else if (currentStep === 1) renderBuildIt('z4b', z.build, z.build.sentence, 0, z.build.hints);
-  else renderZoneDone('z4b', z.notebook, "Now for a real situation.", 'z4c');
-}
-
-function renderQ4b(z) {
-  const q = z.questions[z4bIndex];
-  const total = z.questions.length;
-  const pct = z4bIndex / total;
-
-  setContent(`
-    <div class="zone-eyebrow fade-up">Behaviour questions</div>
-    <div class="silhouette-wrap fade-up">
-      <img class="silhouette-img" id="silhouette" src="${currentObj.image}" alt="" style="filter:brightness(${0.4 + pct * 0.6})">
-      <div class="silhouette-progress">${z4bIndex}/${total} revealed</div>
-    </div>
-    <div class="question-card fade-up">
-      <div class="question-text">${q.q}</div>
-      <div class="yn-buttons">
-        <button class="yn-btn" onclick="answerQ4('${q.answer}','yes','z4b')">Yes</button>
-        <button class="yn-btn" onclick="answerQ4('${q.answer}','no','z4b')">No</button>
-      </div>
-    </div>
-    <div class="feedback" id="feedback"></div>
-  `);
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 4c — REAL WORLD SURVIVAL
-// ──────────────────────────────────────────────
-
-function renderZ4c() {
-  const z = currentObj.zones.z4c;
-  if (currentStep === 0) renderZ4cTask1(z);
-  else if (currentStep === 1) renderZ4cTask2(z);
-  else renderZoneDone('z4c', z.notebook, "Can you say even more? Let's try.", 'z5');
-}
-
-function renderZ4cTask1(z) {
-  setContent(`
-    <div class="zone-eyebrow fade-up">Real world survival</div>
-    <div class="model-card fade-up">
-      <div class="model-sentence" style="font-size:16px;">${z.scenario}</div>
-    </div>
-    <div class="ex-label fade-up">What do you say?</div>
-    <div class="choice-list fade-up">
-      ${z.transactional.map((o,i) => `
-        <button class="choice-btn" onclick="pickTransactional(${i})">${o.text}</button>
-      `).join('')}
-    </div>
-    <div class="feedback" id="feedback"></div>
-  `);
-}
-
-function pickTransactional(idx) {
-  const z = currentObj.zones.z4c;
-  const btns = document.querySelectorAll('.choice-btn');
-  btns.forEach(b => b.onclick = null);
-
-  if (z.transactional[idx].correct) {
-    btns[idx].classList.add('correct');
-    showFeedback('correct', '✓ Good. That\u2019s exactly the right question.');
-    setTimeout(() => { currentStep = 1; renderZone(); }, 1000);
-  } else {
-    btns[idx].classList.add('wrong');
-    showFeedback('hint', 'Think about what you need to know. Try another one.');
-    setTimeout(() => {
-      btns[idx].classList.remove('wrong');
-      btns.forEach((b,i) => b.onclick = () => pickTransactional(i));
-    }, 1000);
-  }
-}
-
-function renderZ4cTask2(z) {
-  setContent(`
-    <div class="zone-eyebrow fade-up">Real world survival</div>
-    <div class="model-card fade-up">
-      <div class="model-sentence" style="font-size:15px;">The person speaks too fast. What do you say?</div>
-    </div>
-    <div class="ex-label fade-up">Pick one — they all work.</div>
-    <div class="choice-list fade-up">
-      ${z.repair.map((o,i) => `
-        <button class="choice-btn" onclick="pickRepair(${i})">${o}</button>
-      `).join('')}
-    </div>
-    <div class="feedback" id="feedback"></div>
-  `);
-}
-
-function pickRepair(idx) {
-  const btns = document.querySelectorAll('.choice-btn');
-  btns.forEach(b => b.onclick = null);
-  btns[idx].classList.add('all-good');
-  showFeedback('correct', 'All of these work. Good thinking.');
-  setTimeout(() => { currentStep = 2; renderZone(); }, 1200);
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 5 — COMPARISON ANCHORS (STRETCH)
-// ──────────────────────────────────────────────
-
-let z5Index = 0;
-
-function renderZ5() {
-  const z = currentObj.zones.z5;
-  if (z5Index >= z.frames.length) {
-    renderZoneDone('z5', null, "Look what you built.", 'z6');
-    return;
-  }
-  const f = z.frames[z5Index];
-  setContent(`
-    <div class="zone-eyebrow fade-up">Can you say more?</div>
-    <div class="model-card fade-up">
-      <div class="model-sentence" style="font-size:20px;">${f.frame}</div>
-    </div>
-    <div class="ex-label fade-up">Choose the best answer</div>
-    <div class="choice-list fade-up">
-      <button class="choice-btn" onclick="pickFrame(0,'${f.optionA}','${f.frame}')">${f.optionA}</button>
-      <button class="choice-btn" onclick="pickFrame(1,'${f.optionB}','${f.frame}')">${f.optionB}</button>
-    </div>
-    <div class="feedback" id="feedback"></div>
-  `);
-  speak(f.frame.replace('___', f.optionA), false);
-}
-
-function pickFrame(idx, chosen, frame) {
-  // Both can be valid — the correct answer is optionA (index 0) as per spec
-  const btns = document.querySelectorAll('.choice-btn');
-  btns.forEach(b => b.onclick = null);
-  if (idx === 0) {
-    btns[0].classList.add('correct');
-    const full = frame.replace('___', chosen);
-    showFeedback('correct', `✓ "${full}"`);
-    speak(full, false);
-  } else {
-    btns[1].classList.add('wrong');
-    const full = frame.replace('___', currentObj.zones.z5.frames[z5Index].optionA);
-    showFeedback('hint', `Try: "${full}"`);
-  }
-  setTimeout(() => {
-    z5Index++;
-    currentStep = 0;
-    renderZone();
-  }, 1200);
-}
-
-// ──────────────────────────────────────────────
-//  ZONE 6 — THE REVEAL
-// ──────────────────────────────────────────────
-
-function renderZ6() {
-  const z = currentObj.zones.z6;
-  setContent(`
-    <div class="zone-eyebrow fade-up">Look what you built.</div>
-    <div class="pyramid-wrap" id="pyramid"></div>
-    <div class="reveal-final fade-up" id="reveal-final" style="display:none;">
-      You described it.<br><span style="font-size:32px;margin-top:10px;display:block;">🎒</span>
-    </div>
-    ${notebook(z.notebook)}
-    <button class="continue-btn primary fade-up" id="done-btn" style="display:none;" onclick="finishLesson()">Done</button>
-  `);
-
-  // Animate tiers in one by one
-  const pyramid = document.getElementById('pyramid');
-  z.sentences.forEach((s, i) => {
-    const div = document.createElement('div');
-    div.className = `pyramid-tier ${s.tier}`;
-    div.innerHTML = `<span class="reveal-label">${s.tier}</span>${s.text}`;
-    pyramid.appendChild(div);
-    setTimeout(() => {
-      div.classList.add('visible');
-      speak(s.text, false);
-    }, i * 900);
-  });
-
-  setTimeout(() => {
-    document.getElementById('reveal-final').style.display = 'block';
-    document.getElementById('done-btn').style.display = 'block';
-    localStorage.setItem(`cl_done_${currentObj.id}`, '1');
-  }, z.sentences.length * 900 + 400);
-}
-
-function finishLesson() {
-  goLanding();
-}
-
-// ──────────────────────────────────────────────
-//  BUILD-IT EXERCISE
-// ──────────────────────────────────────────────
-
-function renderBuildIt(zKey, build, modelText, step, customHints) {
   hintCount = 0;
-  preplaced = [...(build.preplaced || [])];
-  placedTiles = [...preplaced];
+  placed    = [];
+  fixed     = [];
 
-  const tiles = build.tiles;
-  const hints = customHints || currentObj.zones[zKey].fixit?.hints || [];
+  switch(step.type){
+    case "z0":      renderZ0(step);      break;
+    case "build":   renderBuild(step);   break;
+    case "fixit":   renderFixit(step);   break;
+    case "beat":    renderBeat(step);    break;
+    case "colour":  renderColour(step);  break;
+    case "yn":      ynIdx=0; renderYN(step); break;
+    case "transact":renderTransact(step);break;
+    case "repair":  renderRepair(step);  break;
+    case "frames":  frameIdx=0; renderFrame(step); break;
+    case "z6":      renderZ6(step);      break;
+  }
+}
 
-  setContent(`
-    <div class="zone-eyebrow fade-up">${zoneLabel(zKey)}</div>
-    ${modelCard(modelText)}
-    <div class="ex-label fade-up">Build it — put the words in order</div>
-    <div class="tile-drop-zone fade-up" id="drop-zone">
-      ${preplaced.map(w => `<span class="placed-tile ${tileClass(w)}" data-word="${w}" style="cursor:default">${w}</span>`).join('')}
+function advance(){
+  stepIdx++;
+  renderStep();
+}
+
+// ── Zone 0 ──
+function renderZ0(step){
+  set(`
+    <div class="eyebrow fu">Meet it</div>
+    <img class="hero-img fu" src="${obj.image}" alt="${obj.name}" onerror="this.style.display='none'">
+    <div class="word-box fu">
+      <div class="word-big">${step.word}</div>
+      <button class="hear-btn" onclick="speak('${step.word}',true)">🔊 Hear it</button>
     </div>
-    <div class="tile-bank fade-up" id="tile-bank">
-      ${tiles.filter(t => !preplaced.includes(t) || tiles.filter(x=>x===t).length > preplaced.filter(x=>x===t).length)
-             .filter((t,i,a) => {
-               // handle duplicates: show each tile once per occurrence not in preplaced
-               const inPre = preplaced.filter(x=>x===t).length;
-               const inAll = tiles.filter(x=>x===t).length;
-               return a.indexOf(t) === i || i > a.indexOf(t);
-             })
-             .map(t => `<button class="tile ${tileClass(t)}" onclick="placeTile(this,'${t}')">${t}</button>`).join('')}
-    </div>
-    <div class="feedback" id="feedback"></div>
-    <button class="check-btn fade-up" id="check-btn" onclick="checkBuild('${zKey}',${JSON.stringify(build.tiles)},${JSON.stringify(hints||[])},${step})">Check</button>
+    ${nb(step.notebook)}
+    <button class="cont-btn primary fu" onclick="advance()">Let\u2019s go \u2192</button>
+  `);
+  speak(step.word, true);
+}
+
+// ── Build-it ──
+function renderBuild(step){
+  fixed  = step.fixed  || [];
+  placed = [...fixed];
+
+  // Bank tiles = all tiles minus fixed ones (each occurrence)
+  const bankTiles = [];
+  const fixedCopy = [...fixed];
+  for(const t of step.tiles){
+    const fi = fixedCopy.indexOf(t);
+    if(fi > -1){ fixedCopy.splice(fi,1); } // this tile is fixed, skip from bank
+    else { bankTiles.push(t); }
+  }
+
+  const fixedHTML = fixed.map(w=>
+    '<span class="placed-tile fixed '+tc(w)+'">'+w+'</span>'
+  ).join("");
+
+  const bankHTML = bankTiles.map((w,i)=>
+    '<button id="bank_'+i+'" class="tile '+tc(w)+'" onclick="tapTile(this,\''+i+'\',\''+encodeWord(w)+'\')">'+w+'</button>'
+  ).join("");
+
+  const modelHTML = step.model
+    ? '<div class="model-card fu"><div class="model-text">'+step.model+'</div>'
+      +'<button class="model-play" onclick="speak(\''+encodeWord(step.model)+'\',false)">🔊</button></div>'
+    : '';
+
+  set(`
+    <div class="eyebrow fu">${step.eyebrow||""}</div>
+    ${modelHTML}
+    <div class="ex-label fu">Build it \u2014 put the words in order</div>
+    <div class="drop-zone fu has-tiles" id="drop-zone">${fixedHTML}</div>
+    <div class="tile-bank fu" id="tile-bank">${bankHTML}</div>
+    <div class="feedback" id="fb"></div>
+    <button class="check-btn fu" onclick="checkBuild()">Check</button>
   `);
 
-  speak(modelText, false);
-  updateDropZone();
+  if(step.model) speak(step.model, false);
+  // Store bank tiles on window for checkBuild access
+  window._bankTiles = bankTiles;
+  window._buildStep = step;
 }
 
-function placeTile(btn, word) {
-  btn.classList.add('placed');
+function encodeWord(w){
+  // Encode for use in onclick string attribute — replace apostrophes
+  return w.replace(/'/g,"\u2019").replace(/"/g,"&quot;");
+}
+
+function tapTile(btn, bankIdx, encodedWord){
+  const word = encodedWord.replace(/\u2019/g,"'");
+  btn.classList.add("used");
   btn.onclick = null;
-  placedTiles.push(word);
-  const drop = document.getElementById('drop-zone');
-  const span = document.createElement('span');
-  span.className = `placed-tile ${tileClass(word)}`;
-  span.dataset.word = word;
-  span.innerHTML = `${word} <span class="placed-tile-remove" onclick="removePlacedTile(this,'${word}',event)">✕</span>`;
-  // Don't allow removing preplaced
-  if (preplaced.includes(word) && placedTiles.filter(t=>t===word).length <= preplaced.filter(t=>t===word).length) {
-    span.innerHTML = word;
-    span.style.cursor = 'default';
-  }
+  placed.push(word);
+
+  const drop = document.getElementById("drop-zone");
+  const span = document.createElement("span");
+  span.className = "placed-tile "+tc(word);
+  span.dataset.bankIdx = bankIdx;
+  span.dataset.word    = word;
+  span.innerHTML = word+' <button class="placed-tile-x" onclick="removeTile(this)">✕</button>';
   drop.appendChild(span);
-  updateDropZone();
+  drop.classList.add("has-tiles");
 }
 
-function removePlacedTile(removeBtn, word, event) {
-  event.stopPropagation();
-  const span = removeBtn.parentElement;
+function removeTile(xBtn){
+  const span    = xBtn.parentElement;
+  const word    = span.dataset.word;
+  const bankIdx = span.dataset.bankIdx;
   span.remove();
-  const idx = placedTiles.lastIndexOf(word);
-  if (idx > -1) placedTiles.splice(idx, 1);
-  // Re-enable the tile in bank
-  const bank = document.getElementById('tile-bank');
-  const tiles = bank.querySelectorAll('.tile.placed');
-  for (const t of tiles) {
-    if (t.textContent.trim() === word || t.textContent.trim() === word.replace(/[✕]/g,'').trim()) {
-      t.classList.remove('placed');
-      t.onclick = () => placeTile(t, word);
-      break;
-    }
+
+  // Remove last occurrence of this word from placed
+  for(let i=placed.length-1;i>=0;i--){
+    if(placed[i]===word){ placed.splice(i,1); break; }
   }
-  updateDropZone();
+
+  // Re-enable bank button
+  const btn = document.getElementById("bank_"+bankIdx);
+  if(btn){ btn.classList.remove("used"); btn.onclick = function(){ tapTile(this,bankIdx,encodeWord(word)); }; }
 }
 
-function updateDropZone() {
-  const drop = document.getElementById('drop-zone');
-  if (!drop) return;
-  if (drop.querySelectorAll('.placed-tile').length > 0) drop.classList.add('has-tiles');
-  else drop.classList.remove('has-tiles');
-}
+function checkBuild(){
+  const step   = window._buildStep;
+  const target = step.tiles.join("|");
+  const current= placed.join("|");
+  const drop   = document.getElementById("drop-zone");
+  const hints  = step.hints || (step.fixit && step.fixit.hints) || [];
 
-function checkBuild(zKey, correct, hints, nextStep) {
-  const current = placedTiles.join('|');
-  const target  = correct.join('|');
-  const drop    = document.getElementById('drop-zone');
-
-  if (current === target) {
-    drop.classList.add('correct');
-    showFeedback('correct', '✓ Correct!');
-    speak(correct.join(' '), false);
-    disableAll();
-    setTimeout(() => {
-      currentStep = nextStep + 1;
-      renderZone();
-    }, 1000);
+  if(current === target){
+    drop.classList.add("ok");
+    fb("ok","✓ Correct!");
+    speak(step.tiles.join(" "), false);
+    lockAll();
+    setTimeout(advance, 1100);
   } else {
-    drop.classList.add('wrong');
-    setTimeout(() => drop.classList.remove('wrong'), 600);
-
-    if (hintCount < hints.length) {
-      showFeedback('hint', hints[hintCount].text || hints[hintCount]);
+    drop.classList.add("bad");
+    setTimeout(()=>drop.classList.remove("bad"), 600);
+    if(hintCount < hints.length){
+      fb("hint", typeof hints[hintCount]==="object" ? hints[hintCount].text : hints[hintCount]);
       hintCount++;
     } else {
-      // Auto-assemble
-      showFeedback('hint', 'Here is the answer.');
-      autoAssemble(correct, zKey, nextStep);
+      fb("hint","Here is the answer.");
+      autoAssemble(step.tiles);
     }
   }
 }
 
-function autoAssemble(correct, zKey, nextStep) {
-  // Clear drop zone except preplaced, rebuild with correct tiles
-  const drop = document.getElementById('drop-zone');
-  drop.innerHTML = '';
-  placedTiles = [];
-  disableAll();
+function autoAssemble(tiles){
+  const drop = document.getElementById("drop-zone");
+  // Clear non-fixed tiles from drop zone
+  drop.querySelectorAll(".placed-tile:not(.fixed)").forEach(s=>s.remove());
+  placed = [...fixed];
+  lockAll();
 
-  correct.forEach((word, i) => {
-    setTimeout(() => {
-      placedTiles.push(word);
-      const span = document.createElement('span');
-      span.className = `placed-tile ${tileClass(word)}`;
+  const nonFixed = [];
+  const fixedCopy = [...fixed];
+  for(const t of tiles){
+    const fi = fixedCopy.indexOf(t);
+    if(fi>-1){ fixedCopy.splice(fi,1); }
+    else { nonFixed.push(t); }
+  }
+
+  nonFixed.forEach((word,i)=>{
+    setTimeout(()=>{
+      placed.push(word);
+      const span = document.createElement("span");
+      span.className = "placed-tile "+tc(word);
       span.textContent = word;
       drop.appendChild(span);
-      if (i === correct.length - 1) {
-        speak(correct.join(' '), false);
-        setTimeout(() => { currentStep = nextStep + 1; renderZone(); }, 1200);
+      if(i===nonFixed.length-1){
+        speak(tiles.join(" "),false);
+        setTimeout(advance, 1300);
       }
-    }, i * 300);
+    }, i*320);
   });
+  if(!nonFixed.length) setTimeout(advance,800);
 }
 
-// ──────────────────────────────────────────────
-//  FIX-IT EXERCISE
-// ──────────────────────────────────────────────
+// ── Fix-it ──
+function renderFixit(step){
+  fixed  = [];
+  placed = [];
 
-function renderFixIt(zKey, fixit, nextStep) {
-  hintCount = 0;
-  preplaced = [];
-  placedTiles = [];
+  const bankHTML = step.tiles.map((w,i)=>
+    '<button id="bank_'+i+'" class="tile '+tc(w)+'" onclick="tapTile(this,\''+i+'\',\''+encodeWord(w)+'\')">'+w+'</button>'
+  ).join("");
 
-  setContent(`
-    <div class="zone-eyebrow fade-up">${zoneLabel(zKey)}</div>
-    <div class="model-card fade-up" style="background:rgba(232,115,74,0.07);border-color:rgba(232,115,74,0.3);">
-      <div class="model-sentence" style="font-size:18px;text-decoration:line-through;opacity:0.6;">${fixit.broken}</div>
+  set(`
+    <div class="eyebrow fu">${step.eyebrow||""}</div>
+    <div class="model-card fu" style="background:rgba(232,115,74,.07);border-color:rgba(232,115,74,.3)">
+      <div class="model-text" style="font-size:18px;text-decoration:line-through;opacity:.6">${step.broken}</div>
     </div>
-    <div class="ex-label fade-up">Fix it — build the correct sentence</div>
-    <div class="tile-drop-zone fade-up" id="drop-zone"></div>
-    <div class="tile-bank fade-up" id="tile-bank">
-      ${fixit.correctTiles.map(t => `<button class="tile ${tileClass(t)}" onclick="placeTile(this,'${t}')">${t}</button>`).join('')}
-    </div>
-    <div class="feedback" id="feedback"></div>
-    <p class="fade-up" style="font-size:13px;color:var(--dim);text-align:center;margin-top:-8px;">${fixit.prompt}</p>
-    <button class="check-btn fade-up" onclick="checkBuild('${zKey}',${JSON.stringify(fixit.correctTiles)},${JSON.stringify(fixit.hints||[])},${nextStep})">Check</button>
+    <p class="fu" style="font-size:13px;color:var(--dim);text-align:center">${step.prompt}</p>
+    <div class="ex-label fu">Fix it \u2014 build the correct sentence</div>
+    <div class="drop-zone fu" id="drop-zone"></div>
+    <div class="tile-bank fu" id="tile-bank">${bankHTML}</div>
+    <div class="feedback" id="fb"></div>
+    <button class="check-btn fu" onclick="checkBuild()">Check</button>
+    ${step.notebook ? nb(step.notebook) : ""}
+  `);
+
+  window._bankTiles = step.tiles;
+  window._buildStep = { tiles: step.tiles, hints: step.hints || [], model: step.model };
+}
+
+// ── Beat / transition ──
+function renderBeat(step){
+  set(`
+    <div class="beat fu"><div class="beat-text">${step.text}</div></div>
+    <button class="cont-btn primary fu" onclick="advance()">Continue \u2192</button>
   `);
 }
 
-// ──────────────────────────────────────────────
-//  ZONE DONE / TRANSITION
-// ──────────────────────────────────────────────
+// ── Colour pick ──
+function renderColour(step){
+  const swatchHTML = step.swatches.map((s,i)=>
+    '<div class="swatch" style="background:'+s.bg+'" onclick="pickColour('+i+')" title="'+s.label+'"></div>'
+  ).join("");
 
-function renderZoneDone(zKey, notebookText, beatText, nextZoneKey) {
-  setContent(`
-    <div class="zone-beat fade-up">
-      <div class="zone-beat-text">${beatText}</div>
-    </div>
-    ${notebookText ? notebook(notebookText) : ''}
-    <button class="continue-btn primary fade-up" onclick="goNextZone('${nextZoneKey}')">Continue →</button>
+  set(`
+    <div class="eyebrow fu">${step.eyebrow}</div>
+    <div class="model-card fu"><div class="model-text">${step.model}</div>
+      <button class="model-play" onclick="speak('${encodeWord(step.model)}',false)">🔊</button></div>
+    <div class="ex-label fu">Pick the right colour</div>
+    <div class="swatches fu" id="swatches">${swatchHTML}</div>
+    <div class="feedback" id="fb"></div>
   `);
+  speak(step.model, false);
+  window._colourStep = step;
 }
 
-function goNextZone(zKey) {
-  currentZone  = zKey;
-  currentStep  = 0;
-  hintCount    = 0;
-  z4aIndex     = 0;
-  z4bIndex     = 0;
-  z5Index      = 0;
-  renderZone();
-}
-
-function nextZone() {
-  const order = ['z0','z1','z2','z3','z3b','z4a','z4b','z4c','z5','z6'];
-  const idx   = order.indexOf(currentZone);
-  if (idx < order.length - 1) {
-    currentZone = order[idx + 1];
-    currentStep = 0;
-    renderZone();
+function pickColour(idx){
+  const step   = window._colourStep;
+  const chips  = document.querySelectorAll(".swatch");
+  const chosen = step.swatches[idx];
+  chips.forEach(c=>c.onclick=null);
+  if(chosen.correct){
+    chips[idx].classList.add("correct");
+    fb("ok","✓ Good eye.");
+    setTimeout(advance, 900);
+  } else {
+    chips[idx].classList.add("wrong");
+    fb("hint","Look at the bag. What colour is it?");
+    setTimeout(()=>{
+      chips[idx].classList.remove("wrong");
+      chips.forEach((c,i)=>c.onclick=()=>pickColour(i));
+    },1000);
   }
 }
 
-// ──────────────────────────────────────────────
-//  HELPERS
-// ──────────────────────────────────────────────
+// ── Yes/No questions ──
+function renderYN(step){
+  if(ynIdx >= step.questions.length){ advance(); return; }
+  const q    = step.questions[ynIdx];
+  const total= step.questions.length;
+  const pct  = step.silhouetteStart + (ynIdx/total)*(step.silhouetteEnd - step.silhouetteStart);
+  const bri  = Math.round(pct*100);
 
-function setContent(html) {
-  document.getElementById('screen-content').innerHTML = html;
-}
-
-function modelCard(text) {
-  return `
-  <div class="model-card fade-up">
-    <div class="model-sentence">${text}</div>
-    <button class="model-play" onclick="speak('${text.replace(/'/g,"\\'")}', false)">🔊</button>
-  </div>`;
-}
-
-function notebook(text) {
-  return `
-  <div class="notebook-prompt fade-up">
-    <div class="notebook-icon">📓</div>
-    <div>
-      <div class="notebook-label">In your notebook</div>
-      <div class="notebook-text">${text}</div>
+  set(`
+    <div class="eyebrow fu">${step.eyebrow}</div>
+    <div class="silhouette-wrap fu">
+      <img class="silhouette-img" src="${obj.image}" alt="" style="filter:brightness(${pct})">
+      <div class="silhouette-label">${ynIdx}/${total} revealed</div>
     </div>
-  </div>`;
+    <div class="q-card fu">
+      <div class="q-text">${q.q}</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="answerYN('yes')">Yes</button>
+        <button class="yn-btn" onclick="answerYN('no')">No</button>
+      </div>
+    </div>
+    <div class="feedback" id="fb"></div>
+  `);
+  window._ynStep = step;
+  window._ynQ    = q;
 }
 
-function showFeedback(type, text) {
-  const el = document.getElementById('feedback');
-  if (!el) return;
-  el.className = `feedback ${type} visible`;
+function answerYN(chosen){
+  const q    = window._ynQ;
+  const step = window._ynStep;
+  const btns = document.querySelectorAll(".yn-btn");
+  btns.forEach(b=>b.onclick=null);
+  const correct = chosen===q.a || (q.a!=="yes"&&q.a!=="no"&&chosen==="no");
+  const btnIdx  = chosen==="yes"?0:1;
+  if(correct){
+    btns[btnIdx].classList.add("ok");
+    fb("ok", q.extra || (q.a==="yes"?"Yes!":"No."));
+    setTimeout(()=>{ ynIdx++; renderYN(step); }, 900);
+  } else {
+    btns[btnIdx].classList.add("bad");
+    fb("hint","Look at the bag again.");
+    setTimeout(()=>{
+      btns.forEach(b=>b.classList.remove("bad","ok"));
+      btns[0].onclick=()=>answerYN("yes");
+      btns[1].onclick=()=>answerYN("no");
+    }, 900);
+  }
+}
+
+// ── Zone 4c transactional ──
+function renderTransact(step){
+  const optsHTML = step.options.map((o,i)=>
+    '<button class="choice-btn" onclick="pickTransact('+i+')">'+o.text+'</button>'
+  ).join("");
+  set(`
+    <div class="eyebrow fu">${step.eyebrow}</div>
+    <div class="model-card fu"><div class="model-text" style="font-size:16px">${step.scenario}</div></div>
+    <div class="ex-label fu">What do you say?</div>
+    <div class="choices fu">${optsHTML}</div>
+    <div class="feedback" id="fb"></div>
+  `);
+  window._transactStep = step;
+}
+
+function pickTransact(idx){
+  const step = window._transactStep;
+  const btns = document.querySelectorAll(".choice-btn");
+  btns.forEach(b=>b.onclick=null);
+  if(step.options[idx].correct){
+    btns[idx].classList.add("ok");
+    fb("ok","✓ Good. That\u2019s exactly the right question.");
+    setTimeout(advance, 1100);
+  } else {
+    btns[idx].classList.add("bad");
+    fb("hint","Think about what you need to know. Try another one.");
+    setTimeout(()=>{
+      btns[idx].classList.remove("bad");
+      btns.forEach((b,i)=>b.onclick=()=>pickTransact(i));
+    },1000);
+  }
+}
+
+// ── Zone 4c repair ──
+function renderRepair(step){
+  const optsHTML = step.options.map((o,i)=>
+    '<button class="choice-btn" onclick="pickRepair('+i+')">'+o+'</button>'
+  ).join("");
+  set(`
+    <div class="eyebrow fu">${step.eyebrow}</div>
+    <div class="model-card fu"><div class="model-text" style="font-size:16px">${step.prompt}</div></div>
+    <div class="ex-label fu">Pick one \u2014 they all work.</div>
+    <div class="choices fu">${optsHTML}</div>
+    <div class="feedback" id="fb"></div>
+    ${step.notebook ? nb(step.notebook) : ""}
+  `);
+}
+
+function pickRepair(idx){
+  const btns = document.querySelectorAll(".choice-btn");
+  btns.forEach(b=>b.onclick=null);
+  btns[idx].classList.add("allok");
+  fb("ok","All of these work. Good thinking.");
+  setTimeout(advance, 1200);
+}
+
+// ── Zone 5 frames ──
+function renderFrame(step){
+  if(frameIdx >= step.frames.length){ advance(); return; }
+  const f = step.frames[frameIdx];
+  const total = step.frames.length;
+  set(`
+    <div class="eyebrow fu">${step.eyebrow}</div>
+    <div class="frame-card fu">
+      <div class="frame-text">${f.frame}</div>
+      <div class="frame-counter">${frameIdx+1} of ${total}</div>
+    </div>
+    <div class="ex-label fu">Choose the best answer</div>
+    <div class="choices fu">
+      <button class="choice-btn" onclick="pickFrame(0)">A: ${f.a}</button>
+      <button class="choice-btn" onclick="pickFrame(1)">B: ${f.b}</button>
+    </div>
+    <div class="feedback" id="fb"></div>
+  `);
+  speak(f.frame.replace("___","…"), false);
+  window._frameStep = step;
+}
+
+function pickFrame(idx){
+  const step = window._frameStep;
+  const f    = step.frames[frameIdx];
+  const btns = document.querySelectorAll(".choice-btn");
+  btns.forEach(b=>b.onclick=null);
+  if(idx===0){
+    btns[0].classList.add("ok");
+    const full = f.frame.replace("___",f.a);
+    fb("ok","\u2713 "+full);
+    speak(full, false);
+  } else {
+    btns[1].classList.add("bad");
+    const full = f.frame.replace("___",f.a);
+    fb("hint","Try: "+full);
+  }
+  setTimeout(()=>{ frameIdx++; renderFrame(step); }, 1200);
+}
+
+// ── Zone 6 reveal ──
+function renderZ6(step){
+  set(`
+    <div class="eyebrow fu">Look what you built.</div>
+    <div class="pyramid fu" id="pyramid"></div>
+    <div id="reveal-end" style="display:none;text-align:center;padding:20px;font-family:'Fraunces',serif;font-size:18px;color:var(--dim)">
+      You described it.<br><span style="font-size:36px;margin-top:8px;display:block">🎒</span>
+    </div>
+    ${nb(step.notebook)}
+    <button class="cont-btn primary fu" id="done-btn" style="display:none" onclick="finishLesson()">Done</button>
+  `);
+
+  const pyramid = document.getElementById("pyramid");
+  step.tiers.forEach((s,i)=>{
+    const div = document.createElement("div");
+    div.className = "p-tier "+s.tier;
+    div.innerHTML = '<span class="p-tier-label">'+s.tier+'</span>'+s.text;
+    pyramid.appendChild(div);
+    setTimeout(()=>{
+      div.classList.add("on");
+      speak(s.text, false);
+    }, i*1000);
+  });
+  setTimeout(()=>{
+    document.getElementById("reveal-end").style.display = "block";
+    document.getElementById("done-btn").style.display   = "block";
+    localStorage.setItem("cl_done_"+obj.id,"1");
+  }, step.tiers.length*1000+400);
+}
+
+function finishLesson(){ goHome(); }
+
+// ── Helpers ──
+function set(html){ document.getElementById("content").innerHTML = html; }
+
+function nb(text){
+  if(!text) return "";
+  return '<div class="nb fu"><div class="nb-icon">📓</div>'
+    +'<div><div class="nb-label">In your notebook</div>'
+    +'<div class="nb-text">'+text+'</div></div></div>';
+}
+
+function fb(type, text){
+  const el = document.getElementById("fb");
+  if(!el) return;
+  el.className = "feedback "+type;
   el.textContent = text;
 }
 
-function disableAll() {
-  document.querySelectorAll('.tile, .check-btn, .yn-btn, .choice-btn').forEach(el => {
+function lockAll(){
+  document.querySelectorAll(".tile,.check-btn,.yn-btn,.choice-btn,.cont-btn").forEach(el=>{
     el.disabled = true;
-    el.style.pointerEvents = 'none';
+    el.style.pointerEvents = "none";
   });
 }
 
-function zoneLabel(zKey) {
-  return { z1:'What is it?', z2:'What does it look like?', z3:'What makes it special?', z3b:'How does it make you feel?', z4a:'Physical questions', z4b:'Behaviour questions' }[zKey] || '';
-}
-
-// ──────────────────────────────────────────────
-//  AUDIO — Browser TTS (placeholder until EL)
-// ──────────────────────────────────────────────
-
-function speak(text, isWord) {
-  if (!text) return;
-  lastAudioText = text;
-  try {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang  = 'en-GB';
-    u.rate  = isWord ? 0.75 : 0.85;
+// ── Audio (browser TTS until EL audio linked) ──
+function speak(text, isWord){
+  if(!text) return;
+  // Strip unicode smart quotes back to plain for TTS
+  lastSpeak = text;
+  try{
+    const u = new SpeechSynthesisUtterance(text.replace(/\u2019/g,"'"));
+    u.lang = "en-GB";
+    u.rate = isWord ? 0.75 : 0.85;
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
-  } catch(e) {}
+  } catch(e){}
 }
 
-function replayAudio() {
-  if (lastAudioText) speak(lastAudioText, lastAudioText.split(' ').length === 1);
-}
+function replayAudio(){ if(lastSpeak) speak(lastSpeak, lastSpeak.split(" ").length===1); }
 
-// ──────────────────────────────────────────────
-//  WORD GUIDE
-// ──────────────────────────────────────────────
+// ── Guide ──
+function openGuide() { document.getElementById("guide-overlay").classList.add("on"); }
+function closeGuide(){ document.getElementById("guide-overlay").classList.remove("on"); }
 
-function openGuide()  { document.getElementById('guide-overlay').classList.add('open'); }
-function closeGuide() { document.getElementById('guide-overlay').classList.remove('open'); }
-
-// ──────────────────────────────────────────────
-//  INIT
-// ──────────────────────────────────────────────
-
+// ── Init ──
 renderLanding();
 </script>
 </body>
