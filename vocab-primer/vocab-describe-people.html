@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="vocab-primer-player.css?v=5">
+<link rel="stylesheet" href="vocab-primer-player.css?v=6">
 </head>
 <body>
 <div id="loading-overlay">
@@ -48,20 +48,20 @@
   <div class="card-scroll" id="sc-scroll">
     <div class="word-hero">
       <div class="word-text" id="sc-word"></div>
-      <button class="word-audio" id="sc-word-audio" onclick="playWordAudio()">🔊</button>
+      <button class="word-audio" id="sc-word-audio" onclick="playWordAudio()">&#128266;</button>
     </div>
     <div class="card-img" id="sc-img-block">
       <div id="sc-img-inner"></div>
-      <button class="card-video-btn" id="sc-video-btn" style="display:none" onclick="openVideo()">📹 Video reference</button>
+      <button class="card-video-btn" id="sc-video-btn" style="display:none" onclick="openVideo()">&#128249; Video reference</button>
     </div>
     <div class="illus-toggle" id="sc-illus-toggle" style="display:none">
-      <span>💡</span><span id="sc-illus-label">Show illustration</span>
+      <span>&#128161;</span><span id="sc-illus-label">Show illustration</span>
     </div>
     <div>
       <div class="slabel">Example</div>
       <div class="sentence-block">
         <div class="sentence-text" id="sc-sentence"></div>
-        <button class="sentence-audio" id="sc-sentence-audio" onclick="playSentenceAudio()">🔊</button>
+        <button class="sentence-audio" id="sc-sentence-audio" onclick="playSentenceAudio()">&#128266;</button>
       </div>
     </div>
     <div>
@@ -73,21 +73,21 @@
       <div class="trio-wrap" id="sc-trio-wrap">
         <div class="trio-row">
           <button class="trio-btn model" id="sc-model-btn" onclick="playModelAudio()">
-            <span class="trio-icon">🔊</span>
+            <span class="trio-icon">&#128266;</span>
             <span class="trio-label">Model</span>
           </button>
           <button class="trio-btn playback" id="sc-play-btn">
-            <span class="trio-icon" id="sc-play-icon">▶</span>
+            <span class="trio-icon" id="sc-play-icon">&#9654;</span>
             <span class="trio-label">You</span>
           </button>
           <button class="trio-btn record" id="sc-rec-btn">
-            <span class="trio-icon" id="sc-rec-icon">🎤</span>
+            <span class="trio-icon" id="sc-rec-icon">&#127908;</span>
             <span class="trio-label" id="sc-rec-label">Record</span>
           </button>
         </div>
         <p class="trio-hint" id="sc-trio-hint">Hear the model, then record yourself.</p>
         <div class="compare-card" id="sc-compare-card">
-          <button class="compare-play" id="sc-compare-play">▶</button>
+          <button class="compare-play" id="sc-compare-play">&#9654;</button>
           <div class="compare-info">
             <div class="compare-title">Compare with previous try</div>
             <div class="compare-sub" id="sc-compare-sub"></div>
@@ -146,6 +146,6 @@
 </div>
 
 <script>const DECK_URL = 'vocab-describe-people.json';</script>
-<script src="vocab-primer-player.js?v=5"></script>
+<script src="vocab-primer-player.js?v=6"></script>
 </body>
 </html>
