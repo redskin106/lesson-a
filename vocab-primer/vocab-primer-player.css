@@ -166,7 +166,7 @@ html, body {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--bg-card);
 }
-.gc-word { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--cream); line-height: 1.1; }
+.gc-word { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--cream); line-height: 1.1; flex: 1; text-align: center; }
 .gc-play {
   width: 28px; height: 28px; border-radius: 50%;
   background: var(--cream-faint); border: none; font-size: 12px;
@@ -227,7 +227,7 @@ html, body {
 /* Card image */
 .card-img {
   border-radius: 14px; overflow: hidden; background: #272320;
-  aspect-ratio: 1/1; display: flex; align-items: center;
+  width: 100%; aspect-ratio: 1/1; display: flex; align-items: center;
   justify-content: center; font-size: 90px; position: relative;
   border: 1.5px solid var(--border);
 }
