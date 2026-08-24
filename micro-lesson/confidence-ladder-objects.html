@@ -580,8 +580,9 @@ body {
   <div class="landing-sub">One step at a time.</div>
   <div class="name-input-wrap">
     <input class="name-input" id="name-input" type="text" placeholder="Your first name" maxlength="30" autocomplete="off">
-    <button class="start-btn" onclick="startLanding()">Start</button>
+    <button class="start-btn" onclick="startLanding()">Start →</button>
   </div>
+  <div style="font-size:12px;color:var(--dim);margin-bottom:10px;">Or tap an object below to begin</div>
   <div class="obj-grid" id="obj-grid"></div>
 </div>
 
@@ -824,6 +825,10 @@ function renderLanding() {
 function startLanding() {
   const name = document.getElementById('name-input').value.trim();
   if (name) localStorage.setItem('cl_name', name);
+  // If only one object, launch it directly
+  if (OBJECTS.length === 1) {
+    startLesson(OBJECTS[0].id);
+  }
 }
 
 function goLanding() {
