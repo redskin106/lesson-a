@@ -95,107 +95,96 @@ function init() {
 
 /* ═══════════════════════════════════════════════
    GRID BUILD
+   Groups ALL cards (pairs + singles) by category,
+   in the order defined by DECK.categories[].
+   Falls back to legacy auto-grouping for old decks.
 ═══════════════════════════════════════════════ */
 function buildGrid() {
   const grid = document.getElementById('card-grid');
   grid.innerHTML = '';
 
-  // Pairs section label
-  if (pairCards.length) {
-    // Pairs section — collapsible, starts collapsed
-    let pairsCollapsed = true;
-    const pairBody = [];
+  const allCards = DECK.cards;
 
-    const pairHeader = document.createElement('div');
-    pairHeader.className = 'cat-group-header';
-    pairHeader.innerHTML = `<span class="cat-group-toggle">▶</span><span class="cat-group-label">Pairs</span><span class="cat-group-count">${pairCards.length}</span>`;
-    pairHeader.onclick = () => {
-      pairsCollapsed = !pairsCollapsed;
-      pairHeader.querySelector('.cat-group-toggle').textContent = pairsCollapsed ? '▶' : '▼';
-      pairBody.forEach(el => { el.style.display = pairsCollapsed ? 'none' : ''; });
-    };
-    grid.appendChild(pairHeader);
-
-    pairCards.forEach((card, i) => {
-      const el = buildPairGridCard(card, i);
-      el.style.display = 'none'; // start collapsed
-      grid.appendChild(el);
-      pairBody.push(el);
-    });
+  // Resolve category for legacy decks without category field
+  function resolveCategory(card) {
+    if (card.category) return card.category;
+    if (card.type === 'pair') return 'Opposite Pairs';
+    if (card.isColour) return 'Colours';
+    if (['circle','rectangle','triangle','square'].includes(card.word)) return 'Shapes';
+    return 'Nouns';
   }
 
-  if (singleCards.length) {
-    // Group singles by DECK.categories order; fallback for old decks
-    const deckCats = (DECK.categories && DECK.categories.length)
-      ? DECK.categories
-      : (() => {
-          const AUTO = ['Nouns','Shapes','Colours','Other'];
-          const seen = new Set(singleCards.map(c =>
-            c.category || (c.isColour ? 'Colours' : ['circle','rectangle','triangle','square'].includes(c.word) ? 'Shapes' : 'Nouns')
-          ));
-          return AUTO.filter(g => seen.has(g));
-        })();
+  // Build category list — use DECK.categories if present, else auto-detect
+  const deckCats = (DECK.categories && DECK.categories.length)
+    ? DECK.categories
+    : (() => {
+        const AUTO = ['Opposite Pairs','Nouns','Shapes','Colours','Other'];
+        const seen = new Set(allCards.map(c => resolveCategory(c)));
+        return AUTO.filter(g => seen.has(g));
+      })();
 
-    function resolveCategory(card) {
-      if (card.category) return card.category;
-      if (card.isColour) return 'Colours';
-      if (['circle','rectangle','triangle','square'].includes(card.word)) return 'Shapes';
-      return 'Nouns';
-    }
+  const rendered = new Set();
 
-    const _collapsed = {};
-    const rendered = new Set();
+  deckCats.forEach(label => {
+    const groupCards = allCards.filter(c => resolveCategory(c) === label);
+    if (!groupCards.length) return;
 
-    deckCats.forEach(label => {
-      if (label === 'Opposite Pairs') return;
-      const groupCards = singleCards.filter(c => resolveCategory(c) === label);
-      if (!groupCards.length) return;
+    // Category header — collapsible, starts collapsed
+    let collapsed = true;
+    const body = [];
 
-      // Header (toggle)
-      const header = document.createElement('div');
-      header.className = 'cat-group-header';
-      _collapsed[label] = true; // start collapsed
-      header.innerHTML = `<span class="cat-group-toggle">▶</span><span class="cat-group-label">${label}</span><span class="cat-group-count">${groupCards.length}</span>`;
-      header.onclick = () => {
-        _collapsed[label] = !_collapsed[label];
-        const toggle = header.querySelector('.cat-group-toggle');
-        toggle.textContent = _collapsed[label] ? '▶' : '▼';
-        body.forEach(el => { el.style.display = _collapsed[label] ? 'none' : ''; });
-      };
-      grid.appendChild(header);
+    const header = document.createElement('div');
+    header.className = 'cat-group-header';
+    header.innerHTML = `<span class="cat-group-toggle">▶</span><span class="cat-group-label">${label}</span><span class="cat-group-count">${groupCards.length}</span>`;
+    header.onclick = () => {
+      collapsed = !collapsed;
+      header.querySelector('.cat-group-toggle').textContent = collapsed ? '▶' : '▼';
+      body.forEach(el => { el.style.display = collapsed ? 'none' : ''; });
+    };
+    grid.appendChild(header);
 
-      // Cards — start collapsed
-      const body = [];
-      groupCards.forEach(card => {
-        rendered.add(card);
+    groupCards.forEach(card => {
+      rendered.add(card);
+      let el;
+      if (card.type === 'pair') {
+        const i = pairCards.indexOf(card);
+        el = buildPairGridCard(card, i);
+      } else {
         const i = singleCards.indexOf(card);
-        const el = buildSingleGridCard(card, i);
-        el.style.display = 'none';
-        grid.appendChild(el);
-        body.push(el);
-      });
+        el = buildSingleGridCard(card, i);
+      }
+      el.style.display = 'none'; // start collapsed
+      grid.appendChild(el);
+      body.push(el);
     });
+  });
 
-    // Safety net — uncategorised cards
-    const uncategorised = singleCards.filter(c => !rendered.has(c));
-    if (uncategorised.length) {
-      const header = document.createElement('div');
-      header.className = 'cat-group-header';
-      header.innerHTML = `<span class="cat-group-toggle">▼</span><span class="cat-group-label">Other</span><span class="cat-group-count">${uncategorised.length}</span>`;
-      const body = [];
-      header.onclick = () => {
-        const collapsed = header.querySelector('.cat-group-toggle').textContent === '▼';
-        header.querySelector('.cat-group-toggle').textContent = collapsed ? '▶' : '▼';
-        body.forEach(el => { el.style.display = collapsed ? 'none' : ''; });
-      };
-      grid.appendChild(header);
-      uncategorised.forEach(card => {
+  // Safety net — any cards not matched by a category
+  const uncategorised = allCards.filter(c => !rendered.has(c));
+  if (uncategorised.length) {
+    let collapsed = false;
+    const body = [];
+    const header = document.createElement('div');
+    header.className = 'cat-group-header';
+    header.innerHTML = `<span class="cat-group-toggle">▼</span><span class="cat-group-label">Other</span><span class="cat-group-count">${uncategorised.length}</span>`;
+    header.onclick = () => {
+      collapsed = !collapsed;
+      header.querySelector('.cat-group-toggle').textContent = collapsed ? '▶' : '▼';
+      body.forEach(el => { el.style.display = collapsed ? 'none' : ''; });
+    };
+    grid.appendChild(header);
+    uncategorised.forEach(card => {
+      let el;
+      if (card.type === 'pair') {
+        const i = pairCards.indexOf(card);
+        el = buildPairGridCard(card, i);
+      } else {
         const i = singleCards.indexOf(card);
-        const el = buildSingleGridCard(card, i);
-        grid.appendChild(el);
-        body.push(el);
-      });
-    }
+        el = buildSingleGridCard(card, i);
+      }
+      grid.appendChild(el);
+      body.push(el);
+    });
   }
 }
 
