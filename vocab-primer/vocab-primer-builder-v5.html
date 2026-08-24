@@ -1119,11 +1119,11 @@ function downloadCardAudio(cardIdx) {
 
   const slots = card.type === 'single'
     ? [ { key: 'audioWord',     label: `${card.word}_word` },
-        { key: 'audioSentence', label: `${card.word}_sentence` } ]
+        { key: 'audioSentence', label: `${card.word}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` } ]
     : [ { key: 'audio1Word',     label: `${card.word1}_word` },
-        { key: 'audio1Sentence', label: `${card.word1}_sentence` },
+        { key: 'audio1Sentence', label: `${card.word1}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` },
         { key: 'audio2Word',     label: `${card.word2}_word` },
-        { key: 'audio2Sentence', label: `${card.word2}_sentence` } ];
+        { key: 'audio2Sentence', label: `${card.word2}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` } ];
 
   let count = 0;
   slots.forEach(s => {
@@ -1149,11 +1149,11 @@ function downloadAllAudio() {
 
     const slots = card.type === 'single'
       ? [ { key: 'audioWord',     label: `${card.word}_word` },
-          { key: 'audioSentence', label: `${card.word}_sentence` } ]
+          { key: 'audioSentence', label: `${card.word}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` } ]
       : [ { key: 'audio1Word',     label: `${card.word1}_word` },
-          { key: 'audio1Sentence', label: `${card.word1}_sentence` },
+          { key: 'audio1Sentence', label: `${card.word1}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` },
           { key: 'audio2Word',     label: `${card.word2}_word` },
-          { key: 'audio2Sentence', label: `${card.word2}_sentence` } ];
+          { key: 'audio2Sentence', label: `${card.word2}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` } ];
 
     slots.forEach(s => {
       const data = audioBlobs[`${ci}_${s.key}`];
@@ -1370,11 +1370,11 @@ async function confirmPush() {
   cards.forEach((card, ci) => {
     const slots = card.type === 'pair'
       ? [ { key:'audio1Word',     slug:`${card.word1}_word` },
-          { key:'audio1Sentence', slug:`${card.word1}_sentence` },
+          { key:'audio1Sentence', slug:`${card.word1}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` },
           { key:'audio2Word',     slug:`${card.word2}_word` },
-          { key:'audio2Sentence', slug:`${card.word2}_sentence` } ]
+          { key:'audio2Sentence', slug:`${card.word2}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` } ]
       : [ { key:'audioWord',     slug:`${card.word}_word` },
-          { key:'audioSentence', slug:`${card.word}_sentence` } ];
+          { key:'audioSentence', slug:`${card.word}_${cardCategory(card).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}_sentence` } ];
     slots.forEach(s => {
       const val = audioBlobs[`${ci}_${s.key}`] || card[s.key] || '';
       if (val.startsWith('data:')) audioJobs.push({ ci, card, key: s.key, slug: s.slug.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''), dataUrl: val });
