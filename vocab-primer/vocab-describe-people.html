@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="vocab-primer-player.css?v=6">
+<link rel="stylesheet" href="vocab-primer-player.css?v=7">
 </head>
 <body>
 <div id="loading-overlay">
@@ -50,10 +50,10 @@
       <div class="word-text" id="sc-word"></div>
       <button class="word-audio" id="sc-word-audio" onclick="playWordAudio()">&#128266;</button>
     </div>
-    <div class="card-img" id="sc-img-block">
+    <div class="card-img-wrap"><div class="card-img" id="sc-img-block">
       <div id="sc-img-inner"></div>
       <button class="card-video-btn" id="sc-video-btn" style="display:none" onclick="openVideo()">&#128249; Video reference</button>
-    </div>
+    </div></div>
     <div class="illus-toggle" id="sc-illus-toggle" style="display:none">
       <span>&#128161;</span><span id="sc-illus-label">Show illustration</span>
     </div>
@@ -146,6 +146,6 @@
 </div>
 
 <script>const DECK_URL = 'vocab-describe-people.json';</script>
-<script src="vocab-primer-player.js?v=6"></script>
+<script src="vocab-primer-player.js?v=7"></script>
 </body>
 </html>
