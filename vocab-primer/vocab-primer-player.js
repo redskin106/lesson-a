@@ -62,6 +62,8 @@ let currentSingleIdx = 0;  // index into singleCards array
 let currentPairIdx   = 0;  // index into pairCards array
 let singleCards = [];
 let pairCards   = [];
+let navOrder    = [];   // all cards in deck order for sequential nav
+let currentNavIdx = 0;
 let currentVideoData = null;
 let mediaRecorder = null;
 let recordedChunks = [];
@@ -89,6 +91,7 @@ function init() {
   document.getElementById('idx-lesson-name').textContent = DECK.lessonName;
   pairCards   = DECK.cards.filter(c => c.type === 'pair');
   singleCards = DECK.cards.filter(c => c.type === 'single');
+  navOrder    = DECK.cards.slice(); // deck order — category-grouped
   buildGrid();
   updateProgress();
 }
@@ -258,6 +261,7 @@ function updateProgress() {
 ═══════════════════════════════════════════════ */
 function openSingle(i) {
   currentSingleIdx = i;
+  currentNavIdx = navOrder.indexOf(singleCards[i]);
   renderSingle();
   showScreen('screen-single');
 }
@@ -276,12 +280,13 @@ function renderSingle() {
   // Image — colour cards show CSS swatch
   const imgInner = document.getElementById('sc-img-inner');
   if (card.isColour) {
-    imgInner.style.cssText = `width:100%;height:100%;background:${card.swatch};border-radius:12px;`;
+    imgInner.style.cssText = 'position:absolute;inset:0;border-radius:12px;';
+    imgInner.style.background = card.swatch;
     imgInner.innerHTML = '';
   } else {
-    imgInner.style.cssText = '';
+    imgInner.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;';
     imgInner.innerHTML = card.image
-      ? `<img src="${card.image}" alt="${card.word}" style="width:85%;height:85%;object-fit:contain;">`
+      ? `<img src="${card.image}" alt="${card.word}" style="width:100%;height:100%;object-fit:cover;">`
       : `<span style="font-size:90px;">${card.emoji}</span>`;
   }
 
@@ -344,19 +349,7 @@ function renderSingle() {
   document.getElementById('sc-scroll').scrollTop = 0;
 }
 
-function stepCard(dir) {
-  const next = currentSingleIdx + dir;
-  if (next < 0 && pairCards.length > 0) {
-    // wrap back into pairs — go to last pair
-    currentPairIdx = pairCards.length - 1;
-    openPair(currentPairIdx);
-    return;
-  }
-  if (next >= singleCards.length) return;
-  if (next < 0) return;
-  currentSingleIdx = next;
-  renderSingle();
-}
+function stepCard(dir) { stepNav(dir); }
 
 function rateCard(rating) {
   const card = singleCards[currentSingleIdx];
@@ -374,6 +367,7 @@ function rateCard(rating) {
 ═══════════════════════════════════════════════ */
 function openPair(i) {
   currentPairIdx = i;
+  currentNavIdx = navOrder.indexOf(pairCards[i]);
   renderPair();
   showScreen('screen-pair');
 }
@@ -386,11 +380,10 @@ function renderPair() {
   document.getElementById('pc-counter').textContent = `Pair ${i+1} of ${tot}`;
   document.getElementById('pc-tier').className = 'nav-tier tier-' + card.tier;
   document.getElementById('pc-tier').textContent = card.tier.charAt(0).toUpperCase() + card.tier.slice(1);
-  document.getElementById('pc-prev').disabled = i === 0;
-  document.getElementById('pc-next').disabled = (i === tot - 1) && singleCards.length === 0;
-  // Update next label to hint when crossing to singles
+  document.getElementById('pc-prev').disabled = currentNavIdx === 0;
+  document.getElementById('pc-next').disabled = currentNavIdx === navOrder.length - 1;
   const pcNext = document.getElementById('pc-next');
-  pcNext.textContent = (i === tot - 1 && singleCards.length > 0) ? 'Words >' : 'Next >';
+  pcNext.textContent = 'Next >';
 
   const layout = document.getElementById('pair-card-layout');
   layout.innerHTML = buildPairHalfHTML(card, 1) + buildPairHalfHTML(card, 2);
@@ -486,17 +479,25 @@ function buildPairHalfHTML(card, side) {
   </div>`;
 }
 
-function stepPair(dir) {
-  const next = currentPairIdx + dir;
-  if (next >= pairCards.length && singleCards.length > 0) {
-    // advance into singles — go to first single
-    currentSingleIdx = 0;
-    openSingle(0);
-    return;
+function stepPair(dir) { stepNav(dir); }
+
+/* ═══════════════════════════════════════════════
+   UNIFIED NAVIGATION (deck order, category-aware)
+═══════════════════════════════════════════════ */
+function stepNav(dir) {
+  const next = currentNavIdx + dir;
+  if (next < 0 || next >= navOrder.length) return;
+  currentNavIdx = next;
+  const card = navOrder[currentNavIdx];
+  if (card.type === 'pair') {
+    currentPairIdx = pairCards.indexOf(card);
+    renderPair();
+    showScreen('screen-pair');
+  } else {
+    currentSingleIdx = singleCards.indexOf(card);
+    renderSingle();
+    showScreen('screen-single');
   }
-  if (next < 0 || next >= pairCards.length) return;
-  currentPairIdx = next;
-  renderPair();
 }
 
 /* ═══════════════════════════════════════════════
