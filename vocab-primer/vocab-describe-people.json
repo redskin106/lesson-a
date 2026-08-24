@@ -316,7 +316,7 @@
       "tier": "bronze",
       "word": "hands",
       "emoji": "🖐️",
-      "sentence": "They have tanned hands.",
+      "sentence": "They have dark hands.",
       "phonemes": [
         {
           "s": "h",
@@ -487,7 +487,7 @@
       "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/short_sentence.mp3",
       "category": "Build",
       "image1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/tall.png",
-      "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/short.png"
+      "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/images/short.png"
     },
     {
       "type": "pair",
@@ -1038,7 +1038,7 @@
       "wordAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/long_word.mp3",
       "sentenceAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/long_sentence.mp3",
       "category": "Face",
-      "image": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/long.png"
+      "image": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/images/long.png"
     },
     {
       "type": "pair",
@@ -1444,8 +1444,8 @@
       "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/dark_sentence.mp3",
       "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/audio/light_sentence.mp3",
       "category": "Hair",
-      "image1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/dark.png",
-      "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-primer-v2/images/light.png"
+      "image1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/images/dark.png",
+      "image2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-people/images/light.png"
     },
     {
       "type": "pair",
@@ -1813,7 +1813,7 @@
       "emoji1": "🌑",
       "emoji2": "🌕",
       "sentence1": "Chloe has dark skin.",
-      "sentence2": "Dave has light skin.",
+      "sentence2": "Mina has light skin.",
       "phonemes1": [
         {
           "s": "d",
