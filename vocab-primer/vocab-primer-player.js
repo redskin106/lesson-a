@@ -432,8 +432,8 @@ function buildPairHalfHTML(card, side) {
   const rating    = progress[key] || '';
 
   const imgContent = image
-    ? `<img data-src="${image}" alt="${word}" style="opacity:0;transition:opacity 0.3s;">`
-    : `<span style="font-size:48px;">${emoji}</span>`;
+    ? `<img data-src="${image}" alt="${word}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;">`
+    : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;">${emoji}</div>`;
 
   return `
   <div class="pair-card-half">
@@ -441,7 +441,7 @@ function buildPairHalfHTML(card, side) {
       <div class="pair-word-text">${word}${card['word'+side+'note'] ? `<span style="font-size:9px;color:var(--cream-dim);font-family:'Inter',sans-serif;font-weight:400;margin-left:4px;">*</span>` : ''}</div>
       <button class="pair-word-audio" data-audio="${card['wordAudio'+side]||''}" data-tts="${qa(word)}" onclick="playAudio(this.dataset.audio,this.dataset.tts)">🔊</button>
     </div>
-    <div class="pair-card-img">${imgContent}</div>
+    <div class="pair-card-img-wrap"><div class="pair-card-img">${imgContent}</div></div>
     <div class="pair-sentence">
       <span class="pair-s-audio" data-audio="${card['sentenceAudio'+side]||''}" data-tts="${qa(sentence)}" onclick="playAudio(this.dataset.audio,this.dataset.tts)">🔊</span>
       <span>${highlightWord(sentence, word)}</span>
