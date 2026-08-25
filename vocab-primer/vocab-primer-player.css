@@ -409,11 +409,12 @@ html, body {
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; flex-shrink: 0;
 }
+.pair-card-img-wrap { width: 100%; display: block; }
 .pair-card-img {
-  aspect-ratio: 1/1; background: #272320; border-radius: 12px;
+  width: 100%; padding-bottom: 100%; height: 0;
+  background: #272320; border-radius: 12px;
   border: 1.5px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 48px; position: relative; overflow: hidden;
+  position: relative; overflow: hidden;
 }
 .pair-card-img img { width: 100%; height: 100%; object-fit: cover; }
 
