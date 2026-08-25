@@ -428,29 +428,27 @@ function jpUrlForSymbol(sym) {
 // Builder phoneme — same queue pattern as primer
 let _bPhAudio = null, _bPhQueue = [], _bPhPlaying = false;
 function _bPhNext() {
-  if (_bPhQueue.length === 0) { _bPhPlaying = false; _bPhAudio = null; console.log('[PH] queue empty'); return; }
+  if (_bPhQueue.length === 0) { _bPhPlaying = false; _bPhAudio = null; return; }
   _bPhPlaying = true;
   const { url, sym } = _bPhQueue.shift();
-  console.log('[PH] loading:', url);
   const a = new Audio();
   _bPhAudio = a;
   let played = false;
   function doPlay() {
     if (played) return;
     played = true;
-    console.log('[PH] playing:', url);
-    a.play().catch(e => { console.warn('[PH] play() rejected:', e); _bPhPlaying = false; _bPhAudio = null; _bPhNext(); });
+    a.play().catch(() => { _bPhPlaying = false; _bPhAudio = null; _bPhNext(); });
   }
-  a.addEventListener('canplaythrough', () => { console.log('[PH] canplaythrough fired'); doPlay(); }, { once:true });
-  a.addEventListener('ended', () => { console.log('[PH] ended'); _bPhPlaying = false; _bPhAudio = null; _bPhNext(); }, { once:true });
-  a.addEventListener('error', (e) => {
-    console.warn('[PH] error:', a.error?.code, a.error?.message, url);
+  a.addEventListener('canplaythrough', doPlay, { once:true });
+  a.addEventListener('ended', () => { _bPhPlaying = false; _bPhAudio = null; _bPhNext(); }, { once:true });
+  a.addEventListener('error', () => {
     _bPhPlaying = false; _bPhAudio = null;
     const u = new SpeechSynthesisUtterance(sym); u.lang='en-GB'; window.speechSynthesis?.speak(u);
     _bPhNext();
   }, { once:true });
   a.preload = 'auto'; a.src = url; a.load();
-  setTimeout(() => { console.log('[PH] 300ms fallback fired, played=', played); doPlay(); }, 300);
+  // Fallback: if canplaythrough never fires (cached file), play after 300ms
+  setTimeout(() => doPlay(), 300);
 }
 function previewPhoneme(sym, customUrl) {
   const url = customUrl || jpUrlForSymbol(sym);
