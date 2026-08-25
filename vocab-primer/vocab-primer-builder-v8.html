@@ -433,13 +433,22 @@ function _bPhNext() {
   const { url, sym } = _bPhQueue.shift();
   const a = new Audio();
   _bPhAudio = a;
-  a.addEventListener('canplaythrough', () => { a.play().catch(() => _bPhNext()); }, { once:true });
-  a.addEventListener('ended', _bPhNext, { once:true });
+  let played = false;
+  function doPlay() {
+    if (played) return;
+    played = true;
+    a.play().catch(() => { _bPhPlaying = false; _bPhAudio = null; _bPhNext(); });
+  }
+  a.addEventListener('canplaythrough', doPlay, { once:true });
+  a.addEventListener('ended', () => { _bPhPlaying = false; _bPhAudio = null; _bPhNext(); }, { once:true });
   a.addEventListener('error', () => {
+    _bPhPlaying = false; _bPhAudio = null;
     const u = new SpeechSynthesisUtterance(sym); u.lang='en-GB'; window.speechSynthesis?.speak(u);
     _bPhNext();
   }, { once:true });
   a.preload = 'auto'; a.src = url; a.load();
+  // Fallback: if canplaythrough never fires (cached file), play after 300ms
+  setTimeout(() => doPlay(), 300);
 }
 function previewPhoneme(sym, customUrl) {
   const url = customUrl || jpUrlForSymbol(sym);
