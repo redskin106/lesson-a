@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Teaching Moment — Adjective Order</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;0,800;0,900;1,700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1f12;
+  --accent: #4ade80;
+  --accent-dim: rgba(74,222,128,0.15);
+  --accent-border: rgba(74,222,128,0.3);
+  --wrong: #ef4444;
+  --wrong-dim: rgba(239,68,68,0.15);
+  --white: #ffffff;
+  --dim: rgba(255,255,255,0.45);
+  --faint: rgba(255,255,255,0.07);
+
+  /* Tile colours — same as lesson */
+  --ts: #d81b60;   /* size */
+  --tsh: #388e3c;  /* shape */
+  --tc: #e53935;   /* colour */
+  --tn: #1565c0;   /* noun */
+}
+
+html, body {
+  height: 100%;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Phone shell */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 40px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Phases ── */
+.phase { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+.phase.active { opacity: 1; pointer-events: all; }
+
+/* ────────────────────────────────────────
+   PHASE 1: ARRIVAL
+──────────────────────────────────────── */
+#phase-arrival {
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: var(--bg);
+}
+
+.arrival-ring {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--accent-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 32px;
+}
+.arrival-ring::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(74,222,128,0.1);
+  animation: ring-pulse 2s ease-in-out infinite;
+}
+.arrival-ring::after {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  border: 1px solid rgba(74,222,128,0.05);
+  animation: ring-pulse 2s ease-in-out 0.3s infinite;
+}
+@keyframes ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.5; }
+}
+
+.arrival-icon {
+  font-size: 48px;
+  animation: icon-breathe 2s ease-in-out infinite;
+}
+@keyframes icon-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.arrival-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.arrival-label::before,
+.arrival-label::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.arrival-title {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--white);
+  text-align: center;
+  line-height: 1.2;
+  padding: 0 40px;
+}
+
+/* ────────────────────────────────────────
+   PHASE 2: WRONG ORDER
+──────────────────────────────────────── */
+#phase-wrong {
+  padding: 56px 28px 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.scene-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-align: center;
+}
+
+/* Object image zone */
+.object-zone {
+  width: 200px;
+  height: 150px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  position: relative;
+}
+
+/* Sentence strip */
+.sentence-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 48px;
+  padding: 8px;
+}
+
+.s-word {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.3);
+}
+
+/* Tiles */
+.tile {
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  position: relative;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tile-icon {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.tile.size   { background: var(--ts); }
+.tile.shape  { background: var(--tsh); }
+.tile.colour { background: var(--tc); }
+.tile.noun   { background: var(--tn); }
+
+/* Wrong highlight */
+.tile.wrong-highlight {
+  animation: wrong-shake 0.5s ease both;
+  outline: 2px solid var(--wrong);
+  outline-offset: 3px;
+}
+@keyframes wrong-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* Wrong X overlay */
+.wrong-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239,68,68,0.85);
+  border-radius: 12px;
+  font-size: 28px;
+  color: white;
+  font-weight: 900;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.sentence-wrong-line {
+  width: 100%;
+  height: 3px;
+  background: var(--wrong);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.sentence-wrong-line.drawn { transform: scaleX(1); }
+
+/* ────────────────────────────────────────
+   PHASE 3: REARRANGING (the magic)
+──────────────────────────────────────── */
+#phase-rearrange {
+  padding: 48px 28px 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.rule-sequence {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rule-seq-item {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+}
+.rule-seq-item.pop { transform: scale(1); opacity: 1; }
+.rule-seq-arrow {
+  font-size: 16px;
+  color: var(--dim);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.rule-seq-arrow.pop { transform: scale(1); opacity: 1; }
+
+/* Animated tile row */
+.tile-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tile-animated {
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+.tile-animated.glow {
+  box-shadow: 0 0 24px rgba(74,222,128,0.4);
+}
+.tile-animated .t-icon { font-size: 11px; opacity: 0.7; }
+
+/* Correct sentence */
+.correct-sentence {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+  text-align: center;
+  line-height: 1.3;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  padding: 0 20px;
+}
+.correct-sentence.show { opacity: 1; transform: translateY(0); }
+
+/* Sound wave animation */
+.sound-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.sound-wave.playing { opacity: 1; }
+.sound-wave span {
+  display: block;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+  animation: wave 0.8s ease-in-out infinite;
+}
+.sound-wave span:nth-child(1) { height: 8px; animation-delay: 0s; }
+.sound-wave span:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+.sound-wave span:nth-child(3) { height: 24px; animation-delay: 0.2s; }
+.sound-wave span:nth-child(4) { height: 16px; animation-delay: 0.3s; }
+.sound-wave span:nth-child(5) { height: 8px; animation-delay: 0.4s; }
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1); }
+}
+
+/* ────────────────────────────────────────
+   PHASE 4: GHOST DEMO
+──────────────────────────────────────── */
+#phase-demo {
+  padding: 32px 24px 28px;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 16px;
+}
+
+.demo-header {
+  text-align: center;
+}
+.demo-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+.demo-title {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--white);
+}
+
+.demo-object {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  position: relative;
+}
+.demo-question {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Drop zone */
+.demo-drop {
+  background: rgba(255,255,255,0.04);
+  border: 2px dashed rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 52px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  transition: border-color 0.3s, background 0.3s;
+}
+.demo-drop.has-tiles {
+  border-style: solid;
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06);
+}
+.demo-drop.correct {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.demo-bank {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.demo-tile {
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.demo-tile:active { transform: scale(0.93); }
+.demo-tile.used { opacity: 0.25; pointer-events: none; }
+.demo-tile .ti { font-size: 10px; opacity: 0.7; }
+
+.placed-demo-tile {
+  padding: 9px 12px 9px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.placed-demo-tile .ti { font-size: 10px; opacity: 0.7; }
+.placed-demo-tile .px { font-size: 11px; opacity: 0.6; }
+
+/* Ghost hand */
+.ghost-hand {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+  font-size: 28px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+  transition: opacity 0.2s;
+  transform-origin: top left;
+}
+.ghost-hand.visible { opacity: 0.9; }
+
+@keyframes ghost-tap {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.85); }
+}
+
+/* ────────────────────────────────────────
+   PHASE 5: GOT IT
+──────────────────────────────────────── */
+#phase-gotit {
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 32px;
+}
+
+.gotit-check {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  animation: check-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes check-pop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.gotit-title {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--white);
+  text-align: center;
+  line-height: 1.2;
+}
+.gotit-sub {
+  font-size: 14px;
+  color: var(--dim);
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 16px;
+}
+
+/* Rule reminder */
+.rule-reminder {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.rule-chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rule-chip {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rule-chip .ti { font-size: 10px; opacity: 0.7; }
+.rule-arrow { font-size: 14px; color: var(--dim); }
+
+.btn-gotit {
+  width: 100%;
+  padding: 18px;
+  border-radius: 16px;
+  border: none;
+  background: var(--accent);
+  color: #0d1f12;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s, opacity 0.15s;
+}
+.btn-gotit:active { transform: scale(0.97); }
+
+/* ────────────────────────────────────────
+   SHARED
+──────────────────────────────────────── */
+.skip-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dim);
+  cursor: pointer;
+  z-index: 50;
+}
+
+/* Confetti particles */
+.confetti-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 20;
+}
+.confetti-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  opacity: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <button class="skip-btn" onclick="skipToDemo()">Skip →</button>
+
+  <!-- ── PHASE 1: ARRIVAL ── -->
+  <div class="phase active" id="phase-arrival">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px">
+      <div class="arrival-ring">
+        <div class="arrival-icon">✨</div>
+      </div>
+      <div class="arrival-label">Language Note</div>
+      <div class="arrival-title">Word Order</div>
+      <div style="font-size:15px;color:var(--dim);text-align:center;line-height:1.6;max-width:260px">
+        In English, describing words go in a special order.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 2: WRONG ORDER ── -->
+  <div class="phase" id="phase-wrong">
+    <div class="scene-label">❌ Wrong order</div>
+
+    <div class="object-zone">🪑</div>
+
+    <div style="width:100%">
+      <div class="sentence-strip" id="wrong-strip">
+        <span class="s-word">a</span>
+        <div class="tile colour" id="tw-colour">
+          <span class="tile-icon">🎨</span> black
+        </div>
+        <div class="tile size" id="tw-size">
+          <span class="tile-icon">↔</span> small
+        </div>
+        <div class="tile shape" id="tw-shape">
+          <span class="tile-icon">◻</span> wooden
+        </div>
+        <div class="tile noun" id="tw-noun">
+          <span class="tile-icon">📦</span> chair
+        </div>
+      </div>
+      <div style="padding:0 8px;margin-top:4px">
+        <div class="sentence-wrong-line" id="wrong-line"></div>
+      </div>
+    </div>
+
+    <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:14px 18px;text-align:center">
+      <div style="font-size:28px;margin-bottom:6px">🤔</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.5">This doesn't sound right.<br>Listen:</div>
+      <div class="sound-wave" id="wrong-wave" style="justify-content:center;margin-top:8px">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 3: REARRANGE ── -->
+  <div class="phase" id="phase-rearrange">
+    <div class="scene-label">✅ Correct order</div>
+
+    <div style="width:100%">
+      <div class="rule-sequence" id="rule-seq" style="justify-content:center">
+        <div class="rule-seq-item size" id="rs-size" style="background:var(--ts)">
+          <span style="font-size:10px;opacity:0.7">↔</span> size
+        </div>
+        <div class="rule-seq-arrow" id="rs-a1">→</div>
+        <div class="rule-seq-item shape" id="rs-shape" style="background:var(--tsh)">
+          <span style="font-size:10px;opacity:0.7">◻</span> material
+        </div>
+        <div class="rule-seq-arrow" id="rs-a2">→</div>
+        <div class="rule-seq-item colour" id="rs-colour" style="background:var(--tc)">
+          <span style="font-size:10px;opacity:0.7">🎨</span> colour
+        </div>
+        <div class="rule-seq-arrow" id="rs-a3">→</div>
+        <div class="rule-seq-item noun" id="rs-noun" style="background:var(--tn)">
+          <span style="font-size:10px;opacity:0.7">📦</span> noun
+        </div>
+      </div>
+    </div>
+
+    <div class="tile-row" id="correct-tiles" style="justify-content:center">
+      <div class="tile-animated size" id="ct-size" style="background:var(--ts)">
+        <span class="t-icon">↔</span> small
+      </div>
+      <div class="tile-animated shape" id="ct-shape" style="background:var(--tsh)">
+        <span class="t-icon">◻</span> wooden
+      </div>
+      <div class="tile-animated colour" id="ct-colour" style="background:var(--tc)">
+        <span class="t-icon">🎨</span> black
+      </div>
+      <div class="tile-animated noun" id="ct-noun" style="background:var(--tn)">
+        <span class="t-icon">📦</span> chair
+      </div>
+    </div>
+
+    <div class="correct-sentence" id="correct-sent">
+      "a <span style="color:rgba(255,255,255,0.5)">small, wooden, black</span> chair"
+    </div>
+
+    <div class="sound-wave" id="correct-wave" style="justify-content:center">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div style="background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:14px;padding:16px 20px;width:100%">
+      <div style="font-size:24px;text-align:center;margin-bottom:8px">😊</div>
+      <div style="font-size:15px;color:rgba(255,255,255,0.8);text-align:center;line-height:1.6">
+        <span style="color:var(--accent);font-weight:700">Size → Material → Colour → Noun.</span><br>
+        Every time. In English.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 4: GHOST DEMO ── -->
+  <div class="phase" id="phase-demo" style="position:relative;overflow:hidden">
+
+    <div class="demo-header">
+      <div class="demo-label">Now you try</div>
+      <div class="demo-title">Build the sentence</div>
+    </div>
+
+    <!-- Object -->
+    <div class="demo-object">
+      <div class="demo-question">What does it look like?</div>
+      🎒
+    </div>
+
+    <!-- Drop zone -->
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px">Your sentence</div>
+      <div class="demo-drop" id="demo-drop">
+        <span style="font-size:13px;color:rgba(255,255,255,0.2)">Tap tiles below ↓</span>
+      </div>
+    </div>
+
+    <!-- Tile bank -->
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px">Words</div>
+      <div class="demo-bank" id="demo-bank">
+        <div class="demo-tile size"   id="dt-size"   style="background:var(--ts)"  onclick="tapDemoTile(this,'size','↔','small')"><span class="ti">↔</span>small</div>
+        <div class="demo-tile colour" id="dt-colour" style="background:var(--tc)"  onclick="tapDemoTile(this,'colour','🎨','black')"><span class="ti">🎨</span>black</div>
+        <div class="demo-tile shape"  id="dt-shape"  style="background:var(--tsh)" onclick="tapDemoTile(this,'shape','◻','old')"><span class="ti">◻</span>old</div>
+        <div class="demo-tile noun"   id="dt-noun"   style="background:var(--tn)"  onclick="tapDemoTile(this,'noun','📦','bag')"><span class="ti">📦</span>bag</div>
+      </div>
+    </div>
+
+    <!-- Ghost hand -->
+    <div class="ghost-hand" id="ghost-hand">👆</div>
+
+    <!-- Check -->
+    <button class="btn-gotit" id="demo-check-btn" onclick="checkDemo()" style="background:rgba(255,255,255,0.1);color:var(--white);font-size:16px;padding:14px">
+      Check ✓
+    </button>
+
+    <div style="text-align:center;font-size:12px;color:var(--dim)" id="demo-feedback"></div>
+  </div>
+
+  <!-- ── PHASE 5: GOT IT ── -->
+  <div class="phase" id="phase-gotit">
+    <div class="confetti-wrap" id="confetti"></div>
+
+    <div class="gotit-check">✓</div>
+
+    <div class="gotit-title">You've got it!</div>
+    <div class="gotit-sub">
+      In English, describing words always go:<br>
+      <strong style="color:var(--white)">size → material → colour → noun.</strong>
+    </div>
+
+    <div class="rule-reminder">
+      <div class="rule-chips">
+        <div class="rule-chip" style="background:var(--ts)"><span class="ti">↔</span>size</div>
+        <span class="rule-arrow">→</span>
+        <div class="rule-chip" style="background:var(--tsh)"><span class="ti">◻</span>material</div>
+        <span class="rule-arrow">→</span>
+        <div class="rule-chip" style="background:var(--tc)"><span class="ti">🎨</span>colour</div>
+        <span class="rule-arrow">→</span>
+        <div class="rule-chip" style="background:var(--tn)"><span class="ti">📦</span>noun</div>
+      </div>
+    </div>
+
+    <button class="btn-gotit" onclick="restartDemo()">Try another one →</button>
+  </div>
+
+</div>
+
+<script>
+// ── Audio context for tones ──
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(freq, duration, type='sine', gain=0.3, delay=0) {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const vol = ctx.createGain();
+    osc.connect(vol);
+    vol.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.value = freq;
+    vol.gain.setValueAtTime(0, ctx.currentTime + delay);
+    vol.gain.linearRampToValueAtTime(gain, ctx.currentTime + delay + 0.02);
+    vol.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+    osc.start(ctx.currentTime + delay);
+    osc.stop(ctx.currentTime + delay + duration + 0.05);
+  } catch(e) {}
+}
+
+// Arrival sound — warm two-note rise
+function soundArrival() {
+  playTone(330, 0.4, 'sine', 0.2, 0);
+  playTone(440, 0.6, 'sine', 0.15, 0.35);
+  playTone(550, 0.8, 'sine', 0.1, 0.7);
+}
+
+// Wrong sound — descending, unresolved
+function soundWrong() {
+  playTone(300, 0.5, 'sawtooth', 0.15, 0);
+  playTone(220, 0.4, 'sawtooth', 0.12, 0.3);
+}
+
+// Click/snap — single resolved note
+function soundSnap() {
+  playTone(660, 0.12, 'sine', 0.3, 0);
+  playTone(880, 0.08, 'sine', 0.15, 0.08);
+}
+
+// Correct — ascending resolved chord
+function soundCorrect() {
+  playTone(440, 0.3, 'sine', 0.2, 0);
+  playTone(550, 0.3, 'sine', 0.18, 0.05);
+  playTone(660, 0.4, 'sine', 0.15, 0.1);
+  playTone(880, 0.5, 'sine', 0.1, 0.2);
+}
+
+// Celebration — bright chord burst
+function soundCelebrate() {
+  [440,550,660,880,1100].forEach((f,i) => playTone(f, 0.4, 'sine', 0.15, i*0.06));
+}
+
+// Tile tap
+function soundTap() {
+  playTone(500, 0.1, 'sine', 0.2, 0);
+}
+
+// ── Phase management ──
+let currentPhase = 'arrival';
+const phases = ['arrival','wrong','rearrange','demo','gotit'];
+
+function showPhase(id) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.getElementById('phase-' + id).classList.add('active');
+  currentPhase = id;
+}
+
+function skipToDemo() {
+  clearAllTimers();
+  showPhase('demo');
+  runGhostDemo();
+}
+
+let timers = [];
+function t(fn, ms) { const id = setTimeout(fn, ms); timers.push(id); return id; }
+function clearAllTimers() { timers.forEach(clearTimeout); timers = []; }
+
+// ── PHASE 1: ARRIVAL ──
+function runArrival() {
+  soundArrival();
+  t(() => runWrong(), 2200);
+}
+
+// ── PHASE 2: WRONG ORDER ──
+function runWrong() {
+  showPhase('wrong');
+  soundWrong();
+
+  // Shake the tiles one by one
+  const tiles = ['tw-colour','tw-size','tw-shape'];
+  tiles.forEach((id, i) => {
+    t(() => {
+      document.getElementById(id).classList.add('wrong-highlight');
+      soundWrong();
+    }, i * 300);
+  });
+
+  // Draw strikethrough
+  t(() => {
+    document.getElementById('wrong-line').classList.add('drawn');
+  }, 1200);
+
+  // Show sound wave (wrong)
+  t(() => {
+    document.getElementById('wrong-wave').classList.add('playing');
+    soundWrong();
+  }, 1600);
+
+  t(() => {
+    document.getElementById('wrong-wave').classList.remove('playing');
+    runRearrange();
+  }, 2800);
+}
+
+// ── PHASE 3: REARRANGE ──
+function runRearrange() {
+  showPhase('rearrange');
+
+  // Rule sequence pops in one by one
+  const items = [
+    {id:'rs-size', delay:200},
+    {id:'rs-a1',   delay:500},
+    {id:'rs-shape',delay:600},
+    {id:'rs-a2',   delay:900},
+    {id:'rs-colour',delay:1000},
+    {id:'rs-a3',   delay:1300},
+    {id:'rs-noun', delay:1400},
+  ];
+
+  items.forEach(({id, delay}) => {
+    t(() => {
+      document.getElementById(id).classList.add('pop');
+      if (!id.startsWith('rs-a')) soundSnap();
+    }, delay);
+  });
+
+  // Tiles appear in correct order
+  const tiles = [
+    {id:'ct-size',  delay:1800},
+    {id:'ct-shape', delay:2200},
+    {id:'ct-colour',delay:2600},
+    {id:'ct-noun',  delay:3000},
+  ];
+
+  tiles.forEach(({id, delay}) => {
+    t(() => {
+      const el = document.getElementById(id);
+      el.style.transform = 'scale(1)';
+      el.style.opacity = '1';
+      soundSnap();
+      // Glow briefly
+      el.classList.add('glow');
+      setTimeout(() => el.classList.remove('glow'), 600);
+    }, delay);
+  });
+
+  // Hide tiles initially
+  ['ct-size','ct-shape','ct-colour','ct-noun'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.transform = 'scale(0)';
+    el.style.opacity = '0';
+  });
+
+  // Show correct sentence
+  t(() => {
+    document.getElementById('correct-sent').classList.add('show');
+  }, 3500);
+
+  // Sound wave
+  t(() => {
+    document.getElementById('correct-wave').classList.add('playing');
+    soundCorrect();
+  }, 3700);
+
+  t(() => {
+    document.getElementById('correct-wave').classList.remove('playing');
+  }, 5000);
+
+  // Move to demo
+  t(() => {
+    showPhase('demo');
+    runGhostDemo();
+  }, 6000);
+}
+
+// ── PHASE 4: GHOST DEMO ──
+let demoPlaced = [];
+const correctOrder = ['size','colour','shape','noun'];
+// Correct: size → old (shape/material) → black (colour) → bag (noun)
+// We accept: size first, noun last, colour and shape middle = any order middle is ok
+// Actually enforce: size, colour, shape, noun = any reasonable description order
+
+function runGhostDemo() {
+  const hand = document.getElementById('ghost-hand');
+  const bank = document.getElementById('demo-bank');
+
+  // Small delay then ghost appears
+  t(() => {
+    hand.classList.add('visible');
+
+    // Move hand to size tile
+    const sizeTile = document.getElementById('dt-size');
+    moveHandTo(hand, sizeTile, () => {
+      tapAnimation(hand);
+      t(() => {
+        // Simulate tapping size tile
+        ghostTapTile('dt-size', 'size', '↔', 'small');
+        soundTap();
+        // Then move to colour
+        t(() => {
+          const colourTile = document.getElementById('dt-colour');
+          moveHandTo(hand, colourTile, () => {
+            tapAnimation(hand);
+            t(() => {
+              ghostTapTile('dt-colour', 'colour', '🎨', 'black');
+              soundTap();
+              // Hand disappears — student's turn
+              t(() => {
+                hand.classList.remove('visible');
+                // Undo ghost taps so student can try
+                resetDemoForStudent();
+              }, 800);
+            }, 300);
+          });
+        }, 600);
+      }, 300);
+    });
+  }, 600);
+}
+
+function moveHandTo(hand, target, onDone) {
+  const phone = document.querySelector('.phone');
+  const phoneRect = phone.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+
+  const x = targetRect.left - phoneRect.left + targetRect.width/2 - 20;
+  const y = targetRect.top - phoneRect.top + targetRect.height/2 - 10;
+
+  hand.style.transition = 'left 0.5s cubic-bezier(0.34,1.2,0.64,1), top 0.5s cubic-bezier(0.34,1.2,0.64,1), opacity 0.2s';
+  hand.style.left = x + 'px';
+  hand.style.top = y + 'px';
+
+  t(onDone, 550);
+}
+
+function tapAnimation(hand) {
+  hand.style.animation = 'ghost-tap 0.25s ease both';
+  setTimeout(() => hand.style.animation = '', 300);
+}
+
+function ghostTapTile(id, type, icon, word) {
+  const el = document.getElementById(id);
+  if (!el || el.classList.contains('used')) return;
+  el.classList.add('used');
+
+  const drop = document.getElementById('demo-drop');
+  if (drop.querySelector('.placeholder-text')) {
+    drop.querySelector('.placeholder-text')?.remove();
+  }
+
+  // Clear placeholder
+  drop.querySelectorAll('[data-placeholder]').forEach(e => e.remove());
+
+  const placed = document.createElement('div');
+  placed.className = 'placed-demo-tile';
+  placed.style.background = el.style.background;
+  placed.dataset.type = type;
+  placed.innerHTML = `<span class="ti">${icon}</span>${word}<span class="px">✕</span>`;
+  placed.onclick = () => {
+    placed.remove();
+    el.classList.remove('used');
+    demoPlaced = demoPlaced.filter(t => t !== type);
+    updateDropZone();
+  };
+  drop.appendChild(placed);
+  demoPlaced.push(type);
+  drop.classList.add('has-tiles');
+}
+
+function tapDemoTile(el, type, icon, word) {
+  if (el.classList.contains('used')) return;
+  soundTap();
+  ghostTapTile(el.id, type, icon, word);
+}
+
+function updateDropZone() {
+  const drop = document.getElementById('demo-drop');
+  if (!demoPlaced.length) {
+    drop.classList.remove('has-tiles','correct');
+    drop.innerHTML = '<span style="font-size:13px;color:rgba(255,255,255,0.2)">Tap tiles below ↓</span>';
+  }
+}
+
+function resetDemoForStudent() {
+  // Clear what ghost did
+  const drop = document.getElementById('demo-drop');
+  drop.innerHTML = '<span style="font-size:13px;color:rgba(255,255,255,0.2)">Tap tiles below ↓</span>';
+  drop.classList.remove('has-tiles','correct');
+  demoPlaced = [];
+
+  // Re-enable all tiles
+  ['dt-size','dt-colour','dt-shape','dt-noun'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('used');
+  });
+
+  document.getElementById('demo-feedback').textContent = '';
+}
+
+function checkDemo() {
+  const drop = document.getElementById('demo-drop');
+  const placed = drop.querySelectorAll('.placed-demo-tile');
+  const types = Array.from(placed).map(p => p.dataset.type);
+
+  if (types.length < 4) {
+    document.getElementById('demo-feedback').textContent = 'Add all 4 words first!';
+    document.getElementById('demo-feedback').style.color = 'rgba(239,68,68,0.8)';
+    return;
+  }
+
+  // Check: size first, noun last, colour and material in middle
+  const sizeFirst = types[0] === 'size';
+  const nounLast  = types[types.length - 1] === 'noun';
+
+  if (sizeFirst && nounLast) {
+    // Correct!
+    drop.classList.add('correct');
+    drop.classList.remove('has-tiles');
+    soundCelebrate();
+    document.getElementById('demo-check-btn').style.background = 'var(--accent)';
+    document.getElementById('demo-check-btn').style.color = '#0d1f12';
+    document.getElementById('demo-feedback').textContent = '✓ Perfect!';
+    document.getElementById('demo-feedback').style.color = 'var(--accent)';
+    spawnConfetti();
+    t(() => showPhase('gotit'), 1200);
+  } else {
+    // Wrong order
+    soundWrong();
+    drop.style.borderColor = 'var(--wrong)';
+    document.getElementById('demo-feedback').textContent = 'Hmm — size first, noun last. Try again!';
+    document.getElementById('demo-feedback').style.color = 'rgba(239,68,68,0.8)';
+    setTimeout(() => drop.style.borderColor = '', 800);
+  }
+}
+
+// ── Confetti ──
+function spawnConfetti() {
+  const wrap = document.getElementById('confetti');
+  const colours = ['#4ade80','#a78bfa','#f472b6','#fb923c','#facc15','#38bdf8'];
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-particle';
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      top:-10px;
+      background:${colours[Math.floor(Math.random()*colours.length)]};
+      width:${6+Math.random()*6}px;
+      height:${6+Math.random()*6}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation:confetti-fall ${1+Math.random()*1.5}s ease-in ${Math.random()*0.5}s forwards;
+    `;
+    wrap.appendChild(el);
+  }
+}
+
+// Inject confetti keyframes
+const style = document.createElement('style');
+style.textContent = `
+@keyframes confetti-fall {
+  0%   { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
+  100% { opacity:0; transform:translateY(900px) rotate(${Math.random()>0.5?'':'−'}${180+Math.random()*360}deg) scale(0.5); }
+}`;
+document.head.appendChild(style);
+
+function restartDemo() {
+  clearAllTimers();
+  demoPlaced = [];
+  document.getElementById('confetti').innerHTML = '';
+  showPhase('arrival');
+  t(() => runArrival(), 400);
+}
+
+// ── Init ──
+// Initialise rearrange tiles as hidden
+['ct-size','ct-shape','ct-colour','ct-noun'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { el.style.transform = 'scale(0)'; el.style.opacity = '0'; }
+});
+
+// Start on tap (to unlock AudioContext)
+document.querySelector('.phone').addEventListener('click', function startOnTap() {
+  document.querySelector('.phone').removeEventListener('click', startOnTap);
+  runArrival();
+}, { once: false });
+
+t(() => runArrival(), 800);
+</script>
+</body>
+</html>
