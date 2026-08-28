@@ -397,4 +397,61 @@ Priority order:
 
 ---
 
+---
+
+## 16. Animated tile system
+
+### Tiles as self-demonstrating concepts
+
+Every tile demonstrates what it means through its own appearance and motion. The student perceives the concept before reading the label. No translation required.
+
+**Colour tiles**
+The tile background IS the colour. Starts as neutral grey, then the colour bleeds in slowly like ink spreading through water. Word fades in as the colour settles. Both arrive together so the brain pairs them in the same moment. On tap: a colour splash ripples outward briefly.
+
+**Size tiles**
+The tile physically changes size. A small tile for small is literally smaller than other tiles. A large tile for big takes more space. Flat compresses vertically, wide and thin. Heavy sinks slightly as if weighted. Tall stretches upward. The footprint of the tile IS the definition.
+
+**Texture/material tiles**
+The tile surface changes. Wooden gets a subtle wood grain pattern. Smooth becomes glossy, slightly reflective. Rough gets a noisy grainy surface. Soft has a gentle blur at the edges, like felt. All achievable in pure CSS: texture overlays, background gradients, box-shadow treatments.
+
+**Shape tiles**
+The tile border-radius morphs. Round becomes a circle. Square snaps to sharp corners. Flat rectangle becomes wide and low. The tile is the shape it names.
+
+**Action/verb tiles (future lessons)**
+Running: tile moves slightly across screen and returns. Falling: drops and bounces. Opening: splits apart and closes. The word becomes a micro-animation.
+
+### Tile reveal sequence (first encounter)
+1. Tile appears unanimated -- student looks
+2. Animation triggers: colour bleeds in, size shifts, texture appears
+3. Word fades in as animation settles
+4. Optional tap: multiple choice images confirm understanding
+5. Snap sound -- tile settles into stable learned form
+
+---
+
+## 17. Flying sentence assembly
+
+### Tiles as living grammar
+
+When a sentence is demonstrated or assembled -- especially in teaching moments -- tiles do not simply appear in order. They fly in from off-screen or scattered positions, find each other, and settle into the correct sequence. The sentence assembles itself like a living thing. Grammar happens visibly.
+
+### Choreography
+
+**Correct order demo (teaching moment)**
+Tiles start scattered or off-screen. The noun lands first -- anchoring the sentence. Then each modifier flies in and takes its position: size before material, material before colour, colour before noun. Each arrival reinforces the rule. The student watches the order build in real time. When the last tile settles, the full sentence glows and the audio plays.
+
+**Wrong then right rearrangement**
+Tiles arrive chaotically and land in wrong order. The sentence wobbles or pulses. A beat of silence. Then tiles lift off again, travel visibly to their correct positions mid-air, and settle with satisfying snaps. The colour tile that was first visibly travels to third position. The student's eye follows it there. The flight path IS the teaching.
+
+### Physics feel
+Not mechanical. Not floaty. Magnetic -- tiles are attracted to correct positions with a satisfying pull. Slight overshoot and spring-return on landing. CSS cubic-bezier(0.34, 1.56, 0.64, 1) for spring motion. The movement feels inevitable once it starts, like a puzzle piece finding its place.
+
+### What the student learns from the motion
+Not from text. Not from explanation. From physics. The trajectory of each tile encodes the rule. After one viewing the correct order feels inevitable. After two it feels obvious. After three across different objects it is stored in muscle memory.
+
+### Build note
+The adjective order teaching moment prototype (tm-adjective-order.html) already uses spring physics for tile pop-in. Flying sentence assembly extends the same principle -- tiles move from arbitrary starting positions to correct sentence positions with staggered delays and spring easing.
+
+---
+
 *This spec is the source of truth for the Confidence Ladder methodology. All build decisions should be checked against it. When something changes, update this file first.*
