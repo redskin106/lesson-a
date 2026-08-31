@@ -289,10 +289,14 @@ const LANG_META = {
 };
 
 function getAvailableTranslations(card) {
-  // Returns array of lang codes that have at least a word translation
+  // Returns array of lang codes that have at least a word translation.
+  // Pairs use translationVi1 / translationVi2; singles use translationVi.
   return ['vi','km','ur','th'].filter(lang => {
-    const key = 'translation' + lang.charAt(0).toUpperCase() + lang.slice(1);
-    return card[key] && card[key].trim();
+    const cap = lang.charAt(0).toUpperCase() + lang.slice(1);
+    const key = 'translation' + cap;
+    return (card[key] && card[key].trim())       // single card
+        || (card[key+'1'] && card[key+'1'].trim()) // pair card word1
+        || (card[key+'2'] && card[key+'2'].trim()); // pair card word2
   });
 }
 
@@ -358,7 +362,7 @@ function applyTranslationToSingle(card) {
 
   const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
   const wordTr  = card['translation' + langCap] || '';
-  const sentTr  = card['sentence'    + langCap] || '';
+  const sentTr  = card['sentence'    + langCap] || card['sentence' + langCap + '1'] || '';
   const meta    = LANG_META[lang];
   const isRTL   = meta.dir === 'rtl';
 
