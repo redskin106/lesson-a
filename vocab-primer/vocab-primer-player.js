@@ -65,6 +65,7 @@ let pairCards   = [];
 let navOrder    = [];   // all cards in deck order for sequential nav
 let currentNavIdx = 0;
 let currentVideoData = null;
+let activeTranslationLang = null; // null = hidden; 'vi'|'km'|'ur'|'th' = active
 let mediaRecorder = null;
 let recordedChunks = [];
 let recordedBlob   = null;
@@ -92,8 +93,19 @@ function init() {
   pairCards   = DECK.cards.filter(c => c.type === 'pair');
   singleCards = DECK.cards.filter(c => c.type === 'single');
   navOrder    = DECK.cards.slice(); // deck order — category-grouped
+  applyTierColours();
   buildGrid();
   updateProgress();
+}
+
+/* Apply tierColours from deck JSON to CSS variables */
+function applyTierColours() {
+  const tc = DECK.tierColours;
+  if (!tc) return;
+  const root = document.documentElement;
+  if (tc.bronze) root.style.setProperty('--tier-bronze', tc.bronze);
+  if (tc.silver) root.style.setProperty('--tier-silver', tc.silver);
+  if (tc.gold)   root.style.setProperty('--tier-gold',   tc.gold);
 }
 
 /* ═══════════════════════════════════════════════
@@ -257,11 +269,150 @@ function updateProgress() {
 }
 
 /* ═══════════════════════════════════════════════
+   TRANSLATIONS
+═══════════════════════════════════════════════ */
+const LANG_META = {
+  vi: { flag: '🇻🇳', name: 'Vietnamese', dir: 'ltr' },
+  km: { flag: '🇰🇭', name: 'Khmer',      dir: 'ltr' },
+  ur: { flag: '🇵🇰', name: 'Urdu',       dir: 'rtl' },
+  th: { flag: '🇹🇭', name: 'Thai',       dir: 'ltr' },
+};
+
+function getAvailableTranslations(card) {
+  // Returns array of lang codes that have at least a word translation
+  return ['vi','km','ur','th'].filter(lang => {
+    const key = 'translation' + lang.charAt(0).toUpperCase() + lang.slice(1);
+    return card[key] && card[key].trim();
+  });
+}
+
+function buildTranslateDropdown(card, containerEl) {
+  const langs = getAvailableTranslations(card);
+  if (!langs.length) { containerEl.style.display = 'none'; return; }
+  containerEl.style.display = '';
+
+  const active = activeTranslationLang;
+  const activeMeta = active ? LANG_META[active] : null;
+  const btnLabel = activeMeta
+    ? `🌐 ${activeMeta.flag} ${activeMeta.name} ▼`
+    : '🌐 Translate ▼';
+
+  containerEl.innerHTML = `
+    <div class="translate-wrap">
+      <button class="translate-btn" onclick="toggleTranslateMenu(event)">${btnLabel}</button>
+      <div class="translate-menu" id="translate-menu" style="display:none">
+        ${langs.map(lang => {
+          const m = LANG_META[lang];
+          const isActive = lang === active;
+          return `<button class="translate-opt${isActive ? ' active' : ''}" onclick="selectTranslationLang('${lang}',event)">
+            ${m.flag} ${m.name}${isActive ? ' ✓' : ''}
+          </button>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function toggleTranslateMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('translate-menu');
+  if (!menu) return;
+  const open = menu.style.display === 'none';
+  menu.style.display = open ? '' : 'none';
+  // Close on outside click
+  if (open) {
+    const close = ev => { menu.style.display = 'none'; document.removeEventListener('click', close); };
+    setTimeout(() => document.addEventListener('click', close), 0);
+  }
+}
+
+function selectTranslationLang(lang, e) {
+  e && e.stopPropagation();
+  // Toggle off if already active
+  activeTranslationLang = (activeTranslationLang === lang) ? null : lang;
+  // Re-render the current card to apply/remove translation
+  const screen = document.querySelector('.screen.active');
+  if (screen && screen.id === 'screen-single') renderSingle();
+  else if (screen && screen.id === 'screen-pair') renderPair();
+}
+
+function applyTranslationToSingle(card) {
+  const lang = activeTranslationLang;
+  const wordEl = document.getElementById('sc-word');
+  const sentEl = document.getElementById('sc-sentence');
+  if (!wordEl || !sentEl) return;
+
+  // Remove any existing translation nodes
+  document.querySelectorAll('.sc-word-translation, .sc-sent-translation, .sc-sent-sep').forEach(el => el.remove());
+
+  if (!lang) return;
+
+  const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
+  const wordTr  = card['translation' + langCap] || '';
+  const sentTr  = card['sentence'    + langCap] || '';
+  const meta    = LANG_META[lang];
+  const isRTL   = meta.dir === 'rtl';
+
+  if (wordTr) {
+    const el = document.createElement('div');
+    el.className = 'sc-word-translation';
+    el.textContent = wordTr;
+    if (isRTL) { el.setAttribute('dir','rtl'); el.style.textAlign = 'right'; }
+    wordEl.insertAdjacentElement('afterend', el);
+  }
+  if (sentTr) {
+    const sep = document.createElement('hr');
+    sep.className = 'sc-sent-sep';
+    const el = document.createElement('div');
+    el.className = 'sc-sent-translation';
+    el.textContent = sentTr;
+    if (isRTL) { el.setAttribute('dir','rtl'); el.style.textAlign = 'right'; }
+    sentEl.insertAdjacentElement('afterend', sep);
+    sep.insertAdjacentElement('afterend', el);
+  }
+}
+
+function applyTranslationToPairHalf(card, side, halfEl) {
+  const lang = activeTranslationLang;
+  // Remove existing translation nodes in this half
+  halfEl.querySelectorAll('.pair-word-translation, .pair-sent-translation, .pair-sent-sep').forEach(el => el.remove());
+  if (!lang) return;
+
+  const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
+  const sideSuffix = side; // '1' or '2'
+  const wordTr  = card['translation' + langCap + sideSuffix] || card['translation' + langCap] || '';
+  const sentTr  = card['sentence'    + langCap + sideSuffix] || '';
+  const meta    = LANG_META[lang];
+  const isRTL   = meta.dir === 'rtl';
+
+  const wordEl = halfEl.querySelector('.pair-word-text');
+  const sentEl = halfEl.querySelector('.pair-sentence');
+
+  if (wordTr && wordEl) {
+    const el = document.createElement('div');
+    el.className = 'pair-word-translation';
+    el.textContent = wordTr;
+    if (isRTL) { el.setAttribute('dir','rtl'); el.style.textAlign = 'right'; }
+    wordEl.insertAdjacentElement('afterend', el);
+  }
+  if (sentTr && sentEl) {
+    const sep = document.createElement('hr');
+    sep.className = 'pair-sent-sep';
+    const el = document.createElement('div');
+    el.className = 'pair-sent-translation';
+    el.textContent = sentTr;
+    if (isRTL) { el.setAttribute('dir','rtl'); el.style.textAlign = 'right'; }
+    sentEl.insertAdjacentElement('afterend', sep);
+    sep.insertAdjacentElement('afterend', el);
+  }
+}
+
+/* ═══════════════════════════════════════════════
    SINGLE CARD
 ═══════════════════════════════════════════════ */
 function openSingle(i) {
   currentSingleIdx = i;
   currentNavIdx = navOrder.indexOf(singleCards[i]);
+  activeTranslationLang = null; // reset on new card
   renderSingle();
   showScreen('screen-single');
 }
@@ -329,6 +480,11 @@ function renderSingle() {
     </button>`
   ).join('');
 
+  // Translation dropdown
+  const trContainer = document.getElementById('sc-translate-container');
+  if (trContainer) buildTranslateDropdown(card, trContainer);
+  applyTranslationToSingle(card);
+
   // Rating
   const key = cardKey(card);
   const rating = progress[key] || '';
@@ -368,6 +524,7 @@ function rateCard(rating) {
 function openPair(i) {
   currentPairIdx = i;
   currentNavIdx = navOrder.indexOf(pairCards[i]);
+  activeTranslationLang = null; // reset on new card
   renderPair();
   showScreen('screen-pair');
 }
@@ -388,6 +545,14 @@ function renderPair() {
   const layout = document.getElementById('pair-card-layout');
   layout.innerHTML = buildPairHalfHTML(card, 1) + buildPairHalfHTML(card, 2);
   lazyLoadImages(layout);
+
+  // Translation dropdown — inject before pair-card-layout (or use a wrapper container)
+  const trPairContainer = document.getElementById('pc-translate-container');
+  if (trPairContainer) buildTranslateDropdown(card, trPairContainer);
+  // Apply translations to both halves
+  const halves = layout.querySelectorAll('.pair-card-half');
+  if (halves[0]) applyTranslationToPairHalf(card, '1', halves[0]);
+  if (halves[1]) applyTranslationToPairHalf(card, '2', halves[1]);
 
   // Pre-load You buttons from history
   ['1','2'].forEach(side => {

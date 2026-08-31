@@ -551,3 +551,87 @@ html, body {
   width: 0%;
   transition: width 0.35s ease;
 }
+
+/* ═══════════════════════════════════════════
+   V10 — TRANSLATION STYLES
+═══════════════════════════════════════════ */
+.translate-wrap { position: relative; margin: 12px 0 4px; text-align: center; }
+.translate-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 999px;
+  color: var(--cream-dim, rgba(245,235,220,0.65));
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.translate-btn:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.28); }
+.translate-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e2330;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  padding: 4px;
+  min-width: 160px;
+  z-index: 50;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.translate-opt {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 7px;
+  color: var(--cream-dim, rgba(245,235,220,0.65));
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.translate-opt:hover { background: rgba(255,255,255,0.07); }
+.translate-opt.active { color: var(--cream, #f5ebe0); background: rgba(255,255,255,0.10); }
+
+/* Translation text on cards */
+.sc-word-translation {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  color: rgba(245,235,220,0.8);
+  margin-top: 4px;
+  line-height: 1.2;
+}
+.sc-sent-sep { border: none; border-top: 1px solid rgba(255,255,255,0.10); margin: 8px 0; }
+.sc-sent-translation {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  color: rgba(245,235,220,0.8);
+  line-height: 1.5;
+}
+.pair-word-translation {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  color: rgba(245,235,220,0.8);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+.pair-sent-sep { border: none; border-top: 1px solid rgba(255,255,255,0.10); margin: 6px 0; }
+.pair-sent-translation {
+  font-family: 'Fraunces', serif;
+  font-size: 0.85rem;
+  color: rgba(245,235,220,0.8);
+  line-height: 1.5;
+}
+
+/* Tier colour CSS vars (set by applyTierColours at runtime) */
+:root {
+  --tier-bronze: #F5A623;
+  --tier-silver: #3AAFA9;
+  --tier-gold:   #2D6A9F;
+}
