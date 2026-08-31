@@ -279,7 +279,9 @@ function updateProgress() {
 }
 
 /* ═══════════════════════════════════════════════
-   TRANSLATIONS
+   TRANSLATIONS — two independent dropdowns
+   One anchored under the word, one under the sentence.
+   Each has its own active lang state.
 ═══════════════════════════════════════════════ */
 const LANG_META = {
   vi: { flag: '🇻🇳', name: 'Vietnamese', dir: 'ltr' },
@@ -289,125 +291,107 @@ const LANG_META = {
 };
 
 function getAvailableTranslations(card) {
-  // Returns array of lang codes that have at least a word translation.
-  // Pairs use translationVi1 / translationVi2; singles use translationVi.
   return ['vi','km','ur','th'].filter(lang => {
     const cap = lang.charAt(0).toUpperCase() + lang.slice(1);
     const key = 'translation' + cap;
-    return (card[key] && card[key].trim())       // single card
-        || (card[key+'1'] && card[key+'1'].trim()) // pair card word1
-        || (card[key+'2'] && card[key+'2'].trim()); // pair card word2
+    return (card[key] && card[key].trim())
+        || (card[key+'1'] && card[key+'1'].trim())
+        || (card[key+'2'] && card[key+'2'].trim());
   });
 }
 
-function buildTranslateDropdown(card, containerEl) {
+/* Build a self-contained translation dropdown widget.
+   slot:    'word' | 'sentence'
+   card:    card object
+   side:    '1' | '2' | '' (single cards)
+   id:      unique DOM id for this widget instance
+*/
+function buildTrWidget(slot, card, side, id) {
   const langs = getAvailableTranslations(card);
-  if (!langs.length) { containerEl.style.display = 'none'; return; }
-  containerEl.style.display = '';
+  if (!langs.length) return '';
 
-  const active = activeTranslationLang;
-  const activeMeta = active ? LANG_META[active] : null;
-
-  // Inline flag picker — always visible when langs exist
-  const pills = langs.map(lang => {
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const opts = langs.map(lang => {
     const m = LANG_META[lang];
-    const isActive = lang === active;
-    return `<button class="tr-flag-pill${isActive ? ' active' : ''}"
-      onclick="selectTranslationLang('${lang}',event)"
-      title="${m.name}">${m.flag} ${m.name}</button>`;
+    return `<button class="tr-opt" data-lang="${lang}" onclick="trSelect('${id}','${lang}',event)">${m.flag} ${m.name}</button>`;
   }).join('');
 
-  containerEl.innerHTML = `
-    <div class="tr-picker-row">
-      <span class="tr-picker-label">🌐</span>
-      ${pills}
-      ${active ? `<button class="tr-flag-pill dismiss" onclick="selectTranslationLang('${active}',event)" title="Hide translation">✕</button>` : ''}
-    </div>`;
+  return `<div class="tr-widget" id="${id}" data-slot="${slot}" data-side="${side}">
+    <button class="tr-globe" onclick="trToggleMenu('${id}',event)" title="Translate">🌐</button>
+    <div class="tr-menu" style="display:none">${opts}</div>
+    <div class="tr-text" style="display:none"></div>
+  </div>`;
 }
 
-function toggleTranslateMenu(e) {
-  // kept for back-compat — no longer used
-}
-
-function selectTranslationLang(lang, e) {
+function trToggleMenu(id, e) {
   e && e.stopPropagation();
-  // Toggle off if already active
-  activeTranslationLang = (activeTranslationLang === lang) ? null : lang;
-  // Re-render the current card to apply/remove translation
-  const screen = document.querySelector('.screen.active');
-  if (screen && screen.id === 'screen-single') renderSingle();
-  else if (screen && screen.id === 'screen-pair') renderPair();
-}
-
-function applyTranslationToSingle(card) {
-  const lang = activeTranslationLang;
-  const wordEl = document.getElementById('sc-word');
-  const sentEl = document.getElementById('sc-sentence');
-  if (!wordEl || !sentEl) return;
-
-  // Remove any existing translation nodes
-  document.querySelectorAll('.sc-word-translation, .sc-sent-translation, .sc-sent-sep').forEach(el => el.remove());
-
-  if (!lang) return;
-
-  const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
-  const wordTr  = card['translation' + langCap] || '';
-  const sentTr  = card['sentence'    + langCap] || card['sentence' + langCap + '1'] || '';
-  const meta    = LANG_META[lang];
-  const isRTL   = meta.dir === 'rtl';
-
-  if (wordTr) {
-    const el = document.createElement('div');
-    el.className = 'sc-word-translation';
-    el.textContent = wordTr;
-    if (isRTL) { el.setAttribute('dir','rtl'); el.style.textAlign = 'right'; }
-    wordEl.insertAdjacentElement('afterend', el);
-  }
-  if (sentTr) {
-    const sep = document.createElement('hr');
-    sep.className = 'sc-sent-sep';
-    const el = document.createElement('div');
-    el.className = 'sc-sent-translation';
-    el.textContent = sentTr;
-    if (isRTL) { el.setAttribute('dir','rtl'); el.style.textAlign = 'right'; }
-    sentEl.insertAdjacentElement('afterend', sep);
-    sep.insertAdjacentElement('afterend', el);
+  const widget = document.getElementById(id);
+  if (!widget) return;
+  const menu   = widget.querySelector('.tr-menu');
+  const text   = widget.querySelector('.tr-text');
+  const isOpen = menu.style.display !== 'none';
+  if (isOpen) {
+    // Close menu — keep translation visible if one is active
+    menu.style.display = 'none';
+  } else {
+    // If already showing a translation, hide it (toggle off)
+    if (widget.dataset.activeLang && text.style.display !== 'none') {
+      text.style.display = 'none';
+      widget.dataset.activeLang = '';
+      widget.querySelector('.tr-globe').classList.remove('active');
+    } else {
+      menu.style.display = '';
+    }
   }
 }
 
-function applyTranslationToPairHalf(card, side, halfEl) {
-  const lang = activeTranslationLang;
-  // Remove existing translation nodes in this half
-  halfEl.querySelectorAll('.pair-word-translation, .pair-sent-translation, .pair-sent-sep').forEach(el => el.remove());
-  if (!lang) return;
+function trSelect(id, lang, e) {
+  e && e.stopPropagation();
+  const widget = document.getElementById(id);
+  if (!widget) return;
+  const menu  = widget.querySelector('.tr-menu');
+  const text  = widget.querySelector('.tr-text');
+  const globe = widget.querySelector('.tr-globe');
+  const slot  = widget.dataset.slot;   // 'word' | 'sentence'
+  const side  = widget.dataset.side;   // '1' | '2' | ''
 
-  const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
-  const sideSuffix = side; // '1' or '2'
-  const wordTr  = card['translation' + langCap + sideSuffix] || card['translation' + langCap] || '';
-  const sentTr  = card['sentence'    + langCap + sideSuffix] || '';
+  // Get the right text from the current card
+  const card = widget._card;
+  if (!card) return;
+
+  const cap     = lang.charAt(0).toUpperCase() + lang.slice(1);
   const meta    = LANG_META[lang];
   const isRTL   = meta.dir === 'rtl';
+  let content   = '';
 
-  const wordEl = halfEl.querySelector('.pair-word-text');
-  const sentEl = halfEl.querySelector('.pair-sentence');
+  if (slot === 'word') {
+    content = card['translation' + cap + side] || card['translation' + cap] || '';
+  } else {
+    content = card['sentence' + cap + side] || card['sentence' + cap] || '';
+  }
 
-  if (wordTr && wordEl) {
-    const el = document.createElement('div');
-    el.className = 'pair-word-translation';
-    el.textContent = wordTr;
-    if (isRTL) { el.setAttribute('dir','rtl'); el.style.textAlign = 'right'; }
-    wordEl.insertAdjacentElement('afterend', el);
-  }
-  if (sentTr && sentEl) {
-    const sep = document.createElement('hr');
-    sep.className = 'pair-sent-sep';
-    const el = document.createElement('div');
-    el.className = 'pair-sent-translation';
-    el.textContent = sentTr;
-    if (isRTL) { el.setAttribute('dir','rtl'); el.style.textAlign = 'right'; }
-    sentEl.insertAdjacentElement('afterend', sep);
-    sep.insertAdjacentElement('afterend', el);
-  }
+  menu.style.display = 'none';
+
+  if (!content) return;
+
+  text.textContent  = content;
+  text.style.display = '';
+  text.style.direction  = isRTL ? 'rtl' : 'ltr';
+  text.style.textAlign  = isRTL ? 'right' : 'left';
+  widget.dataset.activeLang = lang;
+  globe.classList.add('active');
+  globe.textContent = meta.flag;
+}
+
+/* Attach the card reference to a widget after it's in the DOM */
+function bindTrWidget(id, card) {
+  const el = document.getElementById(id);
+  if (el) el._card = card;
+}
+
+/* Reset all translation widgets (call when navigating to new card) */
+function resetTranslations() {
+  activeTranslationLang = null; // kept for compat
 }
 
 /* ═══════════════════════════════════════════════
@@ -416,8 +400,7 @@ function applyTranslationToPairHalf(card, side, halfEl) {
 function openSingle(i) {
   currentSingleIdx = i;
   currentNavIdx = navOrder.indexOf(singleCards[i]);
-  activeTranslationLang = null;
-  // Mark as seen if not yet rated
+  resetTranslations();
   const k = cardKey(singleCards[i]);
   if (!progress[k]) { progress[k] = 'seen'; saveProgress(); }
   renderSingle();
@@ -434,6 +417,17 @@ function renderSingle() {
   document.getElementById('sc-tier').textContent = card.tier.charAt(0).toUpperCase() + card.tier.slice(1);
 
   document.getElementById('sc-word').textContent = card.word;
+
+  // Word translation widget — injected right after word text
+  const wordHero = document.getElementById('sc-word').parentElement;
+  let wTrEl = document.getElementById('sc-word-tr');
+  if (!wTrEl) {
+    wTrEl = document.createElement('div');
+    wTrEl.id = 'sc-word-tr';
+    wordHero.insertAdjacentElement('afterend', wTrEl);
+  }
+  wTrEl.innerHTML = buildTrWidget('word', card, '', 'tr-sc-word');
+  bindTrWidget('tr-sc-word', card);
 
   // Image — colour cards show CSS swatch
   const imgInner = document.getElementById('sc-img-inner');
@@ -493,6 +487,16 @@ function renderSingle() {
   const sentEl = document.getElementById('sc-sentence');
   sentEl.innerHTML = highlightWord(card.sentence, card.word);
 
+  // Sentence translation widget
+  let sTrEl = document.getElementById('sc-sent-tr');
+  if (!sTrEl) {
+    sTrEl = document.createElement('div');
+    sTrEl.id = 'sc-sent-tr';
+    sentEl.parentElement.insertAdjacentElement('afterend', sTrEl);
+  }
+  sTrEl.innerHTML = buildTrWidget('sentence', card, '', 'tr-sc-sent');
+  bindTrWidget('tr-sc-sent', card);
+
   // Phonemes
   const phEl = document.getElementById('sc-phonemes');
   phEl.innerHTML = (card.phonemes || []).map((ph, pi) =>
@@ -500,11 +504,6 @@ function renderSingle() {
       ${ph.s}<div class="ph-sub">tap to hear</div>
     </button>`
   ).join('');
-
-  // Translation dropdown
-  const trContainer = document.getElementById('sc-translate-container');
-  if (trContainer) buildTranslateDropdown(card, trContainer);
-  applyTranslationToSingle(card);
 
   // Rating
   const key = cardKey(card);
@@ -545,8 +544,7 @@ function rateCard(rating) {
 function openPair(i) {
   currentPairIdx = i;
   currentNavIdx = navOrder.indexOf(pairCards[i]);
-  activeTranslationLang = null;
-  // Mark both words as seen if not yet rated
+  resetTranslations();
   const card = pairCards[i];
   const k1 = `pair_${card.word1}_word1`, k2 = `pair_${card.word2}_word2`;
   let changed = false;
@@ -574,13 +572,9 @@ function renderPair() {
   layout.innerHTML = buildPairHalfHTML(card, 1) + buildPairHalfHTML(card, 2);
   lazyLoadPairImages(layout, card);
 
-  // Translation dropdown — inject before pair-card-layout (or use a wrapper container)
-  const trPairContainer = document.getElementById('pc-translate-container');
-  if (trPairContainer) buildTranslateDropdown(card, trPairContainer);
-  // Apply translations to both halves
-  const halves = layout.querySelectorAll('.pair-card-half');
-  if (halves[0]) applyTranslationToPairHalf(card, '1', halves[0]);
-  if (halves[1]) applyTranslationToPairHalf(card, '2', halves[1]);
+  // Bind card reference to translation widgets (needed for trSelect)
+  [`tr-pair-word-1-${card.word1}`, `tr-pair-sent-1-${card.word1}`,
+   `tr-pair-word-2-${card.word1}`, `tr-pair-sent-2-${card.word1}`].forEach(id => bindTrWidget(id, card));
 
   // Pre-load You buttons from history
   ['1','2'].forEach(side => {
@@ -629,17 +623,22 @@ function buildPairHalfHTML(card, side) {
     ? `<img id="${imgId}" alt="${word}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;">`
     : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;">${emoji}</div>`;
 
+  const trWordId = `tr-pair-word-${side}-${card.word1}`;
+  const trSentId = `tr-pair-sent-${side}-${card.word1}`;
+
   return `
   <div class="pair-card-half">
     <div class="pair-word-row">
       <div class="pair-word-text">${word}${card['word'+side+'note'] ? `<span style="font-size:9px;color:var(--cream-dim);font-family:'Inter',sans-serif;font-weight:400;margin-left:4px;">*</span>` : ''}</div>
       <button class="pair-word-audio" data-audio="${card['wordAudio'+side]||''}" data-tts="${qa(word)}" onclick="playAudio(this.dataset.audio,this.dataset.tts)">🔊</button>
     </div>
+    ${buildTrWidget('word', card, side, trWordId)}
     <div class="pair-card-img-wrap"><div class="pair-card-img">${imgContent}</div></div>
     <div class="pair-sentence">
       <span class="pair-s-audio" data-audio="${card['sentenceAudio'+side]||''}" data-tts="${qa(sentence)}" onclick="playAudio(this.dataset.audio,this.dataset.tts)">🔊</span>
       <span>${highlightWord(sentence, word)}</span>
     </div>
+    ${buildTrWidget('sentence', card, side, trSentId)}
     <div>
       <div class="slabel">Sounds</div>
       <div class="pair-phonemes">
