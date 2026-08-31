@@ -557,8 +557,19 @@ html, body {
 /* ═══════════════════════════════════════════
    V10 — TRANSLATION WIDGETS
 ═══════════════════════════════════════════ */
-.tr-widget { margin: 4px 0 6px; }
+.tr-widget {
+  margin: 4px 0 6px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 
+.tr-globe-wrap {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
 .tr-globe {
   background: none;
   border: none;
@@ -569,11 +580,14 @@ html, body {
   border-radius: 4px;
   transition: opacity 0.15s;
   line-height: 1;
+  flex-shrink: 0;
+  position: relative;
 }
 .tr-globe:hover { opacity: 0.7; }
 .tr-globe.active { opacity: 1; }
 
 .tr-menu {
+  position: absolute;
   background: #1e2330;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 8px;
@@ -600,14 +614,13 @@ html, body {
 }
 .tr-opt:hover { background: rgba(255,255,255,0.08); color: var(--cream, #f5ebe0); }
 
-/* The translation text that appears under word / sentence */
+/* The translation text that appears inline next to the globe */
 .tr-text {
   font-family: 'Fraunces', serif;
   font-size: 0.95em;
   color: rgba(245,235,220,0.72);
-  margin-top: 2px;
   line-height: 1.35;
-  padding-left: 1px;
+  padding-left: 2px;
 }
 
 /* Tier colour CSS vars (set by applyTierColours at runtime) */

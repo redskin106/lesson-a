@@ -317,8 +317,10 @@ function buildTrWidget(slot, card, side, id) {
   }).join('');
 
   return `<div class="tr-widget" id="${id}" data-slot="${slot}" data-side="${side}">
-    <button class="tr-globe" onclick="trToggleMenu('${id}',event)" title="Translate">🌐</button>
-    <div class="tr-menu" style="display:none">${opts}</div>
+    <div class="tr-globe-wrap">
+      <button class="tr-globe" onclick="trToggleMenu('${id}',event)" title="Translate">🌐</button>
+      <div class="tr-menu" style="display:none">${opts}</div>
+    </div>
     <div class="tr-text" style="display:none"></div>
   </div>`;
 }
@@ -329,16 +331,16 @@ function trToggleMenu(id, e) {
   if (!widget) return;
   const menu   = widget.querySelector('.tr-menu');
   const text   = widget.querySelector('.tr-text');
+  const globe  = widget.querySelector('.tr-globe');
   const isOpen = menu.style.display !== 'none';
   if (isOpen) {
-    // Close menu — keep translation visible if one is active
     menu.style.display = 'none';
   } else {
-    // If already showing a translation, hide it (toggle off)
     if (widget.dataset.activeLang && text.style.display !== 'none') {
       text.style.display = 'none';
       widget.dataset.activeLang = '';
-      widget.querySelector('.tr-globe').classList.remove('active');
+      globe.classList.remove('active');
+      globe.textContent = '🌐';
     } else {
       menu.style.display = '';
     }
@@ -352,17 +354,15 @@ function trSelect(id, lang, e) {
   const menu  = widget.querySelector('.tr-menu');
   const text  = widget.querySelector('.tr-text');
   const globe = widget.querySelector('.tr-globe');
-  const slot  = widget.dataset.slot;   // 'word' | 'sentence'
-  const side  = widget.dataset.side;   // '1' | '2' | ''
-
-  // Get the right text from the current card
-  const card = widget._card;
+  const slot  = widget.dataset.slot;
+  const side  = widget.dataset.side;
+  const card  = widget._card;
   if (!card) return;
 
-  const cap     = lang.charAt(0).toUpperCase() + lang.slice(1);
-  const meta    = LANG_META[lang];
-  const isRTL   = meta.dir === 'rtl';
-  let content   = '';
+  const cap   = lang.charAt(0).toUpperCase() + lang.slice(1);
+  const meta  = LANG_META[lang];
+  const isRTL = meta.dir === 'rtl';
+  let content = '';
 
   if (slot === 'word') {
     content = card['translation' + cap + side] || card['translation' + cap] || '';
@@ -371,13 +371,12 @@ function trSelect(id, lang, e) {
   }
 
   menu.style.display = 'none';
-
   if (!content) return;
 
-  text.textContent  = content;
+  text.textContent = content;
   text.style.display = '';
-  text.style.direction  = isRTL ? 'rtl' : 'ltr';
-  text.style.textAlign  = isRTL ? 'right' : 'left';
+  text.style.direction = isRTL ? 'rtl' : 'ltr';
+  text.style.textAlign = isRTL ? 'right' : 'left';
   widget.dataset.activeLang = lang;
   globe.classList.add('active');
   globe.textContent = meta.flag;
