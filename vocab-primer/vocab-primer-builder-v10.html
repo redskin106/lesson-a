@@ -1487,12 +1487,20 @@ function buildAudioSection(card, i, type) {
 /* ═══════════════════════════════════
    BIND FIELDS
 ═══════════════════════════════════ */
+let _bindDebounce = null;
 function bindEditorEvents(card, i) {
-  document.querySelectorAll('[data-field]').forEach(el => {
+  const area = document.getElementById('editor-area');
+  if (!area) return;
+  area.querySelectorAll('[data-field]').forEach(el => {
     const ev = el.tagName === 'SELECT' ? 'change' : 'input';
     el.addEventListener(ev, () => {
+      // Guard: only write if this card is still active
+      if (activeIdx !== i) return;
       cards[i][el.dataset.field] = el.value;
-      markDirty(); renderSidebar(); saveSession();
+      markDirty();
+      // Debounce sidebar re-render + session save to avoid cascade on every keystroke
+      clearTimeout(_bindDebounce);
+      _bindDebounce = setTimeout(() => { renderSidebar(); saveSession(); }, 300);
     });
   });
 }
