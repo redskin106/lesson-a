@@ -557,55 +557,48 @@ html, body {
 /* ═══════════════════════════════════════════
    V10 — TRANSLATION STYLES
 ═══════════════════════════════════════════ */
-.translate-wrap { position: relative; margin: 12px 0 4px; text-align: center; }
-.translate-btn {
+.tr-picker-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 0 4px;
+}
+.tr-picker-label {
+  font-size: 16px;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+.tr-flag-pill {
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.15);
   border-radius: 999px;
-  color: var(--cream-dim, rgba(245,235,220,0.65));
+  color: rgba(245,235,220,0.55);
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 600;
-  padding: 5px 14px;
+  padding: 4px 10px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.translate-btn:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.28); }
-.translate-menu {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1e2330;
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 10px;
-  padding: 4px;
-  min-width: 160px;
-  z-index: 50;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+.tr-flag-pill:hover { background: rgba(255,255,255,0.10); color: rgba(245,235,220,0.85); }
+.tr-flag-pill.active {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.35);
+  color: var(--cream, #f5ebe0);
 }
-.translate-opt {
-  display: block;
-  width: 100%;
-  padding: 7px 12px;
-  text-align: left;
-  background: none;
-  border: none;
-  border-radius: 7px;
-  color: var(--cream-dim, rgba(245,235,220,0.65));
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.12s;
+.tr-flag-pill.dismiss {
+  border-color: transparent;
+  color: rgba(245,235,220,0.3);
+  padding: 4px 7px;
 }
-.translate-opt:hover { background: rgba(255,255,255,0.07); }
-.translate-opt.active { color: var(--cream, #f5ebe0); background: rgba(255,255,255,0.10); }
+.tr-flag-pill.dismiss:hover { color: var(--coral, #e05c5c); border-color: var(--coral, #e05c5c); }
 
-/* Translation text on cards */
+/* Translation text on single cards */
 .sc-word-translation {
   font-family: 'Fraunces', serif;
   font-size: 1.5rem;
-  color: rgba(245,235,220,0.8);
+  color: rgba(245,235,220,0.75);
   margin-top: 4px;
   line-height: 1.2;
 }
@@ -613,21 +606,23 @@ html, body {
 .sc-sent-translation {
   font-family: 'Fraunces', serif;
   font-size: 1rem;
-  color: rgba(245,235,220,0.8);
+  color: rgba(245,235,220,0.75);
   line-height: 1.5;
 }
+
+/* Translation text on pair cards */
 .pair-word-translation {
   font-family: 'Fraunces', serif;
-  font-size: 1rem;
-  color: rgba(245,235,220,0.8);
+  font-size: 0.95rem;
+  color: rgba(245,235,220,0.75);
   margin-top: 2px;
   line-height: 1.2;
 }
-.pair-sent-sep { border: none; border-top: 1px solid rgba(255,255,255,0.10); margin: 6px 0; }
+.pair-sent-sep { border: none; border-top: 1px solid rgba(255,255,255,0.10); margin: 5px 0; }
 .pair-sent-translation {
   font-family: 'Fraunces', serif;
-  font-size: 0.85rem;
-  color: rgba(245,235,220,0.8);
+  font-size: 0.82rem;
+  color: rgba(245,235,220,0.75);
   line-height: 1.5;
 }
 

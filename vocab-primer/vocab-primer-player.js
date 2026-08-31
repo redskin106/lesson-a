@@ -307,36 +307,26 @@ function buildTranslateDropdown(card, containerEl) {
 
   const active = activeTranslationLang;
   const activeMeta = active ? LANG_META[active] : null;
-  const btnLabel = activeMeta
-    ? `🌐 ${activeMeta.flag} ${activeMeta.name} ▼`
-    : '🌐 Translate ▼';
+
+  // Inline flag picker — always visible when langs exist
+  const pills = langs.map(lang => {
+    const m = LANG_META[lang];
+    const isActive = lang === active;
+    return `<button class="tr-flag-pill${isActive ? ' active' : ''}"
+      onclick="selectTranslationLang('${lang}',event)"
+      title="${m.name}">${m.flag} ${m.name}</button>`;
+  }).join('');
 
   containerEl.innerHTML = `
-    <div class="translate-wrap">
-      <button class="translate-btn" onclick="toggleTranslateMenu(event)">${btnLabel}</button>
-      <div class="translate-menu" id="translate-menu" style="display:none">
-        ${langs.map(lang => {
-          const m = LANG_META[lang];
-          const isActive = lang === active;
-          return `<button class="translate-opt${isActive ? ' active' : ''}" onclick="selectTranslationLang('${lang}',event)">
-            ${m.flag} ${m.name}${isActive ? ' ✓' : ''}
-          </button>`;
-        }).join('')}
-      </div>
+    <div class="tr-picker-row">
+      <span class="tr-picker-label">🌐</span>
+      ${pills}
+      ${active ? `<button class="tr-flag-pill dismiss" onclick="selectTranslationLang('${active}',event)" title="Hide translation">✕</button>` : ''}
     </div>`;
 }
 
 function toggleTranslateMenu(e) {
-  e.stopPropagation();
-  const menu = document.getElementById('translate-menu');
-  if (!menu) return;
-  const open = menu.style.display === 'none';
-  menu.style.display = open ? '' : 'none';
-  // Close on outside click
-  if (open) {
-    const close = ev => { menu.style.display = 'none'; document.removeEventListener('click', close); };
-    setTimeout(() => document.addEventListener('click', close), 0);
-  }
+  // kept for back-compat — no longer used
 }
 
 function selectTranslationLang(lang, e) {
@@ -582,7 +572,7 @@ function renderPair() {
 
   const layout = document.getElementById('pair-card-layout');
   layout.innerHTML = buildPairHalfHTML(card, 1) + buildPairHalfHTML(card, 2);
-  lazyLoadImages(layout);
+  lazyLoadPairImages(layout, card);
 
   // Translation dropdown — inject before pair-card-layout (or use a wrapper container)
   const trPairContainer = document.getElementById('pc-translate-container');
@@ -634,8 +624,9 @@ function buildPairHalfHTML(card, side) {
   const key       = `pair_${word}_word${side}`;
   const rating    = progress[key] || '';
 
+  const imgId = `pair-img-${side}-${card.word1}`;
   const imgContent = image
-    ? `<img data-src="${image}" alt="${word}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;">`
+    ? `<img id="${imgId}" alt="${word}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;">`
     : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;">${emoji}</div>`;
 
   return `
@@ -1213,6 +1204,18 @@ function lazyLoadImages(root) {
     const src = img.getAttribute('data-src');
     if (!src) return;
     img.removeAttribute('data-src');
+    const tmp = new Image();
+    tmp.onload = () => { img.src = tmp.src; img.style.opacity = '1'; };
+    tmp.src = src;
+  });
+}
+
+function lazyLoadPairImages(layout, card) {
+  // Set pair images via JS to avoid breaking HTML with raw base64 in attribute strings
+  ['1','2'].forEach(side => {
+    const img = layout.querySelector(`#pair-img-${side}-${card.word1}`);
+    const src = card['image' + side];
+    if (!img || !src) return;
     const tmp = new Image();
     tmp.onload = () => { img.src = tmp.src; img.style.opacity = '1'; };
     tmp.src = src;
