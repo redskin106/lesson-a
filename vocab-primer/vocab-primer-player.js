@@ -201,8 +201,9 @@ function buildGrid() {
 
 function dotClass(key) {
   const s = progress[key];
-  if (s === 'got-it') return 'gc-dot done';
+  if (s === 'got-it')     return 'gc-dot done';
   if (s === 'practicing') return 'gc-dot practicing';
+  if (s === 'seen')       return 'gc-dot seen';
   return 'gc-dot';
 }
 function pairDotClass(card) {
@@ -210,7 +211,10 @@ function pairDotClass(card) {
   const k2 = 'pair_' + card.word2 + '_word2';
   const s1 = progress[k1], s2 = progress[k2];
   if (s1 === 'got-it' && s2 === 'got-it') return 'gc-dot done';
-  if (s1 || s2) return 'gc-dot practicing';
+  if (s1 || s2) {
+    if (s1 === 'seen' && (!s2 || s2 === 'seen')) return 'gc-dot seen';
+    return 'gc-dot practicing';
+  }
   return 'gc-dot';
 }
 
@@ -218,7 +222,10 @@ function buildSingleGridCard(card, i) {
   const el = document.createElement('div');
   const rating = progress[cardKey(card)] || '';
   el.dataset.tier = card.tier;
-  el.className = 'gc' + (rating === 'got-it' ? ' done-card' : rating === 'practicing' ? ' practice-card' : '');
+  el.className = 'gc'
+    + (rating === 'got-it'     ? ' done-card'     : '')
+    + (rating === 'practicing' ? ' practice-card' : '')
+    + (rating === 'seen'       ? ' seen-card'      : '');
   el.onclick = () => openSingle(i);
   el.innerHTML = `
     <div class="${dotClass(cardKey(card))}"></div>
@@ -236,8 +243,10 @@ function buildPairGridCard(card, i) {
   const hasVideo = card.video1 || card.video2;
   const dot = pairDotClass(card);
   el.dataset.tier = card.tier;
-  el.className = 'gc pair' +
-    (dot.includes('done') ? ' done-card' : dot.includes('practicing') ? ' practice-card' : '');
+  el.className = 'gc pair'
+    + (dot.includes('done')       ? ' done-card'     : '')
+    + (dot.includes('practicing') ? ' practice-card' : '')
+    + (dot.includes('seen')       ? ' seen-card'      : '');
   el.onclick = () => openPair(i);
   el.innerHTML = `
     <div class="${dot}" style="z-index:4"></div>
@@ -260,12 +269,13 @@ function buildPairGridCard(card, i) {
    PROGRESS
 ═══════════════════════════════════════════════ */
 function updateProgress() {
-  // Each pair word rated independently → total = singles + (pairs × 2)
-  const total = singleCards.length + (pairCards.length * 2);
-  const done  = Object.values(progress).filter(v => v === 'got-it').length;
-  const pct   = total > 0 ? Math.round((done/total)*100) : 0;
+  const total    = singleCards.length + (pairCards.length * 2);
+  const done     = Object.values(progress).filter(v => v === 'got-it').length;
+  const seen     = Object.values(progress).filter(v => v === 'seen').length;
+  const pct      = total > 0 ? Math.round((done / total) * 100) : 0;
   document.getElementById('prog-fill').style.width = pct + '%';
-  document.getElementById('prog-count').textContent = done + ' of ' + total + ' confident';
+  const seenNote = seen > 0 ? ` · ${seen} seen` : '';
+  document.getElementById('prog-count').textContent = done + ' of ' + total + ' confident' + seenNote;
 }
 
 /* ═══════════════════════════════════════════════
@@ -412,7 +422,10 @@ function applyTranslationToPairHalf(card, side, halfEl) {
 function openSingle(i) {
   currentSingleIdx = i;
   currentNavIdx = navOrder.indexOf(singleCards[i]);
-  activeTranslationLang = null; // reset on new card
+  activeTranslationLang = null;
+  // Mark as seen if not yet rated
+  const k = cardKey(singleCards[i]);
+  if (!progress[k]) { progress[k] = 'seen'; saveProgress(); }
   renderSingle();
   showScreen('screen-single');
 }
@@ -451,21 +464,35 @@ function renderSingle() {
     currentVideoData = null;
   }
 
-  // Illustration toggle — swaps between photo and illustration
+  // Illustration toggle — tap image or button to flip between photo and illustration
   const ilToggle = document.getElementById('sc-illus-toggle');
   const ilLabel  = document.getElementById('sc-illus-label');
+  const imgBlock = document.getElementById('sc-img-block');
   ilToggle.style.display = card.illustration ? '' : 'none';
   let showingIllus = false;
+
+  function renderCardImg(illus) {
+    const inner = document.getElementById('sc-img-inner');
+    inner.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;';
+    const src = illus ? card.illustration : card.image;
+    if (src) {
+      inner.innerHTML = `<img src="${src}" alt="${card.word}" style="width:100%;height:100%;object-fit:${illus ? 'contain' : 'cover'};">`;
+    } else {
+      inner.innerHTML = `<span style="font-size:90px;">${card.emoji}</span>`;
+    }
+    ilLabel.textContent = illus ? 'Show photo' : 'Show illustration';
+    imgBlock.style.cursor = card.illustration ? 'pointer' : '';
+  }
+
+  // Tap image to flip (if illustration exists)
+  imgBlock.onclick = card.illustration ? () => {
+    showingIllus = !showingIllus;
+    renderCardImg(showingIllus);
+  } : null;
+
   ilToggle.onclick = () => {
     showingIllus = !showingIllus;
-    const imgInner = document.getElementById('sc-img-inner');
-    imgInner.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;';
-    if (src) {
-      imgInner.innerHTML = `<img src="${'${src}'}" alt="${'${card.word}'}" style="width:100%;height:100%;object-fit:cover;">`;  
-    } else {
-      imgInner.innerHTML = `<span style="font-size:90px;">${'${card.emoji}'}</span>`;
-    }
-    ilLabel.textContent = showingIllus ? 'Show photo' : 'Show illustration';
+    renderCardImg(showingIllus);
   };
 
   // Sentence
@@ -524,7 +551,14 @@ function rateCard(rating) {
 function openPair(i) {
   currentPairIdx = i;
   currentNavIdx = navOrder.indexOf(pairCards[i]);
-  activeTranslationLang = null; // reset on new card
+  activeTranslationLang = null;
+  // Mark both words as seen if not yet rated
+  const card = pairCards[i];
+  const k1 = `pair_${card.word1}_word1`, k2 = `pair_${card.word2}_word2`;
+  let changed = false;
+  if (!progress[k1]) { progress[k1] = 'seen'; changed = true; }
+  if (!progress[k2]) { progress[k2] = 'seen'; changed = true; }
+  if (changed) saveProgress();
   renderPair();
   showScreen('screen-pair');
 }

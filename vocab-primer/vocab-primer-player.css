@@ -140,6 +140,7 @@ html, body {
 .gc.pair   { grid-column: span 2; }
 .gc.done-card     { border-color: var(--sage); }
 .gc.practice-card { border-color: var(--coral); }
+.gc.seen-card     { border-color: var(--gold, #c9a84c); opacity: 0.8; }
 
 /* Status dot */
 .gc-dot {
@@ -150,6 +151,7 @@ html, body {
 }
 .gc-dot.done       { background: var(--sage); border-color: var(--sage); }
 .gc-dot.practicing { background: var(--coral); border-color: var(--coral); }
+.gc-dot.seen       { background: var(--gold, #c9a84c); border-color: var(--gold, #c9a84c); opacity: 0.7; }
 
 /* Single card image */
 /* gc-img removed — grid is text-only */
