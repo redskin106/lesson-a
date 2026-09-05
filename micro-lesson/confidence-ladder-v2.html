@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Confidence Ladder — Bag</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,600;0,700;0,800;0,900;1,700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Light theme — warm neutrals from mockup */
+  --bg:      #fafaf8;
+  --surface: #f2f1ee;
+  --card:    #ffffff;
+  --ink:     #1c1c1a;
+  --ink2:    rgba(28,28,26,0.5);
+  --ink3:    rgba(28,28,26,0.15);
+  --border:  rgba(28,28,26,0.09);
+  --border2: rgba(28,28,26,0.18);
+
+  /* Brand colours */
+  --coral:  #e8734a;
+  --sage:   #5a9e7c;
+  --gold:   #c9a84c;
+  --blue:   #3b72d4;
+  --purple: #7c5cbf;
+
+  /* Tile colours */
+  --tn:   #1565c0;  /* noun */
+  --tc:   #e53935;  /* colour */
+  --ts:   #d81b60;  /* size */
+  --tsh:  #388e3c;  /* shape/material */
+  --td:   #e65100;  /* detail */
+  --tr:   #311b92;  /* reason */
+  --tdef: #455a64;  /* grammar words */
+
+  /* Teaching moment worlds */
+  --tm-art-bg:     #1a1035;
+  --tm-art-accent: #a78bfa;
+  --tm-ord-bg:     #0d2818;
+  --tm-ord-accent: #4ade80;
+  --tm-bec-bg:     #2a0d1a;
+  --tm-bec-accent: #f472b6;
+
+  /* Notebook */
+  --nb-bg:     #fdf8ed;
+  --nb-border: rgba(201,168,76,0.3);
+  --nb-text:   #6b5a2e;
+
+  --radius: 16px;
+  --pill:   999px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── Shell ── */
+.shell {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.hdr {
+  padding: 14px 20px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  z-index: 20;
+  flex-shrink: 0;
+}
+.hdr-back {
+  background: none; border: none;
+  font-size: 20px; color: var(--ink2);
+  cursor: pointer; padding: 4px; line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.hdr-title {
+  font-family: 'Fraunces', serif;
+  font-size: 16px; font-weight: 700; flex: 1;
+}
+.hdr-zone {
+  font-size: 10px; font-weight: 700;
+  color: var(--ink2); letter-spacing: .1em; text-transform: uppercase;
+}
+
+/* ── Progress bar ── */
+.progress-wrap {
+  height: 3px; background: var(--ink3);
+  flex-shrink: 0; position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--coral), var(--gold));
+  border-radius: var(--pill);
+  transition: width .5s ease;
+  width: 0%;
+}
+
+/* ── Screens ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  top: 0; /* screens sit under header — header is outside */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+  padding: 24px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Teaching moment screens override padding/gap */
+.screen.tm {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ── Typography ── */
+.eyebrow {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ink2);
+}
+.model-text {
+  font-family: 'Fraunces', serif;
+  font-size: 22px; font-weight: 700; line-height: 1.3; color: var(--ink);
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+}
+.card-surface {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  padding: 18px 20px;
+}
+
+/* ── Continue button ── */
+.btn-cont {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 16px; font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .01em;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s, opacity .2s;
+  position: relative;
+  overflow: hidden;
+  margin-top: auto;
+}
+.btn-cont:active { transform: scale(0.98); }
+.btn-cont.pulse {
+  animation: btn-pulse 2s ease-in-out infinite;
+}
+@keyframes btn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(28,28,26,0); }
+  50%       { box-shadow: 0 0 0 8px rgba(28,28,26,0.08); }
+}
+.btn-cont.gold {
+  background: linear-gradient(135deg, var(--coral), var(--gold));
+  color: #fff;
+}
+
+/* ── Play button ── */
+.play-btn {
+  background: none;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--pill);
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; flex-shrink: 0;
+  color: var(--ink2);
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .15s, color .15s;
+}
+.play-btn:active { border-color: var(--coral); color: var(--coral); }
+
+/* ── Tile system ── */
+.tile-bank {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.tile {
+  padding: 10px 15px;
+  border-radius: 12px;
+  font-size: 14px; font-weight: 700;
+  color: #fff;
+  display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .15s cubic-bezier(0.34,1.56,0.64,1), opacity .2s;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+.tile:active { transform: scale(0.93); }
+.tile.used   { opacity: 0.25; pointer-events: none; }
+.tile-icon   { font-size: 11px; opacity: 0.7; }
+
+.tile.t-noun   { background: var(--tn); }
+.tile.t-colour { background: var(--tc); }
+.tile.t-size   { background: var(--ts); }
+.tile.t-shape  { background: var(--tsh); }
+.tile.t-detail { background: var(--td); }
+.tile.t-reason { background: var(--tr); }
+.tile.t-def    { background: var(--tdef); }
+
+/* Animated tile (for teaching moments / flying assembly) */
+.tile-anim {
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-size: 15px; font-weight: 700; color: #fff;
+  display: inline-flex; align-items: center; gap: 6px;
+  position: absolute;
+  transition: left .6s cubic-bezier(0.34,1.56,0.64,1),
+              top  .6s cubic-bezier(0.34,1.56,0.64,1),
+              transform .5s cubic-bezier(0.34,1.56,0.64,1),
+              opacity .3s ease,
+              box-shadow .3s ease;
+}
+.tile-anim.glow { box-shadow: 0 0 20px rgba(255,255,255,0.35); }
+
+/* Drop zone */
+.drop-zone {
+  min-height: 54px;
+  background: var(--surface);
+  border: 2px dashed var(--ink3);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  transition: border-color .2s, background .2s;
+}
+.drop-zone.has-tiles { border-style: solid; border-color: var(--border2); background: var(--bg); }
+.drop-zone.ok  { border-color: var(--sage)!important;  background: rgba(90,158,124,.06)!important; }
+.drop-zone.bad { border-color: var(--coral)!important; }
+
+.placed-tile {
+  padding: 8px 10px 8px 13px;
+  border-radius: 10px;
+  font-size: 13px; font-weight: 700; color: #fff;
+  display: inline-flex; align-items: center; gap: 5px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.placed-tile .px { font-size: 11px; opacity: 0.6; }
+
+/* ── Feedback ── */
+.fb-ok {
+  background: rgba(90,158,124,.1);
+  border: 1px solid rgba(90,158,124,.3);
+  border-radius: 12px; padding: 12px 16px;
+  font-size: 13px; font-weight: 600; color: #2d6b4f;
+}
+.fb-hint {
+  background: rgba(201,168,76,.1);
+  border: 1px solid rgba(201,168,76,.3);
+  border-radius: 12px; padding: 12px 16px;
+  font-size: 13px; font-weight: 600; color: #6b5a2e;
+}
+
+/* ── Notebook block ── */
+.nb {
+  background: var(--nb-bg);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex; gap: 12px;
+}
+.nb-label {
+  font-size: 9px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(107,90,46,.5); margin-bottom: 3px;
+}
+.nb-text {
+  font-size: 14px; font-weight: 500; color: var(--nb-text); line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════
+   ZONE 0 — MYSTERY SILHOUETTE
+═══════════════════════════════════════════ */
+.silhouette-wrap {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  aspect-ratio: 4/3;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.silhouette-img {
+  width: 100%; height: 100%; object-fit: contain;
+  filter: brightness(0) contrast(1);
+  transition: filter 1.2s ease;
+}
+.silhouette-img.revealed {
+  filter: brightness(1) contrast(1);
+}
+.silhouette-tap-hint {
+  position: absolute;
+  bottom: 14px; left: 50%; transform: translateX(-50%);
+  background: rgba(28,28,26,0.7);
+  color: #fff; font-size: 12px; font-weight: 600;
+  padding: 6px 14px; border-radius: var(--pill);
+  opacity: 0;
+  transition: opacity .5s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.silhouette-tap-hint.show { opacity: 1; }
+
+.word-reveal {
+  text-align: center;
+  padding: 28px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.word-reveal.show { opacity: 1; transform: translateY(0); }
+.word-big {
+  font-family: 'Fraunces', serif;
+  font-size: 52px; font-weight: 900;
+  letter-spacing: -.02em; color: var(--ink);
+  line-height: 1;
+}
+.word-phonetic {
+  font-size: 14px; color: var(--ink2); margin-top: 6px; letter-spacing: .02em;
+}
+.word-play-row {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 14px;
+}
+
+/* ═══════════════════════════════════════════
+   TEACHING MOMENT — ARTICLES (indigo world)
+═══════════════════════════════════════════ */
+#s-tm-articles {
+  background: var(--tm-art-bg);
+  color: #fff;
+}
+.tm-wrap {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 28px; padding: 40px 28px;
+}
+.tm-label {
+  font-size: 10px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--tm-art-accent);
+  display: flex; align-items: center; gap: 10px;
+}
+.tm-label::before, .tm-label::after {
+  content: ''; display: block; width: 20px; height: 2px;
+  background: var(--tm-art-accent); border-radius: 2px;
+}
+.tm-title {
+  font-family: 'Fraunces', serif;
+  font-size: 30px; font-weight: 900; color: #fff; text-align: center;
+}
+
+/* Box reveal animation */
+.box-scene {
+  position: relative;
+  width: 160px; height: 140px;
+  display: flex; align-items: center; justify-content: center;
+}
+.box-body {
+  width: 120px; height: 90px;
+  background: rgba(167,139,250,.15);
+  border: 2px solid rgba(167,139,250,.4);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.box-lid {
+  position: absolute;
+  top: -28px; left: -2px;
+  width: 124px; height: 32px;
+  background: rgba(167,139,250,.25);
+  border: 2px solid rgba(167,139,250,.5);
+  border-radius: 6px 6px 0 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transform-origin: bottom center;
+  transition: transform .6s cubic-bezier(0.34,1.2,0.64,1);
+}
+.box-lid.open { transform: rotateX(-70deg) translateY(-8px); }
+.box-content {
+  font-size: 36px;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+.box-content.show { opacity: 1; }
+
+/* Article comparison */
+.art-pair {
+  width: 100%;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.art-row {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.art-row.show { opacity: 1; transform: translateY(0); }
+.art-tag {
+  font-size: 10px; font-weight: 800; letter-spacing: .08em;
+  padding: 3px 9px; border-radius: var(--pill);
+}
+.art-tag.new { background: rgba(167,139,250,.25); color: var(--tm-art-accent); }
+.art-tag.known { background: rgba(255,255,255,.1); color: rgba(255,255,255,.45); }
+.art-text {
+  font-family: 'Fraunces', serif;
+  font-size: 17px; font-weight: 700; color: rgba(255,255,255,.9);
+}
+.art-text em { color: var(--tm-art-accent); font-style: normal; }
+
+.btn-gotit {
+  width: 100%; padding: 17px;
+  border-radius: var(--radius); border: none;
+  background: var(--tm-art-accent);
+  color: var(--tm-art-bg);
+  font-size: 17px; font-weight: 800;
+  cursor: pointer; letter-spacing: .01em;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s;
+  opacity: 0; pointer-events: none;
+  transition: opacity .4s ease, transform .1s;
+}
+.btn-gotit.show { opacity: 1; pointer-events: all; }
+.btn-gotit:active { transform: scale(0.98); }
+
+/* ═══════════════════════════════════════════
+   ZONE 1 — BUILD: "It's a bag"
+═══════════════════════════════════════════ */
+.model-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+/* ═══════════════════════════════════════════
+   ZONE 2 — ADJECTIVE ORDER teaching moment
+   (reuses tm-adjective-order.html structure)
+═══════════════════════════════════════════ */
+#s-tm-order {
+  background: var(--tm-ord-bg);
+  color: #fff;
+}
+.tm-order-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px; padding: 40px 24px;
+}
+.rule-seq {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap; justify-content: center;
+}
+.rule-chip {
+  padding: 8px 13px; border-radius: 10px;
+  font-size: 13px; font-weight: 800; color: #fff;
+  display: inline-flex; align-items: center; gap: 5px;
+  transform: scale(0); opacity: 0;
+  transition: transform .4s cubic-bezier(0.34,1.56,0.64,1), opacity .3s ease;
+}
+.rule-chip.pop { transform: scale(1); opacity: 1; }
+.rule-arrow {
+  font-size: 14px; color: rgba(74,222,128,.4);
+  transform: scale(0); opacity: 0;
+  transition: transform .3s ease, opacity .3s ease;
+}
+.rule-arrow.pop { transform: scale(1); opacity: 1; }
+.flying-row {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; min-height: 48px;
+}
+.flying-tile {
+  padding: 11px 16px; border-radius: 12px;
+  font-size: 15px; font-weight: 700; color: #fff;
+  display: inline-flex; align-items: center; gap: 6px;
+  transform: scale(0); opacity: 0;
+  transition: transform .5s cubic-bezier(0.34,1.56,0.64,1),
+              opacity .3s ease, box-shadow .3s ease;
+}
+.flying-tile.land { transform: scale(1); opacity: 1; }
+.flying-tile.glow { box-shadow: 0 0 20px rgba(74,222,128,.4); }
+.correct-sent {
+  font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 800;
+  color: var(--tm-ord-accent); text-align: center; line-height: 1.3;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.correct-sent.show { opacity: 1; transform: translateY(0); }
+.btn-gotit-green {
+  width: 100%; padding: 17px;
+  border-radius: var(--radius); border: none;
+  background: var(--tm-ord-accent);
+  color: var(--tm-ord-bg);
+  font-size: 17px; font-weight: 800;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s, opacity .4s;
+  opacity: 0; pointer-events: none;
+}
+.btn-gotit-green.show { opacity: 1; pointer-events: all; }
+.btn-gotit-green:active { transform: scale(0.98); }
+
+/* ═══════════════════════════════════════════
+   ZONE 3b — BECAUSE teaching moment (rose)
+═══════════════════════════════════════════ */
+#s-tm-because {
+  background: var(--tm-bec-bg);
+  color: #fff;
+}
+.tm-because-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 28px; padding: 40px 28px;
+}
+.because-halves {
+  width: 100%; display: flex; flex-direction: column; gap: 10px; position: relative;
+}
+.because-half {
+  font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 700;
+  color: rgba(255,255,255,.35);
+  text-align: center; line-height: 1.4;
+  transition: color .5s ease;
+}
+.because-half.lit { color: rgba(255,255,255,.9); }
+.because-bridge {
+  font-family: 'Fraunces', serif;
+  font-size: 22px; font-weight: 900;
+  color: var(--tm-bec-accent);
+  text-align: center;
+  transform: scale(0); opacity: 0;
+  transition: transform .5s cubic-bezier(0.34,1.56,0.64,1), opacity .3s ease;
+}
+.because-bridge.show { transform: scale(1); opacity: 1; }
+.btn-gotit-rose {
+  width: 100%; padding: 17px;
+  border-radius: var(--radius); border: none;
+  background: var(--tm-bec-accent);
+  color: var(--tm-bec-bg);
+  font-size: 17px; font-weight: 800;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s, opacity .4s;
+  opacity: 0; pointer-events: none;
+}
+.btn-gotit-rose.show { opacity: 1; pointer-events: all; }
+.btn-gotit-rose:active { transform: scale(0.98); }
+
+/* ═══════════════════════════════════════════
+   ZONE 6 — PYRAMID REVEAL
+═══════════════════════════════════════════ */
+.pyramid-wrap {
+  display: flex; flex-direction: column; gap: 6px; align-items: stretch;
+}
+.pyramid-tier {
+  border-radius: 12px;
+  padding: 14px 18px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.pyramid-tier.show { opacity: 1; transform: translateY(0); }
+.pyramid-tier.bronze {
+  background: rgba(201,168,76,.12);
+  border: 1px solid rgba(201,168,76,.3);
+}
+.pyramid-tier.silver {
+  background: rgba(90,158,124,.1);
+  border: 1px solid rgba(90,158,124,.3);
+}
+.pyramid-tier.gold {
+  background: rgba(232,115,74,.1);
+  border: 1px solid rgba(232,115,74,.3);
+}
+.tier-label {
+  font-size: 9px; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; margin-bottom: 5px;
+}
+.pyramid-tier.bronze .tier-label { color: var(--gold); }
+.pyramid-tier.silver .tier-label { color: var(--sage); }
+.pyramid-tier.gold   .tier-label { color: var(--coral); }
+.tier-text {
+  font-family: 'Fraunces', serif;
+  font-size: 18px; font-weight: 700; line-height: 1.35;
+}
+.pyramid-tier.bronze .tier-text { color: #7a6520; }
+.pyramid-tier.silver .tier-text { color: #2d6b4f; }
+.pyramid-tier.gold   .tier-text { color: #8a3820; }
+
+/* ═══════════════════════════════════════════
+   CELEBRATE screen
+═══════════════════════════════════════════ */
+#s-celebrate {
+  align-items: center; justify-content: center; text-align: center;
+}
+.celebrate-icon {
+  font-size: 64px;
+  animation: bounce-in .5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes bounce-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.celebrate-title {
+  font-family: 'Fraunces', serif;
+  font-size: 32px; font-weight: 900; line-height: 1.2; color: var(--ink);
+}
+.celebrate-sub { font-size: 15px; color: var(--ink2); line-height: 1.6; }
+
+/* ═══════════════════════════════════════════
+   Can Do badges
+═══════════════════════════════════════════ */
+.badges-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge {
+  padding: 6px 13px; border-radius: var(--pill);
+  background: var(--surface); border: 1px solid var(--border2);
+  font-size: 12px; font-weight: 700; color: var(--ink2);
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background .4s, color .4s, border-color .4s;
+}
+.badge.earned {
+  background: rgba(201,168,76,.12);
+  border-color: rgba(201,168,76,.4);
+  color: var(--gold);
+}
+
+/* ═══════════════════════════════════════════
+   Confetti
+═══════════════════════════════════════════ */
+.confetti-wrap {
+  position: fixed; inset: 0;
+  pointer-events: none; overflow: hidden; z-index: 100;
+}
+.confetti-dot {
+  position: absolute; width: 8px; height: 8px;
+  border-radius: 2px; opacity: 0;
+  animation: confetti-fall linear forwards;
+}
+@keyframes confetti-fall {
+  0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+}
+
+/* ═══════════════════════════════════════════
+   LISTEN & RECORD widget
+═══════════════════════════════════════════ */
+.record-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  background: var(--card);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.record-row { display: flex; gap: 10px; }
+.btn-record {
+  flex: 1; padding: 13px;
+  border-radius: 12px; border: 1.5px solid var(--border2);
+  background: none; font-size: 14px; font-weight: 700;
+  color: var(--ink); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: border-color .15s, background .15s;
+}
+.btn-record.recording {
+  border-color: #e53935; background: rgba(229,57,53,.06); color: #e53935;
+}
+.waveform {
+  height: 32px; display: flex; align-items: center; gap: 2px; justify-content: center;
+  opacity: 0; transition: opacity .3s;
+}
+.waveform.active { opacity: 1; }
+.waveform span {
+  display: block; width: 3px; background: var(--coral);
+  border-radius: 2px; animation: wave-bar .7s ease-in-out infinite;
+}
+.waveform span:nth-child(1) { height: 8px; animation-delay: 0s; }
+.waveform span:nth-child(2) { height: 18px; animation-delay: .1s; }
+.waveform span:nth-child(3) { height: 28px; animation-delay: .15s; }
+.waveform span:nth-child(4) { height: 18px; animation-delay: .2s; }
+.waveform span:nth-child(5) { height: 10px; animation-delay: .3s; }
+@keyframes wave-bar {
+  0%, 100% { transform: scaleY(.5); }
+  50%       { transform: scaleY(1); }
+}
+
+/* ═══════════════════════════════════════════
+   Silhouette / Yes-No exercise
+═══════════════════════════════════════════ */
+.yn-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.yn-btn {
+  padding: 18px 12px;
+  border-radius: var(--radius); border: 2px solid var(--border2);
+  background: var(--card); font-size: 16px; font-weight: 700;
+  color: var(--ink); cursor: pointer; text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .15s, background .15s;
+}
+.yn-btn:active { transform: scale(0.97); }
+.yn-btn.correct { border-color: var(--sage); background: rgba(90,158,124,.08); color: #2d6b4f; }
+.yn-btn.wrong   { border-color: var(--coral); background: rgba(232,115,74,.08); }
+
+/* ─── Scrollable content area ─── */
+.scroll-content {
+  position: absolute;
+  top: 59px; /* header height */
+  left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Header (always visible) -->
+  <div class="hdr">
+    <button class="hdr-back" onclick="goBack()">←</button>
+    <div class="hdr-title" id="hdr-title">Bag</div>
+    <div class="hdr-zone" id="hdr-zone">Zone 0</div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+
+  <!-- Screen container -->
+  <div class="scroll-content">
+
+    <!-- ══ ZONE 0: Meet It ══ -->
+    <div class="screen active" id="s-z0">
+      <div class="eyebrow">Zone 0 — Meet it</div>
+
+      <!-- Silhouette image -->
+      <div class="silhouette-wrap" id="sil-wrap" onclick="revealImage()">
+        <img class="silhouette-img" id="sil-img"
+             src="https://raw.githubusercontent.com/redskin106/lesson-a/main/micro-lesson/images/bag.jpg"
+             onerror="this.src=''"
+             alt="bag">
+        <div class="silhouette-tap-hint" id="sil-hint">Tap to reveal 👆</div>
+      </div>
+
+      <!-- Word reveal (hidden until audio plays) -->
+      <div class="word-reveal" id="word-reveal">
+        <div class="word-big">bag</div>
+        <div class="word-phonetic">/bæɡ/</div>
+        <div class="word-play-row">
+          <button class="play-btn" onclick="speak('bag')">🔊</button>
+          <span style="font-size:13px;color:var(--ink2)">Tap to hear again</span>
+        </div>
+      </div>
+
+      <!-- Continue (hidden until image revealed) -->
+      <button class="btn-cont pulse" id="btn-z0" onclick="goTo('s-tm-articles')"
+              style="opacity:0;pointer-events:none;margin-top:auto">
+        Continue →
+      </button>
+    </div>
+
+    <!-- ══ TEACHING MOMENT: Articles ══ -->
+    <div class="screen tm" id="s-tm-articles">
+      <div class="tm-wrap">
+        <div class="tm-label" style="color:var(--tm-art-accent)">Language note</div>
+        <div class="tm-title" style="color:#fff">a <span style="color:var(--tm-art-accent)">vs</span> the</div>
+
+        <!-- Box scene -->
+        <div class="box-scene" id="box-scene">
+          <div class="box-body">
+            <div class="box-lid" id="box-lid">❓</div>
+            <div class="box-content" id="box-content">🎒</div>
+          </div>
+        </div>
+
+        <!-- Article examples -->
+        <div class="art-pair">
+          <div class="art-row" id="art-row-1">
+            <span class="art-tag new">new</span>
+            <span class="art-text">There's <em>a</em> bag in here.</span>
+          </div>
+          <div class="art-row" id="art-row-2">
+            <span class="art-tag known">known</span>
+            <span class="art-text">That's <em>the</em> bag.</span>
+          </div>
+        </div>
+
+        <button class="btn-gotit" id="btn-art-gotit"
+                style="background:var(--tm-art-accent);color:var(--tm-art-bg)"
+                onclick="artGotIt()">Got it ✓</button>
+      </div>
+    </div>
+
+    <!-- ══ ZONE 1: It's a bag (build) ══ -->
+    <div class="screen" id="s-z1">
+      <div class="eyebrow">Zone 1 — Name it</div>
+
+      <div class="model-row">
+        <div class="model-text" style="flex:1">It's a bag.</div>
+        <button class="play-btn" onclick="speak('It\'s a bag.')">🔊</button>
+      </div>
+
+      <div class="card-surface">
+        <div class="eyebrow" style="margin-bottom:10px">Build the sentence</div>
+        <div class="drop-zone" id="drop-z1">
+          <span style="font-size:13px;color:var(--ink2)">Tap words below →</span>
+        </div>
+      </div>
+
+      <div class="tile-bank" id="bank-z1">
+        <button class="tile t-def" onclick="tapTile(this,'z1','It\'s','It\'s')">It's</button>
+        <button class="tile t-def" onclick="tapTile(this,'z1','a','a')">a</button>
+        <button class="tile t-noun" onclick="tapTile(this,'z1','bag','bag')">🎒 bag</button>
+        <button class="tile t-def" onclick="tapTile(this,'z1','the','the')">the</button>
+        <button class="tile t-noun" onclick="tapTile(this,'z1','chair','chair')">chair</button>
+      </div>
+
+      <div id="fb-z1"></div>
+
+      <button class="btn-cont" id="btn-z1" onclick="checkZ1()"
+              style="margin-top:auto">Check ✓</button>
+    </div>
+
+    <!-- ══ ZONE 2: What does it look like? (listen) ══ -->
+    <div class="screen" id="s-z2-listen">
+      <div class="eyebrow">Zone 2 — Describe it</div>
+
+      <div style="text-align:center;padding:12px 0">
+        <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">Listen to the description</div>
+        <button class="play-btn" style="margin:0 auto;width:56px;height:56px;font-size:22px"
+                onclick="speak('It\'s a big, flat, black bag.')">🔊</button>
+      </div>
+
+      <div class="model-row">
+        <div class="model-text" style="flex:1">It's a big, flat, black bag.</div>
+      </div>
+
+      <!-- Record & Compare -->
+      <div class="record-wrap">
+        <div class="eyebrow">Record yourself</div>
+        <div class="record-row">
+          <button class="btn-record" id="rec-btn-z2" onclick="toggleRecord('z2')">🎤 Record</button>
+          <button class="play-btn" onclick="playRecording('z2')" id="play-rec-z2"
+                  style="opacity:.4;pointer-events:none">▶</button>
+        </div>
+        <div class="waveform" id="wave-z2">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <button class="btn-cont pulse" onclick="goTo('s-tm-order')">Continue →</button>
+    </div>
+
+    <!-- ══ TEACHING MOMENT: Adjective Order (green world) ══ -->
+    <div class="screen tm" id="s-tm-order">
+      <div class="tm-order-wrap">
+        <div class="tm-label" style="color:var(--tm-ord-accent)">Word order</div>
+        <div class="tm-title" style="color:#fff;font-family:'Fraunces',serif;font-size:28px;font-weight:900;text-align:center">
+          Describing words<br>go in order
+        </div>
+
+        <!-- Wrong sentence -->
+        <div style="width:100%;text-align:center">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(239,68,68,.7);margin-bottom:8px">❌ Wrong</div>
+          <div id="wrong-sent" style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:rgba(255,255,255,.4);text-decoration:line-through;text-decoration-color:rgba(239,68,68,.6)">
+            a black flat big bag
+          </div>
+        </div>
+
+        <!-- Rule chips -->
+        <div class="rule-seq" id="rule-seq">
+          <div class="rule-chip" id="rc-size" style="background:var(--ts)"><span style="font-size:10px;opacity:.7">↔</span>size</div>
+          <div class="rule-arrow" id="ra-1">→</div>
+          <div class="rule-chip" id="rc-mat" style="background:var(--tsh)"><span style="font-size:10px;opacity:.7">◻</span>material</div>
+          <div class="rule-arrow" id="ra-2">→</div>
+          <div class="rule-chip" id="rc-col" style="background:var(--tc)"><span style="font-size:10px;opacity:.7">●</span>colour</div>
+          <div class="rule-arrow" id="ra-3">→</div>
+          <div class="rule-chip" id="rc-noun" style="background:var(--tn)"><span style="font-size:10px;opacity:.7">📦</span>noun</div>
+        </div>
+
+        <!-- Flying tiles landing in correct order -->
+        <div class="flying-row" id="flying-row">
+          <div class="flying-tile" id="ft-size" style="background:var(--ts)"><span style="font-size:10px;opacity:.7">↔</span>big</div>
+          <div class="flying-tile" id="ft-mat" style="background:var(--tsh)"><span style="font-size:10px;opacity:.7">◻</span>flat</div>
+          <div class="flying-tile" id="ft-col" style="background:var(--tc)"><span style="font-size:10px;opacity:.7">●</span>black</div>
+          <div class="flying-tile" id="ft-noun" style="background:var(--tn)"><span style="font-size:10px;opacity:.7">🎒</span>bag</div>
+        </div>
+
+        <div class="correct-sent" id="correct-sent">It's a <span style="color:rgba(255,255,255,.5)">big, flat, black</span> bag.</div>
+
+        <button class="btn-gotit-green" id="btn-order-gotit" onclick="goTo('s-z2-build')">Got it ✓</button>
+      </div>
+    </div>
+
+    <!-- ══ ZONE 2: Build the full description ══ -->
+    <div class="screen" id="s-z2-build">
+      <div class="eyebrow">Zone 2 — Build it</div>
+
+      <div class="model-row">
+        <div class="model-text" style="flex:1">It's a big, flat, black bag.</div>
+        <button class="play-btn" onclick="speak('It\'s a big, flat, black bag.')">🔊</button>
+      </div>
+
+      <div class="card-surface">
+        <div class="eyebrow" style="margin-bottom:10px">Tap in order: size → material → colour → noun</div>
+        <div class="drop-zone" id="drop-z2">
+          <span style="font-size:13px;color:var(--ink2)">Tap words below →</span>
+        </div>
+      </div>
+
+      <div class="tile-bank" id="bank-z2">
+        <button class="tile t-def"  onclick="tapTile(this,'z2','It\'s a','It\'s a')">It's a</button>
+        <button class="tile t-size" onclick="tapTile(this,'z2','big','big')">↔ big</button>
+        <button class="tile t-shape" onclick="tapTile(this,'z2','flat','flat')">◻ flat</button>
+        <button class="tile t-colour" onclick="tapTile(this,'z2','black','black')">● black</button>
+        <button class="tile t-noun"  onclick="tapTile(this,'z2','bag','bag')">🎒 bag</button>
+        <button class="tile t-colour" onclick="tapTile(this,'z2','brown','brown')">● brown</button>
+        <button class="tile t-size"  onclick="tapTile(this,'z2','small','small')">↔ small</button>
+      </div>
+
+      <div id="fb-z2"></div>
+
+      <button class="btn-cont" id="btn-z2" onclick="checkZ2()" style="margin-top:auto">Check ✓</button>
+    </div>
+
+    <!-- ══ ZONE 3: It has a zip ══ -->
+    <div class="screen" id="s-z3">
+      <div class="eyebrow">Zone 3 — Special detail</div>
+
+      <div class="model-row">
+        <div class="model-text" style="flex:1">It has a zip.</div>
+        <button class="play-btn" onclick="speak('It has a zip.')">🔊</button>
+      </div>
+
+      <div class="card-surface" style="display:flex;align-items:center;gap:14px;padding:16px 18px">
+        <span style="font-size:48px">🤐</span>
+        <div>
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:4px">Look at the bag</div>
+          <div style="font-size:15px;font-weight:600">What do you notice?</div>
+        </div>
+      </div>
+
+      <div class="yn-options">
+        <button class="yn-btn" onclick="checkYN(this,true)">✓ Yes, it has a zip</button>
+        <button class="yn-btn" onclick="checkYN(this,false)">✗ No zip</button>
+      </div>
+
+      <div id="fb-z3"></div>
+      <button class="btn-cont pulse" id="btn-z3" onclick="goTo('s-tm-because')"
+              style="opacity:0;pointer-events:none;margin-top:auto">Continue →</button>
+    </div>
+
+    <!-- ══ TEACHING MOMENT: Because (rose world) ══ -->
+    <div class="screen tm" id="s-tm-because">
+      <div class="tm-because-wrap">
+        <div class="tm-label" style="color:var(--tm-bec-accent)">Language note</div>
+        <div class="tm-title" style="color:#fff;font-family:'Fraunces',serif;font-size:28px;font-weight:900;text-align:center">
+          Feeling + reason
+        </div>
+
+        <div class="because-halves">
+          <div class="because-half" id="bec-h1">It looks old</div>
+          <div class="because-bridge" id="bec-bridge">because</div>
+          <div class="because-half" id="bec-h2">it's dirty.</div>
+        </div>
+
+        <div style="background:rgba(244,114,182,.1);border:1px solid rgba(244,114,182,.25);border-radius:12px;padding:14px 18px;width:100%">
+          <div style="font-size:13px;color:rgba(255,255,255,.65);text-align:center;line-height:1.6">
+            <span style="color:var(--tm-bec-accent);font-weight:700">because</span> joins a feeling to a reason.<br>
+            First the feeling — then why.
+          </div>
+        </div>
+
+        <button class="btn-gotit-rose" id="btn-bec-gotit" onclick="becGotIt()">Got it ✓</button>
+      </div>
+    </div>
+
+    <!-- ══ ZONE 3b: Because sentence ══ -->
+    <div class="screen" id="s-z3b">
+      <div class="eyebrow">Zone 3b — How does it feel?</div>
+
+      <div class="model-row">
+        <div class="model-text" style="flex:1">It looks old because it's dirty.</div>
+        <button class="play-btn" onclick="speak('It looks old because it\'s dirty.')">🔊</button>
+      </div>
+
+      <div class="card-surface">
+        <div class="eyebrow" style="margin-bottom:10px">Build the sentence</div>
+        <div class="drop-zone" id="drop-z3b">
+          <span style="font-size:13px;color:var(--ink2)">Tap words below →</span>
+        </div>
+      </div>
+
+      <div class="tile-bank" id="bank-z3b">
+        <button class="tile t-def"    onclick="tapTile(this,'z3b','It looks','It looks')">It looks</button>
+        <button class="tile t-detail" onclick="tapTile(this,'z3b','old','old')">old</button>
+        <button class="tile t-reason" onclick="tapTile(this,'z3b','because','because')">↩ because</button>
+        <button class="tile t-def"    onclick="tapTile(this,'z3b','it\'s','it\'s')">it's</button>
+        <button class="tile t-detail" onclick="tapTile(this,'z3b','dirty','dirty')">dirty</button>
+        <button class="tile t-detail" onclick="tapTile(this,'z3b','new','new')">new</button>
+      </div>
+
+      <div id="fb-z3b"></div>
+      <button class="btn-cont" id="btn-z3b" onclick="checkZ3b()" style="margin-top:auto">Check ✓</button>
+    </div>
+
+    <!-- ══ ZONE 6: Pyramid Reveal ══ -->
+    <div class="screen" id="s-z6">
+      <div class="eyebrow">Zone 6 — The full picture</div>
+
+      <img src="https://raw.githubusercontent.com/redskin106/lesson-a/main/micro-lesson/images/bag.jpg"
+           style="width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border)"
+           onerror="this.style.display='none'" alt="bag">
+
+      <div class="pyramid-wrap" id="pyramid">
+        <div class="pyramid-tier bronze" id="pt-bronze">
+          <div class="tier-label">🥉 Bronze</div>
+          <div class="tier-text">It's a bag.</div>
+        </div>
+        <div class="pyramid-tier silver" id="pt-silver">
+          <div class="tier-label">🥈 Silver</div>
+          <div class="tier-text">It's a big, flat, black bag. It has a zip.</div>
+        </div>
+        <div class="pyramid-tier gold" id="pt-gold">
+          <div class="tier-label">🥇 Gold</div>
+          <div class="tier-text">It looks old because it's dirty.</div>
+        </div>
+      </div>
+
+      <!-- Notebook prompt -->
+      <div class="nb">
+        <span style="font-size:24px">✏️</span>
+        <div>
+          <div class="nb-label">Notebook</div>
+          <div class="nb-text">Draw the bag. Write the words around it. Make it yours.</div>
+        </div>
+      </div>
+
+      <button class="btn-cont gold pulse" onclick="goTo('s-celebrate')">Done! →</button>
+    </div>
+
+    <!-- ══ CELEBRATE ══ -->
+    <div class="screen" id="s-celebrate">
+      <div class="celebrate-icon" id="cel-icon">🎒</div>
+      <div class="celebrate-title">You described it!</div>
+      <div class="celebrate-sub">
+        You can describe a bag in English.<br>
+        The same six questions work for <em>any</em> object.
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px">Can Do</div>
+        <div class="badges-row">
+          <div class="badge earned">🎒 Named it</div>
+          <div class="badge earned">🎨 Described it</div>
+          <div class="badge earned">✦ Found the detail</div>
+          <div class="badge earned">💬 Explained why</div>
+          <div class="badge earned">🏆 Gold level</div>
+        </div>
+      </div>
+
+      <button class="btn-cont" onclick="goHome()" style="margin-top:auto">Back to home</button>
+    </div>
+
+  </div><!-- /scroll-content -->
+</div><!-- /shell -->
+
+<!-- Confetti layer -->
+<div class="confetti-wrap" id="confetti"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  SCREEN FLOW
+// ══════════════════════════════════════════
+const SCREENS = [
+  's-z0', 's-tm-articles', 's-z1',
+  's-z2-listen', 's-tm-order', 's-z2-build',
+  's-z3', 's-tm-because', 's-z3b',
+  's-z6', 's-celebrate'
+];
+const ZONE_LABELS = {
+  's-z0':          'Zone 0',
+  's-tm-articles': 'Language note',
+  's-z1':          'Zone 1',
+  's-z2-listen':   'Zone 2',
+  's-tm-order':    'Word order',
+  's-z2-build':    'Zone 2',
+  's-z3':          'Zone 3',
+  's-tm-because':  'Language note',
+  's-z3b':         'Zone 3b',
+  's-z6':          'Zone 6',
+  's-celebrate':   '🎉'
+};
+
+let currentScreen = 's-z0';
+let history = ['s-z0'];
+
+function goTo(id) {
+  const prev = document.getElementById(currentScreen);
+  const next = document.getElementById(id);
+  if (!next) return;
+
+  prev.classList.remove('active');
+  next.classList.add('active');
+  currentScreen = id;
+  history.push(id);
+
+  // Scroll new screen to top
+  next.scrollTop = 0;
+
+  // Update header
+  document.getElementById('hdr-zone').textContent = ZONE_LABELS[id] || '';
+  updateProgress();
+
+  // Trigger screen-enter animations
+  onScreenEnter(id);
+}
+
+function goBack() {
+  if (history.length <= 1) { goHome(); return; }
+  history.pop();
+  const prev = history[history.length - 1];
+  const curr = document.getElementById(currentScreen);
+  const target = document.getElementById(prev);
+  curr.classList.remove('active');
+  target.classList.add('active');
+  currentScreen = prev;
+  document.getElementById('hdr-zone').textContent = ZONE_LABELS[prev] || '';
+  updateProgress();
+}
+
+function goHome() {
+  // Reset to zone 0 for now
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-z0').classList.add('active');
+  currentScreen = 's-z0';
+  history = ['s-z0'];
+  resetZ0();
+  updateProgress();
+}
+
+function updateProgress() {
+  const idx = SCREENS.indexOf(currentScreen);
+  const pct = idx < 0 ? 0 : Math.round((idx / (SCREENS.length - 1)) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function onScreenEnter(id) {
+  if (id === 's-tm-articles') runArticlesTM();
+  if (id === 's-tm-order')    runOrderTM();
+  if (id === 's-tm-because')  runBecauseTM();
+  if (id === 's-z6')          runPyramidReveal();
+  if (id === 's-celebrate')   runCelebrate();
+}
+
+// ══════════════════════════════════════════
+//  AUDIO — browser TTS placeholder
+// ══════════════════════════════════════════
+let synth = window.speechSynthesis;
+let voices = [];
+synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+
+function speak(text) {
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.85;
+  u.pitch = 1;
+  // Prefer a natural English voice if available
+  const preferred = voices.find(v => v.lang.startsWith('en') && !v.name.includes('Google'));
+  if (preferred) u.voice = preferred;
+  synth.speak(u);
+}
+
+// Procedural audio tones (teaching moments)
+let audioCtx = null;
+function getAC() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function tone(freq, dur, type='sine', gain=0.25, delay=0) {
+  try {
+    const ctx = getAC();
+    const osc = ctx.createOscillator();
+    const vol = ctx.createGain();
+    osc.connect(vol); vol.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    vol.gain.setValueAtTime(0, ctx.currentTime + delay);
+    vol.gain.linearRampToValueAtTime(gain, ctx.currentTime + delay + 0.02);
+    vol.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+    osc.start(ctx.currentTime + delay);
+    osc.stop(ctx.currentTime + delay + dur + 0.05);
+  } catch(e) {}
+}
+function sndArrival()   { tone(330,.4,'sine',.18,0); tone(440,.6,'sine',.14,.35); tone(550,.8,'sine',.1,.7); }
+function sndSnap()      { tone(660,.12,'sine',.3,0); tone(880,.08,'sine',.15,.08); }
+function sndCorrect()   { [440,550,660,880].forEach((f,i) => tone(f,.4,'sine',.18,i*.06)); }
+function sndCelebrate() { [440,550,660,880,1100].forEach((f,i) => tone(f,.4,'sine',.15,i*.06)); }
+function sndWrong()     { tone(300,.4,'sawtooth',.15,0); tone(220,.35,'sawtooth',.1,.3); }
+function sndTap()       { tone(500,.08,'sine',.2,0); }
+
+// ══════════════════════════════════════════
+//  ZONE 0 — Mystery silhouette
+// ══════════════════════════════════════════
+let z0Revealed = false;
+let z0WordShown = false;
+
+function initZ0() {
+  // Show word reveal after a beat, auto-play audio
+  setTimeout(() => {
+    const wr = document.getElementById('word-reveal');
+    wr.classList.add('show');
+    z0WordShown = true;
+    speak('bag');
+    // Show tap hint on image
+    setTimeout(() => {
+      document.getElementById('sil-hint').classList.add('show');
+    }, 800);
+  }, 600);
+}
+
+function revealImage() {
+  if (z0Revealed) return;
+  z0Revealed = true;
+  sndCorrect();
+  const img = document.getElementById('sil-img');
+  const hint = document.getElementById('sil-hint');
+  img.classList.add('revealed');
+  hint.classList.remove('show');
+  // Show continue button
+  setTimeout(() => {
+    const btn = document.getElementById('btn-z0');
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'all';
+  }, 800);
+}
+
+function resetZ0() {
+  z0Revealed = false;
+  z0WordShown = false;
+  document.getElementById('sil-img').classList.remove('revealed');
+  document.getElementById('word-reveal').classList.remove('show');
+  document.getElementById('sil-hint').classList.remove('show');
+  const btn = document.getElementById('btn-z0');
+  btn.style.opacity = '0';
+  btn.style.pointerEvents = 'none';
+}
+
+// ══════════════════════════════════════════
+//  TEACHING MOMENT — Articles
+// ══════════════════════════════════════════
+let tmArtDone = false;
+function runArticlesTM() {
+  if (tmArtDone) return;
+  tmArtDone = true;
+  sndArrival();
+
+  // After pause, open the box
+  setTimeout(() => {
+    speak('There\'s a bag in here.');
+    setTimeout(() => {
+      document.getElementById('box-lid').classList.add('open');
+      setTimeout(() => {
+        document.getElementById('box-content').classList.add('show');
+        sndSnap();
+        speak('That\'s the bag.');
+        // Show article rows
+        setTimeout(() => {
+          document.getElementById('art-row-1').classList.add('show');
+          sndSnap();
+          setTimeout(() => {
+            document.getElementById('art-row-2').classList.add('show');
+            sndSnap();
+            // Show got it
+            setTimeout(() => {
+              document.getElementById('btn-art-gotit').classList.add('show');
+            }, 500);
+          }, 600);
+        }, 800);
+      }, 700);
+    }, 1200);
+  }, 1000);
+}
+
+function artGotIt() {
+  sndCorrect();
+  goTo('s-z1');
+}
+
+// ══════════════════════════════════════════
+//  ZONE 1 — Build "It's a bag"
+// ══════════════════════════════════════════
+const ANSWER_Z1 = ['It\'s', 'a', 'bag'];
+let placed_z1 = [];
+
+function checkZ1() {
+  const words = placed_z1.map(p => p.word);
+  const fb = document.getElementById('fb-z1');
+  if (JSON.stringify(words) === JSON.stringify(ANSWER_Z1)) {
+    fb.innerHTML = '<div class="fb-ok">✓ Perfect! "It\'s a bag." — first sentence!</div>';
+    sndCorrect();
+    document.getElementById('btn-z1').textContent = 'Continue →';
+    document.getElementById('btn-z1').onclick = () => goTo('s-z2-listen');
+  } else if (words.length < 3) {
+    fb.innerHTML = '<div class="fb-hint">Add all three words.</div>';
+    sndWrong();
+  } else {
+    fb.innerHTML = '<div class="fb-hint">Try: It\'s → a → bag</div>';
+    sndWrong();
+  }
+}
+
+// ══════════════════════════════════════════
+//  TEACHING MOMENT — Adjective Order
+// ══════════════════════════════════════════
+let tmOrdDone = false;
+function runOrderTM() {
+  if (tmOrdDone) return;
+  tmOrdDone = true;
+  sndArrival();
+
+  const chips = [
+    {id:'rc-size',  delay:600},
+    {id:'ra-1',     delay:900},
+    {id:'rc-mat',   delay:1000},
+    {id:'ra-2',     delay:1300},
+    {id:'rc-col',   delay:1400},
+    {id:'ra-3',     delay:1700},
+    {id:'rc-noun',  delay:1800},
+  ];
+  chips.forEach(({id, delay}) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('pop');
+      if (!id.startsWith('ra')) sndSnap();
+    }, delay);
+  });
+
+  // Flying tiles land in correct order
+  const tiles = [
+    {id:'ft-size',  delay:2400},
+    {id:'ft-mat',   delay:2800},
+    {id:'ft-col',   delay:3200},
+    {id:'ft-noun',  delay:3600},
+  ];
+  tiles.forEach(({id, delay}) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      el.classList.add('land');
+      sndSnap();
+      el.classList.add('glow');
+      setTimeout(() => el.classList.remove('glow'), 500);
+    }, delay);
+  });
+
+  // Show correct sentence
+  setTimeout(() => {
+    document.getElementById('correct-sent').classList.add('show');
+    speak('It\'s a big, flat, black bag.');
+  }, 4200);
+
+  // Show got it
+  setTimeout(() => {
+    document.getElementById('btn-order-gotit').classList.add('show');
+  }, 5500);
+}
+
+// ══════════════════════════════════════════
+//  ZONE 2 — Build "It's a big flat black bag"
+// ══════════════════════════════════════════
+const ANSWER_Z2 = ['It\'s a', 'big', 'flat', 'black', 'bag'];
+let placed_z2 = [];
+
+function checkZ2() {
+  const words = placed_z2.map(p => p.word);
+  const fb = document.getElementById('fb-z2');
+  if (JSON.stringify(words) === JSON.stringify(ANSWER_Z2)) {
+    fb.innerHTML = '<div class="fb-ok">✓ Size → material → colour → noun. Perfect order!</div>';
+    sndCorrect();
+    document.getElementById('btn-z2').textContent = 'Continue →';
+    document.getElementById('btn-z2').onclick = () => goTo('s-z3');
+  } else if (words.includes('bag') && words[words.length-1] !== 'bag') {
+    fb.innerHTML = '<div class="fb-hint">Noun goes last — bag at the end.</div>';
+    sndWrong();
+  } else if (words.length < 5) {
+    fb.innerHTML = '<div class="fb-hint">Use all five tiles.</div>';
+    sndWrong();
+  } else {
+    fb.innerHTML = '<div class="fb-hint">Try: big → flat → black → bag</div>';
+    sndWrong();
+  }
+}
+
+// ══════════════════════════════════════════
+//  ZONE 3 — Yes/No
+// ══════════════════════════════════════════
+function checkYN(btn, isCorrect) {
+  if (isCorrect) {
+    btn.classList.add('correct');
+    sndCorrect();
+    speak('Yes! It has a zip.');
+    document.getElementById('fb-z3').innerHTML = '<div class="fb-ok">✓ It has a zip — you noticed!</div>';
+    setTimeout(() => {
+      const contBtn = document.getElementById('btn-z3');
+      contBtn.style.opacity = '1';
+      contBtn.style.pointerEvents = 'all';
+    }, 600);
+  } else {
+    btn.classList.add('wrong');
+    sndWrong();
+    setTimeout(() => btn.classList.remove('wrong'), 800);
+  }
+}
+
+// ══════════════════════════════════════════
+//  TEACHING MOMENT — Because
+// ══════════════════════════════════════════
+let tmBecDone = false;
+function runBecauseTM() {
+  if (tmBecDone) return;
+  tmBecDone = true;
+  sndArrival();
+
+  setTimeout(() => {
+    speak('It looks old');
+    document.getElementById('bec-h1').classList.add('lit');
+  }, 800);
+
+  setTimeout(() => {
+    document.getElementById('bec-bridge').classList.add('show');
+    sndSnap();
+    speak('because');
+  }, 2000);
+
+  setTimeout(() => {
+    speak('it\'s dirty.');
+    document.getElementById('bec-h2').classList.add('lit');
+  }, 3000);
+
+  setTimeout(() => {
+    speak('It looks old because it\'s dirty.');
+    sndCorrect();
+  }, 4200);
+
+  setTimeout(() => {
+    document.getElementById('btn-bec-gotit').classList.add('show');
+  }, 5500);
+}
+
+function becGotIt() {
+  sndCorrect();
+  goTo('s-z3b');
+}
+
+// ══════════════════════════════════════════
+//  ZONE 3b — Build "because" sentence
+// ══════════════════════════════════════════
+const ANSWER_Z3B = ['It looks', 'old', 'because', 'it\'s', 'dirty'];
+let placed_z3b = [];
+
+function checkZ3b() {
+  const words = placed_z3b.map(p => p.word);
+  const fb = document.getElementById('fb-z3b');
+  if (JSON.stringify(words) === JSON.stringify(ANSWER_Z3B)) {
+    fb.innerHTML = '<div class="fb-ok">✓ Feeling + because + reason. That\'s Gold level!</div>';
+    sndCorrect();
+    document.getElementById('btn-z3b').textContent = 'See the full picture →';
+    document.getElementById('btn-z3b').onclick = () => goTo('s-z6');
+  } else if (!words.includes('because')) {
+    fb.innerHTML = '<div class="fb-hint">Don\'t forget "because" — it\'s the bridge.</div>';
+    sndWrong();
+  } else {
+    fb.innerHTML = '<div class="fb-hint">Try: It looks → old → because → it\'s → dirty</div>';
+    sndWrong();
+  }
+}
+
+// ══════════════════════════════════════════
+//  ZONE 6 — Pyramid reveal
+// ══════════════════════════════════════════
+function runPyramidReveal() {
+  const tiers = ['pt-bronze','pt-silver','pt-gold'];
+  const sentences = [
+    'It\'s a bag.',
+    'It\'s a big, flat, black bag. It has a zip.',
+    'It looks old because it\'s dirty.'
+  ];
+  tiers.forEach((id, i) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('show');
+      sndSnap();
+      speak(sentences[i]);
+    }, i * 1000);
+  });
+}
+
+// ══════════════════════════════════════════
+//  CELEBRATE
+// ══════════════════════════════════════════
+function runCelebrate() {
+  sndCelebrate();
+  spawnConfetti();
+  // Animate icon
+  const icon = document.getElementById('cel-icon');
+  icon.style.animation = 'none';
+  void icon.offsetWidth;
+  icon.style.animation = 'bounce-in .5s cubic-bezier(0.34,1.56,0.64,1) both';
+}
+
+function spawnConfetti() {
+  const wrap = document.getElementById('confetti');
+  wrap.innerHTML = '';
+  const cols = ['#e8734a','#c9a84c','#5a9e7c','#3b72d4','#7c5cbf','#f472b6'];
+  for (let i = 0; i < 50; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-dot';
+    const dur = 1.2 + Math.random() * 1.2;
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      top:-12px;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      width:${6+Math.random()*6}px;
+      height:${6+Math.random()*6}px;
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      animation-duration:${dur}s;
+      animation-delay:${Math.random()*.6}s;
+    `;
+    wrap.appendChild(el);
+  }
+}
+
+// ══════════════════════════════════════════
+//  UNIVERSAL TILE SYSTEM
+// ══════════════════════════════════════════
+const placedMap = { z1: [], z2: [], z3b: [] };
+// Expose globals for check functions
+Object.defineProperty(window, 'placed_z1',  { get: () => placedMap.z1 });
+Object.defineProperty(window, 'placed_z2',  { get: () => placedMap.z2 });
+Object.defineProperty(window, 'placed_z3b', { get: () => placedMap.z3b });
+
+function tapTile(btn, zone, word, display) {
+  if (btn.classList.contains('used')) return;
+  sndTap();
+  btn.classList.add('used');
+
+  const drop = document.getElementById('drop-' + zone);
+  const bank = document.getElementById('bank-' + zone);
+
+  // Clear placeholder
+  const ph = drop.querySelector('span');
+  if (ph) ph.remove();
+
+  // Get tile colour class
+  const colClass = [...btn.classList].find(c => c.startsWith('t-')) || 't-def';
+  const colMap = {
+    't-def':'var(--tdef)', 't-noun':'var(--tn)', 't-colour':'var(--tc)',
+    't-size':'var(--ts)', 't-shape':'var(--tsh)', 't-detail':'var(--td)',
+    't-reason':'var(--tr)'
+  };
+  const bg = colMap[colClass] || 'var(--tdef)';
+
+  const placed = document.createElement('div');
+  placed.className = 'placed-tile';
+  placed.style.background = bg;
+  placed.dataset.word = word;
+  placed.dataset.bankId = btn.id || '';
+  placed.innerHTML = `${display} <span class="px">✕</span>`;
+  placed.onclick = () => {
+    placed.remove();
+    placedMap[zone] = placedMap[zone].filter(p => p.word !== word || p.el !== placed);
+    btn.classList.remove('used');
+    if (!drop.querySelector('.placed-tile')) {
+      drop.innerHTML = '<span style="font-size:13px;color:var(--ink2)">Tap words below →</span>';
+      drop.classList.remove('has-tiles','ok','bad');
+    }
+    // Clear feedback
+    const fb = document.getElementById('fb-' + zone);
+    if (fb) fb.innerHTML = '';
+  };
+
+  drop.appendChild(placed);
+  drop.classList.add('has-tiles');
+  placedMap[zone].push({ word, el: placed });
+}
+
+// ══════════════════════════════════════════
+//  RECORDING (stub — real MediaRecorder hook)
+// ══════════════════════════════════════════
+const recState = {};
+function toggleRecord(zone) {
+  const btn = document.getElementById('rec-btn-' + zone);
+  const wave = document.getElementById('wave-' + zone);
+  if (!recState[zone]) {
+    recState[zone] = true;
+    btn.classList.add('recording');
+    btn.textContent = '⏹ Stop';
+    wave.classList.add('active');
+  } else {
+    recState[zone] = false;
+    btn.classList.remove('recording');
+    btn.textContent = '🎤 Record';
+    wave.classList.remove('active');
+    // Enable play button
+    const playBtn = document.getElementById('play-rec-' + zone);
+    if (playBtn) { playBtn.style.opacity = '1'; playBtn.style.pointerEvents = 'all'; }
+  }
+}
+function playRecording(zone) {
+  // Stub — plays model audio as proxy until MediaRecorder wired
+  speak('It\'s a big, flat, black bag.');
+}
+
+// ══════════════════════════════════════════
+//  GITHUB PUSH PIPELINE
+// ══════════════════════════════════════════
+const REPO  = 'redskin106/lesson-a';
+const BRANCH = 'main';
+const PAT = localStorage.getItem('ghPAT') || '';
+
+async function pushFile(path, content, message) {
+  const api = `https://api.github.com/repos/${REPO}/contents/${path}`;
+  // Get current SHA if file exists
+  let sha;
+  try {
+    const r = await fetch(api, { headers: { Authorization: `token ${PAT}` } });
+    if (r.ok) { const d = await r.json(); sha = d.sha; }
+  } catch(e) {}
+
+  const body = { message, content: btoa(unescape(encodeURIComponent(content))), branch: BRANCH };
+  if (sha) body.sha = sha;
+
+  const res = await fetch(api, {
+    method: 'PUT',
+    headers: { Authorization: `token ${PAT}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return res.ok;
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+window.addEventListener('load', () => {
+  voices = synth.getVoices();
+  updateProgress();
+  // Zone 0 auto-start
+  setTimeout(initZ0, 400);
+});
+</script>
+</body>
+</html>
