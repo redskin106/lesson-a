@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Filmmaker's deck</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--surface:#141414;--surface2:#1e1e1e;
+  --border:rgba(255,255,255,0.07);--text:#f0ede8;--muted:#666;--amber:#F5C842;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;}
+
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0;flex-shrink:0;}
+.hdr-left{display:flex;flex-direction:column;gap:1px}
+.hdr-title{font-size:11px;letter-spacing:0.1em;color:var(--muted);font-weight:500}
+.hdr-sub{font-size:10px;color:#444}
+.hdr-count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.tabs{display:flex;gap:5px;padding:10px 18px 0;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.tab.active{background:var(--amber);color:#080808;border-color:var(--amber);font-weight:600}
+
+.deck{flex:1;position:relative;padding:10px 18px 0;overflow:hidden;min-height:0}
+
+.card{
+  position:absolute;inset:0;margin:0 18px;
+  background:var(--surface);border-radius:16px;overflow:hidden;
+  display:flex;flex-direction:column;
+  opacity:0;transform:translateX(56px);
+  transition:opacity 0.2s ease,transform 0.2s ease;
+  pointer-events:none;border:0.5px solid var(--border);
+}
+.card.active{opacity:1;transform:translateX(0);pointer-events:all}
+.card.exit-left{opacity:0;transform:translateX(-56px)}
+.card.exit-right{opacity:0;transform:translateX(56px)}
+
+/* Photo top half */
+.photo-wrap{position:relative;flex-shrink:0;height:52%;overflow:hidden;}
+.photo-wrap img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block;transition:opacity 0.3s;}
+.photo-wrap img.loading{opacity:0}
+.photo-credit{position:absolute;bottom:6px;right:8px;font-size:9px;color:rgba(255,255,255,0.3);font-style:italic;pointer-events:none;}
+.photo-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:32px 16px 10px;
+  background:linear-gradient(to top,rgba(8,8,8,0.95) 0%,transparent 100%);
+}
+.card-name{font-size:22px;font-weight:700;letter-spacing:-0.02em;line-height:1.1;color:#fff;margin-bottom:3px;}
+.card-mood{font-size:11px;font-weight:500;}
+
+/* Video top half — clickable thumbnail */
+.video-wrap{position:relative;flex-shrink:0;height:52%;overflow:hidden;background:#000;cursor:pointer;}
+.video-wrap img.vthumb{width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.2s;}
+.video-wrap:hover img.vthumb{opacity:0.85;}
+.play-btn{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(8,8,8,0.75);border:2px solid rgba(255,255,255,0.8);
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.play-btn svg{width:22px;height:22px;fill:#fff;margin-left:3px;}
+.video-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:28px 16px 10px;
+  background:linear-gradient(to top,rgba(8,8,8,0.95) 0%,transparent 100%);
+  pointer-events:none;
+}
+
+/* Body */
+.card-body{flex:1;overflow-y:auto;scrollbar-width:none;padding:11px 16px 10px;display:flex;flex-direction:column;gap:7px;min-height:0;}
+.card-body::-webkit-scrollbar{display:none}
+.card-cat{font-size:10px;letter-spacing:0.1em;color:var(--muted);}
+.expl-en{font-size:13px;line-height:1.55;color:rgba(240,237,232,0.75);}
+
+.translate-btn{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:5px 11px;cursor:pointer;align-self:flex-start;transition:border-color 0.12s;}
+.translate-btn:hover{border-color:rgba(255,255,255,0.18)}
+.translation-box{display:none;background:rgba(245,200,66,0.08);border:0.5px solid rgba(245,200,66,0.18);border-radius:10px;padding:10px 13px;}
+.translation-box.show{display:block}
+.lang-tabs{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;}
+.lang-tab{font-size:10px;padding:3px 8px;border-radius:12px;border:0.5px solid rgba(245,200,66,0.2);background:transparent;color:rgba(245,200,66,0.5);cursor:pointer;transition:all 0.12s;}
+.lang-tab.active{background:var(--amber);color:#080808;border-color:var(--amber);font-weight:600}
+.t-text{font-size:13px;color:var(--amber);line-height:1.6;min-height:18px;}
+.t-text[dir="rtl"]{text-align:right;font-size:14px;}
+
+.vids{display:flex;flex-direction:column;gap:6px;}
+.vid-btn{display:flex;align-items:center;gap:10px;background:var(--surface2);border:0.5px solid var(--border);border-radius:10px;padding:9px 12px;text-decoration:none;color:var(--text);transition:border-color 0.12s;}
+.vid-btn:hover{border-color:rgba(255,255,255,0.18)}
+.vid-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;}
+.vid-icon.how{background:rgba(245,200,66,0.12);}
+.vid-icon.film{background:rgba(255,255,255,0.06);}
+.vid-label{font-size:9px;color:var(--muted);margin-bottom:1px;}
+.vid-title{font-size:11px;font-weight:500;line-height:1.3;}
+
+.nav{display:flex;align-items:center;justify-content:space-between;padding:8px 18px 16px;flex-shrink:0;}
+.nav-btn{width:44px;height:44px;border-radius:50%;border:0.5px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+.nav-btn:hover{border-color:rgba(255,255,255,0.2);background:var(--surface2)}
+.nav-btn:disabled{opacity:0.2;cursor:default}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:4px;height:4px;border-radius:50%;background:var(--muted);opacity:0.3;transition:all 0.15s;}
+.dot.active{opacity:1;background:var(--amber);transform:scale(1.6);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <span class="hdr-title">Filmmaker's deck</span>
+    <span class="hdr-sub">Shots · Angles · Movement · Sequences</span>
+  </div>
+  <span class="hdr-count" id="counter">1 / 1</span>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="deck" id="deck"></div>
+<nav class="nav">
+  <button class="nav-btn" id="prev">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="next">→</button>
+</nav>
+
+<script>
+const LANGS=[
+  {code:'th',label:'ไทย',dir:'ltr'},
+  {code:'km',label:'ខ្មែរ',dir:'ltr'},
+  {code:'vi',label:'Việt',dir:'ltr'},
+  {code:'ur',label:'اردو',dir:'rtl'},
+];
+
+// mediaType: 'photo' = Unsplash image, 'video' = embedded YouTube
+const cards=[
+
+// ── SHOT SIZES ───────────────────────────────────────────────────────────────
+{
+  cat:'Shot size',name:'Wide shot',abbr:'WS',
+  mood:'space · alone · context',moodColor:'#67e8f9',
+  en:'Show the whole place. The person looks small. Use this to start a scene.',
+  mediaType:'photo',photo:'1610918814907-6e7c6d566828',credit:'Samuel Heuberger Reichert',
+  translations:{
+    th:'แสดงทั้งสถานที่ คนดูเล็ก ใช้เปิดฉาก',
+    km:'បង្ហាញទីកន្លែងទាំងមូល។ មនុស្សមើលទៅតូច។ ប្រើវាដើម្បីចាប់ផ្តើមមួយឈុត។',
+    vi:'Hiện toàn bộ khung cảnh. Người trông nhỏ bé. Dùng để mở đầu cảnh quay.',
+    ur:'پوری جگہ دکھاتا ہے۔ انسان چھوٹا لگتا ہے۔ سین شروع کرنے کے لیے استعمال کریں۔',
+  },
+  how:{label:'3 Wide Shots Every Filmmaker Needs',url:'https://www.youtube.com/watch?v=VwbSxxm6skM'},
+  film:{label:'Lawrence of Arabia — epic wide shot (Lean, 1962)',url:'https://www.youtube.com/watch?v=RwT7hYcmJLQ'},
+},
+{
+  cat:'Shot size',name:'Medium shot',abbr:'MS',
+  mood:'natural · conversation · normal',moodColor:'#67e8f9',
+  en:'Waist up. The everyday shot. Use for talking, working, most scenes.',
+  mediaType:'photo',photo:'1744986924413-1c971922408d',credit:'Valentina Kondrasyuk',
+  translations:{
+    th:'ถ่ายจากเอวขึ้นไป ใช้สำหรับการพูดคุยและฉากทั่วไป',
+    km:'ពីចង្កេះឡើងទៅ។ ប្រើសម្រាប់ការនិយាយ ការងារ ឈុតភាគច្រើន។',
+    vi:'Từ thắt lưng trở lên. Dùng cho cảnh trò chuyện, làm việc.',
+    ur:'کمر سے اوپر۔ بات چیت اور زیادہ تر مناظر کے لیے استعمال کریں۔',
+  },
+  how:{label:'Medium Shot in Film — examples explained',url:'https://www.youtube.com/watch?v=dQV2-6_0ZeY'},
+  film:{label:'Whiplash — audition scene (Chazelle, 2014)',url:'https://www.youtube.com/watch?v=OMDZa5WRczI'},
+},
+{
+  cat:'Shot size',name:'Close-up',abbr:'CU',
+  mood:'emotion · personal · we care',moodColor:'#818cf8',
+  en:'Just the face. The audience feels what the character feels.',
+  mediaType:'photo',photo:'1672530928133-aadb40761356',credit:'Ali Kazal',
+  translations:{
+    th:'เห็นแค่ใบหน้า ผู้ชมรู้สึกตามตัวละคร',
+    km:'តែមុខប៉ុណ្ណោះ។ អ្នកទស្សនារូបអារម្មណ៍អ្វីដែលតួអង្គមានអារម្មណ៍។',
+    vi:'Chỉ thấy khuôn mặt. Khán giả cảm nhận điều nhân vật cảm nhận.',
+    ur:'صرف چہرہ۔ ناظرین وہی محسوس کرتے ہیں جو کردار کرتا ہے۔',
+  },
+  how:{label:'Close-up Shots — Ultimate Guide with film examples',url:'https://www.youtube.com/watch?v=VfaZXlJso-s'},
+  film:{label:'Spirited Away — Chihiro reacts (Miyazaki, 2001)',url:'https://www.youtube.com/watch?v=ByXuk9QqQkk'},
+},
+{
+  cat:'Shot size',name:'Extreme close-up',abbr:'ECU',
+  mood:'intense · secret · uncomfortable',moodColor:'#f87171',
+  en:'Fill the frame with one detail — an eye, a hand. Creates tension.',
+  mediaType:'photo',photo:'1607283339784-c73ff8195c0e',credit:'Umesh Soni',
+  translations:{
+    th:'ถ่ายเฉพาะรายละเอียด เช่น ดวงตา สร้างความตึงเครียด',
+    km:'បំពេញស៊ុមជាមួយព័ត៌មានលម្អិតមួយ — ភ្នែក ដៃ។ បង្កើតភាពតានតឹង។',
+    vi:'Lấp đầy khung hình bằng một chi tiết — mắt, bàn tay. Tạo sự căng thẳng.',
+    ur:'فریم کو ایک تفصیل سے بھریں — آنکھ، ہاتھ۔ تناؤ پیدا کرتا ہے۔',
+  },
+  how:{label:'All Shot Types Explained with film examples',url:'https://www.youtube.com/watch?v=G32ooHdtz-8'},
+  film:{label:'The Good the Bad and the Ugly — final duel (Leone)',url:'https://www.youtube.com/watch?v=WCN5JJY_ESA'},
+},
+
+// ── ANGLES ───────────────────────────────────────────────────────────────────
+{
+  cat:'Angle',name:'Low angle',abbr:'LA',
+  mood:'powerful · scary · big',moodColor:'#f87171',
+  en:'Camera on the floor looking up. Everything looks powerful and large.',
+  mediaType:'photo',photo:'1610124734968-a52252d732e4',credit:'Kristopher Villa',
+  translations:{
+    th:'กล้องบนพื้นมองขึ้น ทุกอย่างดูทรงพลังและใหญ่โต',
+    km:'កាមេរ៉ានៅលើកំរាលឥដ្ឋ មើលឡើង។ អ្វីៗទាំងអស់មើលទៅមានឥទ្ធិពល។',
+    vi:'Máy quay trên sàn nhìn lên. Mọi thứ trông mạnh mẽ và to lớn.',
+    ur:'کیمرہ فرش پر اوپر دیکھ رہا ہے۔ ہر چیز طاقتور اور بڑی لگتی ہے۔',
+  },
+  how:{label:'Camera Angles in Film — High vs Low explained',url:'https://www.youtube.com/watch?v=sDZ6KlzWjAQ'},
+  film:{label:'Parasite — low angle status scenes (Bong, 2019)',url:'https://www.youtube.com/watch?v=isOGD_7hNIY'},
+},
+{
+  cat:'Angle',name:'High angle',abbr:'HA',
+  mood:'small · weak · watched',moodColor:'#818cf8',
+  en:'Camera above looking down. The subject looks small and vulnerable.',
+  mediaType:'photo',photo:'1668376189009-e7cebd22152b',credit:'Dollar Gill',
+  translations:{
+    th:'กล้องอยู่สูงมองลงมา ตัวแบบดูเล็กและเปราะบาง',
+    km:'កាមេរ៉ានៅខ្ពស់ មើលចុះ។ ប្រធានបទមើលទៅតូច និងងាយរងគ្រោះ។',
+    vi:'Máy quay ở trên cao nhìn xuống. Chủ thể trông nhỏ bé và dễ tổn thương.',
+    ur:'کیمرہ اوپر سے نیچے دیکھ رہا ہے۔ موضوع چھوٹا اور بے بس لگتا ہے۔',
+  },
+  how:{label:'Camera Angles in Film — High vs Low explained',url:'https://www.youtube.com/watch?v=sDZ6KlzWjAQ'},
+  film:{label:'Parasite — the flood scene (Bong Joon-ho, 2019)',url:'https://www.youtube.com/watch?v=isOGD_7hNIY'},
+},
+{
+  cat:'Angle',name:'Dutch angle',abbr:'DA',
+  mood:'wrong · unstable · danger',moodColor:'#f87171',
+  en:'Tilt the phone. Everything feels wrong. Use for danger or confusion.',
+  mediaType:'photo',photo:'1645273603365-659e5622ea78',credit:'Risto Kokkonen',photoPosition:'center 20%',
+  translations:{
+    th:'เอียงโทรศัพท์ ทุกอย่างรู้สึกไม่ถูกต้อง ใช้แสดงอันตราย',
+    km:'ទ្រេតទូរស័ព្ទ។ អ្វីៗទាំងអស់មានអារម្មណ៍ខុស។ ប្រើសម្រាប់គ្រោះថ្នាក់។',
+    vi:'Nghiêng điện thoại. Mọi thứ đều cảm thấy sai. Dùng cho nguy hiểm.',
+    ur:'فون کو جھکائیں۔ سب کچھ غلط لگتا ہے۔ خطرے کے لیے استعمال کریں۔',
+  },
+  how:{label:'What is a Dutch Angle? — explained with examples',url:'https://www.youtube.com/watch?v=3P1p5kULnIs'},
+  film:{label:'Why filmmakers use the Dutch angle',url:'https://www.youtube.com/watch?v=5JhYnJfNbfw'},
+},
+{
+  cat:'Angle',name:'Point of view',abbr:'POV',
+  mood:'suspense · empathy · inside',moodColor:'#818cf8',
+  en:'We see exactly what the character sees. The audience becomes them.',
+  mediaType:'photo',photo:'1568577108208-96e17a956a29',credit:'Nassim Wahba',
+  translations:{
+    th:'เราเห็นสิ่งที่ตัวละครเห็น ผู้ชมกลายเป็นตัวละคร',
+    km:'យើងឃើញអ្វីដែលតួអង្គឃើញ។ អ្នកទស្សនារូបក្លាយជាពួកគេ។',
+    vi:'Chúng ta thấy đúng những gì nhân vật thấy. Khán giả trở thành họ.',
+    ur:'ہم وہی دیکھتے ہیں جو کردار دیکھتا ہے۔ ناظرین کردار بن جاتے ہیں۔',
+  },
+  how:{label:'The Kuleshov Effect — original experiment',url:'https://www.youtube.com/watch?v=6KJ82pSXdTA'},
+  film:{label:'Kuleshov effect — face looks, we see, face reacts',url:'https://www.youtube.com/watch?v=6KJ82pSXdTA'},
+},
+
+// ── MOVEMENT ─────────────────────────────────────────────────────────────────
+{
+  cat:'Movement',name:'Pan',abbr:'PAN',
+  mood:'reveal · follow · survey',moodColor:'#86efac',
+  en:'Camera stays still, rotates left or right. Follow movement or reveal a space.',
+  mediaType:'video',videoId:'I6Tb-oltJSE',
+  translations:{
+    th:'กล้องนิ่งอยู่กับที่ หมุนซ้ายหรือขวา ตามการเคลื่อนไหว',
+    km:'កាមេរ៉ានៅស្ងៀម បង្វិលឆ្វេង ឬស្ដាំ។ តាមចលនា ឬបង្ហាញចន្លោះ។',
+    vi:'Máy quay đứng yên, xoay sang trái hoặc phải.',
+    ur:'کیمرہ جگہ پر رہتا ہے، بائیں یا دائیں گھومتا ہے۔',
+  },
+  how:{label:'Panning & Tilting — Ultimate Guide',url:'https://www.youtube.com/watch?v=iAZvLA_K94w'},
+  film:{label:'Pan shots — The Royal Tenenbaums',url:'https://www.youtube.com/watch?v=I6Tb-oltJSE'},
+},
+{
+  cat:'Movement',name:'Tilt',abbr:'TILT',
+  mood:'scale · grandeur · reveal',moodColor:'#86efac',
+  en:'Camera stays still, rotates up or down. Shows height and scale.',
+  mediaType:'video',videoId:'wG49Htk6D7s',
+  translations:{
+    th:'กล้องนิ่งอยู่กับที่ หมุนขึ้นหรือลง แสดงความสูงและขนาด',
+    km:'កាមេរ៉ានៅស្ងៀម បង្វិលឡើង ឬចុះ។ បង្ហាញកម្ពស់ និងទំហំ។',
+    vi:'Máy quay đứng yên, xoay lên hoặc xuống. Thể hiện chiều cao.',
+    ur:'کیمرہ جگہ پر رہتا ہے، اوپر یا نیچے گھومتا ہے۔ اونچائی دکھاتا ہے۔',
+  },
+  how:{label:'Panning & Tilting — Ultimate Guide',url:'https://www.youtube.com/watch?v=iAZvLA_K94w'},
+  film:{label:'Tilt shot — Blade Runner 2049',url:'https://www.youtube.com/watch?v=wG49Htk6D7s'},
+},
+{
+  cat:'Movement',name:'Tracking shot',abbr:'TRACK',
+  mood:'intimate · follow · urgent',moodColor:'#fbbf24',
+  en:'Camera walks with the subject. We go with them. Creates energy and closeness.',
+  mediaType:'video',videoId:'IBMKyNJvNV8',
+  translations:{
+    th:'กล้องเดินตามตัวแบบ เราไปด้วยกัน สร้างพลังงานและความใกล้ชิด',
+    km:'កាមេរ៉ាដើរជាមួយប្រធានបទ។ យើងទៅជាមួយពួកគេ។ បង្កើតថាមពល។',
+    vi:'Máy quay đi cùng nhân vật. Chúng ta đi cùng họ. Tạo năng lượng.',
+    ur:'کیمرہ موضوع کے ساتھ چلتا ہے۔ ہم ان کے ساتھ جاتے ہیں۔',
+  },
+  how:{label:'Tracking vs Pan shots — the difference',url:'https://www.youtube.com/watch?v=z-4BBLjNC3U'},
+  film:{label:'The Copacabana tracking shot — Goodfellas',url:'https://www.youtube.com/watch?v=IBMKyNJvNV8'},
+},
+
+// ── SEQUENCES ────────────────────────────────────────────────────────────────
+{
+  cat:'Sequence',name:'3-shot sequence',abbr:'W→M→CU',
+  mood:'context · character · detail',moodColor:'#67e8f9',
+  en:'Wide → Medium → Close-up. Answer three questions: Where? Who? What matters?',
+  mediaType:'video',videoId:'4uoJROcDk7s',isShort:true,
+  translations:{
+    th:'ไวด์ → มีเดียม → โคลสอัพ ตอบสามคำถาม: ที่ไหน? ใคร? อะไรสำคัญ?',
+    km:'ទូលាយ → មធ្យម → ក្រៅ។ ឆ្លើយសំណួរបី: នៅឯណា? អ្នកណា? អ្វីដែលសំខាន់?',
+    vi:'Rộng → Trung → Cận. Trả lời ba câu hỏi: Ở đâu? Ai? Điều gì quan trọng?',
+    ur:'چوڑا → درمیانی → قریب۔ تین سوالوں کے جواب: کہاں؟ کون؟ کیا اہم ہے؟',
+  },
+  how:{label:'The only 3 shots you need to make a cinematic film',url:'https://www.youtube.com/watch?v=Ewj3kGbR1NY'},
+  film:{label:'Simple 3-shot sequence — how to shoot it',url:'https://www.youtube.com/shorts/4uoJROcDk7s'},
+},
+{
+  cat:'Sequence',name:'Tighten in',abbr:'WS→ECU',
+  mood:'tension · trapped · no escape',moodColor:'#f87171',
+  en:'Start wide, cut closer and closer. The audience feels more trapped each cut.',
+  mediaType:'video',videoId:'OMDZa5WRczI',
+  translations:{
+    th:'เริ่มไวด์ ตัดให้ใกล้ขึ้นเรื่อยๆ ผู้ชมรู้สึกอึดอัดขึ้นทุกการตัด',
+    km:'ចាប់ផ្តើមទូលាយ កាត់ឱ្យកាន់តែជិត។ អ្នកទស្សនារូបអារម្មណ៍ចាប់ជាប់ជាងនៅការកាត់នីមួយៗ។',
+    vi:'Bắt đầu rộng, cắt gần hơn và gần hơn. Khán giả cảm thấy bị giam cầm hơn.',
+    ur:'چوڑے سے شروع کریں، قریب سے قریب تر کاٹیں۔ ناظرین زیادہ پھنسا محسوس کرتے ہیں۔',
+  },
+  how:{label:'The Pro Editor\'s Trick to Build Tension',url:'https://www.youtube.com/watch?v=Y04EVCC6D4o'},
+  film:{label:'Whiplash — opening scene tightens wide to ECU',url:'https://www.youtube.com/watch?v=OMDZa5WRczI'},
+},
+{
+  cat:'Sequence',name:'Before → After',abbr:'B→A',
+  mood:'change · story · time passing',moodColor:'#818cf8',
+  en:'Same place. Two shots. Something changed. The audience writes the story.',
+  mediaType:'photo',photo:'1610918814907-6e7c6d566828',credit:'Samuel Heuberger Reichert',
+  translations:{
+    th:'สถานที่เดิม สองช็อต มีบางอย่างเปลี่ยนไป ผู้ชมเขียนเรื่องราวเอง',
+    km:'កន្លែងដូចគ្នា។ បាញ់ពីរ។ អ្វីមួយបានផ្លាស់ប្តូរ។ អ្នកទស្សនាសរសេររឿង។',
+    vi:'Cùng một nơi. Hai cảnh quay. Có gì đó đã thay đổi. Khán giả tự viết câu chuyện.',
+    ur:'ایک ہی جگہ۔ دو شاٹس۔ کچھ بدل گیا۔ ناظرین خود کہانی لکھتے ہیں۔',
+  },
+  how:{label:'Why simple storytelling makes better videos',url:'https://www.youtube.com/watch?v=UPtkVL0CrLU'},
+  film:{label:'5 Easy Editing Tricks for Powerful Storytelling',url:'https://www.youtube.com/watch?v=yQK4bjoxO1w'},
+},
+{
+  cat:'Sequence',name:'Speed ramp',abbr:'RAMP',
+  mood:'impact · drama · style',moodColor:'#fbbf24',
+  en:'The shot slows down then speeds up. Makes any moment feel cinematic.',
+  mediaType:'video',videoId:'7ARFyrM6gVs',
+  translations:{
+    th:'ภาพช้าลงแล้วเร็วขึ้น ทำให้ทุกช่วงเวลาดูเหมือนภาพยนตร์',
+    km:'រូបភាពយឺតចុះ ហើយលឿនឡើង។ ធ្វើឱ្យរឿងណាមួយមានអារម្មណ៍ដូចជាភាពយន្ត។',
+    vi:'Cảnh chậm lại rồi tăng tốc. Làm cho bất kỳ khoảnh khắc nào cũng trở nên điện ảnh.',
+    ur:'شاٹ سست ہوتا ہے پھر تیز ہوتا ہے۔ کسی بھی لمحے کو سینماٹک بناتا ہے۔',
+  },
+  how:{label:'CapCut Speed Ramp Tutorial — beginner 2024',url:'https://www.youtube.com/watch?v=6atiIPeYrzQ'},
+  film:{label:'Baby Driver — opening scene (pure speed ramp)',url:'https://www.youtube.com/watch?v=7ARFyrM6gVs'},
+},
+];
+
+// ── APP ───────────────────────────────────────────────────────────────────────
+const CATS=['All',...new Set(cards.map(c=>c.cat))];
+let currentCat='All',filtered=cards,idx=0,animating=false;
+
+function getFiltered(){return currentCat==='All'?cards:cards.filter(c=>c.cat===currentCat);}
+
+function mediaHTML(c){
+  if(c.mediaType==='video'){
+    const thumb=`https://img.youtube.com/vi/${c.videoId}/hqdefault.jpg`;
+    const ytUrl=c.isShort?`https://www.youtube.com/shorts/${c.videoId}`:`https://www.youtube.com/watch?v=${c.videoId}`;
+    return `<div class="video-wrap" onclick="window.open('${ytUrl}','_blank')">
+      <img class="vthumb" src="${thumb}" alt="${c.name}">
+      <div class="play-btn"><svg viewBox="0 0 16 16"><path d="M3 2l10 6-10 6V2z"/></svg></div>
+      <div class="video-label">
+        <div class="card-name">${c.name}</div>
+        <div class="card-mood" style="color:${c.moodColor}">${c.mood}</div>
+      </div>
+    </div>`;
+  }
+  const url=`https://images.unsplash.com/photo-${c.photo}?w=800&q=80&fit=crop&auto=format`;
+  const pos=c.photoPosition||'center center';
+  return `<div class="photo-wrap">
+    <img src="${url}" alt="${c.name}" class="loading" style="object-position:${pos}"
+         onload="this.classList.remove('loading')"
+         onerror="this.style.background='#1a1a1a'">
+    <div class="photo-credit">${c.credit} / Unsplash</div>
+    <div class="photo-label">
+      <div class="card-name">${c.name}</div>
+      <div class="card-mood" style="color:${c.moodColor}">${c.mood}</div>
+    </div>
+  </div>`;
+}
+
+function cardHTML(c){
+  const langs=LANGS.map(l=>`<button class="lang-tab" data-code="${l.code}" data-dir="${l.dir}">${l.label}</button>`).join('');
+  return `
+    ${mediaHTML(c)}
+    <div class="card-body">
+      <div class="card-cat">${c.cat}</div>
+      <div class="expl-en">${c.en}</div>
+      <button class="translate-btn" onclick="toggleTr(this)"><span>🌐</span><span class="tl"> Translate</span></button>
+      <div class="translation-box">
+        <div class="lang-tabs">${langs}</div>
+        <div class="t-text"></div>
+      </div>
+      <div class="vids">
+        <a class="vid-btn" href="${c.how.url}" target="_blank" rel="noopener">
+          <div class="vid-icon how">📱</div>
+          <div><div class="vid-label">How to shoot it</div><div class="vid-title">${c.how.label}</div></div>
+        </a>
+        <a class="vid-btn" href="${c.film.url}" target="_blank" rel="noopener">
+          <div class="vid-icon film">🎬</div>
+          <div><div class="vid-label">In a real film</div><div class="vid-title">${c.film.label}</div></div>
+        </a>
+      </div>
+    </div>`;
+}
+
+function toggleTr(btn){
+  const box=btn.nextElementSibling;
+  const show=box.classList.toggle('show');
+  btn.querySelector('span').textContent=show?'✕':'🌐';
+  btn.querySelector('.tl').textContent=show?' Hide':' Translate';
+  if(show&&!box.querySelector('.lang-tab.active'))selectLang(box.querySelector('.lang-tab'));
+}
+
+function selectLang(tab){
+  const box=tab.closest('.translation-box');
+  box.querySelectorAll('.lang-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  const tt=box.querySelector('.t-text');
+  tt.textContent=filtered[idx].translations[tab.dataset.code]||'';
+  tt.dir=tab.dataset.dir;
+}
+
+document.addEventListener('click',e=>{if(e.target.classList.contains('lang-tab'))selectLang(e.target);});
+
+function renderDeck(){
+  const deck=document.getElementById('deck');
+  deck.innerHTML='';
+  filtered.forEach((c,i)=>{
+    const el=document.createElement('div');
+    el.className='card'+(i===idx?' active':'');
+    el.innerHTML=cardHTML(c);
+    deck.appendChild(el);
+  });
+  document.getElementById('dots').innerHTML=filtered.map((_,i)=>`<div class="dot${i===idx?' active':''}"></div>`).join('');
+  document.getElementById('counter').textContent=`${idx+1} / ${filtered.length}`;
+  document.getElementById('prev').disabled=idx===0;
+  document.getElementById('next').disabled=idx===filtered.length-1;
+}
+
+function renderTabs(){
+  document.getElementById('tabs').innerHTML=CATS.map(c=>
+    `<button class="tab${c===currentCat?' active':''}" onclick="setcat('${c}')">${c}</button>`
+  ).join('');
+}
+
+function setcat(cat){currentCat=cat;filtered=getFiltered();idx=0;renderDeck();renderTabs();}
+
+function goTo(to,dir){
+  if(animating||to<0||to>=filtered.length)return;
+  animating=true;
+  const cs=document.querySelectorAll('.card');
+  const out=dir==='next'?'exit-left':'exit-right';
+  cs[idx].classList.remove('active');cs[idx].classList.add(out);
+  setTimeout(()=>{
+    cs[idx].classList.remove(out);idx=to;
+    cs[idx].classList.add('active');
+    cs[idx].querySelector('.card-body').scrollTop=0;
+    document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+    document.getElementById('counter').textContent=`${idx+1} / ${filtered.length}`;
+    document.getElementById('prev').disabled=idx===0;
+    document.getElementById('next').disabled=idx===filtered.length-1;
+    animating=false;
+  },200);
+}
+
+document.getElementById('prev').onclick=()=>goTo(idx-1,'prev');
+document.getElementById('next').onclick=()=>goTo(idx+1,'next');
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')goTo(idx+1,'next');if(e.key==='ArrowLeft')goTo(idx-1,'prev');});
+
+let tx=0;
+document.getElementById('deck').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.getElementById('deck').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>45)dx<0?goTo(idx+1,'next'):goTo(idx-1,'prev');
+},{passive:true});
+
+renderTabs();renderDeck();
+</script>
+</body>
+</html>
