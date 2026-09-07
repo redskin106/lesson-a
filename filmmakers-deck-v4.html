@@ -223,7 +223,7 @@ const cards=[
   cat:'Angle',name:'Dutch angle',abbr:'DA',
   mood:'wrong · unstable · danger',moodColor:'#f87171',
   en:'Tilt the phone. Everything feels wrong. Use for danger or confusion.',
-  mediaType:'photo',photo:'1645273603365-659e5622ea78',credit:'Risto Kokkonen',photoPosition:'center bottom',
+  mediaType:'photo',photo:'1645273603365-659e5622ea78',credit:'Risto Kokkonen',photoFit:'contain',
   translations:{
     th:'เอียงโทรศัพท์ ทุกอย่างรู้สึกไม่ถูกต้อง ใช้แสดงอันตราย',
     km:'ទ្រេតទូរស័ព្ទ។ អ្វីៗទាំងអស់មានអារម្មណ៍ខុស។ ប្រើសម្រាប់គ្រោះថ្នាក់។',
@@ -372,8 +372,9 @@ function mediaHTML(c){
   }
   const url=`https://images.unsplash.com/photo-${c.photo}?w=800&q=80&fit=crop&auto=format`;
   const pos=c.photoPosition||'center center';
-  return `<div class="photo-wrap">
-    <img src="${url}" alt="${c.name}" class="loading" style="object-position:${pos}"
+  const fit=c.photoFit||'cover';
+  return `<div class="photo-wrap" style="${c.photoFit==='contain'?'background:#0a0a0a':''}">
+    <img src="${url}" alt="${c.name}" class="loading" style="object-fit:${fit};object-position:${pos}"
          onload="this.classList.remove('loading')"
          onerror="this.style.background='#1a1a1a'">
     <div class="photo-credit">${c.credit} / Unsplash</div>
