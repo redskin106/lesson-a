@@ -54,8 +54,9 @@
       layout.querySelectorAll('.pair-card-half, .card-col').forEach(function (hf) {
         var w = hf.getBoundingClientRect().width; if (!w) return;
         var cs = getComputedStyle(hf), on;
-        hf.classList.remove('compact');
-        on = (hf.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) < sw; hf.classList.toggle('compact', on);
+        hf.classList.remove('compact'); hf.classList.remove('tight');
+        var inner = hf.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        on = inner < sw; hf.classList.toggle('compact', on); hf.classList.toggle('tight', !on && inner < px('--col-roomy'));
         if (on) hf.querySelectorAll(':scope > details.section > summary').forEach(function (s) { if (!s.hasAttribute('aria-label')) s.setAttribute('aria-label', s.textContent.trim()); });
       });
     }

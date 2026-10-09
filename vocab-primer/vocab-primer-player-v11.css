@@ -1040,3 +1040,14 @@ summary[data-next] { border-radius: var(--r-md); padding-inline: var(--sp-md); }
 .past-lock{width:var(--icon);height:var(--icon);background:currentColor;-webkit-mask:var(--ic-lock) center/contain no-repeat;mask:var(--ic-lock) center/contain no-repeat}
 .past-bin{width:var(--ring-lg);height:var(--ring-lg);border-radius:50%;border:var(--border-w) solid var(--line);background:var(--surface-2);color:var(--fg-dim);display:grid;place-items:center;cursor:pointer;padding:0}
 .past-bin::before{content:'';width:var(--icon);height:var(--icon);background:currentColor;-webkit-mask:var(--ic-bin) center/contain no-repeat;mask:var(--ic-bin) center/contain no-repeat}
+
+/* Narrow (but not icon-only) columns: past recordings take two lines per row */
+.tight .past-row{grid-template-columns:var(--icon) minmax(0,1fr) var(--ring-lg);grid-template-areas:"n d p" "w w w";gap:var(--sp-sm);padding:var(--sp-sm)}
+.tight .past-n{grid-area:n}
+.tight .past-d{grid-area:d;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.tight .past-p{grid-area:p}
+.tight .past-w{grid-area:w}
+.tight .past-keep{flex-wrap:wrap}
+.tight .past-ic{display:none}
+.past-lbl{min-width:0;overflow-wrap:anywhere}
+.tight .past-d::before{display:none}
