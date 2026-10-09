@@ -1,0 +1,416 @@
+/* SkillsXLab design tokens
+   The only file allowed to contain raw px, hex or rgba values.
+   Every module reads these names. Change a value here and every tool follows. */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Fraunces:wght@700&display=swap');
+
+:root {
+  /* Spacing, 4px base. Nothing else is allowed. */
+  --sp-xs: 4px;
+  --bar-w: 3px;
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 32px;
+  --sp-2xl: 48px;
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+
+  /* Sizes */
+  --tap: 48px;
+  --card-min: 80px;
+  --app-max: 480px;
+  --border-w: 1.5px;
+  --dot: 16px;
+  --grid-cols: 2;
+  --rail: 440px;
+  --gap: var(--sp-md);
+  --pad: var(--sp-md);
+  --col-min: 160px;
+  --col-icon: 56px;
+  --col-switch: 165px;
+  --rail-min: 48px;
+  --img-max: 44dvh;
+  --img-scale: 1;
+
+  /* Icons. Material paths as masks, so they take any text colour. */
+  --icon: 24px;
+  --icon-lg: 28px;
+  --hair: 1px;
+  --ring-lg: 40px;
+  --ring-md: 34px;
+  --ring-sm: 30px;
+  --btn-sm: 36px;
+  --icon-audio: 18px;
+  --icon-audio-sm: 16px;
+  --icon-trio: 22px;
+  --ic-speaker: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z'/%3E%3C/svg%3E");
+  --ic-replay: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z'/%3E%3C/svg%3E");
+  --ic-flip: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 4 3 8l4 4V9h7V7H7zm10 8v3h-7v2h7v3l4-4z'/%3E%3C/svg%3E");
+  --flip-perspective: 1200px;
+  --ic-pencil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E");
+  --ic-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+  --ic-chat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E");
+  --ic-syl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5v13h17V5H4zm10 2v9h-3V7h3zM6 7h3v9H6V7zm13 9h-3V7h3v9z'/%3E%3C/svg%3E");
+  --ic-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V6h-2v12zm4-8v4h2v-4h-2z'/%3E%3C/svg%3E");
+  --ic-smile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z'/%3E%3C/svg%3E");
+  --ic-play: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+  --ic-pause: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/%3E%3C/svg%3E");
+  --ic-mic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z'/%3E%3C/svg%3E");
+  --ic-stop: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6h12v12H6z'/%3E%3C/svg%3E");
+  --ic-chev-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E");
+  --ic-cal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z'/%3E%3C/svg%3E");
+  --ic-lock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z'/%3E%3C/svg%3E");
+  --ic-bin: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/%3E%3C/svg%3E");
+  --ic-chev-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z'/%3E%3C/svg%3E");
+  --ic-globe: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z'/%3E%3C/svg%3E");
+  --sw-sky: #0788BD;
+  --sw-indigo: #4F46E5;
+  --sw-violet: #7C3AED;
+  --sw-rose: #D6336C;
+  --sw-teal: #0F7F86;
+  --sw-slate: #475569;
+  --pv-day-bg: #FAFAFA; --pv-day-surface: #FFFFFF; --pv-day-accent: #0788BD;
+  --pv-night-bg: #121212; --pv-night-surface: #2A2A2A; --pv-night-accent: #4FC3F7;
+  --pv-warm-bg: #1A1714; --pv-warm-surface: #2C2723; --pv-warm-accent: #4FC3F7;
+  --pv-ember-bg: #1A1714; --pv-ember-surface: #2C2723; --pv-ember-accent: #E8734A;
+  --pv-emberblack-bg: #000000; --pv-emberblack-surface: #1C1916; --pv-emberblack-accent: #E8734A;
+  --pv-indigonight-bg: #121212; --pv-indigonight-surface: #2A2A2A; --pv-indigonight-accent: #A5B4FC;
+  --pv-violetnight-bg: #121212; --pv-violetnight-surface: #2A2A2A; --pv-violetnight-accent: #C4B5FD;
+  --pv-roseday-bg: #FAFAFA; --pv-roseday-surface: #FFFFFF; --pv-roseday-accent: #D6336C;
+  --pv-tealday-bg: #FAFAFA; --pv-tealday-surface: #FFFFFF; --pv-tealday-accent: #0F7F86;
+  --pv-slateday-bg: #FAFAFA; --pv-slateday-surface: #FFFFFF; --pv-slateday-accent: #475569;
+  --ic-page: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z'/%3E%3C/svg%3E");
+  --ic-brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37-1.34-1.34a.996.996 0 0 0-1.41 0L9 12.25 11.75 15l8.96-8.96a.996.996 0 0 0 0-1.41z'/%3E%3C/svg%3E");
+  --ic-text: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 4v3h5.5v12h3V7H19V4z'/%3E%3C/svg%3E");
+  --ic-sun: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4.5'/%3E%3Cpath d='M11 1h2v4h-2zM11 19h2v4h-2zM1 11h4v2H1zM19 11h4v2h-4z'/%3E%3Cg transform='rotate(45 12 12)'%3E%3Cpath d='M11 1h2v4h-2zM11 19h2v4h-2zM1 11h4v2H1zM19 11h4v2h-4z'/%3E%3C/g%3E%3C/svg%3E");
+  --ic-moon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z'/%3E%3C/svg%3E");
+  --ic-auto: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18V4c4.42 0 8 3.58 8 8s-3.58 8-8 8z'/%3E%3C/svg%3E");
+  --ic-palette: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/%3E%3C/svg%3E");
+  --ic-chev-left: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z'/%3E%3C/svg%3E");
+
+  /* Phoneme tile density: width, height, font. Chosen by tile count in the CSS. */
+  --ph-w-lg: 48px;  --ph-h-lg: 56px;  --ph-fs-lg: 20px;
+  --ph-w-md: 44px;  --ph-h-md: 48px;  --ph-fs-md: 16px;
+  --ph-w-sm: 36px;  --ph-h-sm: 40px;  --ph-fs-sm: 14px;
+
+  /* Type */
+  --font: 'Noto Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-word: var(--font);
+  --fs-caption: 12px;
+  --fs-small: 14px;
+  --fs-body: 16px;
+  --fs-lead: 20px;
+  --fs-title: 28px;
+  --fs-word: clamp(32px, 10vw, 44px);
+  --lh-tight: 1.15;
+  --lh-body: 1.5;
+  --tracking-label: 0.08em;
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-pulse: 2400ms;
+  --dur-slow: 400ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Colour, light. Neutral canvas, Sky accent. */
+  --bg: #FAFAFA;
+  --surface: #FFFFFF;
+  --surface-2: #F1F3F5;
+  --fg: #1A1A1A;
+  --fg-dim: #5F6368;
+  --line: #E0E0E0;
+  --scrim: rgba(10, 10, 10, 0.55);
+  --on-scrim: #FFFFFF;
+  --video-bg: #111111;
+
+  --sky: #0788BD;
+  --on-sky: #FFFFFF;
+  --sky-ink: #06709C;
+  --sky-tint: #E3F3FA;
+  --sheen: linear-gradient(135deg, #22A9E3 0%, #0788BD 55%, #06709C 100%);
+
+  /* Role colours. Components use these, so a palette can recolour a role on its own. */
+  --ph: var(--sky);
+  --ph-ink: var(--fg);
+  --ph-tint: var(--sky-tint);
+  --on-ph: var(--on-sky);
+  --model: var(--sky);
+  --model-ink: var(--sky-ink);
+  --model-tint: var(--sky-tint);
+  --playback: var(--fg-dim);
+  --playback-ink: var(--fg-dim);
+  --playback-tint: var(--surface-2);
+  --font-ph: var(--font);
+
+  --amber: #B7791F;
+  --amber-tint: #FBF1DD;
+  --glow-a: #FFE08A;  --glow-b: #E39B00;  --on-glow: #2A1C00;
+  --green: #1E8A4C;
+  --green-tint: #E1F4E8;
+  --danger: #D93025;
+  --danger-tint: #FCE8E6;
+
+  --tier-bronze: #B8733A;
+  --tier-silver: #8E979F;
+  --tier-gold: #D4A017;
+
+  /* Grammar colours. Words only. Always flat. */
+  --g-subject: #0E9F8E;
+  --g-verb: #2E9E4D;
+  --g-object: #E8710F;
+  --g-place: #7448DB;
+  --g-time: #D93C8E;
+
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.16);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212;
+    --surface: #1E1E1E;
+    --surface-2: #2A2A2A;
+    --fg: #F2F2F2;
+    --fg-dim: #A3A8AE;
+    --line: #333333;
+    --scrim: rgba(0, 0, 0, 0.7);
+
+    --sky: #4FC3F7;
+    --on-sky: #06202E;
+    --sky-ink: #4FC3F7;
+    --sky-tint: rgba(79, 195, 247, 0.16);
+    --sheen: linear-gradient(135deg, #8ADBFB 0%, #4FC3F7 55%, #2FA9E0 100%);
+
+    --amber: #F5B63A;
+    --amber-tint: rgba(245, 182, 58, 0.16);
+    --green: #4ADE80;
+    --green-tint: rgba(74, 222, 128, 0.16);
+    --danger: #F28B82;
+    --danger-tint: rgba(242, 139, 130, 0.16);
+
+    --g-subject: #2DD4BF;
+    --g-verb: #4ADE80;
+    --g-object: #FB923C;
+    --g-place: #A78BFA;
+    --g-time: #F472B6;
+
+    --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121212;
+  --surface: #1E1E1E;
+  --surface-2: #2A2A2A;
+  --fg: #F2F2F2;
+  --fg-dim: #A3A8AE;
+  --line: #333333;
+  --scrim: rgba(0, 0, 0, 0.7);
+
+  --sky: #4FC3F7;
+  --on-sky: #06202E;
+  --sky-ink: #4FC3F7;
+  --sky-tint: rgba(79, 195, 247, 0.16);
+  --sheen: linear-gradient(135deg, #8ADBFB 0%, #4FC3F7 55%, #2FA9E0 100%);
+
+  --amber: #F5B63A;
+  --amber-tint: rgba(245, 182, 58, 0.16);
+  --green: #4ADE80;
+  --green-tint: rgba(74, 222, 128, 0.16);
+  --danger: #F28B82;
+  --danger-tint: rgba(242, 139, 130, 0.16);
+
+  --g-subject: #2DD4BF;
+  --g-verb: #4ADE80;
+  --g-object: #FB923C;
+  --g-place: #A78BFA;
+  --g-time: #F472B6;
+
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/* Responsive steps. Breakpoints: tablet from 768px, desktop and landscape tablet from 1100px.
+   Only tokens change here. Components never need their own breakpoint values for type or width. */
+@media (min-width: 768px) {
+  :root {
+    --app-max: 760px;
+    --grid-cols: 3;
+    --img-max: 100%;
+    --fs-small: 15px;
+    --fs-body: 18px;
+    --fs-lead: 22px;
+    --fs-title: 32px;
+    --fs-word: clamp(40px, 6vw, 56px);
+  }
+}
+@media (min-width: 1100px) {
+  :root {
+    --app-max: 1600px;
+    --grid-cols: 2;
+    --img-max: 46dvh;
+    --fs-small: 16px;
+    --fs-body: 20px;
+    --fs-lead: 24px;
+    --fs-title: 36px;
+    --fs-word: clamp(48px, 4vw, 72px);
+  }
+}
+
+/* Dark palette options (experiment). Apply with data-palette on <html>.
+   warm  = warm neutrals, Sky accent.
+   ember = the old look: warm neutrals, coral model/accent, gold sound tiles, purple playback, serif words. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-palette="warm"] {
+    --bg: #1A1714;
+    --surface: #221F1B;
+    --surface-2: #2C2723;
+    --fg: #F0EAD8;
+    --fg-dim: #9A9486;
+    --line: #2E2A25;
+    --scrim: rgba(10, 8, 6, 0.7);
+  }
+}
+:root[data-theme="dark"][data-palette="warm"] {
+  --bg: #1A1714;
+  --surface: #221F1B;
+  --surface-2: #2C2723;
+  --fg: #F0EAD8;
+  --fg-dim: #9A9486;
+  --line: #2E2A25;
+  --scrim: rgba(10, 8, 6, 0.7);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-palette="ember"] {
+    --bg: #1A1714;
+    --surface: #221F1B;
+    --surface-2: #2C2723;
+    --fg: #F0EAD8;
+    --fg-dim: #9A9486;
+    --line: #2E2A25;
+    --scrim: rgba(10, 8, 6, 0.7);
+    --sky: #E8734A;
+    --on-sky: #1A1714;
+    --sky-ink: #E8734A;
+    --sky-tint: rgba(232, 115, 74, 0.16);
+    --sheen: linear-gradient(135deg, #F59A78 0%, #E8734A 55%, #C95A33 100%);
+    --ph: #C9A84C;
+    --ph-ink: #C9A84C;
+    --ph-tint: rgba(201, 168, 76, 0.14);
+    --on-ph: #1A1714;
+    --playback: #9B7FD4;
+    --playback-ink: #C4A8F0;
+    --playback-tint: rgba(155, 127, 212, 0.15);
+    --danger: #E05C5C;
+    --danger-tint: rgba(224, 92, 92, 0.15);
+    --tier-bronze: #C9A84C;
+  }
+}
+:root[data-theme="dark"][data-palette="ember"] {
+  --bg: #1A1714;
+  --surface: #221F1B;
+  --surface-2: #2C2723;
+  --fg: #F0EAD8;
+  --fg-dim: #9A9486;
+  --line: #2E2A25;
+  --scrim: rgba(10, 8, 6, 0.7);
+  --sky: #E8734A;
+  --on-sky: #1A1714;
+  --sky-ink: #E8734A;
+  --sky-tint: rgba(232, 115, 74, 0.16);
+  --sheen: linear-gradient(135deg, #F59A78 0%, #E8734A 55%, #C95A33 100%);
+  --ph: #C9A84C;
+  --ph-ink: #C9A84C;
+  --ph-tint: rgba(201, 168, 76, 0.14);
+  --on-ph: #1A1714;
+  --playback: #9B7FD4;
+  --playback-ink: #C4A8F0;
+  --playback-tint: rgba(155, 127, 212, 0.15);
+  --danger: #E05C5C;
+  --danger-tint: rgba(224, 92, 92, 0.15);
+  --tier-bronze: #C9A84C;
+}
+
+/* ember-black: Ember with a true black page for OLED and projectors. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-palette="ember-black"] {
+    --bg: #1A1714;
+    --surface: #221F1B;
+    --surface-2: #2C2723;
+    --fg: #F0EAD8;
+    --fg-dim: #9A9486;
+    --line: #2E2A25;
+    --scrim: rgba(10, 8, 6, 0.7);
+    --sky: #E8734A;
+    --on-sky: #1A1714;
+    --sky-ink: #E8734A;
+    --sky-tint: rgba(232, 115, 74, 0.16);
+    --sheen: linear-gradient(135deg, #F59A78 0%, #E8734A 55%, #C95A33 100%);
+    --ph: #C9A84C;
+    --ph-ink: #C9A84C;
+    --ph-tint: rgba(201, 168, 76, 0.14);
+    --on-ph: #1A1714;
+    --playback: #9B7FD4;
+    --playback-ink: #C4A8F0;
+    --playback-tint: rgba(155, 127, 212, 0.15);
+    --danger: #E05C5C;
+    --danger-tint: rgba(224, 92, 92, 0.15);
+    --tier-bronze: #C9A84C;
+    --bg: #000000;
+    --surface: #12100E;
+    --surface-2: #1C1916;
+    --line: #27231F;
+  }
+}
+:root[data-theme="dark"][data-palette="ember-black"] {
+  --bg: #1A1714;
+  --surface: #221F1B;
+  --surface-2: #2C2723;
+  --fg: #F0EAD8;
+  --fg-dim: #9A9486;
+  --line: #2E2A25;
+  --scrim: rgba(10, 8, 6, 0.7);
+  --sky: #E8734A;
+  --on-sky: #1A1714;
+  --sky-ink: #E8734A;
+  --sky-tint: rgba(232, 115, 74, 0.16);
+  --sheen: linear-gradient(135deg, #F59A78 0%, #E8734A 55%, #C95A33 100%);
+  --ph: #C9A84C;
+  --ph-ink: #C9A84C;
+  --ph-tint: rgba(201, 168, 76, 0.14);
+  --on-ph: #1A1714;
+  --playback: #9B7FD4;
+  --playback-ink: #C4A8F0;
+  --playback-tint: rgba(155, 127, 212, 0.15);
+  --danger: #E05C5C;
+  --danger-tint: rgba(224, 92, 92, 0.15);
+  --tier-bronze: #C9A84C;
+  --bg: #000000;
+  --surface: #12100E;
+  --surface-2: #1C1916;
+  --line: #27231F;
+}
+
+/* ── Learner colours: one accent each, light and dark. Roles that mean something (done, next step, got it) keep their own colours. Default is Sky. ── */
+:root[data-accent="indigo"] { --sky: #4F46E5; --on-sky: #FFFFFF; --sky-ink: #4338CA; --sky-tint: #E8E7FB; --sheen: linear-gradient(135deg, #7C74F0 0%, #4F46E5 55%, #4338CA 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-accent="indigo"] { --sky: #A5B4FC; --on-sky: #12143A; --sky-ink: #A5B4FC; --sky-tint: rgba(165,180,252, 0.16); --sheen: linear-gradient(135deg, #C7D2FE 0%, #A5B4FC 55%, #818CF8 100%); } }
+:root[data-theme="dark"][data-accent="indigo"] { --sky: #A5B4FC; --on-sky: #12143A; --sky-ink: #A5B4FC; --sky-tint: rgba(165,180,252, 0.16); --sheen: linear-gradient(135deg, #C7D2FE 0%, #A5B4FC 55%, #818CF8 100%); }
+:root[data-accent="violet"] { --sky: #7C3AED; --on-sky: #FFFFFF; --sky-ink: #6D28D9; --sky-tint: #F0E9FD; --sheen: linear-gradient(135deg, #A06BF5 0%, #7C3AED 55%, #6D28D9 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-accent="violet"] { --sky: #C4B5FD; --on-sky: #1E1040; --sky-ink: #C4B5FD; --sky-tint: rgba(196,181,253, 0.16); --sheen: linear-gradient(135deg, #DDD6FE 0%, #C4B5FD 55%, #A78BFA 100%); } }
+:root[data-theme="dark"][data-accent="violet"] { --sky: #C4B5FD; --on-sky: #1E1040; --sky-ink: #C4B5FD; --sky-tint: rgba(196,181,253, 0.16); --sheen: linear-gradient(135deg, #DDD6FE 0%, #C4B5FD 55%, #A78BFA 100%); }
+:root[data-accent="rose"] { --sky: #D6336C; --on-sky: #FFFFFF; --sky-ink: #B02457; --sky-tint: #FCE7EF; --sheen: linear-gradient(135deg, #E8608F 0%, #D6336C 55%, #B02457 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-accent="rose"] { --sky: #F9A8C9; --on-sky: #3A0F22; --sky-ink: #F9A8C9; --sky-tint: rgba(249,168,201, 0.16); --sheen: linear-gradient(135deg, #FBCFE3 0%, #F9A8C9 55%, #F472B6 100%); } }
+:root[data-theme="dark"][data-accent="rose"] { --sky: #F9A8C9; --on-sky: #3A0F22; --sky-ink: #F9A8C9; --sky-tint: rgba(249,168,201, 0.16); --sheen: linear-gradient(135deg, #FBCFE3 0%, #F9A8C9 55%, #F472B6 100%); }
+:root[data-accent="teal"] { --sky: #0F7F86; --on-sky: #FFFFFF; --sky-ink: #0B6469; --sky-tint: #DDF3F4; --sheen: linear-gradient(135deg, #2AA3AB 0%, #0F7F86 55%, #0B6469 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-accent="teal"] { --sky: #4DD0E1; --on-sky: #04252B; --sky-ink: #4DD0E1; --sky-tint: rgba(77,208,225, 0.16); --sheen: linear-gradient(135deg, #8BE3EF 0%, #4DD0E1 55%, #26C0D6 100%); } }
+:root[data-theme="dark"][data-accent="teal"] { --sky: #4DD0E1; --on-sky: #04252B; --sky-ink: #4DD0E1; --sky-tint: rgba(77,208,225, 0.16); --sheen: linear-gradient(135deg, #8BE3EF 0%, #4DD0E1 55%, #26C0D6 100%); }
+:root[data-accent="slate"] { --sky: #475569; --on-sky: #FFFFFF; --sky-ink: #334155; --sky-tint: #E8ECF1; --sheen: linear-gradient(135deg, #64748B 0%, #475569 55%, #334155 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-accent="slate"] { --sky: #B6C2D1; --on-sky: #141B24; --sky-ink: #B6C2D1; --sky-tint: rgba(182,194,209, 0.16); --sheen: linear-gradient(135deg, #D4DCE6 0%, #B6C2D1 55%, #94A3B8 100%); } }
+:root[data-theme="dark"][data-accent="slate"] { --sky: #B6C2D1; --on-sky: #141B24; --sky-ink: #B6C2D1; --sky-tint: rgba(182,194,209, 0.16); --sheen: linear-gradient(135deg, #D4DCE6 0%, #B6C2D1 55%, #94A3B8 100%); }
