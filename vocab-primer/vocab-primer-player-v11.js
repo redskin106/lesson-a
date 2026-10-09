@@ -1107,6 +1107,7 @@ function dayMonth(ts) {
 function renderTakes(word, container) {
   const history = loadRecHistory(word);
   if (!container) return;
+  const wasOpen = !!(container.querySelector('details.past') || {}).open;
   if (!history.length) { container.innerHTML = ''; return; }
   const rev = history.slice().reverse();
   container.innerHTML =
@@ -1123,6 +1124,7 @@ function renderTakes(word, container) {
     '<div class="past-keep"><span class="past-lock" role="img" aria-label="Stays on this device"></span><button type="button" class="past-bin" aria-label="Delete my recordings"></button></div>' +
     '</details>';
   const det = container.querySelector('details.past');
+  if (wasOpen) { det.open = true; det.querySelector('.past-lbl').textContent = 'Hide past recordings'; }
   det.addEventListener('toggle', () => { det.querySelector('.past-lbl').textContent = det.open ? 'Hide past recordings' : 'Show past recordings'; });
   container.querySelectorAll('.past-p').forEach((b, i) => b.addEventListener('click', () => playDataUrl(rev[i].dataUrl)));
   container.querySelector('.past-bin').addEventListener('click', () => { deleteRecs(word); container.innerHTML = ''; refreshRecUI(); });
