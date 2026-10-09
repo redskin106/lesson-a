@@ -1077,6 +1077,27 @@ function resetSCTrio() {
   }
 }
 
+// Simplified waveform: one smooth, mirrored shape drawn from the stored loudness values.
+function waveSVG(b) {
+  if (!b || b.length < 2) return '';
+  const W = 100, H = 40, mid = H / 2, n = b.length;
+  const pts = b.map((v, i) => [i * W / (n - 1), Math.max(1.5, v / 100 * mid * 0.95)]);
+  const curve = (arr, sgn) => {
+    let d = '';
+    for (let i = 0; i < arr.length - 1; i++) {
+      const p0 = arr[i - 1] || arr[i], p1 = arr[i], p2 = arr[i + 1], p3 = arr[i + 2] || p2;
+      const y = q => mid - sgn * q[1];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, mid - sgn * (p1[1] + (p2[1] - p0[1]) / 6)];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, mid - sgn * (p2[1] - (p3[1] - p1[1]) / 6)];
+      d += ' C' + c1[0].toFixed(1) + ',' + c1[1].toFixed(1) + ' ' + c2[0].toFixed(1) + ',' + c2[1].toFixed(1) + ' ' + p2[0].toFixed(1) + ',' + y(p2).toFixed(1);
+    }
+    return d;
+  };
+  const top = 'M0,' + (mid - pts[0][1]).toFixed(1) + curve(pts, 1);
+  const rev = pts.slice().reverse();
+  const bottom = ' L' + W + ',' + (mid + pts[n - 1][1]).toFixed(1) + curve(rev, -1) + ' Z';
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true"><path d="' + top + bottom + '"/></svg>';
+}
 // One history list for single and pair cards: a collapsible row, then numbered takes (1 = newest) with their date and shape.
 function dayMonth(ts) {
   const a = new Date(ts), b = new Date();
@@ -1095,7 +1116,7 @@ function renderTakes(word, container) {
       '<div class="past-row' + (i === 0 ? ' new' : '') + '">' +
       '<span class="past-n">' + (i + 1) + '</span>' +
       '<span class="past-d">' + dayMonth(r.ts) + '</span>' +
-      '<span class="past-w">' + (r.b ? r.b.map(h => '<i style="height:' + h + '%"></i>').join('') : '') + '</span>' +
+      '<span class="past-w">' + waveSVG(r.b) + '</span>' +
       '<button type="button" class="past-p" aria-label="Play take ' + (i + 1) + '"></button>' +
       '</div>').join('') +
     '</div>' +
@@ -1200,7 +1221,7 @@ function wireSCTrio() {
         const _w = singleCards[currentSingleIdx]?.word;
         if (_w) scBlobMap[_w] = scRecBlob;
         playBtn.classList.add('ready');
-        hint.textContent = 'Listen to both, then rate yourself.';
+        hint.textContent = 'Listen to both, then test yourself.';
 
         // Save to history
         const card = singleCards[currentSingleIdx];
@@ -1312,7 +1333,7 @@ function togglePairRec(btn, word, side) {
       if(youBtn){ youBtn.classList.add('ready'); youBtn.onclick=()=>new Audio(URL.createObjectURL(blob)).play().catch(()=>{}); }
       const hist = await saveRecToHistory(word,blob);
       if(histEl) renderPairHistory(word,histEl);
-      if(hint) hint.textContent='Listen to both, then rate yourself.';
+      if(hint) hint.textContent='Listen to both, then test yourself.';
     };
     mr.start();
     btn.classList.add('recording');
