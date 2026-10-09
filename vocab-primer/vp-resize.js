@@ -73,7 +73,17 @@
       while (Math.abs(r - ratio) > 1e-6) {
         var prev = ratio, next = dir > 0 ? Math.min(r, ratio + STEP) : Math.max(r, ratio - STEP);
         apply(next);
-        if (!already && overflows()) { apply(prev); break; }
+        if (!already && overflows()) {
+          // A brief tight spot (one row a little too wide just before a column switches to icons) must not stop the drag:
+          // look a few steps ahead and only stop if nothing clears within about a tenth of the width.
+          var probe = next, clear = false;
+          for (var k = 0; k < 10 && Math.abs(r - probe) > 1e-6; k++) {
+            probe = dir > 0 ? Math.min(r, probe + STEP) : Math.max(r, probe - STEP);
+            apply(probe);
+            if (!overflows()) { clear = true; break; }
+          }
+          if (!clear) { apply(prev); break; }
+        }
       }
       place();
     }
