@@ -400,6 +400,7 @@ function resetTranslations() {
    SINGLE CARD
 ═══════════════════════════════════════════════ */
 function openSingle(i) {
+  stopPast();
   currentSingleIdx = i;
   currentNavIdx = navOrder.indexOf(singleCards[i]);
   resetTranslations();
@@ -1105,6 +1106,7 @@ function dayMonth(ts) {
   return n <= 0 ? 'Today' : n === 1 ? 'Yesterday' : n + ' days ago';
 }
 function renderTakes(word, container) {
+  stopPast();
   const history = loadRecHistory(word);
   if (!container) return;
   const wasOpen = !!(container.querySelector('details.past') || {}).open;
@@ -1126,8 +1128,8 @@ function renderTakes(word, container) {
   const det = container.querySelector('details.past');
   if (wasOpen) { det.open = true; det.querySelector('.past-lbl').textContent = 'Hide past recordings'; }
   det.addEventListener('toggle', () => { det.querySelector('.past-lbl').textContent = det.open ? 'Hide past recordings' : 'Show past recordings'; });
-  container.querySelectorAll('.past-p').forEach((b, i) => b.addEventListener('click', () => playDataUrl(rev[i].dataUrl)));
-  container.querySelector('.past-bin').addEventListener('click', () => { deleteRecs(word); container.innerHTML = ''; refreshRecUI(); });
+  container.querySelectorAll('.past-p').forEach((b, i) => b.addEventListener('click', () => togglePast(b, rev[i].dataUrl)));
+  container.querySelector('.past-bin').addEventListener('click', () => { stopPast(); deleteRecs(word); container.innerHTML = ''; refreshRecUI(); });
 }
 function renderRecHistory(word, container) { renderTakes(word, container); }
 function toggleRecHistory() {}
@@ -1144,6 +1146,23 @@ function refreshRecUI() {
 
 function playDataUrl(dataUrl) {
   new Audio(dataUrl).play().catch(() => {});
+}
+// Past-recording player: tap to play, tap again to stop. One take plays at a time.
+let _pastAudio = null, _pastBtn = null;
+function stopPast() {
+  if (_pastAudio) { try { _pastAudio.pause(); } catch (e) {} _pastAudio = null; }
+  if (_pastBtn) { _pastBtn.classList.remove('playing'); _pastBtn.setAttribute('aria-label', _pastBtn.dataset.play || 'Play'); _pastBtn = null; }
+}
+function togglePast(btn, dataUrl) {
+  const same = _pastBtn === btn;
+  stopPast();
+  if (same) return;
+  const a = new Audio(dataUrl);
+  _pastAudio = a; _pastBtn = btn;
+  btn.dataset.play = btn.getAttribute('aria-label');
+  btn.classList.add('playing'); btn.setAttribute('aria-label', 'Stop');
+  a.onended = () => { if (_pastAudio === a) stopPast(); };
+  a.play().catch(() => { if (_pastAudio === a) stopPast(); });
 }
 
 function dataUrlToBlob(dataUrl) {
@@ -1305,6 +1324,7 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 function goIndex() {
+  stopPast();
   showScreen('screen-index');
   buildGrid(); // refresh dots
 }
