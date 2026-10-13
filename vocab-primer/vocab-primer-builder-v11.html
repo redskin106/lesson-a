@@ -280,6 +280,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
       <button class="btn-full" onclick="importDeck()">📂 Import deck.json</button>
       <button class="btn-full" onclick="openFromRepo()">☁️ Open from repo</button>
       <button class="btn-full sage" onclick="pushToGitHub()">🚀 Push to GitHub</button>
+      <label style="display:flex;gap:8px;align-items:center;font-size:12px;color:var(--text2);margin:2px 0 6px"><input type="checkbox" id="shell-motion" checked> Use the motion player (new)</label>
       <button class="btn-full" onclick="createShell()" style="color:var(--teal,#00bcd4);border-color:var(--teal,#00bcd4);">🏗 Create lesson shell</button>
       <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 8px;">
       <button class="btn-full" onclick="clearSession()" style="color:var(--red);">↺ Reset to seed</button>
@@ -2284,10 +2285,33 @@ async function createShell() {
   const jsonFilename  = shellFilename.replace(/\.html$/i, '.json');
   const lessonName    = document.getElementById('lesson-name').value || 'Vocab Primer';
 
-  if (!confirm(`Create shell at:\n${shellPath}\n\nThis will push to GitHub. Continue?`)) return;
+  const useMotion = document.getElementById('shell-motion')?.checked;
+  if (!confirm(`Create ${useMotion ? 'motion' : 'classic'} shell at:\n${shellPath}\n\nThis will push to GitHub. Continue?`)) return;
 
   const CACHE_V = 11;
-  const shellHTML = `<!DOCTYPE html>
+  // Motion shell: tiny page that loads the shared player from <deck folder>/motion/. It never needs regenerating when the player improves.
+  const motionShell = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>${esc(lessonName)} — Vocab Primer</title>
+<link rel="stylesheet" href="motion/vp-motion.css?v=1">
+</head>
+<body>
+<script>window.DECK_URL = '${jsonFilename.replace(/[^A-Za-z0-9._-]/g,'')}';<\/script>
+<script src="motion/vp-motion.js?v=1"><\/script>
+</body>
+</html>
+`;
+  if (useMotion) {
+    const dir = shellPath.includes('/') ? shellPath.slice(0, shellPath.lastIndexOf('/')) : '';
+    try {
+      const chk = await fetch('https://api.github.com/repos/'+repo+'/contents/'+(dir?dir+'/':'')+'motion/vp-motion.js', { headers:{ Authorization:'token '+pat } });
+      if (!chk.ok && !confirm('The motion player files are not in ' + (dir||'the repo') + '/motion/ yet, so this shell will show a blank page until they are added.\n\nCreate the shell anyway?')) return;
+    } catch(_) {}
+  }
+  const shellHTML = useMotion ? motionShell : `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
