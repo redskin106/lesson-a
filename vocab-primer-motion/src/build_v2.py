@@ -110,6 +110,9 @@ html.mo-calm .sentence-hl::after,html.mo-calm .pair-sentence-hl::after{transitio
 .mo-class svg{flex:none;width:14px;height:14px;fill:var(--gold,#F2B33D)}
 .mo-cnt{flex:none;font-size:12px;font-weight:800;color:var(--fg-dim,#5B6B7A);font-variant-numeric:tabular-nums}
 @container (max-width:170px){.mo-stamp .mo-lb{display:none}.mo-stamp{padding-inline:8px}}
+/* past recordings: in a narrow column drop the date so the play button never leaves the box */
+.past-list{container-type:inline-size}
+@container (max-width:300px){.past-row,.tight .past-row{grid-template-columns:var(--icon) minmax(0,1fr) var(--ring-lg);grid-template-areas:"n w p";gap:var(--sp-sm)}.past-d{display:none}.past-n{grid-area:n}.past-w{grid-area:w}.past-p{grid-area:p}}
 /* celebration on the smileys */
 .mo-spark{position:fixed;width:10px;height:10px;border-radius:50%;pointer-events:none;z-index:9999}
 .mo-ringfx{position:fixed;border-radius:50%;border:3px solid var(--amber);pointer-events:none;z-index:9999}
