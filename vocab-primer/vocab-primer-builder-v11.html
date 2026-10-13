@@ -278,6 +278,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
       <button class="btn-full primary" onclick="openExport()">⬇ View DECK JSON</button>
       <button class="btn-full primary" onclick="downloadDeckJSON()">💾 Save deck.json</button>
       <button class="btn-full" onclick="importDeck()">📂 Import deck.json</button>
+      <button class="btn-full" onclick="openFromRepo()">☁️ Open from repo</button>
       <button class="btn-full sage" onclick="pushToGitHub()">🚀 Push to GitHub</button>
       <button class="btn-full" onclick="createShell()" style="color:var(--teal,#00bcd4);border-color:var(--teal,#00bcd4);">🏗 Create lesson shell</button>
       <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 8px;">
@@ -370,6 +371,15 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-sy
         <div style="font-size:13px;color:var(--dim);margin-top:6px;">or add a new card using the sidebar</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Open from repo modal -->
+<div class="modal-bg" id="repo-modal">
+  <div class="modal-box">
+    <div class="modal-head"><span class="modal-head-title">OPEN FROM REPO</span><button class="btn sm" onclick="closeRepoModal()">✕</button></div>
+    <div class="modal-body" id="repo-list"></div>
+    <div class="modal-foot"><button class="btn" onclick="closeRepoModal()">Cancel</button></div>
   </div>
 </div>
 
@@ -1840,50 +1850,55 @@ function importDeck() {
     const reader = new FileReader();
     reader.onload = ev => {
       try {
-        const deck = JSON.parse(ev.target.result);
-        if (!deck.cards || !Array.isArray(deck.cards)) throw new Error('Invalid format');
-        // Normalise to builder format
-        cards = deck.cards.map(card => {
-          if (card.type === 'pair') {
-            return { ...card,
-              animSrc1: card.animation1?.sources?.[0]?.src||'', animSrc2: card.animation2?.sources?.[0]?.src||'',
-              audio1Word: card.wordAudio1||'', audio1Sentence: card.sentenceAudio1||'',
-              audio2Word: card.wordAudio2||'', audio2Sentence: card.sentenceAudio2||'',
-              audio1Ph:[], audio2Ph:[],
-              phonemes1: (card.phonemes1||[]).map(p=>({s:p.s,audio:p.audio||'',audioSrc:p.audioSrc||'jp'})),
-              phonemes2: (card.phonemes2||[]).map(p=>({s:p.s,audio:p.audio||'',audioSrc:p.audioSrc||'jp'})),
-            };
-          } else {
-            return { ...card,
-              animSrc: card.animation?.sources?.[0]?.src||'',
-              audioWord: card.wordAudio||'', audioSentence: card.sentenceAudio||'',
-              audioPh:[],
-              phonemes: (card.phonemes||[]).map(p=>({s:p.s,audio:p.audio||'',audioSrc:p.audioSrc||'jp'})),
-            };
-          }
-        });
-        if (deck.lessonName) document.getElementById('lesson-name').value = deck.lessonName;
-        if (deck.categories?.length) categories = deck.categories; else { categories = []; initCategories(); }
-        if (deck.tierColours) applyTierColours(deck.tierColours);
-        // Repopulate audioBlobs from card data so play/download buttons activate correctly
-        const AUDIO_FIELDS_SINGLE = ['audioWord','audioSentence'];
-        const AUDIO_FIELDS_PAIR   = ['audio1Word','audio1Sentence','audio2Word','audio2Sentence'];
-        cards.forEach((card, ci) => {
-          const fields = card.type === 'pair' ? AUDIO_FIELDS_PAIR : AUDIO_FIELDS_SINGLE;
-          fields.forEach(f => { if (card[f]) audioBlobs[`${ci}_${f}`] = card[f]; });
-          // Phoneme audio
-          (card.phonemes ||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audioPh_${pi}`]  = ph.audio; });
-          (card.phonemes1||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audio1Ph_${pi}`] = ph.audio; });
-          (card.phonemes2||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audio2Ph_${pi}`] = ph.audio; });
-        });
-        activeIdx = null; renderSidebar(); renderEditor();
-        saveSession();
+        applyDeck(JSON.parse(ev.target.result));
+        repoOpen = { path:'', sha:'' };   // opened from a local file, so there is no repo version to compare with
         toast(`✅ Imported ${cards.length} cards`);
       } catch(err) { toast('❌ Import failed: ' + err.message); }
     };
     reader.readAsText(file);
   };
   input.click();
+}
+
+// Load a parsed deck into the editor (used by both file import and open-from-repo)
+function applyDeck(deck) {
+  if (!deck.cards || !Array.isArray(deck.cards)) throw new Error('Invalid format');
+  // Normalise to builder format
+  cards = deck.cards.map(card => {
+    if (card.type === 'pair') {
+      return { ...card,
+        animSrc1: card.animation1?.sources?.[0]?.src||'', animSrc2: card.animation2?.sources?.[0]?.src||'',
+        audio1Word: card.wordAudio1||'', audio1Sentence: card.sentenceAudio1||'',
+        audio2Word: card.wordAudio2||'', audio2Sentence: card.sentenceAudio2||'',
+        audio1Ph:[], audio2Ph:[],
+        phonemes1: (card.phonemes1||[]).map(p=>({s:p.s,audio:p.audio||'',audioSrc:p.audioSrc||'jp'})),
+        phonemes2: (card.phonemes2||[]).map(p=>({s:p.s,audio:p.audio||'',audioSrc:p.audioSrc||'jp'})),
+      };
+    } else {
+      return { ...card,
+        animSrc: card.animation?.sources?.[0]?.src||'',
+        audioWord: card.wordAudio||'', audioSentence: card.sentenceAudio||'',
+        audioPh:[],
+        phonemes: (card.phonemes||[]).map(p=>({s:p.s,audio:p.audio||'',audioSrc:p.audioSrc||'jp'})),
+      };
+    }
+  });
+  if (deck.lessonName) document.getElementById('lesson-name').value = deck.lessonName;
+  if (deck.categories?.length) categories = deck.categories; else { categories = []; initCategories(); }
+  if (deck.tierColours) applyTierColours(deck.tierColours);
+  // Repopulate audioBlobs from card data so play/download buttons activate correctly
+  const AUDIO_FIELDS_SINGLE = ['audioWord','audioSentence'];
+  const AUDIO_FIELDS_PAIR   = ['audio1Word','audio1Sentence','audio2Word','audio2Sentence'];
+  cards.forEach((card, ci) => {
+    const fields = card.type === 'pair' ? AUDIO_FIELDS_PAIR : AUDIO_FIELDS_SINGLE;
+    fields.forEach(f => { if (card[f]) audioBlobs[`${ci}_${f}`] = card[f]; });
+    // Phoneme audio
+    (card.phonemes ||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audioPh_${pi}`]  = ph.audio; });
+    (card.phonemes1||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audio1Ph_${pi}`] = ph.audio; });
+    (card.phonemes2||[]).forEach((ph,pi) => { if (ph.audio) audioBlobs[`${ci}_audio2Ph_${pi}`] = ph.audio; });
+  });
+  activeIdx = null; renderSidebar(); renderEditor();
+  saveSession();
 }
 
 function pushToGitHub() {
@@ -1958,11 +1973,67 @@ async function uploadAudioToGitHub(pat, repo, folder, slug, dataUrl) {
   return `https://raw.githubusercontent.com/${repo}/main/${ghPath}`;
 }
 
+/* ── Repo sync: open a deck straight from the repo, and warn before publishing over a newer version ── */
+let repoOpen = { path:'', sha:'' };   // the repo file this deck was opened from, and its version at that moment
+function ghFields() {
+  return { pat: document.getElementById('gh-pat').value.trim(), repo: document.getElementById('gh-repo').value.trim(), path: document.getElementById('gh-path').value.trim() };
+}
+async function ghSha(pat, repo, path) {
+  const r = await fetch('https://api.github.com/repos/'+repo+'/contents/'+path, { headers:{ Authorization:'token '+pat, Accept:'application/vnd.github.v3+json' } });
+  if (r.status === 404) return '';
+  if (!r.ok) throw new Error('GitHub answered ' + r.status);
+  return (await r.json()).sha || '';
+}
+function closeRepoModal() { document.getElementById('repo-modal').classList.remove('open'); }
+async function openFromRepo() {
+  const { pat, repo, path } = ghFields();
+  if (!pat || !repo) { toast('Fill in the GitHub token and repo first'); return; }
+  const dir = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '';
+  const list = document.getElementById('repo-list');
+  list.innerHTML = '<div style="padding:14px;color:var(--text2)">Looking in the repo…</div>';
+  document.getElementById('repo-modal').classList.add('open');
+  try {
+    const r = await fetch('https://api.github.com/repos/'+repo+'/contents/'+dir, { headers:{ Authorization:'token '+pat, Accept:'application/vnd.github.v3+json' } });
+    if (!r.ok) throw new Error('GitHub answered ' + r.status);
+    const files = (await r.json()).filter(f => f.type === 'file' && /\.json$/i.test(f.name));
+    if (!files.length) { list.innerHTML = '<div style="padding:14px;color:var(--text2)">No deck files in ' + esc(dir || 'the repo') + '.</div>'; return; }
+    list.innerHTML = '';
+    files.forEach(f => {
+      const b = document.createElement('button'); b.className = 'btn-full'; b.style.marginBottom = '6px'; b.style.textAlign = 'left';
+      b.textContent = f.name; b.onclick = () => loadFromRepo(f.path, f.sha);
+      list.appendChild(b);
+    });
+  } catch(e) { list.innerHTML = '<div style="padding:14px;color:var(--coral)">Could not read the repo: ' + esc(e.message) + '</div>'; }
+}
+async function loadFromRepo(path, sha) {
+  const { pat, repo } = ghFields();
+  if (dirty && cards.length && !confirm('You have changes that are not published. Replace them with this deck from the repo?')) return;
+  try {
+    const r = await fetch('https://api.github.com/repos/'+repo+'/contents/'+path, { headers:{ Authorization:'token '+pat, Accept:'application/vnd.github.raw+json' } });
+    if (!r.ok) throw new Error('GitHub answered ' + r.status);
+    applyDeck(JSON.parse(await r.text()));
+    document.getElementById('gh-path').value = path;
+    repoOpen = { path, sha };
+    dirty = false; closeRepoModal();
+    toast('☁️ Opened ' + path + ' from the repo');
+  } catch(e) { toast('❌ Could not open: ' + e.message); }
+}
+// Before publishing: if the deck was opened from the repo and the repo copy has changed since, ask before overwriting it.
+async function repoClashOk(pat, repo, path) {
+  if (!repoOpen.sha || repoOpen.path !== path) return true;
+  let now = '';
+  try { now = await ghSha(pat, repo, path); } catch(e) { return true; }   // can't tell: don't block
+  if (!now || now === repoOpen.sha) return true;
+  return confirm('The copy of ' + path + ' in the repo has changed since you opened it (someone else, another computer, or an earlier publish).\n\nPublishing now will replace it with what is on this screen.\n\nPress OK to replace it, or Cancel to stop.');
+}
+
 async function confirmPush() {
   const pat    = document.getElementById('gh-pat').value.trim();
   const repo   = document.getElementById('gh-repo').value.trim();
   const path   = document.getElementById('gh-path').value.trim();
   const aFolder = (document.getElementById('gh-audio-folder').value || 'vocab-primer-v2/audio').trim().replace(/\/+$/, '');
+
+  if (!await repoClashOk(pat, repo, path)) { closePushModal(); return; }
 
   // Hide buttons, show progress
   document.getElementById('push-confirm-actions').style.display = 'none';
@@ -2044,6 +2115,7 @@ async function confirmPush() {
   });
 
   if (resp.ok) {
+    try { repoOpen = { path, sha: (await resp.json()).content.sha }; } catch(_) {}
     setPushProgress(100, '✅ Done! Live in ~30s.');
     dirty = false;
     setTimeout(closePushModal, 1800);
