@@ -1,0 +1,261 @@
+{
+  "lessonName": "Live test",
+  "categories": [
+    "Opposite Pairs",
+    "Nouns",
+    "Shapes",
+    "Colours"
+  ],
+  "cards": [
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "rectangle",
+      "emoji": "▬",
+      "sentence": "It is shaped like a rectangle.",
+      "phonemes": [
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "k",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "æ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ŋ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/rectangle_word.mp3",
+      "sentenceAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/rectangle_sentence.mp3",
+      "category": "Shapes"
+    },
+    {
+      "type": "single",
+      "tier": "silver",
+      "word": "triangle",
+      "emoji": "🔺",
+      "sentence": "It is shaped like a triangle.",
+      "phonemes": [
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "aɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "æ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ŋ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/triangle_word.mp3",
+      "sentenceAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/triangle_sentence.mp3",
+      "category": "Shapes"
+    },
+    {
+      "type": "single",
+      "tier": "bronze",
+      "word": "yellow",
+      "emoji": "🟡",
+      "sentence": "The cup is yellow.",
+      "phonemes": [
+        {
+          "s": "j",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɛ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "əʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/yellow_word.mp3",
+      "sentenceAudio": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/yellow_sentence.mp3",
+      "category": "Colours",
+      "isColour": true,
+      "swatch": "#FDD835"
+    },
+    {
+      "type": "pair",
+      "tier": "bronze",
+      "word1": "big",
+      "word2": "small",
+      "emoji1": "📦",
+      "emoji2": "📎",
+      "sentence1": "The elephant is big.",
+      "sentence2": "The mouse is small.",
+      "phonemes1": [
+        {
+          "s": "b",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɪ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "g",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "s",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "m",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "ɔː",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/big_word.mp3",
+      "wordAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/small_word.mp3",
+      "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/big_sentence.mp3",
+      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/small_sentence.mp3",
+      "category": "Opposite Pairs",
+      "image1": "",
+      "image2": ""
+    },
+    {
+      "type": "pair",
+      "tier": "bronze",
+      "word1": "round",
+      "word2": "flat",
+      "emoji1": "⚽",
+      "emoji2": "📄",
+      "sentence1": "The ball is round.",
+      "sentence2": "The phone is flat.",
+      "phonemes1": [
+        {
+          "s": "r",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "aʊ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "n",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "d",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "phonemes2": [
+        {
+          "s": "f",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "l",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "æ",
+          "audio": "",
+          "audioSrc": "jp"
+        },
+        {
+          "s": "t",
+          "audio": "",
+          "audioSrc": "jp"
+        }
+      ],
+      "wordAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/round_word.mp3",
+      "wordAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/flat_word.mp3",
+      "sentenceAudio1": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/round_sentence.mp3",
+      "sentenceAudio2": "https://raw.githubusercontent.com/redskin106/lesson-a/main/vocab-describe-objects/images/flat_sentence.mp3",
+      "category": "Opposite Pairs",
+      "image1": "",
+      "image2": ""
+    }
+  ]
+}
