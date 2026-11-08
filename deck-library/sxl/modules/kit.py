@@ -4,6 +4,10 @@ Grad names: violet red teal amber rose orange sky, or any CSS gradient string.""
 import math
 from ..core import *
 G=lambda g:GRAD.get(g,g)
+def stp(html,s,g=None,pills=False):
+    """Mark an element as reveal step s (click-per-step in interactive decks; ignored in static output)."""
+    i=html.index('<'); j=html.index(' ',i)
+    return html[:j]+f' data-s="{s}"'+(f' data-g="{g}"' if g else '')+(' data-pills="1"' if pills else '')+html[j:]
 def pill(t,fs=36,mu=True): return f'<span class="pill{" mu" if mu else ""}" style="font-size:{fs}px;padding:12px 38px;{"" if mu else "color:#6a35e8"}">{t}</span>'
 def chiprow(cs,fs=46,p='8px 26px',gap='12px',wrap=False): return f'<div style="display:flex;gap:{gap};{"flex-wrap:wrap;" if wrap else ""}align-items:center">'+''.join(ch(c,t,fs,p) for c,t in cs)+'</div>'
 def sh(): return 'filter:drop-shadow(0 16px 18px rgba(40,20,90,.3))'
@@ -29,19 +33,38 @@ def title_card(d):
 
 @module('today')
 def today(d):
-    """{'phase':'STUDY','emoji':'pointing_viewer','title':'Orders and advice','rows':[[(c,t),...]],'fs':76,'tfs':104,'role':'Today we learn'}"""
-    fs=d.get('fs',70); tfs=d.get('tfs',104)
+    """{'phase':'STUDY','emoji':'pointing_viewer','title':'Orders and advice','rows':[[(c,t),...] or {'icon':emoji,'chips':[...]}],'fs':76,'tfs':104}"""
+    fs=d.get('fs',70); tfs=d.get('tfs',104); rows=''
+    for i,r in enumerate(d['rows']):
+        cs,ic=(r['chips'],r.get('icon')) if isinstance(r,dict) else (r,None)
+        row=chiprow(cs,fs,'8px 30px','16px')
+        if ic: row=f'<div style="display:flex;gap:28px;align-items:center"><img src="{EM(ic)}" style="width:110px;{sh()}">{row}</div>'
+        rows+=stp(f'<div class="rw">{row}</div>',i+2,pills=True)
     return (header(d['phase'],d.get('role','Today we learn'),'violet')
-      +f'<div class="gl" style="left:90px;top:168px;width:1740px;height:820px;border-radius:72px;display:flex;align-items:center;gap:90px;padding:0 110px">'
-      f'<img src="{EM(d["emoji"])}" style="width:300px;{sh()}">'
-      f'<div style="display:flex;flex-direction:column;gap:44px;align-items:flex-start"><div style="font-family:O;font-weight:800;font-size:{tfs}px;color:#1c1b2e;white-space:nowrap;line-height:1">{d["title"]}</div>'
-      +''.join(chiprow(r,fs,'8px 30px','16px') for r in d['rows'])+'</div></div>')
+      +'<div class="gl" style="left:90px;top:168px;width:1740px;height:820px;border-radius:72px"></div>'
+      +f'<div class="a" style="left:200px;top:168px;width:1520px;height:820px;display:flex;align-items:center;gap:90px">'
+      +stp(f'<img src="{EM(d["emoji"])}" style="width:300px;{sh()}">',1)
+      +f'<div style="display:flex;flex-direction:column;gap:44px;align-items:flex-start">'+stp(f'<div style="font-family:O;font-weight:800;font-size:{tfs}px;color:#1c1b2e;white-space:nowrap;line-height:1">{d["title"]}</div>',1)
+      +rows+'</div></div>')
 
 @module('columns')
 def columns(d):
     """2-3 columns, each a labelled picture with chip rows and a gloss. {'cols':[{'label','grad'?,'pic','rows':[[chips]],'gloss'}]}"""
     C=d['cols']; n=len(C); gx=40; w=int((1740-gx*(n-1))/n); w=min(w,560); ph=int(w*9/16); gx=int((1740-w*n)/(n-1)) if n>1 else 0
     o=header(d['phase'],d.get('title'),d.get('rg','violet')); nb=d.get('numbered')
+    if d.get('card'):
+        cw=int((1740-30*(n-1))/n); st=1
+        for i,c in enumerate(C):
+            x=90+i*(cw+30); g=i+1; pw=cw-40; ph2=int(pw*9/16)
+            o+=stp(f'<div class="gl" style="left:{x}px;top:168px;width:{cw}px;height:820px;border-radius:64px"></div>',st,g)
+            o+=stp(f'<div class="a" style="left:{x}px;top:196px;width:{cw}px;display:flex;justify-content:center">{grad_chip(c.get("grad","violet"),c["label"],44,"8px 34px")}</div>',st,g)
+            o+=stp(pic(x+20,270,pw,ph2,c['pic'],40),st,g); st+=1
+            for k_,r in enumerate(c['rows']):
+                yy=270+ph2+40+k_*104
+                if k_: o+=stp(f'<div class="a" style="left:{x+60}px;top:{yy-14}px;width:{cw-120}px;height:3px;border-radius:2px;background:rgba(124,70,230,.25)"></div>',st,g)
+                o+=stp(f'<div class="a" style="left:{x}px;top:{yy}px;width:{cw}px;display:flex;gap:8px;justify-content:center">'+''.join(ch(a,b,40,'6px 16px') for a,b in r)+'</div>',st,g,pills=True); st+=1
+            if c.get('gloss'): o+=stp(f'<div class="a" style="left:{x}px;top:{270+ph2+40+len(c["rows"])*104+10}px;width:{cw}px;text-align:center"><span class="pill" style="font-size:42px;padding:8px 32px;color:#6a35e8;white-space:nowrap">{c["gloss"]}</span></div>',st,g); st+=1
+        return o
     for i,c in enumerate(C):
         x=90+i*(w+gx)
         if nb: o+=num(x+w//2-32,200,i+1)+pic(x,290,w,ph,c['pic'],40)+f'<div class="a" style="left:{x}px;top:{290+ph+36}px;width:{w}px;display:flex;justify-content:center">{grad_chip(c.get("grad","violet"),c["label"],44,"8px 34px")}</div>'; continue
@@ -55,10 +78,10 @@ def columns(d):
 def pic_question(d):
     """One big picture + a question panel. {'phase':'ENGAGE','pic':f,'q':('What',['should','he do?'])}"""
     w,rest=d['q']
-    return (header(d['phase'])+pic(90,235,1240,686,d['pic'],56)
-      +'<div class="gl" style="left:1370px;top:235px;width:460px;height:686px;border-radius:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:O;font-weight:800;font-size:76px;line-height:1.05">'
+    return (header(d['phase'])+stp(pic(90,235,1240,686,d['pic'],56),1)
+      +stp('<div class="gl" style="left:1370px;top:235px;width:460px;height:686px;border-radius:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:O;font-weight:800;font-size:76px;line-height:1.05">'
       +f'<span class="chip c4" style="font-size:80px;padding:8px 36px;border-radius:999px">{w}</span>'+''.join(f'<span>{t}</span>' for t in rest)
-      +f'<div style="width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:80px;{GR}">?</div></div>')
+      +f'<div style="width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:80px;{GR}">?</div></div>',2))
 
 EARTH='<svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#4fa7ff" stroke="#1c1b2e" stroke-width="4"/><path d="M14 22c6-8 14-6 16 0s-6 8-4 14-10 6-12-2z" fill="#4fcf7a"/><path d="M38 14c8-2 14 4 12 10s-8 4-10 10 8 8 0 12-8-18-2-32z" fill="#4fcf7a"/></svg>'
 def bubble(x,y,mark):
@@ -71,10 +94,11 @@ def strip(d):
     o=header(d['phase'],d['role']+' says' if 'title' not in d else d['title'],d.get('grad','violet'))
     xs=[90,680,1270]; ny=[168,593]; py=[248,673]
     for i,f in enumerate(d['pics']):
-        r,c=divmod(i,3); o+=num(xs[c]+248,ny[r],i+1)+pic(xs[c],py[r],560,315,f)
-    o+='<div class="gl" style="left:1270px;top:673px;width:560px;height:315px;border-radius:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">'+''.join(chiprow(r,52,'10px 30px','14px') for r in d['close'])+'</div>'
+        r,c=divmod(i,3); o+=stp(num(xs[c]+248,ny[r],i+1),i+1)+stp(pic(xs[c],py[r],560,315,f),i+1)
+    n=len(d['pics'])+1
+    o+=stp('<div class="gl" style="left:1270px;top:673px;width:560px;height:315px;border-radius:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">'+''.join(chiprow(r,52,'10px 30px','14px') for r in d['close'])+'</div>',n,pills=True)
     b=d.get('bubble')
-    if b: o+=bubble(1440,252,b['emoji'])
+    if b: o+=f'<div data-s="{b.get("panel",3)}" style="position:absolute;left:0;top:0">'+bubble(1440,252,b['emoji'])+'</div>'
     return o
 
 @module('pic_rows')
@@ -83,9 +107,10 @@ def pic_rows(d):
     R=d['rows']; n=len(R); o=header(d['phase'],d.get('title'))
     for j,r in enumerate(R):
         y=168+j*425; k=len(r['pics']); w=int((1740-30*(k-1))/k); w=min(w,520 if k==3 else 405); h=int(w*9/16); gx=int((1740-w*k)/(k-1)) if k>1 else 0
-        o+=f'<div class="a" style="left:90px;top:{y}px;display:flex;align-items:center;gap:0"><div class="chip" style="font-size:44px;padding:10px 40px;border-radius:999px;background:{G(r["grad"])}">{r["label"]}</div><div style="width:6px;height:54px;border-radius:3px;background:rgba(124,70,230,.4);margin:0 44px"></div>{chiprow(r["chips"])}</div>'
-        for i,f in enumerate(r['pics']): o+=pic(90+i*(w+gx),y+90,w,h,f,36)
-        if r.get('cap'): o+=f'<div class="a mu" style="left:96px;top:{y+90+h+10}px;font-size:36px">{r["cap"]}</div>'
+        st=j*(k+1)+1
+        o+=stp(f'<div class="a" style="left:90px;top:{y}px;display:flex;align-items:center;gap:0"><div class="chip" style="font-size:44px;padding:10px 40px;border-radius:999px;background:{G(r["grad"])}">{r["label"]}</div><div style="width:6px;height:54px;border-radius:3px;background:rgba(124,70,230,.4);margin:0 44px"></div>{chiprow(r["chips"])}</div>',st,pills=True)
+        for i,f in enumerate(r['pics']): o+=stp(pic(90+i*(w+gx),y+90,w,h,f,36),st+1+i)
+        if r.get('cap'): o+=stp(f'<div class="a mu" style="left:96px;top:{y+90+h+10}px;font-size:36px">{r["cap"]}</div>',st+k)
     return o
 
 @module('qgrid')
@@ -94,7 +119,7 @@ def qgrid(d):
     o=header(d['phase'],d.get('title','Question it'))
     for i,it in enumerate(d['items'][:4]):
         r,c=divmod(i,2); x=90+c*920; y=168+r*420
-        o+=pic(x+140,y,540,304,it['pic'],40)+f'<div class="a" style="left:{x}px;top:{y+322}px;width:820px;display:flex;gap:12px;justify-content:center">'+''.join(ch(a,b,46,'8px 26px') for a,b in it['chips'])+'</div>'
+        o+=stp(pic(x+140,y,540,304,it['pic'],40),i+1)+stp(f'<div class="a" style="left:{x}px;top:{y+322}px;width:820px;display:flex;gap:12px;justify-content:center">'+''.join(ch(a,b,46,'8px 26px') for a,b in it['chips'])+'</div>',i+1,pills=True)
     return o
 
 @module('dial')
@@ -115,6 +140,26 @@ def dial(d):
         else: o+=f'<div style="position:absolute;left:{x+65+24}px;top:{y-(80 if len(ts)>1 else 60)}px;width:440px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;height:{160 if len(ts)>1 else 120}px;justify-content:center"><div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">{labs}</div>{g}</div>'
     return o
 
+@module('choice_board')
+def choice_board(d):
+    """Picture dial: 5 tiles (weak->strong). Tap a tile -> big picture + sentence + gloss. {'stops':[{'word','pic','chips','gloss','grad'}],'start':4}"""
+    S=d['stops']; n=len(S); st=d.get('start',n-1)
+    o=header(d['phase'],d.get('title','How strong?'),'violet')
+    o+='<div class="gl" style="left:90px;top:168px;width:1740px;height:520px;border-radius:72px"></div>'
+    for i,s in enumerate(S):
+        op=1 if i==st else 0
+        o+=f'<div class="cbp" data-i="{i}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:{op};pointer-events:none">'
+        o+=pic(118,187,856,482,s['pic'],48)
+        o+=f'<div class="a" style="left:1010px;top:230px;width:780px;display:flex;flex-direction:column;align-items:center;gap:34px">{chiprow(s["chips"],64,"10px 32px","14px",wrap=True)}<span class="pill" style="font-size:54px;padding:10px 44px;color:#6a35e8;white-space:nowrap">{s["gloss"]}</span></div></div>'
+    w=300; h=169; gx=int((1560-w*n)/(n-1))
+    o+='<div class="gl" style="left:90px;top:712px;width:1740px;height:276px;border-radius:64px"></div>'
+    for i,s in enumerate(S):
+        x=130+i*(w+gx)
+        o+=(f'<div class="cbt{" sel" if i==st else ""}" data-i="{i}" style="position:absolute;left:{x}px;top:732px;width:{w}px;height:{h+90}px;cursor:pointer">'
+            +pic(0,0,w,h,s['pic'],30)
+            +f'<div class="a" style="left:0;top:{h+16}px;width:{w}px;text-align:center"><span class="chip" style="font-size:44px;padding:8px 30px;border-radius:999px;background:{G(s["grad"])}">{s["word"]}</span></div></div>')
+    return o
+
 @module('cards')
 def cards(d):
     """2-4 tall cards. {'cards':[{'emoji','name','grad','text','foot'}]}"""
@@ -122,10 +167,10 @@ def cards(d):
     o=header(d['phase'],d.get('title'),d.get('rg','violet'))
     for i,c in enumerate(C):
         x=90+i*(w+gx)
-        o+=(f'<div class="gl" style="left:{x}px;top:168px;width:{w}px;height:820px;border-radius:72px;display:flex;flex-direction:column;align-items:center;gap:36px;padding:{70 if n<4 else 90}px 24px 0">'
+        o+=stp(f'<div class="gl" style="left:{x}px;top:168px;width:{w}px;height:820px;border-radius:72px;display:flex;flex-direction:column;align-items:center;gap:36px;padding:{70 if n<4 else 90}px 24px 0">'
             f'<img src="{EM(c["emoji"])}" style="width:{260 if n<4 else 210}px;{sh()}"><div class="chip" style="font-size:{64 if n<4 else 52}px;padding:12px {56 if n<4 else 40}px;border-radius:999px;background:{G(c["grad"])}">{c["name"]}</div>'
             f'<div style="font-family:O;font-weight:800;font-size:{46 if n<4 else 44}px;color:#1c1b2e;text-align:center;line-height:1.15;padding:0 20px">{c.get("text","")}</div>'
-            +(f'<div class="pill" style="font-size:38px;padding:10px 36px;color:#6a35e8">{c["foot"]}</div>' if c.get('foot') else '')+'</div>')
+            +(f'<div class="pill" style="font-size:38px;padding:10px 36px;color:#6a35e8">{c["foot"]}</div>' if c.get('foot') else '')+'</div>',i+1)
     if d.get('note'): o+=f'<div class="pill" style="position:absolute;left:150px;top:900px;font-size:36px;padding:10px 36px">{d["note"]}</div>'
     return o
 
@@ -167,20 +212,21 @@ def prep(d):
     if s: o+=f'<div class="gl" style="left:820px;top:40px;height:100px;width:auto;padding:0 40px;border-radius:50px;display:flex;align-items:center;gap:26px"><img src="{EM(s[0])}" style="width:64px">{dots(s[1])}<img src="{EM(s[2])}" style="width:64px"></div>'
     o+=f'<div class="pill" style="position:absolute;right:90px;top:50px;font-size:50px;padding:10px 46px;color:#fff;{GR}">{d.get("timer","3:00")}</div>'
     for x,w,blocks,al in [(90,1010,d['left'],d.get('lal','center')),(1130,700,d['right'],'center')]:
-        o+=f'<div class="gl" style="left:{x}px;top:168px;width:{w}px;height:552px;border-radius:72px;padding:44px 40px;display:flex;flex-direction:column;align-items:{"flex-start" if al=="start" else "center"};justify-content:center;gap:{26 if al=="start" else 32}px">'+''.join(block(b) for b in blocks)+'</div>'
-    o+='<div class="gl" style="left:90px;top:760px;width:1740px;height:228px;border-radius:72px;display:flex;align-items:center;gap:20px;padding:0 40px"><div class="chip" style="font-size:40px;padding:10px 34px;border-radius:999px;background:linear-gradient(135deg,#ff8a3c,#ff4f7a)">Repair kit</div>'+''.join(tile(e,t) for e,t in d.get('repair',[('red_question_mark','Sorry?'),('speech_balloon','Say that again?'),('stopwatch','Slower, please.'),('face_with_open_mouth','I don’t understand.')]))+'</div>'
+        o+=stp(f'<div class="gl" style="left:{x}px;top:168px;width:{w}px;height:552px;border-radius:72px;padding:44px 40px;display:flex;flex-direction:column;align-items:{"flex-start" if al=="start" else "center"};justify-content:center;gap:{26 if al=="start" else 32}px">'+''.join(block(b) for b in blocks)+'</div>',1 if x==90 else 2)
+    o+=stp('<div class="gl" style="left:90px;top:760px;width:1740px;height:228px;border-radius:72px;display:flex;align-items:center;gap:20px;padding:0 40px"><div class="chip" style="font-size:40px;padding:10px 34px;border-radius:999px;background:linear-gradient(135deg,#ff8a3c,#ff4f7a)">Repair kit</div>'+''.join(tile(e,t) for e,t in d.get('repair',[('red_question_mark','Sorry?'),('speech_balloon','Say that again?'),('stopwatch','Slower, please.'),('face_with_open_mouth','I don’t understand.')]))+'</div>',3)
     return o
 
 @module('recap')
 def recap(d):
     """{'phase':'RECAP','rows':[([chips],'gloss')],'side':[[chips]],'emoji':'face_with_thermometer'}"""
     o=header(d['phase'])+f'<div class="a h" style="left:90px;top:130px;font-size:68px">{d.get("title","Today we can say…")}</div>'
+    nr=len(d['rows'])
     for k,(cs,g) in enumerate(d['rows']):
-        o+=f'<div class="gl" style="left:90px;top:{240+k*150}px;width:960px;height:128px;border-radius:64px;display:flex;align-items:center;gap:14px;padding:0 36px">{chiprow(cs,48,"8px 24px","14px")}<span class="mu" style="margin-left:auto;font-family:O;font-weight:700;font-size:36px">{g}</span></div>'
+        o+=stp(f'<div class="gl" style="left:90px;top:{240+k*150}px;width:960px;height:128px;border-radius:64px;display:flex;align-items:center;gap:14px;padding:0 36px">{chiprow(cs,48,"8px 24px","14px")}<span class="mu" style="margin-left:auto;font-family:O;font-weight:700;font-size:36px">{g}</span></div>',k+1,pills=True)
     if d.get('side'):
-        o+='<div class="gl" style="left:1080px;top:240px;width:750px;height:728px;border-radius:72px"></div>'
-        for k,q in enumerate(d['side']): o+=f'<div class="a" style="left:1100px;top:{300+k*150}px;width:710px;display:flex;gap:10px;justify-content:center">'+''.join(ch(a,b,44,'8px 22px') for a,b in q)+'</div>'
-        if d.get('emoji'): o+=f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1360px;top:770px;width:190px;{sh()}">'
+        o+=stp('<div class="gl" style="left:1080px;top:240px;width:750px;height:728px;border-radius:72px"></div>',nr+1)
+        for k,q in enumerate(d['side']): o+=stp(f'<div class="a" style="left:1100px;top:{300+k*150}px;width:710px;display:flex;gap:10px;justify-content:center">'+''.join(ch(a,b,44,'8px 22px') for a,b in q)+'</div>',nr+1+k,pills=True)
+        if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1360px;top:770px;width:190px;{sh()}">',nr+len(d['side']))
     return o+'<div class="a mu" style="left:90px;bottom:22px;font-size:22px">Emoji: Microsoft Fluent Emoji (MIT)</div>'
 
 @module('exit')

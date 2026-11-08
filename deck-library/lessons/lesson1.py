@@ -10,7 +10,7 @@ spec=[
   'cards':[{'pic':'01_c1.jpg','x':1010,'y':150,'w':330,'h':430,'r':-7},{'pic':'01_c2.jpg','x':1290,'y':300,'w':330,'h':430,'r':4},{'pic':'01_c3.jpg','x':1500,'y':120,'w':330,'h':430,'r':-3}]},
  {'m':'columns','phase':E_,'numbered':True,'cols':[{'label':'Two weeks before','pic':'hw_1.jpg','rows':[]},{'label':'The day before','pic':'hw_2.jpg','rows':[]},{'label':'Today','pic':'hw_3.jpg','rows':[]}]},
  {'m':'pic_question','phase':E_,'pic':'hw_3.jpg','q':('What',['should','he do?'])},
- {'m':'today','phase':S_,'emoji':'pointing_viewer','title':'Orders and advice','fs':76,'rows':[[YOU,('c2','have to'),('c3','rest.')],[YOU,('c2','should'),('c3','drink water.')]]},
+ {'m':'today','phase':S_,'emoji':'pointing_viewer','title':'Orders and advice','fs':76,'rows':[{'icon':'red_exclamation_mark','chips':[YOU,('c2','have to'),('c3','rest.')]},{'icon':'light_bulb','chips':[YOU,('c2','should'),('c3','drink water.')]}]},
  {'m':'strip','phase':S_,'role':'Boss','grad':'red','pics':['05_p1.jpg','05_p2.jpg','05a_p3.jpg','05a_p4.jpg','05a_p5.jpg'],'close':[[YOU,('c2','have to')],[('c3','save the planet.')]],'bubble':{'emoji':'red_exclamation_mark'}},
  {'m':'strip','phase':S_,'role':'Friend','grad':'teal','pics':['05_p1.jpg','05_p2.jpg','05b_p3_beach.jpg','05b_p4_m.jpg','05b_p5.jpg'],'close':[[YOU,('c2','should')],[('c3','save the planet.')]],'bubble':{'emoji':'thumbs_up'}},
  {'m':'contrast','phase':S_,'title':'Boss says','left':{'label':'Boss says','grad':'red','pic':'05a_p3.jpg','chips':[YOU,('c2','have to'),('c3','save the planet.')],'cap':'Needed.'},
@@ -18,11 +18,16 @@ spec=[
  {'m':'pic_rows','phase':S_,'rows':[
    {'label':'Neighbour','grad':'amber','chips':[YOU,('c2','should'),('c3','put a banana on your head.')],'pics':[f'09a_p{k}.jpg' for k in range(1,5)],'cap':'Good idea?'},
    {'label':'Pharmacist','grad':'teal','chips':[YOU,('c2','have to'),('c3','take this pill.')],'pics':[f'09b_p{k}.jpg' for k in range(1,5)],'cap':'Needed.'}]},
- {'m':'dial','phase':S_,'stops':[(180,'prohibited',['mustn’t'],'not allowed'),(135,'thumbs_down',['shouldn’t'],'bad idea?'),(90,'relieved_face',['don’t have to'],'not needed'),(45,'thumbs_up',['should'],'good idea?'),(0,'red_exclamation_mark',['have to','must'],'needed')]},
+ {'m':'choice_board','phase':S_,'title':'How strong?','start':4,'stops':[
+   {'word':'mustn’t','pic':'hw_5.jpg','grad':'red','chips':[YOU,('c2','mustn’t'),('c3','copy.')],'gloss':'Not allowed'},
+   {'word':'shouldn’t','pic':'hw_3.jpg','grad':'orange','chips':[YOU,('c2','shouldn’t'),('c3','work.')],'gloss':'Bad idea?'},
+   {'word':'don’t have to','pic':'hw_1.jpg','grad':'teal','chips':[YOU,('c2','don’t have to'),('c3','rush.')],'gloss':'Not needed'},
+   {'word':'should','pic':'hw_4.jpg','grad':'sky','chips':[YOU,('c2','should'),('c3','start.')],'gloss':'Good idea?'},
+   {'word':'have to','pic':'hw_2.jpg','grad':'violet','chips':[YOU,('c2','have to'),('c3','finish.')],'gloss':'Needed'}]},
  {'m':'timer','phase':S_,'title':'Pair talk','optional':True,'min':2,'icons':['speech_balloon','speech_balloon'],'note':'One thing you should / shouldn’t do tonight'},
  {'m':'contrast','phase':S_,'title':'Not the same!','left':{'label':'Not allowed','grad':'red','pic':'mu_1.jpg','chips':[YOU,('c2','mustn’t'),('c3','drink alcohol.')]},
    'right':{'label':'Not needed','grad':'teal','pic':'mu_2.jpg','chips':[YOU,('c2','don’t have to'),('c3','take it with food.')]}},
- {'m':'columns','phase':S_,'title':'Homework','cols':[
+ {'m':'columns','phase':S_,'title':'Homework','card':True,'cols':[
    {'label':'Two weeks before','pic':'hw_1.jpg','rows':[[YOU,('c2','don’t have to'),('c3','rush.')],[YOU,('c2','should'),('c3','start.')]],'gloss':'Not needed · good idea?'},
    {'label':'The day before','pic':'hw_2.jpg','rows':[[YOU,('c2','have to'),('c3','finish.')]],'gloss':'Needed'},
    {'label':'Today','pic':'hw_3.jpg','rows':[[YOU,('c2','shouldn’t'),('c3','work.')]],'gloss':'Bad idea?'}]},

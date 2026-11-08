@@ -105,3 +105,8 @@ def build(spec,outdir,pdf=None,light=True):
         if light: ims=[i.resize((1280,720),Image.LANCZOS) for i in ims]
         ims[0].save(pdf,save_all=True,append_images=ims[1:],resolution=96,quality=55)
     return outdir
+
+def stp(html,s,g=None,pills=False):
+    """Mark element as reveal step s (click-per-step in interactive decks; ignored in static output)."""
+    i=html.index('<'); j=html.index(' ',i)
+    return html[:j]+f' data-s="{s}"'+(f' data-g="{g}"' if g else '')+(' data-pills="1"' if pills else '')+html[j:]
