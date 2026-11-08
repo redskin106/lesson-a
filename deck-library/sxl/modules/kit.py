@@ -107,7 +107,7 @@ def dial(d):
          f'<line x1="{cx}" y1="{cy}" x2="{cx}" y2="{cy-R+60}" stroke="#1c1b2e" stroke-width="10" stroke-linecap="round"/><circle cx="{cx}" cy="{cy}" r="24" fill="#1c1b2e"/></svg>')
     o=header(d['phase'],d.get('title','How strong?'),'violet')+svg
     for (x,y),(a,e,ts,gl) in zip(pts,S):
-        o+=f'<div class="gl" style="left:{x-65}px;top:{y-65}px;width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;border-color:#fff"><img src="{EM(e)}" style="width:84px"></div>'
+        o+=f'<div class="gl dstop" style="left:{x-65}px;top:{y-65}px;width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;border-color:#fff"><img src="{EM(e)}" style="width:84px"></div>'
         labs=''.join(ch('c2',t,52 if i==0 else 40,'8px 30px' if i==0 else '6px 22px') for i,t in enumerate(ts))
         g=f'<div class="mu" style="font-size:30px;margin-top:6px">{gl}</div>' if gl else ''
         if a>=135: o+=f'<div style="position:absolute;left:{x-65-24-560}px;top:{y-60}px;width:560px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;height:120px"><div style="display:flex;gap:10px">{labs}</div>{g}</div>'
@@ -133,14 +133,15 @@ def reel(emo,spin=False):
     inner=(f'<img src="{EM(emo)}" style="width:84px;filter:blur(7px);opacity:.55;transform:translateY(-14px)"><img src="{EM(emo)}" style="width:84px;filter:blur(7px);opacity:.55;transform:translateY(14px);margin-left:-60px">' if spin else f'<img src="{EM(emo)}" style="width:84px">')
     return f'<div style="width:500px;height:100px;border-radius:50px;background:rgba(255,255,255,.75);box-shadow:inset 0 4px 10px rgba(80,60,160,.15);display:flex;align-items:center;justify-content:center;overflow:hidden">{inner}</div>'
 def reelp(n,spin=False):
+    import html as _h
     x=('<div style="font-family:O;font-weight:800;font-size:60px;color:#9a5cff;letter-spacing:.2em;filter:blur(3px)">· · ·</div>' if spin else dots(n))
-    return f'<div style="width:500px;height:100px;border-radius:50px;background:rgba(255,255,255,.75);box-shadow:inset 0 4px 10px rgba(80,60,160,.15);display:flex;align-items:center;justify-content:center">{x}</div>'
+    return f'<div class="reelp" data-real="{_h.escape(dots(n))}" style="width:500px;height:100px;border-radius:50px;background:rgba(255,255,255,.75);box-shadow:inset 0 4px 10px rgba(80,60,160,.15);display:flex;align-items:center;justify-content:center">{x}</div>'
 @module('slot')
 def slot(d):
     """Slot machine: every row = (problem emoji, pain 1-5, twist emoji, spinning?). Heads are data."""
     heads=d.get('heads',['PROBLEM','PAIN','TWIST'])
     o=header(d['phase'])+'<div class="a" style="left:300px;top:176px;display:flex;gap:20px;font-family:O;font-weight:700;font-size:28px;letter-spacing:.14em;color:#4a5a7a">'+''.join(f'<div style="width:500px;text-align:center">{t}</div>' for t in heads)+'</div>'
-    o+=f'<div style="position:absolute;left:1650px;top:60px;width:180px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:44px;color:#fff;{GR}">SPIN</div>'
+    o+=f'<div class="spinbtn" style="position:absolute;left:1650px;top:60px;width:180px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:44px;color:#fff;{GR}">SPIN</div>'
     for k,(a,p,t,sp) in enumerate(d['rows']):
         y=226+k*152
         o+=(f'<div class="gl" style="left:90px;top:{y}px;width:1740px;height:132px;border-radius:66px;display:flex;align-items:center;gap:20px;padding:0 36px">'
