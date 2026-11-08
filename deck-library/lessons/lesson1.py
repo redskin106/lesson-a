@@ -6,7 +6,7 @@ YOU=('c1','You')
 E_,S_,A_='ENGAGE','STUDY','ACTIVATE'
 SHOULDBANK=[('c2','have to'),('c2','don’t have to'),('c2','shouldn’t'),('c2','should')]
 spec=[
- {'m':'cover','phase':E_,'tag':'EFL','title':'Lesson <span class="grad">1</span>','phases':['Engage','Study','Activate'],'active':0,
+ {'m':'cover','phase':E_,'title':'Lesson <span class="grad">1</span>','phases':['Engage','Study','Activate'],'active':0,
   'cards':[{'pic':'01_c1.jpg','x':1010,'y':150,'w':330,'h':430,'r':-7},{'pic':'01_c2.jpg','x':1290,'y':300,'w':330,'h':430,'r':4},{'pic':'01_c3.jpg','x':1500,'y':120,'w':330,'h':430,'r':-3}]},
  {'m':'columns','phase':E_,'numbered':True,'cols':[{'label':'Two weeks before','pic':'hw_1.jpg','rows':[]},{'label':'The day before','pic':'hw_2.jpg','rows':[]},{'label':'Today','pic':'hw_3.jpg','rows':[]}]},
  {'m':'pic_question','phase':E_,'pic':'hw_3.jpg','q':('What',['should','he do?'])},
@@ -17,7 +17,7 @@ spec=[
    'right':{'label':'Boss says','grad':'red','pic':'06_p2.jpg','chips':[YOU,('c2','don’t have to'),('c3','save the planet.')],'cap':'Not needed.'}},
  {'m':'pic_rows','phase':S_,'rows':[
    {'label':'Neighbour','grad':'amber','chips':[YOU,('c2','should'),('c3','put a banana on your head.')],'pics':[f'09a_p{k}.jpg' for k in range(1,5)],'cap':'Good idea?'},
-   {'label':'Pharmacist','grad':'teal','chips':[YOU,('c2','have to'),('c3','take this pill.')],'pics':[f'09b_p{k}.jpg' for k in range(1,5)],'cap':'Needed.'}]},
+   {'label':'Pharmacist','grad':'teal','chips':[YOU,('c2','have to'),('c3','take this pill.')],'pics':['09b_p1.jpg','09b_p2.jpg','09b_p3.jpg','09b_p4.jpg'],'cap':'Needed.'}]},
  {'m':'choice_board','phase':S_,'title':'How strong?','start':4,'stops':[
    {'word':'mustn’t','pic':'hw_5.jpg','grad':'red','chips':[YOU,('c2','mustn’t'),('c3','copy.')],'gloss':'Not allowed'},
    {'word':'shouldn’t','pic':'hw_3.jpg','grad':'orange','chips':[YOU,('c2','shouldn’t'),('c3','work.')],'gloss':'Bad idea?'},
@@ -34,9 +34,9 @@ spec=[
  {'m':'pic_rows','phase':S_,'title':'Swap!','optional':True,'rows':[
    {'label':'Boss','grad':'red','chips':[YOU,('c2','should'),('c3','rest.')],'pics':['sw_1t.jpg','sw_2a.jpg','sw_3.jpg']},
    {'label':'Friend','grad':'teal','chips':[YOU,('c2','have to'),('c3','rest.')],'pics':['sw_1t.jpg','sw_2b.jpg','sw_3.jpg']}]},
- {'m':'sort','phase':S_,'title':'Fill the gaps','bank':['have to','should','|',('c3','go to hospital'),('c3','sleep'),('c3','drink tea')],'rows':[{'pic':'sc_1.jpg','ans':['have to','go to hospital']},{'pic':'sc_2.jpg','ans':['should','sleep']},{'pic':'sc_3.jpg','ans':['should','drink tea']}]},
- {'m':'sort','phase':S_,'title':'Fill the gaps','bank':['have to','should','shouldn’t','don’t have to','mustn’t'],'rows':[
-   {'pic':'sc2_1.jpg','end':('c3','eat spicy food.'),'ans':'shouldn’t'},{'pic':'sc2_2.jpg','end':('c3','see a doctor.'),'ans':'have to'},{'pic':'sc2_3.jpg','end':('c3','stay in bed.'),'ans':'don’t have to'},{'pic':'sc2_4.jpg','end':('c3','drive.'),'ans':'mustn’t'}]},
+ {'m':'sort','phase':S_,'title':'Fill the gaps','bank':['have to','should','don’t have to','|',('c3','go to hospital'),('c3','sleep'),('c3','stay in bed')],'rows':[{'pic':'sc_1.jpg','ans':['have to','go to hospital']},{'pic':'sc_2.jpg','ans':['should','sleep']},{'pic':'sc2_3.jpg','ans':['don’t have to','stay in bed']}]},
+ {'m':'sort','phase':S_,'title':'Fill the gaps','bank':['have to','should','shouldn’t','mustn’t'],'rows':[
+   {'pic':'sc2_1.jpg','end':('c3','eat spicy food.'),'ans':'shouldn’t'},{'pic':'sc2_2.jpg','end':('c3','see a doctor.'),'ans':'have to'},{'pic':'sc2_4.jpg','end':('c3','drive.'),'ans':'mustn’t'}]},
  {'m':'today','phase':S_,'emoji':'red_question_mark','title':'Questions','fs':60,'tfs':96,'rows':[
    [('c4','Where'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','How much'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','When'),('c2','did'),('c1','it'),('c3','start?')],[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')]]},
  {'m':'qgrid','phase':S_,'title':'Question it','items':[
@@ -65,17 +65,18 @@ spec=[
  {'m':'cards','phase':A_,'title':'Your twist','rg':'orange','cards':[
    {'emoji':'zany_face','name':'Gibberish','grad':'orange','text':'“Blah blah blah…”'},{'emoji':'face_with_open_mouth','name':'Drama','grad':'orange','text':'“I’m dying!”'},
    {'emoji':'face_with_symbols_on_mouth','name':'Stubborn','grad':'orange','text':'“I don’t want to!”'},{'emoji':'old_woman','name':'Neighbour','grad':'orange','text':'“My neighbour says…”'}]},
- {'m':'slot','phase':A_,'rows':[('face_with_head-bandage',4,'zany_face',0),('sneezing_face',2,'stopwatch',0),('face_with_thermometer',3,'shushing_face',0),('nauseated_face',5,'zany_face',1),('hot_face',1,'stopwatch',1)]},
+ {'m':'slot','phase':A_,'rows':[('face_with_head-bandage',4,'zany_face',1),('sneezing_face',2,'face_with_open_mouth',1),('face_with_thermometer',3,'face_with_symbols_on_mouth',1),('nauseated_face',5,'old_woman',1),('tooth',1,'zany_face',1)]},
  {'m':'prep','phase':A_,'role':'Nurse','grad':'teal','status':('face_with_head-bandage',4,'zany_face'),'lal':'start',
   'left':[('chips',[[('c4','Where'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','How much'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','When'),('c2','did'),('c1','it'),('c3','start?')],[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')]])],
-  'right':[('lead',[YOU,('c2','should')]),('tiles',[('sleeping_face','sleep'),('glass_of_milk','drink water'),('hot_beverage','drink tea')])]},
+  'right':[('lead',[YOU,('c2','should')]),('bigtiles',[('sleeping_face','sleep'),('glass_of_milk','drink water')])]},
  {'m':'prep','phase':A_,'role':'Doctor','grad':'violet','status':('face_with_head-bandage',4,'zany_face'),
-  'left':[('lead',[YOU,('c2','have to')]),('bigtiles',[('hospital','go to hospital'),('pill','take medicine'),('stethoscope','see a doctor')])],
-  'right':[('chips',[[('c2','Have'),('c1','you'),('c2','tried'),('c3','this?')],[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')]]),('label','OPTIONAL')]},
+  'left':[('lead',[YOU,('c2','have to')]),('tiles',[('hospital','go to hospital'),('pill','take medicine'),('stethoscope','see a doctor')])],
+  'repair':[],'widths':(780,930),'right':[('qrows',[('light_bulb',[('c2','Have'),('c1','you'),('c2','tried'),('c3','this?')]),('pill',[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')])])]},
  {'m':'timer','phase':A_,'title':'Group practice','min':8,'icons':['face_with_thermometer','woman_health_worker','man_health_worker'],'note':'Everyone speaks at once'},
  {'m':'recap','phase':'RECAP','rows':[([YOU,('c2','have to'),('c3','rest.')],'needed'),([YOU,('c2','should'),('c3','drink water.')],'good idea?'),([YOU,('c2','shouldn’t'),('c3','drive.')],'bad idea?'),
    ([YOU,('c2','don’t have to'),('c3','go.')],'not needed'),([YOU,('c2','mustn’t'),('c3','drink.')],'not allowed')],
   'side':[[('c4','Where'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','When'),('c2','did'),('c1','it'),('c3','start?')],[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')]],'emoji':'face_with_thermometer'},
+ {'m':'closing','mode':'night','line1':'Thank','line2':'you!','sub':'See you next time.','emoji':'waving_hand'},
 ]
 from lessons.plan import L1,apply
 apply(spec,[r for r in L1])

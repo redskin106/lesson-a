@@ -16,7 +16,7 @@ def dots(n,total=5): return '<div style="display:flex;gap:16px">'+''.join(f'<div
 @module('cover')
 def cover(d):
     """{'tag':'EFL','title':'Lesson <span class="grad">1</span>','phases':['Engage','Study','Activate'],'active':0,'cards':[{'pic':f,'x':1010,'y':150,'w':330,'h':430,'r':-7}]}"""
-    o=f'<div class="tag" style="left:110px;top:90px;{GR}font-size:30px">{d.get("tag","")}</div>'
+    o=f'<div class="tag" style="left:110px;top:90px;{GR}font-size:30px">{d["tag"]}</div>' if d.get('tag') else ''
     o+=f'<div class="a h" style="left:104px;top:640px;font-size:210px;line-height:.9;white-space:nowrap">{d["title"]}</div>'
     o+='<div class="a" style="left:110px;top:900px;display:flex;gap:20px">'+''.join(pill(t,36,i!=d.get('active',0)) for i,t in enumerate(d.get('phases',[])))+'</div>'
     for c in d.get('cards',[]):
@@ -63,7 +63,7 @@ def columns(d):
                 yy=270+ph2+40+k_*104
                 if k_: o+=stp(f'<div class="a" style="left:{x+60}px;top:{yy-14}px;width:{cw-120}px;height:3px;border-radius:2px;background:rgba(124,70,230,.25)"></div>',st,g)
                 o+=stp(f'<div class="a" style="left:{x}px;top:{yy}px;width:{cw}px;display:flex;gap:8px;justify-content:center">'+''.join(ch(a,b,40,'6px 16px') for a,b in r)+'</div>',st,g,pills=True); st+=1
-            if c.get('gloss'): o+=stp(f'<div class="a" style="left:{x}px;top:{270+ph2+40+len(c["rows"])*104+10}px;width:{cw}px;text-align:center"><span class="pill" style="font-size:42px;padding:8px 32px;color:#6a35e8;white-space:nowrap">{c["gloss"]}</span></div>',st,g); st+=1
+            if c.get('gloss'): o+=stp(f'<div class="a" style="left:{x}px;top:872px;width:{cw}px;text-align:center"><span class="pill" style="font-size:42px;padding:8px 32px;color:#6a35e8;white-space:nowrap">{c["gloss"]}</span></div>',st,g); st+=1
         return o
     for i,c in enumerate(C):
         x=90+i*(w+gx)
@@ -145,19 +145,19 @@ def choice_board(d):
     """Picture dial: 5 tiles (weak->strong). Tap a tile -> big picture + sentence + gloss. {'stops':[{'word','pic','chips','gloss','grad'}],'start':4}"""
     S=d['stops']; n=len(S); st=d.get('start',n-1)
     o=header(d['phase'],d.get('title','How strong?'),'violet')
-    o+='<div class="gl" style="left:90px;top:168px;width:1740px;height:520px;border-radius:72px"></div>'
+    o+='<div class="gl" style="left:90px;top:168px;width:1740px;height:470px;border-radius:72px"></div>'
     for i,s in enumerate(S):
         op=1 if i==st else 0
         o+=f'<div class="cbp" data-i="{i}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:{op};pointer-events:none">'
-        o+=pic(118,187,856,482,s['pic'],48)
-        o+=f'<div class="a" style="left:1010px;top:230px;width:780px;display:flex;flex-direction:column;align-items:center;gap:34px">{chiprow(s["chips"],64,"10px 32px","14px",wrap=True)}<span class="pill" style="font-size:54px;padding:10px 44px;color:#6a35e8;white-space:nowrap">{s["gloss"]}</span></div></div>'
-    w=300; h=169; gx=int((1560-w*n)/(n-1))
-    o+='<div class="gl" style="left:90px;top:712px;width:1740px;height:276px;border-radius:64px"></div>'
+        o+=pic(124,194,774,418,s['pic'],48)
+        o+=f'<div class="a" style="left:960px;top:230px;width:830px;display:flex;flex-direction:column;align-items:center;gap:40px">{chiprow(s["chips"],64,"10px 32px","14px",wrap=True)}<span class="pill" style="font-size:54px;padding:10px 44px;color:#6a35e8;white-space:nowrap">{s["gloss"]}</span></div></div>'
+    w=268; h=151; gx=int((1560-w*n)/(n-1))
+    o+='<div class="gl" style="left:90px;top:668px;width:1740px;height:320px;border-radius:64px"></div>'
     for i,s in enumerate(S):
         x=130+i*(w+gx)
-        o+=(f'<div class="cbt{" sel" if i==st else ""}" data-i="{i}" style="position:absolute;left:{x}px;top:732px;width:{w}px;height:{h+90}px;cursor:pointer">'
+        o+=(f'<div class="cbt{" sel" if i==st else ""}" data-i="{i}" style="position:absolute;left:{x}px;top:700px;width:{w}px;height:{h+110}px;cursor:pointer">'
             +pic(0,0,w,h,s['pic'],30)
-            +f'<div class="a" style="left:0;top:{h+16}px;width:{w}px;text-align:center"><span class="chip" style="font-size:44px;padding:8px 30px;border-radius:999px;background:{G(s["grad"])}">{s["word"]}</span></div></div>')
+            +f'<div class="a" style="left:0;top:{h+34}px;width:{w}px;text-align:center"><span class="chip" style="font-size:38px;padding:6px 26px;border-radius:999px;background:{G(s["grad"])}">{s["word"]}</span></div></div>')
     return o
 
 @module('cards')
@@ -175,8 +175,10 @@ def cards(d):
     return o
 
 def reel(emo,spin=False):
-    inner=(f'<img src="{EM(emo)}" style="width:84px;filter:blur(7px);opacity:.55;transform:translateY(-14px)"><img src="{EM(emo)}" style="width:84px;filter:blur(7px);opacity:.55;transform:translateY(14px);margin-left:-60px">' if spin else f'<img src="{EM(emo)}" style="width:84px">')
-    return f'<div style="width:500px;height:100px;border-radius:50px;background:rgba(255,255,255,.75);box-shadow:inset 0 4px 10px rgba(80,60,160,.15);display:flex;align-items:center;justify-content:center;overflow:hidden">{inner}</div>'
+    import html as _h
+    real=f'<img src="{EM(emo)}" style="width:84px">'
+    inner=(f'<img src="{EM(emo)}" style="width:84px;filter:blur(7px);opacity:.55;transform:translateY(-14px)"><img src="{EM(emo)}" style="width:84px;filter:blur(7px);opacity:.55;transform:translateY(14px);margin-left:-60px">' if spin else real)
+    return f'<div class="reelc" data-real="{_h.escape(real)}" style="width:500px;height:100px;border-radius:50px;background:rgba(255,255,255,.75);box-shadow:inset 0 4px 10px rgba(80,60,160,.15);display:flex;align-items:center;justify-content:center;overflow:hidden">{inner}</div>'
 def reelp(n,spin=False):
     import html as _h
     x=('<div style="font-family:O;font-weight:800;font-size:60px;color:#9a5cff;letter-spacing:.2em;filter:blur(3px)">· · ·</div>' if spin else dots(n))
@@ -187,13 +189,14 @@ def slot(d):
     heads=d.get('heads',['PROBLEM','PAIN','TWIST'])
     o=header(d['phase'])+'<div class="a" style="left:300px;top:176px;display:flex;gap:20px;font-family:O;font-weight:700;font-size:28px;letter-spacing:.14em;color:#4a5a7a">'+''.join(f'<div style="width:500px;text-align:center">{t}</div>' for t in heads)+'</div>'
     o+=f'<div class="spinbtn" style="position:absolute;left:1650px;top:60px;width:180px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:44px;color:#fff;{GR}">SPIN</div>'
-    for k,(a,p,t,sp) in enumerate(d['rows']):
-        y=226+k*152
-        o+=(f'<div class="gl" style="left:90px;top:{y}px;width:1740px;height:132px;border-radius:66px;display:flex;align-items:center;gap:20px;padding:0 36px">'
-            f'<div style="width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:50px;margin-right:24px;{GR}">{k+1}</div>'+reel(a,sp)+reelp(p,sp)+reel(t,sp)+'</div>')
+    o+='<div class="srows" style="position:absolute;left:90px;top:226px;width:1740px;height:770px;display:flex;flex-direction:column;justify-content:center;gap:20px">'
+    for k_,(a,p,t,sp) in enumerate(d['rows']):
+        o+=(f'<div class="gl sr" data-k="{k_}" style="position:relative;flex:1 1 0;max-height:176px;min-height:110px;border-radius:66px;display:flex;align-items:center;gap:20px;padding:0 36px">'
+            f'<div style="width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:50px;margin-right:24px;{GR}">{k_+1}</div>'+reel(a,sp)+reelp(p,sp)+reel(t,sp)+'</div>')
+    o+='</div>'
     return o
 
-tile=lambda e,t:f'<div style="width:300px;height:170px;border-radius:44px;background:rgba(255,255,255,.75);display:flex;align-items:center;gap:16px;padding:0 24px"><img src="{EM(e)}" style="width:80px"><div style="font-family:O;font-weight:800;font-size:34px;line-height:1.1;color:#1c1b2e">{t}</div></div>'
+tile=lambda e,t:f'<div style="width:330px;height:170px;border-radius:44px;background:rgba(255,255,255,.75);display:flex;align-items:center;gap:16px;padding:0 20px"><img src="{EM(e)}" style="width:80px"><div style="font-family:O;font-weight:800;font-size:30px;line-height:1.1;color:#1c1b2e">{t}</div></div>'
 bigtile=lambda e,t,w=190,h=230,iw=100,fs=34:f'<div style="width:{w}px;height:{h}px;border-radius:44px;background:rgba(255,255,255,.75);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><img src="{EM(e)}" style="width:{iw}px"><div style="font-family:O;font-weight:800;font-size:{fs}px;color:#1c1b2e;text-align:center;line-height:1.1">{t}</div></div>'
 def block(b):
     k=b[0]
@@ -201,6 +204,7 @@ def block(b):
     if k=='lead': return chiprow(b[1],56,'8px 30px')
     if k=='tiles': return '<div style="display:flex;gap:20px">'+''.join(bigtile(e,t) for e,t in b[1])+'</div>'
     if k=='bigtiles': return '<div style="display:flex;gap:26px">'+''.join(bigtile(e,t,270,300,140,40) for e,t in b[1])+'</div>'
+    if k=='qrows': return '<div style="display:flex;flex-direction:column;gap:34px;width:100%">'+''.join(f'<div style="display:flex;align-items:center;gap:28px;background:rgba(255,255,255,.7);border-radius:64px;padding:30px 36px"><img src="{EM(e)}" style="width:100px;{sh()}">{chiprow(cs,46,"8px 26px","10px")}</div>' for e,cs in b[1])+'</div>'
     if k=='label': return f'<div style="font-family:O;font-weight:700;font-size:30px;color:#4a5a7a;letter-spacing:.08em">{b[1]}</div>'
     return ''
 @module('prep')
@@ -211,9 +215,12 @@ def prep(d):
     s=d.get('status')
     if s: o+=f'<div class="gl" style="left:820px;top:40px;height:100px;width:auto;padding:0 40px;border-radius:50px;display:flex;align-items:center;gap:26px"><img src="{EM(s[0])}" style="width:64px">{dots(s[1])}<img src="{EM(s[2])}" style="width:64px"></div>'
     o+=f'<div class="pill" style="position:absolute;right:90px;top:50px;font-size:50px;padding:10px 46px;color:#fff;{GR}">{d.get("timer","3:00")}</div>'
-    for x,w,blocks,al in [(90,1010,d['left'],d.get('lal','center')),(1130,700,d['right'],'center')]:
-        o+=stp(f'<div class="gl" style="left:{x}px;top:168px;width:{w}px;height:552px;border-radius:72px;padding:44px 40px;display:flex;flex-direction:column;align-items:{"flex-start" if al=="start" else "center"};justify-content:center;gap:{26 if al=="start" else 32}px">'+''.join(block(b) for b in blocks)+'</div>',1 if x==90 else 2)
-    o+=stp('<div class="gl" style="left:90px;top:760px;width:1740px;height:228px;border-radius:72px;display:flex;align-items:center;gap:20px;padding:0 40px"><div class="chip" style="font-size:40px;padding:10px 34px;border-radius:999px;background:linear-gradient(135deg,#ff8a3c,#ff4f7a)">Repair kit</div>'+''.join(tile(e,t) for e,t in d.get('repair',[('red_question_mark','Sorry?'),('speech_balloon','Say that again?'),('stopwatch','Slower, please.'),('face_with_open_mouth','I don’t understand.')]))+'</div>',3)
+    kit=d.get('repair','default'); ph=552 if kit else 820
+    wl,wr=d.get('widths',(1010,700))
+    for x,w,blocks,al in [(90,wl,d['left'],d.get('lal','center')),(90+wl+30,wr,d['right'],'center')]:
+        o+=stp(f'<div class="gl" style="left:{x}px;top:168px;width:{w}px;height:{ph}px;border-radius:72px;padding:44px 40px;display:flex;flex-direction:column;align-items:{"flex-start" if al=="start" else "center"};justify-content:center;gap:{26 if al=="start" else 32}px">'+''.join(block(b) for b in blocks)+'</div>',1 if x==90 else 2)
+    if kit:
+        o+=stp('<div class="gl" style="left:90px;top:760px;width:1740px;height:228px;border-radius:72px;display:flex;align-items:center;gap:20px;padding:0 40px"><div class="chip" style="font-size:40px;padding:10px 34px;border-radius:999px;background:linear-gradient(135deg,#ff8a3c,#ff4f7a)">Repair kit</div>'+''.join(tile(e,t) for e,t in (d['repair'] if isinstance(d.get('repair'),list) and d['repair'] else [('red_question_mark','Sorry?'),('speech_balloon','Say that again?'),('stopwatch','Slower, please.'),('face_with_open_mouth','I don’t understand.')]))+'</div>',3)
     return o
 
 @module('recap')

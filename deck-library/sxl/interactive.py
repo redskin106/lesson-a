@@ -26,7 +26,7 @@ def inline_assets(html):
             kind = 'font' if p.endswith('.woff2') else 'art' if '/art/' in p else 'emoji'
             cache[u] = _b64(p, kind)
         return cache[u]
-    return re.sub(r'file:///[^")\'\s]+', rep, html)
+    return re.sub(r'file:///[^")\'\s&]+', rep, html)
 
 # ---------- slide builders (markup identical to static modules; behaviour via data-* hooks) ----------
 def chat_markup(d, sid):
@@ -58,7 +58,7 @@ def chat_markup(d, sid):
             f'<script type="application/json" id="d-{sid}">{json.dumps({"banks": bankhtml, "n": len(L), "gapn": [len(x["gaps"]) for x in data]})}</script>')
 
 def sort_markup(d, sid):
-    rows = d['rows']; n = len(rows); top, bot = 168, 830; step = (bot - top) / n; h = min(int(step - 18), 190); fs = min(72, int(h * .42)); ps = max(10, int(h * .22))
+    rows = d['rows']; n = len(rows); top, bot = 168, 812; step = (bot - top) / n; h = min(int(step - 18), 190); fs = min(64, int(h * .36)); ps = max(8, int(h * .1)); gh = int(fs * 1.3 + 2 * ps)
     out = header(d['phase'], d.get('title')); bank = d['bank']; plain = [b if isinstance(b, tuple) else ('c2', b) for b in bank if b != '|']
     for i, r in enumerate(rows):
         y = int(top + i * step); pre = r.get('pre', ('c1', 'You')) if r.get('pre', 1) else None; end = r.get('end')
@@ -67,7 +67,7 @@ def sort_markup(d, sid):
         out += num(90, y + h // 2 - 32, i + 1) + ph + f'<img class="spk" data-i="{i}" src="{EM("sparkles")}" style="left:{180 + h - 80}px;top:{y - 20}px;width:120px">'
         x0 = 180 + h + 40
         def slot(k, cls, col, w):
-            return (f'<span class="slot" data-i="{i}" data-t="{a[k]}"><span class="op">{gap(col, w, "…", h=int(fs * 1.45))}</span>'
+            return (f'<span class="slot" data-i="{i}" data-t="{a[k]}"><span class="op">{gap(col, w, "…", h=gh)}</span>'
                     f'<span class="fl" style="display:none">{ch(cls, a[k], fs, f"{ps}px {int(fs * .55)}px")}</span></span>')
         slots = slot(0, 'c2', '#9a5cff', 420) + ('' if end else slot(1, 'c3', '#ff7a3c', 470))
         out += (f'<div class="gl" style="left:{x0}px;top:{y}px;width:{1830 - x0}px;height:{h}px;border-radius:{int(h * .4)}px;display:flex;align-items:center;gap:22px;padding:0 50px">'
@@ -77,12 +77,12 @@ def sort_markup(d, sid):
     for r in rows:
         a = r.get('ans'); a = [a] if isinstance(a, str) else (a or [])
         for t in a: need[t] = need.get(t, 0) + 1
-    bfs = 52 if len(bank) > 4 else 56; btn = ''
+    bfs = 44 if len(bank) > 6 else (58 if len(bank) > 4 else 64); btn = ''
     for b in bank:
         if b == '|': btn += '<div style="width:6px;height:70px;border-radius:3px;background:#b9a6f5;margin:0 10px"></div>'; continue
         c, t = b if isinstance(b, tuple) else ('c2', b)
-        btn += f'<button class="bk" data-t="{t}" data-n="{need.get(t, 1)}">{ch(c, t, bfs, "8px 30px")}</button>'
-    out += f'<div class="gl" style="left:90px;top:840px;width:1740px;height:148px;border-radius:72px;display:flex;align-items:center;gap:20px;padding:0 44px" id="bk-{sid}">{btn}</div>'
+        btn += f'<button class="bk" data-t="{t}" data-n="{need.get(t, 1)}">{ch(c, t, bfs, "10px 30px" if bfs < 58 else "10px 34px")}</button>'
+    out += f'<div class="gl" style="left:90px;top:830px;width:1740px;height:158px;border-radius:79px;display:flex;align-items:center;gap:22px;padding:0 44px" id="bk-{sid}">{btn}</div>'
     return out
 
 def timeline_markup(d, sid):
@@ -169,6 +169,7 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .chip.pin{opacity:0;transform:scale(.4)}.chip.pp{animation:moc .5s cubic-bezier(.2,1.6,.4,1)}
 .bk{touch-action:none}.bk.ghost{opacity:.3}.bk.drag{position:absolute;z-index:60;pointer-events:none;transform:scale(1.12) rotate(-3deg);filter:drop-shadow(0 18px 22px rgba(40,20,90,.35));transition:none}.bk.drag.back{transition:left .35s cubic-bezier(.3,1.4,.5,1),top .35s cubic-bezier(.3,1.4,.5,1)}
 .cbt{transition:transform .25s}.cbt.sel{transform:translateY(-8px) scale(1.04);filter:drop-shadow(0 0 0 #9a5cff)}.cbt.sel>div:first-child,.cbt.sel>div:first-of-type{box-shadow:0 0 0 8px #9a5cff,0 14px 30px rgba(106,53,232,.4)}.cbp{transition:opacity .35s}
+.gsel{position:absolute;top:70px;z-index:5;width:76px;height:76px;border-radius:50%;background:rgba(255,255,255,.7);font:800 38px O;color:#6a35e8;display:flex;align-items:center;justify-content:center;cursor:pointer}.gsel.sel{background:linear-gradient(135deg,#9a5cff,#6a35e8);color:#fff}.gslab{position:absolute;top:84px;font:700 26px O;color:#4a5a7a;letter-spacing:.12em}
 .gp.hov{box-shadow:0 0 0 6px rgba(154,92,255,.6);border-radius:30px}
 .gl.hov{box-shadow:0 0 0 6px rgba(154,92,255,.55),0 0 40px rgba(154,92,255,.5)}
 .rp.react{animation:react .8s}@keyframes react{25%{transform:scale(1.14) rotate(-3deg)}55%{transform:scale(.97) rotate(2deg)}100%{transform:none}}
@@ -308,7 +309,9 @@ INIT.view=function(s){
  s.addEventListener('click',function(){skip=true},{once:true});
  P('open');wait(250).then(step);
  s.addEventListener('click',function(e){var g=e.target.closest('.gl');if(g&&!g.closest('.bagx')){g.classList.remove('tp');void g.offsetWidth;g.classList.add('tp');P('tick')}});
- var sp=$('.spinbtn',s);if(sp){sp.style.cursor='pointer';sp.onclick=function(){if(sp.__d)return;sp.__d=1;var n=0,iv=setInterval(function(){P('tick');if(++n>8){clearInterval(iv);$$('.reelp',s).forEach(function(r){if(r.dataset.real)r.innerHTML=r.dataset.real});$$('img',s).forEach(function(im){if(im.style.filter&&im.style.filter.indexOf('blur')>-1){im.style.filter='none';im.style.opacity=1;im.style.transform='none'}});P('good')}},110)}}
+ var nr=$$('.sr',s).length;if(nr){var lb=document.createElement('div');lb.className='gslab';lb.style.left='640px';lb.textContent='GROUPS';s.appendChild(lb);for(var q=2;q<=nr;q++){var gb=document.createElement('div');gb.className='gsel'+(q===nr?' sel':'');gb.dataset.n=q;gb.textContent=q;gb.style.left=(790+(q-2)*96)+'px';s.appendChild(gb)}}
+ var gs=$$('.gsel',s);gs.forEach(function(g){g.onclick=function(e){e.stopPropagation();var n=+g.dataset.n;gs.forEach(function(x){x.classList.toggle('sel',x===g)});$$('.sr',s).forEach(function(r){r.style.display=(+r.dataset.k<n)?'flex':'none'});P('tick')}});
+ var sp=$('.spinbtn',s);if(sp){sp.style.cursor='pointer';sp.onclick=function(){if(sp.__d)return;sp.__d=1;var n=0,iv=setInterval(function(){P('tick');if(++n>8){clearInterval(iv);$$('.reelp,.reelc',s).forEach(function(r){if(r.dataset.real)r.innerHTML=r.dataset.real});$$('img',s).forEach(function(im){if(im.style.filter&&im.style.filter.indexOf('blur')>-1){im.style.filter='none';im.style.opacity=1;im.style.transform='none'}});P('good')}},110)}}
  var ts=$('.tstart',s);if(ts){var tc=$('.tclock',s),left=+tc.dataset.sec,iv2=null;ts.onclick=function(){if(iv2){clearInterval(iv2);iv2=null;return}P('tick');iv2=setInterval(function(){left--;tc.innerHTML='<span class="grad">'+Math.floor(left/60)+':'+('0'+left%60).slice(-2)+'</span>';if(left<=0){clearInterval(iv2);iv2=null;P('done');tc.classList.add('tp')}},1000)}}
  $$('.dstop',s).forEach(function(d){d.style.cursor='pointer';d.onclick=function(e){e.stopPropagation();d.classList.remove('tp');void d.offsetWidth;d.classList.add('tp');P('pop')}});
 };
