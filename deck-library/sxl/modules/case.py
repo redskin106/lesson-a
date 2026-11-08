@@ -117,5 +117,9 @@ def solved_board(d):
 
 @module('closing')
 def closing(d):
+    if d.get('stack'):
+        return (em(d.get('emoji','waving_hand'),810,120,300,0)
+          +f'<div class="a h" style="left:0;right:0;top:440px;text-align:center;font-size:200px;line-height:1;white-space:nowrap">{d["line1"]} <span class="grad">{d["line2"]}</span></div>'
+          +f'<div class="a mu" style="left:0;right:0;top:720px;text-align:center;font-size:58px">{d.get("sub","")}</div>')
     return (f'<div class="a h" style="left:0;right:0;top:250px;text-align:center;font-size:150px;line-height:1.08">{d["line1"]}<br><span class="grad">{d["line2"]}</span></div>'
       +f'<div class="a mu" style="left:0;right:0;top:700px;text-align:center;font-size:54px">{d.get("sub","")}</div>'+em(d.get('emoji','detective'),1480,150,250,10))

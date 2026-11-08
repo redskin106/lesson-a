@@ -50,8 +50,8 @@ spec=[
    ('N',[C('c2','Did'),C('c1','you'),C('c2','take'),G('c3','anything?')],[('c3','anything?'),('c2','should'),('c2','have to'),('c3','something?')]),('P','No.'),
    ('N',[C('c1','You'),G('c2','should'),C('c3','drink water.')],[('c3','anything?'),('c2','should'),('c2','have to'),('c3','something?')]),('P','Thank you!')]},
  {'m':'chat','phase':S_,'title':'The doctor says','window':4,'lines':[
-   ('D',[C('c1','You'),G('c2','have to'),C('c3','take this medicine.')],SHOULDBANK),('P','Every day?'),
-   ('D',[C('c1','You'),G('c2','don’t have to'),C('c3','take it every day.')],SHOULDBANK),('P','OK. Thank you, doctor.')]},
+   ('D',[C('c1','You'),G('c2','have to'),C('c3','take this medicine.')],SHOULDBANK),('P','Can I miss a day?'),
+   ('D','Yes.'),('D',[C('c1','You'),G('c2','don’t have to'),C('c3','take it every day.')],[('c2','have to'),('c2','don’t have to'),('c2','should')]),('P','OK. Thank you, doctor.')]},
  {'m':'chat','phase':S_,'title':'The neighbour twist','optional':True,'window':4,'lines':[
    ('P','My neighbour says: put a banana on your head.'),('N',[C('c1','You'),G('c2','shouldn’t'),C('c3','put a banana on your head.')],SHOULDBANK),
    ('P','I don’t want to take medicine!'),('D',[C('c1','You'),G('c2','have to'),C('c3','take it.')],SHOULDBANK)]},
@@ -76,7 +76,7 @@ spec=[
  {'m':'recap','phase':'RECAP','rows':[([YOU,('c2','have to'),('c3','rest.')],'needed'),([YOU,('c2','should'),('c3','drink water.')],'good idea?'),([YOU,('c2','shouldn’t'),('c3','drive.')],'bad idea?'),
    ([YOU,('c2','don’t have to'),('c3','go.')],'not needed'),([YOU,('c2','mustn’t'),('c3','drink.')],'not allowed')],
   'side':[[('c4','Where'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','When'),('c2','did'),('c1','it'),('c3','start?')],[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')]],'emoji':'face_with_thermometer'},
- {'m':'closing','mode':'night','line1':'Thank','line2':'you!','sub':'See you next time.','emoji':'waving_hand'},
+ {'m':'closing','phase':E_,'stack':True,'line1':'Thank','line2':'you!','sub':'See you next time.','emoji':'waving_hand'},
 ]
 from lessons.plan import L1,apply
 apply(spec,[r for r in L1])
