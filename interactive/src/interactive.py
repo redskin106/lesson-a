@@ -84,7 +84,42 @@ def timeline_markup(d, sid):
                 + art(0, 0, w, w, P[idx], r=44, label=P[idx]) + '</button>')
     return out + f'<script type="application/json" id="d-{sid}">{json.dumps({"n": n})}</script>'
 
-BUILD = {'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup}
+
+DOTS={'dot1':'●','dot2':'● ●','buzz':'〰'}
+HINT={'dot1':'tap','buzz':'hand on throat','dot2':'clap clap'}
+def sound_markup(d, sid):
+    B=d['bags']; n=len(B); w=int((1740-40*(n-1))/n); out=header(d['phase'],d.get('title','Listen. Which sound?'),'orange'); aud=d.get('audio',{})
+    for i,b in enumerate(B):
+        x=90+i*(w+40); out+=glass(x,170,w,560,'',r=64)
+        out+=f'<div class="a bagic" data-i="{i}" style="left:{x}px;top:200px;width:{w}px;text-align:center;font-family:O;font-weight:800;font-size:150px;color:#6a35e8">{DOTS[b["icon"]]}</div>'
+        out+=f'<div class="a mu bagh" style="left:{x}px;top:640px;width:{w}px;text-align:center;font-size:40px;opacity:0">{HINT[b["icon"]]}</div>'
+        out+=f'<div class="a bag" data-i="{i}" style="left:{x}px;top:170px;width:{w}px;height:560px;border-radius:64px"><div class="drop" style="position:absolute;left:30px;top:300px;width:{w-60}px;display:flex;flex-direction:column;gap:16px;align-items:center;min-height:140px;border-radius:44px;border:5px dashed #b9a6f5;padding:6px"></div></div>'
+    words=[(t,i) for i,b in enumerate(B) for t in b['words']]
+    out+=('<div class="gl" style="left:90px;top:790px;width:1740px;height:190px;border-radius:80px;display:flex;align-items:center;gap:26px;padding:0 60px" id="bk-'+sid+'">'
+          +''.join(f'<button class="bk" data-t="{t}" data-bag="{i}" data-a="{aud.get(t,"")}">{ch("c2",t,64,"10px 40px")}</button>' for t,i in words)+'</div>')
+    return out+f'<script type="application/json" id="d-{sid}">{json.dumps({"demo":d.get("demo",0)})}</script>'
+
+def match_markup(d, sid):
+    P=d['pics']; W=d['words']; n=len(P); w=int((1740-40*(n-1))/n); out=header(d['phase'],d.get('title','Match'),'violet')
+    for i,p in enumerate(P):
+        x=90+i*(w+40); out+=f'<button class="mp" data-i="{i}" style="position:absolute;left:{x}px;top:170px;width:{w}px;height:{w}px;border-radius:44px">'+art(0,0,w,w,p,r=44,label=p)+num(16,-34,i+1,64)+'</button>'
+    order=[(i*3+1)%n for i in range(n)] if n>2 else list(range(n))
+    out+='<div class="gl" style="left:90px;top:%dpx;width:1740px;height:300px;border-radius:72px;display:flex;align-items:center;justify-content:center;gap:36px;padding:0 40px">'%(170+w+60)
+    for i in order:
+        out+=f'<button class="mw" data-i="{i}" style="display:flex;flex-direction:column;align-items:center;gap:14px"><span class="mg">{gap("#9a5cff",64,"",h=64)}</span>{ch("c3",W[i],52,"8px 30px")}</button>'
+    return out+'</div>'+f'<script type="application/json" id="d-{sid}">{json.dumps({"n":n})}</script>'
+
+def fib_markup(d, sid):
+    out=header(d['phase'],d.get('title','True or a fib?'),'red')+art(90,170,820,820,d['pic'],r=56,label=d['pic'])
+    for k,(chips_,ok) in enumerate(d['statements']):
+        y=200+k*400
+        out+=f'<div class="gl" style="left:980px;top:{y}px;width:850px;height:230px;border-radius:70px;display:flex;align-items:center;gap:14px;padding:0 40px;flex-wrap:wrap">'+core.chips(chips_,50,'8px 26px')+'</div>'
+        out+=(f'<button class="tf" data-k="{k}" data-v="1" data-ok="{int(ok)}" style="position:absolute;left:1100px;top:{y+250}px;width:110px;height:110px">'+f'<img src="{E}check_mark_button.png" style="width:110px">'+'</button>'
+              +f'<button class="tf" data-k="{k}" data-v="0" data-ok="{int(ok)}" style="position:absolute;left:1260px;top:{y+250}px;width:110px;height:110px">'+f'<img src="{E}cross_mark.png" style="width:110px">'+'</button>')
+    return out+f'<script type="application/json" id="d-{sid}">{json.dumps({"n":len(d["statements"])})}</script>'
+
+BUILD = {'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
+
 
 CSS_EXTRA = """
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eeeef3}
@@ -101,6 +136,7 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .shake{animation:sh .35s}@keyframes sh{20%{transform:translateX(-14px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
 .mo{animation:moc .5s cubic-bezier(.2,1.6,.4,1)}@keyframes moc{from{transform:scale(.4)}to{transform:scale(1)}}
 .card{position:absolute;transition:left .6s cubic-bezier(.3,1.2,.4,1),top .6s cubic-bezier(.3,1.2,.4,1),transform .5s}
+.bag{pointer-events:auto;cursor:pointer}.drop.hot{background:rgba(255,255,255,.5)}.mp,.mw{cursor:pointer}.mp.sel,.mw.sel{transform:translateY(-12px) scale(1.04)}.mp.ok{opacity:.55;pointer-events:none}.mw.ok{pointer-events:none}.tf{transition:opacity .3s,transform .2s}.tf.off{opacity:.18;pointer-events:none}.tf.pick{transform:scale(1.25)}
 .card.done{pointer-events:none}
 .pulse{animation:pu .8s 2}@keyframes pu{50%{transform:scale(1.05)}}
 .calm *,.off *{animation-duration:.01s!important;transition-duration:.01s!important}
@@ -164,6 +200,26 @@ INIT.sort=function(s){
 INIT.timeline=function(s){
  var cards=$$('.card',s),slots=$$('.slotn',s),k=0;
  cards.forEach(function(c){c.onclick=function(){if(+c.dataset.idx===k){var sl=slots[k];c.style.left=sl.style.left;c.style.top=sl.style.top;c.style.transform='rotate(0deg)';c.classList.add('done');sl.style.opacity=.0;P('pop');setTimeout(function(){P('tick')},120);k++;if(k==cards.length)finish(s)}else wrong(c)}});};
+/* ---- sound sort: watch the first word go in, then place the rest. Optional per-word audio (data-a) only if supplied. ---- */
+INIT.sound_sort=function(s){
+ var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),bar=$('#bk-'+id),bags=$$('.bag',s),sel=null,left=$$('.bk',bar).length;
+ function drop(b,bag){var d=$('.drop',bag);d.appendChild(b.cloneNode(true));$$('button',d).forEach(function(x){x.className='';x.style.pointerEvents='none'});b.classList.remove('sel');b.classList.add('used');d.lastChild.classList.add('mo');P('pop');setTimeout(function(){P('tick')},90);if(--left==0)finish(s)}
+ function hint(i){var h=$$('.bagh',s)[i],ic=$$('.bagic',s)[i];h.style.opacity=1;ic.classList.add('pulse');setTimeout(function(){ic.classList.remove('pulse')},1700)}
+ function play(b){var a=b.dataset.a;if(a&&!SXL.cfg.calm&&!SXL.cfg.off){try{new Audio(a).play()}catch(e){}}}
+ bar.onclick=function(e){var b=e.target.closest('.bk');if(!b||b.classList.contains('used'))return;$$('.bk',bar).forEach(function(x){x.classList.remove('sel')});sel=(sel===b)?null:b;if(sel){sel.classList.add('sel');P('tick');play(sel)}};
+ bags.forEach(function(g){g.onclick=function(){if(!sel){hint(+g.dataset.i);P('tick');return}if(sel.dataset.bag===g.dataset.i){var b=sel;sel=null;drop(b,g);hint(+g.dataset.i)}else{var b2=sel;sel=null;b2.classList.remove('sel');wrong(g)}}});
+ /* demo (teacherless modelling): first word flies into its bag, its icon pulses with the gesture hint */
+ var first=$$('.bk',bar)[D.demo];if(first){wait(900).then(function(){first.classList.add('sel');P('tick');play(first);return wait(900)}).then(function(){var g=bags[+first.dataset.bag];sel=null;drop(first,g);hint(+g.dataset.i)})}};
+/* ---- match pairs: tap a picture, tap its word ---- */
+INIT.match_pairs=function(s){
+ var ps=$$('.mp',s),ws=$$('.mw',s),sp=null,left=ps.length;
+ ps.forEach(function(p){p.onclick=function(){ps.forEach(function(x){x.classList.remove('sel')});sp=(sp===p)?null:p;if(sp){sp.classList.add('sel');P('tick')}}});
+ ws.forEach(function(w){w.onclick=function(){if(!sp){w.classList.add('pulse');setTimeout(function(){w.classList.remove('pulse')},1700);P('tick');return}
+  if(sp.dataset.i===w.dataset.i){var g=$('.mg',w);g.innerHTML='<span class="chip c1 mo" style="font-size:42px;padding:2px 20px;border-radius:44px">'+(+sp.dataset.i+1)+'</span>';sp.classList.remove('sel');sp.classList.add('ok');w.classList.add('ok');sp=null;P('pop');setTimeout(function(){P('tick')},90);if(--left==0)finish(s)}else{wrong(sp);sp.classList.remove('sel');sp=null}}})};
+/* ---- true or a fib: tick or cross under each sentence ---- */
+INIT.spot_fib=function(s){
+ var n=JSON.parse($('#d-'+s.dataset.id).textContent).n,left=n;
+ $$('.tf',s).forEach(function(b){b.onclick=function(){var ok=b.dataset.v===b.dataset.ok;if(ok){$$('.tf[data-k="'+b.dataset.k+'"]',s).forEach(function(x){x.classList.add('off')});b.classList.remove('off');b.classList.add('pick');P('pop');setTimeout(function(){P('tick')},90);if(--left==0)finish(s)}else{b.classList.add('off');P('boop')}}})};
 go(0);
 """
 
