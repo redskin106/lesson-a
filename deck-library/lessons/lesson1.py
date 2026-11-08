@@ -18,12 +18,12 @@ spec=[
  {'m':'pic_rows','phase':S_,'rows':[
    {'label':'Neighbour','grad':'amber','chips':[YOU,('c2','should'),('c3','put a banana on your head.')],'pics':[f'09a_p{k}.jpg' for k in range(1,5)],'cap':'Good idea?'},
    {'label':'Pharmacist','grad':'teal','chips':[YOU,('c2','have to'),('c3','take this pill.')],'pics':['09b_p1.jpg','09b_p2.jpg','09b_p3.jpg','09b_p4.jpg'],'cap':'Needed.'}]},
- {'m':'choice_board','phase':S_,'title':'How strong?','start':4,'stops':[
-   {'word':'mustn’t','pic':'hw_5.jpg','grad':'red','chips':[YOU,('c2','mustn’t'),('c3','copy.')],'gloss':'Not allowed'},
-   {'word':'shouldn’t','pic':'hw_3.jpg','grad':'orange','chips':[YOU,('c2','shouldn’t'),('c3','work.')],'gloss':'Bad idea?'},
-   {'word':'don’t have to','pic':'hw_1.jpg','grad':'teal','chips':[YOU,('c2','don’t have to'),('c3','rush.')],'gloss':'Not needed'},
-   {'word':'should','pic':'hw_4.jpg','grad':'sky','chips':[YOU,('c2','should'),('c3','start.')],'gloss':'Good idea?'},
-   {'word':'have to','pic':'hw_2.jpg','grad':'violet','chips':[YOU,('c2','have to'),('c3','finish.')],'gloss':'Needed'}]},
+ {'m':'dial_ladder','phase':S_,'title':'How strong?','start':4,'stops':[
+   {'word':'mustn’t','focus':(0.47, 0.5, 0.85),'pic':'hw_5.jpg','grad':'red','chips':[YOU,('c2','mustn’t'),('c3','copy.')],'gloss':'Not allowed'},
+   {'word':'shouldn’t','focus':(0.45, 0.5, 0.8),'pic':'hw_3.jpg','grad':'orange','chips':[YOU,('c2','shouldn’t'),('c3','work.')],'gloss':'Bad idea?'},
+   {'word':'don’t have to','focus':(0.42, 0.5, 0.8),'pic':'hw_1.jpg','grad':'teal','chips':[YOU,('c2','don’t have to'),('c3','rush.')],'gloss':'Not needed'},
+   {'word':'should','focus':(0.35, 0.5, 1.0),'pic':'hw_4.jpg','grad':'sky','chips':[YOU,('c2','should'),('c3','start.')],'gloss':'Good idea?'},
+   {'word':'have to','focus':(0.3, 0.5, 1.0),'pic':'hw_2.jpg','grad':'violet','chips':[YOU,('c2','have to'),('c3','finish.')],'gloss':'Needed'}]},
  {'m':'timer','phase':S_,'title':'Pair talk','optional':True,'min':2,'icons':['speech_balloon','speech_balloon'],'note':'One thing you should / shouldn’t do tonight'},
  {'m':'contrast','phase':S_,'title':'Not the same!','left':{'label':'Not allowed','grad':'red','pic':'mu_1.jpg','chips':[YOU,('c2','mustn’t'),('c3','drink alcohol.')]},
    'right':{'label':'Not needed','grad':'teal','pic':'mu_2.jpg','chips':[YOU,('c2','don’t have to'),('c3','take it with food.')]}},

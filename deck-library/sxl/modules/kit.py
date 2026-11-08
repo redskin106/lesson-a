@@ -160,6 +160,55 @@ def choice_board(d):
             +f'<div class="a" style="left:0;top:{h+34}px;width:{w}px;text-align:center"><span class="chip" style="font-size:38px;padding:6px 26px;border-radius:999px;background:{G(s["grad"])}">{s["word"]}</span></div></div>')
     return o
 
+@module('dial_pics')
+def dial_pics(d):
+    """Dial + pictures: arc with five picture bubbles and a needle; tap a bubble -> needle swings, big picture + sentence + gloss at right.
+    {'stops':[{'word','pic','grad','chips','gloss'}] weak->strong left->right, 'start':4}"""
+    S=d['stops']; n=len(S); st=d.get('start',n-1); cx,cy,R,br=640,780,400,82
+    ang=[180-i*(180/(n-1)) for i in range(n)]
+    o=header(d['phase'],d.get('title','How strong?'),'violet')
+    o+=(f'<svg style="position:absolute;left:0;top:0" width="1920" height="1080"><defs><linearGradient id="dg" x1="0" x2="1"><stop offset="0" stop-color="#ff6b78"/><stop offset=".3" stop-color="#ffb347"/><stop offset=".5" stop-color="#7fd3ff"/><stop offset=".75" stop-color="#9a5cff"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient></defs>'
+        f'<path d="M {cx-R} {cy} A {R} {R} 0 0 1 {cx+R} {cy}" fill="none" stroke="url(#dg)" stroke-width="30" stroke-linecap="round"/></svg>')
+    L=R-br-50
+    o+=(f'<div class="dpn" data-cx="{cx}" style="position:absolute;left:{cx-9}px;top:{cy-L}px;width:18px;height:{L}px;border-radius:9px;background:#1c1b2e;transform-origin:50% 100%;transform:rotate({90-ang[st]}deg);transition:transform .7s cubic-bezier(.3,1.5,.5,1)"></div>'
+        f'<div style="position:absolute;left:{cx-30}px;top:{cy-30}px;width:60px;height:60px;border-radius:50%;background:#1c1b2e"></div>')
+    for i,s in enumerate(S):
+        a=math.radians(ang[i]); x=cx+R*math.cos(a); y=cy-R*math.sin(a)
+        o+=(f'<div class="dpb{" sel" if i==st else ""}" data-i="{i}" data-a="{ang[i]:.0f}" style="position:absolute;left:{x-br-60}px;top:{y-br}px;width:{2*br+120}px;height:{2*br+90}px;cursor:pointer;text-align:center">'
+            f'<div class="dpc" style="position:absolute;left:60px;top:0;width:{2*br}px;height:{2*br}px;border-radius:50%;border:8px solid #fff;box-shadow:0 12px 26px rgba(40,20,90,.3);background:#fff;box-sizing:border-box;overflow:hidden"><img src="{ART}{s["pic"]}" style="position:absolute;height:{(2*br-16)*s.get("focus",(.5,.5,1))[2]:.0f}px;width:auto;left:{(2*br-16)/2-s.get("focus",(.5,.5,1))[0]*(2*br-16)*s.get("focus",(.5,.5,1))[2]*1.7917:.0f}px;top:{(2*br-16)/2-s.get("focus",(.5,.5,1))[1]*(2*br-16)*s.get("focus",(.5,.5,1))[2]:.0f}px"></div>'
+            +(f'<div style="position:absolute;left:-300px;width:350px;text-align:right;top:{br-26}px">' if 90<ang[i]<180 else (f'<div style="position:absolute;left:{60+2*br+10}px;width:350px;text-align:left;top:{br-26}px">' if 0<ang[i]<90 else f'<div style="position:absolute;left:0;right:0;top:{2*br+10}px">'))
+            +f'<span class="chip" style="font-size:36px;padding:5px 24px;border-radius:999px;background:{G(s["grad"])};white-space:nowrap">{s["word"]}</span></div></div>')
+    o+='<div class="gl" style="left:1230px;top:168px;width:600px;height:820px;border-radius:72px"></div>'
+    for i,s in enumerate(S):
+        o+=(f'<div class="dpp" data-i="{i}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:{1 if i==st else 0};pointer-events:none">'
+            +pic(1260,214,540,304,s['pic'],44)
+            +f'<div class="a" style="left:1250px;top:560px;width:560px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center">{chiprow(s["chips"],50,"8px 28px","12px",wrap=True)}</div>'
+            +f'<div class="a" style="left:1250px;top:800px;width:560px;text-align:center"><span class="pill" style="font-size:50px;padding:10px 44px;color:#6a35e8;white-space:nowrap">{s["gloss"]}</span></div></div>')
+    return o
+
+@module('dial_ladder')
+def dial_ladder(d):
+    """Vertical ladder: strongest at the top. Same stop data as dial_pics; tap a rung -> marker slides, picture + sentence + gloss at right."""
+    S=d['stops']; n=len(S); st=d.get('start',n-1); top0=168; rh=148; gp=16; x0=150; w=1040
+    o=header(d['phase'],d.get('title','How strong?'),'violet')
+    o+=f'<div style="position:absolute;left:96px;top:{top0}px;width:16px;height:{n*rh+(n-1)*gp}px;border-radius:8px;background:linear-gradient(180deg,#ff4fa3,#9a5cff 30%,#7fd3ff 50%,#ffb347 75%,#ff6b78)"></div>'
+    ys=[top0+(n-1-i)*(rh+gp) for i in range(n)]
+    for i,s in enumerate(S):
+        y=ys[i]; f=s.get('focus',(.5,.5,1)); sz=rh-28; ins=sz-12
+        o+=(f'<div class="dlr{" sel" if i==st else ""}" data-i="{i}" data-y="{y}" style="position:absolute;left:{x0}px;top:{y}px;width:{w}px;height:{rh}px;cursor:pointer">'
+            f'<div class="gl" style="left:0;top:0;width:{w}px;height:{rh}px;border-radius:{rh//2}px"></div>'
+            f'<div style="position:absolute;left:14px;top:14px;width:{sz}px;height:{sz}px;border-radius:50%;border:6px solid #fff;box-sizing:border-box;background:#fff;overflow:hidden;box-shadow:0 8px 18px rgba(40,20,90,.25)"><img src="{ART}{s["pic"]}" style="position:absolute;height:{ins*f[2]:.0f}px;width:auto;left:{ins/2-f[0]*ins*f[2]*1.7917:.0f}px;top:{ins/2-f[1]*ins*f[2]:.0f}px"></div>'
+            f'<div style="position:absolute;left:{sz+50}px;top:0;height:{rh}px;display:flex;align-items:center"><span class="chip" style="font-size:50px;padding:8px 34px;border-radius:999px;background:{G(s["grad"])};white-space:nowrap">{s["word"]}</span></div>'
+            f'<div style="position:absolute;right:40px;top:0;height:{rh}px;display:flex;align-items:center"><span class="pill" style="font-size:40px;padding:8px 32px;color:#6a35e8;white-space:nowrap">{s["gloss"]}</span></div></div>')
+    o+=f'<div class="dlm" style="position:absolute;left:{x0-8}px;top:{ys[st]-8}px;width:{w+16}px;height:{rh+16}px;border-radius:{rh//2+8}px;border:7px solid #9a5cff;box-shadow:0 0 0 6px rgba(154,92,255,.25),0 14px 34px rgba(106,53,232,.35);pointer-events:none;transition:top .55s cubic-bezier(.3,1.4,.5,1)"></div>'
+    o+='<div class="gl" style="left:1230px;top:168px;width:600px;height:820px;border-radius:72px"></div>'
+    for i,s in enumerate(S):
+        o+=(f'<div class="dpp" data-i="{i}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:{1 if i==st else 0};pointer-events:none">'
+            +pic(1260,214,540,304,s['pic'],44)
+            +f'<div class="a" style="left:1250px;top:560px;width:560px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center">{chiprow(s["chips"],50,"8px 28px","12px",wrap=True)}</div>'
+            +f'<div class="a" style="left:1250px;top:800px;width:560px;text-align:center"><span class="pill" style="font-size:50px;padding:10px 44px;color:#6a35e8;white-space:nowrap">{s["gloss"]}</span></div></div>')
+    return o
+
 @module('cards')
 def cards(d):
     """2-4 tall cards. {'cards':[{'emoji','name','grad','text','foot'}]}"""

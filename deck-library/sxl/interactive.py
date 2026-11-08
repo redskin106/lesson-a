@@ -168,7 +168,7 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .sx{transition:opacity .45s,transform .5s cubic-bezier(.2,.9,.3,1.2),filter .4s}.sx.sh{opacity:0;transform:translateY(22px) scale(.96);pointer-events:none}.sx.dim{opacity:.38;filter:saturate(.5)}
 .chip.pin{opacity:0;transform:scale(.4)}.chip.pp{animation:moc .5s cubic-bezier(.2,1.6,.4,1)}
 .bk{touch-action:none}.bk.ghost{opacity:.3}.bk.drag{position:absolute;z-index:60;pointer-events:none;transform:scale(1.12) rotate(-3deg);filter:drop-shadow(0 18px 22px rgba(40,20,90,.35));transition:none}.bk.drag.back{transition:left .35s cubic-bezier(.3,1.4,.5,1),top .35s cubic-bezier(.3,1.4,.5,1)}
-.cbt{transition:transform .25s}.cbt.sel{transform:translateY(-8px) scale(1.04);filter:drop-shadow(0 0 0 #9a5cff)}.cbt.sel>div:first-child,.cbt.sel>div:first-of-type{box-shadow:0 0 0 8px #9a5cff,0 14px 30px rgba(106,53,232,.4)}.cbp{transition:opacity .35s}
+.cbt{transition:transform .25s}.cbt.sel{transform:translateY(-8px) scale(1.04);filter:drop-shadow(0 0 0 #9a5cff)}.cbt.sel>div:first-child,.cbt.sel>div:first-of-type{box-shadow:0 0 0 8px #9a5cff,0 14px 30px rgba(106,53,232,.4)}.cbp,.dpp{transition:opacity .35s}.dlr{transition:transform .25s}.dlr.sel{transform:scale(1.015)}.dpb{transition:transform .3s}.dpb.sel{transform:scale(1.18) translateY(-6px)}.dpb.sel .dpc{border-color:#9a5cff!important;box-shadow:0 0 0 6px rgba(154,92,255,.35),0 14px 30px rgba(106,53,232,.4)!important}
 .gsel{position:absolute;top:70px;z-index:5;width:76px;height:76px;border-radius:50%;background:rgba(255,255,255,.7);font:800 38px O;color:#6a35e8;display:flex;align-items:center;justify-content:center;cursor:pointer}.gsel.sel{background:linear-gradient(135deg,#9a5cff,#6a35e8);color:#fff}.gslab{position:absolute;top:84px;font:700 26px O;color:#4a5a7a;letter-spacing:.12em}
 .gp.hov{box-shadow:0 0 0 6px rgba(154,92,255,.6);border-radius:30px}
 .gl.hov{box-shadow:0 0 0 6px rgba(154,92,255,.55),0 0 40px rgba(154,92,255,.5)}
@@ -294,6 +294,8 @@ INIT.spot_fib=function(s){
 
 /* ---- view slides: everything arrives one piece at a time; tap a piece to make it bounce; slot machine spins; dial stops are tappable ---- */
 INIT.view=function(s){
+ $$('.dlr',s).forEach(function(t){t.onclick=function(){$('.dlm',s).style.top=(+t.dataset.y-8)+'px';$$('.dlr',s).forEach(function(x){x.classList.remove('sel')});t.classList.add('sel');$$('.dpp',s).forEach(function(p){p.style.opacity=(p.dataset.i===t.dataset.i)?1:0});P('pop');setTimeout(function(){P('tick')},250)}});
+ $$('.dpb',s).forEach(function(t){t.onclick=function(){$$('.dpb',s).forEach(function(x){x.classList.remove('sel')});t.classList.add('sel');$('.dpn',s).style.transform='rotate('+(90-(+t.dataset.a))+'deg)';$$('.dpp',s).forEach(function(p){p.style.opacity=(p.dataset.i===t.dataset.i)?1:0});P('pop');setTimeout(function(){P('tick')},250)}});
  $$('.cbt',s).forEach(function(t){t.onclick=function(){$$('.cbt',s).forEach(function(x){x.classList.remove('sel')});t.classList.add('sel');$$('.cbp',s).forEach(function(p){p.style.opacity=(p.dataset.i===t.dataset.i)?1:0});P('pop');var p=$('.cbp[data-i="'+t.dataset.i+'"] .chip',s);if(p){p.classList.remove('pp');void p.offsetWidth;p.classList.add('pp')}}});
  var stp=$$('[data-s]',s);
  if(stp.length){stp.forEach(function(e){e.classList.add('sx','sh');if(e.dataset.pills)$$('.chip',e).forEach(function(c){c.classList.add('pin')})});
