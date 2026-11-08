@@ -191,3 +191,14 @@ def exit_(d):
       +em(d.get('emoji','light_bulb'),1330,200,420,8))
 
 PAL['RECAP']=PAL['EXIT']=PAL['ENGAGE']
+
+@module('timer')
+def timer(d):
+    """Activity slide with a visible countdown. {'phase':'ACTIVATE','title':'Group practice','min':8,'icons':['face_with_thermometer',..],'note':'Everyone speaks at once'}"""
+    sec=int(d.get('min',3)*60); icons=''.join(f'<img src="{EM(e)}" style="width:190px;{sh()}">' for e in d.get('icons',['stopwatch']))
+    return (header(d['phase'],d['title'],d.get('rg','violet'))
+      +'<div class="gl" style="left:90px;top:168px;width:1740px;height:820px;border-radius:72px"></div>'
+      +f'<div class="a" style="left:90px;top:230px;width:1740px;display:flex;gap:60px;justify-content:center">{icons}</div>'
+      +f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:440px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:330px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>'
+      +f'<div class="a tstart" style="left:860px;top:830px;width:200px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="56" height="56" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>'
+      +(f'<div class="a mu" style="left:90px;top:730px;width:1740px;text-align:center;font-size:44px">{d["note"]}</div>' if d.get('note') else ''))

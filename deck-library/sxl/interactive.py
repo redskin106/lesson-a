@@ -155,6 +155,10 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;z-index:50;display:flex;gap:14px}
 #ctl button{font:700 24px Outfit,O,sans-serif;padding:4px 20px;border-radius:999px;background:rgba(255,255,255,.8);border:3px solid #fff;color:#6a35e8;box-shadow:0 8px 20px rgba(80,60,160,.15)}
 #nx{position:absolute;right:90px;bottom:34px;z-index:40;width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#9a5cff,#6a35e8);color:#fff;font:800 56px O;display:none;align-items:center;justify-content:center;box-shadow:0 20px 40px rgba(80,40,200,.4)}
+#clk{position:absolute;right:150px;bottom:44px;z-index:40;font:700 26px O;color:#4a3a8a;background:rgba(255,255,255,.75);padding:6px 18px;border-radius:999px;display:none}
+#rpt{position:absolute;inset:60px 200px;z-index:80;background:rgba(255,255,255,.96);border-radius:40px;padding:30px 40px;font:500 24px O;overflow:auto;display:none;box-shadow:0 30px 80px rgba(40,20,90,.35)}
+#rpt table{border-collapse:collapse;width:100%}#rpt td,#rpt th{padding:4px 10px;border-bottom:1px solid #ddd;text-align:left}#rpt tr.o td{background:#f1e9ff}
+.tstart{cursor:pointer}.tclock.run{animation:none}
 #pv{position:absolute;left:30px;bottom:34px;z-index:40;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.7);color:#6a35e8;font:800 36px O;display:flex;align-items:center;justify-content:center;opacity:.55}
 #cnt{position:absolute;left:110px;bottom:46px;z-index:40;font:700 24px O;color:#6a6a7e}
 .sl.night{background:#0b0a10;color:#f6f3ff}.night .mu{color:#a9a3cc}.night .gl,.night .tag,.night .pill{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18)}.night .grad{background:linear-gradient(90deg,#c9a2ff,#ff8cc6);-webkit-background-clip:text;color:transparent}
@@ -188,7 +192,14 @@ var P=function(n){SXLSound.play(n)}, wait=function(ms){return new Promise(functi
 function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);var st=$('#stage');st.style.transform='scale('+s+')';st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px'}
 addEventListener('resize',fit);fit();
 var slides=$$('.sl'),cur=-1;
-function go(i){if(i<0||i>=slides.length)return;slides.forEach(function(s){s.classList.remove('on')});cur=i;upd();var s=slides[i];s.classList.add('on');$('#nx').classList.remove('on');if(!s.__init){s.__init=1;INIT[s.dataset.m](s)}else if(s.__done)$('#nx').classList.add('on');}
+[$('#stage')].concat(slides).forEach(function(e){e.addEventListener('scroll',function(){if(e.id==='stage'||!e.classList.contains('thread')){e.scrollTop=0;e.scrollLeft=0}})});
+function go(i){if(i<0||i>=slides.length)return;tickClk();slides.forEach(function(s){s.classList.remove('on')});cur=i;lastI=i;lastT=Date.now();upd();var s=slides[i];s.classList.add('on');$('#nx').classList.remove('on');if(!s.__init){s.__init=1;INIT[s.dataset.m](s)}else if(s.__done)$('#nx').classList.add('on');}
+var T0=Date.now(),SL=[],lastT=Date.now(),lastI=-1,showClk=false;
+function fmt(s){s=Math.round(s);return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
+function tickClk(){var now=Date.now();if(lastI>=0)SL[lastI]=(SL[lastI]||0)+(now-lastT)/1000;lastT=now;if(!showClk)return;var tot=SL.reduce(function(a,b){return a+(b||0)},0),plan=0,pc=0;slides.forEach(function(s,i){var m=+s.dataset.min||0;if(!s.dataset.opt)plan+=m;if(i<=cur&&!s.dataset.opt)pc+=m});$('#clk').textContent='slide '+fmt((SL[cur]||0))+'  ·  total '+fmt(tot)+' / plan '+fmt(pc*60)+' (core '+fmt(plan*60)+')'}
+setInterval(tickClk,500);
+$('#ck').onclick=function(){showClk=!showClk;$('#clk').style.display=showClk?'block':'none';tickClk()};
+$('#rp').onclick=function(){var r=$('#rpt');if(r.style.display==='block'){r.style.display='none';return}tickClk();var h='<h2>Rehearsal report</h2><table><tr><th>#</th><th>Slide</th><th>Plan</th><th>Actual</th></tr>',tx='',tp=0,ta=0;slides.forEach(function(s,i){var m=(+s.dataset.min||0)*60,a=SL[i]||0;if(!s.dataset.opt)tp+=m;ta+=a;h+='<tr class="'+(s.dataset.opt?'o':'')+'"><td>'+(i+1)+'</td><td>'+s.dataset.label+(s.dataset.opt?' (optional)':'')+'</td><td>'+fmt(m)+'</td><td>'+fmt(a)+'</td></tr>';tx+=(i+1)+'\t'+s.dataset.label+'\t'+fmt(m)+'\t'+fmt(a)+'\n'});h+='<tr><td></td><td><b>Total</b> (plan = core only)</td><td><b>'+fmt(tp)+'</b></td><td><b>'+fmt(ta)+'</b></td></tr></table><p>Timer slides run on their own clock: skip them with the arrow when you like. Click Report again to close.</p>';r.innerHTML=h;r.style.display='block'};
 function upd(){$('#cnt').textContent=(cur+1)+' / '+slides.length;$('#pv').style.display=cur>0?'flex':'none'}
 $('#pv').onclick=function(){go(cur-1)};
 function finish(s){s.__done=1;P('done');wait(500).then(function(){if(cur<slides.length-1)$('#nx').classList.add('on')})}
@@ -250,6 +261,7 @@ INIT.view=function(s){
  P('open');wait(250).then(step);
  s.addEventListener('click',function(e){var g=e.target.closest('.gl');if(g&&!g.closest('.bagx')){g.classList.remove('tp');void g.offsetWidth;g.classList.add('tp');P('tick')}});
  var sp=$('.spinbtn',s);if(sp){sp.style.cursor='pointer';sp.onclick=function(){if(sp.__d)return;sp.__d=1;var n=0,iv=setInterval(function(){P('tick');if(++n>8){clearInterval(iv);$$('.reelp',s).forEach(function(r){if(r.dataset.real)r.innerHTML=r.dataset.real});$$('img',s).forEach(function(im){if(im.style.filter&&im.style.filter.indexOf('blur')>-1){im.style.filter='none';im.style.opacity=1;im.style.transform='none'}});P('good')}},110)}}
+ var ts=$('.tstart',s);if(ts){var tc=$('.tclock',s),left=+tc.dataset.sec,iv2=null;ts.onclick=function(){if(iv2){clearInterval(iv2);iv2=null;return}P('tick');iv2=setInterval(function(){left--;tc.innerHTML='<span class="grad">'+Math.floor(left/60)+':'+('0'+left%60).slice(-2)+'</span>';if(left<=0){clearInterval(iv2);iv2=null;P('done');tc.classList.add('tp')}},1000)}}
  $$('.dstop',s).forEach(function(d){d.style.cursor='pointer';d.onclick=function(e){e.stopPropagation();d.classList.remove('tp');void d.offsetWidth;d.classList.add('tp');P('pop')}});
 };
 go(0);
@@ -261,10 +273,10 @@ def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
         sid = f's{n}'; ph_ = d.get('phase'); night = d.get('mode') == 'night'; orbs = phase_orbs(ph_) if ph_ in PAL and not night else ''
         if d['m'] in BUILD: m = d['m']; body = BUILD[m](d, sid)
         else: m = 'view'; body = core.MODULES[d['m']](d)
-        secs += f'<section class="sl{" night" if night else ""}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
+        secs += f'<section class="sl{" night" if night else ""}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}" data-min="{d.get("min",0)}" data-label="{d.get("label",d.get("title") or d["m"])}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
     html = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>'
             f'<style>{css("day")}{CSS_EXTRA}</style></head><body><div id="stage">{secs}</div>'
-            '<div id="ctl"><button id="sf">Sound: On</button><button id="mo">Motion: On</button></div><button id="pv">←</button><button id="nx">→</button><div id="cnt"></div>'
+            '<div id="ctl"><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
             f'<script>{SFX_JS}</script><script>{APP_JS}</script></body></html>')
     html = inline_assets(html)
     pathlib.Path(out).write_text(html, encoding='utf-8')

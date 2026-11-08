@@ -19,6 +19,7 @@ spec=[
    {'label':'Neighbour','grad':'amber','chips':[YOU,('c2','should'),('c3','put a banana on your head.')],'pics':[f'09a_p{k}.jpg' for k in range(1,5)],'cap':'Good idea?'},
    {'label':'Pharmacist','grad':'teal','chips':[YOU,('c2','have to'),('c3','take this pill.')],'pics':[f'09b_p{k}.jpg' for k in range(1,5)],'cap':'Needed.'}]},
  {'m':'dial','phase':S_,'stops':[(180,'prohibited',['mustn’t'],'not allowed'),(135,'thumbs_down',['shouldn’t'],'bad idea?'),(90,'relieved_face',['don’t have to'],'not needed'),(45,'thumbs_up',['should'],'good idea?'),(0,'red_exclamation_mark',['have to','must'],'needed')]},
+ {'m':'timer','phase':S_,'title':'Pair talk','optional':True,'min':2,'icons':['speech_balloon','speech_balloon'],'note':'One thing you should / shouldn’t do tonight'},
  {'m':'contrast','phase':S_,'title':'Not the same!','left':{'label':'Not allowed','grad':'red','pic':'mu_1.jpg','chips':[YOU,('c2','mustn’t'),('c3','drink alcohol.')]},
    'right':{'label':'Not needed','grad':'teal','pic':'mu_2.jpg','chips':[YOU,('c2','don’t have to'),('c3','take it with food.')]}},
  {'m':'columns','phase':S_,'title':'Homework','cols':[
@@ -66,9 +67,12 @@ spec=[
  {'m':'prep','phase':A_,'role':'Doctor','grad':'violet','status':('face_with_head-bandage',4,'zany_face'),
   'left':[('lead',[YOU,('c2','have to')]),('bigtiles',[('hospital','go to hospital'),('pill','take medicine'),('stethoscope','see a doctor')])],
   'right':[('chips',[[('c2','Have'),('c1','you'),('c2','tried'),('c3','this?')],[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')]]),('label','OPTIONAL')]},
+ {'m':'timer','phase':A_,'title':'Group practice','min':8,'icons':['face_with_thermometer','woman_health_worker','man_health_worker'],'note':'Everyone speaks at once'},
  {'m':'recap','phase':'RECAP','rows':[([YOU,('c2','have to'),('c3','rest.')],'needed'),([YOU,('c2','should'),('c3','drink water.')],'good idea?'),([YOU,('c2','shouldn’t'),('c3','drive.')],'bad idea?'),
    ([YOU,('c2','don’t have to'),('c3','go.')],'not needed'),([YOU,('c2','mustn’t'),('c3','drink.')],'not allowed')],
   'side':[[('c4','Where'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','When'),('c2','did'),('c1','it'),('c3','start?')],[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')]],'emoji':'face_with_thermometer'},
 ]
+from lessons.plan import L1,apply
+apply(spec,[r for r in L1])
 if __name__=='__main__':
     sxl.build(spec,'/home/claude/work/lesson/lesson1_deck',pdf='/home/claude/work/lesson/SkillsXLab_Lesson1_lib_v1_light.pdf')

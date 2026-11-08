@@ -52,10 +52,13 @@ spec=[
    ('P','Yes, doctor.'),
    ('D',[G('c2','Take'),C('c3','this medicine.')],[('c2','Don’t eat'),('c2','Take'),('c2','Rest')],'adv_pill.jpg'),
    ('P','Thank you, doctor.')]},
+ {'m':'timer','phase':A_,'title':'Solve a case','min':12,'icons':['detective','woman_health_worker','face_with_thermometer'],'note':'Nurse asks. Patient answers. Doctor advises.'},
  {'m':'solved_board','phase':A_,'title':'Cases solved','items':[
    {'pic':'l2_quack_2.jpg','solved':True},{'pic':'l2_quack_3.jpg','solved':True},{'pic':'l2_quack_1.jpg'},{'pic':'l2_quack_4.jpg'}]},
  {'m':'closing','mode':'night','line1':'One strange','line2':'case.','sub':'Tell the story to the person next to you.'},
 ]
+from lessons.plan import L2,apply
+apply(spec,[r for r in L2])
 if __name__=='__main__':
     sxl.build(spec,'/home/claude/work/lesson/lesson2_deck',pdf='/home/claude/work/lesson/SkillsXLab_Lesson2_deck_v1_light.pdf')
     print(len(sxl.expand_spec(spec)))
