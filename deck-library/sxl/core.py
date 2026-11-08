@@ -110,3 +110,16 @@ def stp(html,s,g=None,pills=False):
     """Mark element as reveal step s (click-per-step in interactive decks; ignored in static output)."""
     i=html.index('<'); j=html.index(' ',i)
     return html[:j]+f' data-s="{s}"'+(f' data-g="{g}"' if g else '')+(' data-pills="1"' if pills else '')+html[j:]
+
+# strength scale (mustn't ... have to): hue = direction (do / don't), saturation = strength. Verb chips stay violet (grammar code).
+STRENGTH=[('#ff6b78','#d62f48','#fff'),('#ffa07a','#ee6a36','#fff'),('#ffe27a','#e3b21c','#3a2f00'),('#6fd79a','#2fa85e','#fff'),('#3fc27c','#168648','#fff')]
+for _i,(_a,_b,_t) in enumerate(STRENGTH): GRAD[f's{_i}']=f'linear-gradient(135deg,{_a},{_b});color:{_t}'
+SIDX={'not allowed':0,'mustn’t':0,'bad idea?':1,'shouldn’t':1,'not needed':2,'don’t have to':2,'good idea?':3,'should':3,'needed':4,'have to':4,'must':4}
+def spill(t,i=None,fs=42,p='8px 32px'):
+    """Strength-tinted gloss pill. i = 0..4 or None -> looked up from the text."""
+    if i is None: i=SIDX.get(t.lower().strip('.'),None)
+    if i is None: return f'<span class="pill" style="font-size:{fs}px;padding:{p};color:#6a35e8;white-space:nowrap">{t}</span>'
+    a,b,tc=STRENGTH[i]
+    return f'<span class="pill" style="font-size:{fs}px;padding:{p};background:linear-gradient(135deg,{a},{b});color:{tc};border-color:{a};white-space:nowrap;font-family:O;font-weight:800">{t}</span>'
+def stint(i,a1='66',a2='22'):
+    a=STRENGTH[i][0]; return f'background:linear-gradient(180deg,{a}{a1},{a}{a2});border-color:{a}aa'

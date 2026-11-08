@@ -57,6 +57,12 @@ def chat_markup(d, sid):
             f'<div class="gl bankbar" id="bk-{sid}" style="left:90px;top:896px;width:1740px;height:100px;border-radius:50px;display:flex;align-items:center;gap:20px;padding:0 40px"></div>'
             f'<script type="application/json" id="d-{sid}">{json.dumps({"banks": bankhtml, "n": len(L), "gapn": [len(x["gaps"]) for x in data]})}</script>')
 
+def tintch(html, word):
+    i = SIDX.get(word.lower().strip('.'))
+    if i is None: return html
+    a, b, tc = STRENGTH[i]
+    return html.replace('style="', f'style="background:linear-gradient(135deg,{a},{b});color:{tc};', 1)
+
 def sort_markup(d, sid):
     rows = d['rows']; n = len(rows); top, bot = 168, 812; step = (bot - top) / n; h = min(int(step - 18), 190); fs = min(64, int(h * .36)); ps = max(8, int(h * .1)); gh = int(fs * 1.3 + 2 * ps)
     out = header(d['phase'], d.get('title')); bank = d['bank']; plain = [b if isinstance(b, tuple) else ('c2', b) for b in bank if b != '|']
@@ -68,7 +74,7 @@ def sort_markup(d, sid):
         x0 = 180 + h + 40
         def slot(k, cls, col, w):
             return (f'<span class="slot" data-i="{i}" data-t="{a[k]}"><span class="op">{gap(col, w, "…", h=gh)}</span>'
-                    f'<span class="fl" style="display:none">{ch(cls, a[k], fs, f"{ps}px {int(fs * .55)}px")}</span></span>')
+                    f'<span class="fl" style="display:none">{tintch(ch(cls, a[k], fs, f"{ps}px {int(fs * .55)}px"), a[k])}</span></span>')
         slots = slot(0, 'c2', '#9a5cff', 420) + ('' if end else slot(1, 'c3', '#ff7a3c', 470))
         out += (f'<div class="gl" style="left:{x0}px;top:{y}px;width:{1830 - x0}px;height:{h}px;border-radius:{int(h * .4)}px;display:flex;align-items:center;gap:22px;padding:0 50px">'
                 + (ch(pre[0], pre[1], fs, f'{ps}px {int(fs * .55)}px') if pre else '') + slots

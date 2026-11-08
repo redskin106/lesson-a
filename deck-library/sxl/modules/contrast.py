@@ -5,7 +5,7 @@ def col(x,c,s):
     return (stp(f'<div class="chip" style="position:absolute;left:{x}px;top:176px;font-size:40px;padding:10px 40px;border-radius:999px;background:{GRAD.get(c["grad"],c["grad"])}">{c["label"]}</div>',s)
       +stp(pic(x,252,840,440,c['pic'],48,fit=c.get('fit','cover')),s)
       +stp(f'<div class="a" style="left:{x}px;top:722px;width:840px;display:flex;flex-wrap:wrap;gap:14px 12px">'+chips(c['chips'],50,'8px 28px')+'</div>',s+1,pills=True)
-      +(stp(f'<div class="a mu" style="left:{x+6}px;top:900px;font-size:42px">{c["cap"]}</div>',s+1) if c.get('cap') else ''))
+      +(stp(f'<div class="a" style="left:{x}px;top:930px">{spill(c["cap"],c.get("sc"),42,"8px 34px")}</div>',s+1) if c.get('cap') else ''))
 @module('contrast')
 def contrast(d):
     return (header(d['phase'],d.get('title'))+col(90,d['left'],1)+col(990,d['right'],3)
