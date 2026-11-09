@@ -5,7 +5,7 @@ BECAUSE=('c4','because')
 spec=[
  # ---------- ENGAGE ----------
  {'m':'cover','phase':E_,'title':'Lesson <span class="grad">2</span>','phases':['Engage','Study','Activate'],'active':0,
-  'cards':[{'pic':'v3_back.jpg','x':1010,'y':150,'w':330,'h':430,'r':-7},{'pic':'v3_stomach.jpg','x':1290,'y':300,'w':330,'h':430,'r':4},{'pic':'v3_head.jpg','x':1500,'y':120,'w':330,'h':430,'r':-3}]},
+  'cards':[{'pic':'v3_head.jpg','x':1530,'y':110,'w':330,'h':430,'r':4},{'pic':'v3_back.jpg','x':1010,'y':150,'w':330,'h':430,'r':-7},{'pic':'v3_stomach.jpg','x':1250,'y':330,'w':330,'h':430,'r':3}]},
  {'m':'pic_question','phase':E_,'pic':'v3_back.jpg','q':('What’s',['wrong?'])},
  {'m':'pic_rows','phase':E_,'title':'Why?','rows':[{'label':'Why?','grad':'violet','chips':[('c1','My back hurts'),BECAUSE,('c1','I'),('c2','slept'),('c3','on the floor.')],'pics':['v3_hook1.jpg','v3_hook2.jpg','v3_hook3.jpg']}]},
  # ---------- STUDY ----------

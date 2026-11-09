@@ -166,7 +166,7 @@ CSS_EXTRA = """.cn{position:absolute;width:480px;height:180px;border-radius:50px
 #vov video.on{display:block}
 #vx{position:absolute;top:3vh;right:3vw;width:72px;height:72px;border-radius:50%;border:0;cursor:pointer;background:#fff;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 8px 20px rgba(0,0,0,.3)}
 
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eeeef3}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eeeef3;transition:background .5s}
 body{width:100%!important;height:100%!important}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
 .sl{position:absolute;inset:0;display:none;overflow:hidden}.sl.on{display:block}
@@ -230,11 +230,11 @@ SFX_JS = r"""
 APP_JS = r"""
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var P=function(n){SXLSound.play(n)}, wait=function(ms){return new Promise(function(r){setTimeout(r,SXL.cfg.off?0:ms)})};
-function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);var st=$('#stage');st.style.transform='scale('+s+')';st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px'}
+PHBG={ENGAGE:'linear-gradient(135deg,#ffd27a,#ff9fb8 45%,#ffb066)',STUDY:'linear-gradient(135deg,#b98cff,#8fb4ff 50%,#7fd3ff)',ACTIVATE:'linear-gradient(135deg,#9fe8c4,#7fe0d8 50%,#a8e6ff)',night:'#0b0a10'};function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);var st=$('#stage');st.style.transform='scale('+s+')';st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px'}
 addEventListener('resize',fit);fit();
 var slides=$$('.sl'),cur=-1;
 [$('#stage')].concat(slides).forEach(function(e){e.addEventListener('scroll',function(){if(e.id==='stage'||!e.classList.contains('thread')){e.scrollTop=0;e.scrollLeft=0}})});
-function go(i){if(i<0||i>=slides.length)return;tickClk();slides.forEach(function(s){s.classList.remove('on')});cur=i;lastI=i;lastT=Date.now();upd();var s=slides[i];s.classList.add('on');$('#nx').classList.remove('on');if(!s.__init){s.__init=1;INIT[s.dataset.m](s)}else if(s.__done)$('#nx').classList.add('on');}
+function go(i){if(i<0||i>=slides.length)return;tickClk();slides.forEach(function(s){s.classList.remove('on')});cur=i;lastI=i;lastT=Date.now();upd();var s=slides[i];s.classList.add('on');var pb=PHBG[s.dataset.ph];document.body.style.background=pb||'#eeeef3';$('#nx').classList.remove('on');if(!s.__init){s.__init=1;INIT[s.dataset.m](s)}else if(s.__done)$('#nx').classList.add('on');}
 var T0=Date.now(),SL=[],lastT=Date.now(),lastI=-1,showClk=false;
 function fmt(s){s=Math.round(s);return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
 function tickClk(){var now=Date.now();if(lastI>=0)SL[lastI]=(SL[lastI]||0)+(now-lastT)/1000;lastT=now;if(!showClk)return;var tot=SL.reduce(function(a,b){return a+(b||0)},0),plan=0,pc=0;slides.forEach(function(s,i){var m=+s.dataset.min||0;if(!s.dataset.opt)plan+=m;if(i<=cur&&!s.dataset.opt)pc+=m});$('#clk').textContent='slide '+fmt((SL[cur]||0))+'  ·  total '+fmt(tot)+' / plan '+fmt(pc*60)+' (core '+fmt(plan*60)+')'}
@@ -396,7 +396,7 @@ def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
         sid = f's{n}'; ph_ = d.get('phase'); night = d.get('mode') == 'night'; orbs = phase_orbs(ph_) if ph_ in PAL and not night else ''
         if d['m'] in BUILD: m = d['m']; body = BUILD[m](d, sid)
         else: m = 'view'; body = core.MODULES[d['m']](d)
-        secs += f'<section class="sl{" night" if night else ""}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}" data-min="{d.get("min",0)}" data-label="{d.get("label",d.get("title") or d["m"])}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
+        secs += f'<section class="sl{" night" if night else ""}" data-ph="{"night" if night else (ph_ or "")}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}" data-min="{d.get("min",0)}" data-label="{d.get("label",d.get("title") or d["m"])}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
     html = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>'
             f'<style>{css("day")}{CSS_EXTRA}</style></head><body><div id="stage">{secs}</div>'
             '<div id="ctl"><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
