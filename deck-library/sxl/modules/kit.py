@@ -108,11 +108,11 @@ def pic_rows(d):
     """Rows of pictures with a label chip + sentence. {'rows':[{'label','grad','chips':[..],'pics':[files],'cap':'...'}]}"""
     R=d['rows']; n=len(R); o=header(d['phase'],d.get('title')); st=1
     for j,r in enumerate(R):
-        y=168+j*425+(150 if n==1 else 0); k=len(r['pics']); w=int((1740-30*(k-1))/k); w=min(w,(560 if n==1 else 520) if k==3 else 405); h=int(w*9/16); gx=int((1740-w*k)/(k-1)) if k>1 else 0
+        y=168+j*425+(150 if n==1 else 0); k=len(r['pics']); w=int((1740-30*(k-1))/k); w=min(w,(560 if n==1 else 440) if k==3 else 405); h=int(w*9/16); gx=(60 if n>1 else int((1740-w*k)/(k-1))) if k>1 else 0
         for i,f in enumerate(r['pics']): o+=stp(pic(90+i*(w+gx),y+90,w,h,f,36),st+i)
         o+=stp(f'<div class="a" style="left:90px;top:{y}px;display:flex;align-items:center;gap:0"><div class="chip" style="font-size:44px;padding:10px 40px;border-radius:999px;background:{G(r["grad"])}">{r["label"]}</div><div style="width:6px;height:54px;border-radius:3px;background:rgba(124,70,230,.4);margin:0 44px"></div>{chiprow(r["chips"])}</div>',st+k,pills=True)
         used=k+1
-        if r.get('cap'): o+=stp(f'<div class="a" style="left:90px;top:{y+90+h+8}px">{spill(r["cap"],r.get("sc"),34,"6px 28px")}</div>',st+k+1); used+=1
+        if r.get('cap'): o+=stp(f'<div class="a" style="left:{90+(k-1)*(w+gx)}px;top:{y+90+h+10}px;width:{w}px;display:flex;justify-content:center">{spill(r["cap"],r.get("sc"),34,"6px 28px")}</div>',st+k+1); used+=1
         st+=used
     return o
 
@@ -286,11 +286,11 @@ def recap(d):
     o=header(d['phase'])+f'<div class="a h" style="left:90px;top:130px;font-size:68px">{d.get("title","Today we can say…")}</div>'
     nr=len(d['rows'])
     for k,(cs,g) in enumerate(d['rows']):
-        o+=stp(f'<div class="gl" style="left:90px;top:{240+k*150}px;width:960px;height:128px;border-radius:64px;display:flex;align-items:center;gap:14px;padding:0 36px">{chiprow(cs,48,"8px 24px","14px")}<span style="margin-left:auto">{spill(g,None,34,"6px 26px")}</span></div>',k+1,pills=True)
+        o+=stp(f'<div class="gl" style="left:90px;top:{240+k*150}px;width:{960 if d.get('side') else 1270}px;height:128px;border-radius:64px;display:flex;align-items:center;gap:14px;padding:0 36px">{chiprow(cs,48,"8px 24px","14px")}<span style="margin-left:auto">{spill(g,None,34,"6px 26px")}</span></div>',k+1,pills=True)
     if d.get('side'):
         o+=stp('<div class="gl" style="left:1080px;top:240px;width:750px;height:728px;border-radius:72px"></div>',nr+1)
         for k,q in enumerate(d['side']): o+=stp(f'<div class="a" style="left:1100px;top:{300+k*150}px;width:710px;display:flex;gap:10px;justify-content:center">'+''.join(ch(a,b,44,'8px 22px') for a,b in q)+'</div>',nr+1+k,pills=True)
-        if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1360px;top:770px;width:190px;{sh()}">',nr+len(d['side']))
+    if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1520px;top:{300 if not d.get("side") else 770}px;width:{260 if not d.get("side") else 190}px;{sh()}">',nr+len(d.get('side') or [])+(0 if d.get('side') else 1))
     return o+'<div class="a mu" style="left:90px;bottom:22px;font-size:22px">Emoji: Microsoft Fluent Emoji (MIT)</div>'
 
 @module('exit')
@@ -351,26 +351,27 @@ def ball_circle(d):
     o+=(f'<div class="a tclock" data-sec="{sec}" style="left:1380px;top:34px;width:300px;text-align:center;font-family:O;font-weight:800;font-size:92px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>'
         f'<div class="a tstart" style="left:1700px;top:44px;width:130px;height:84px;border-radius:42px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="40" height="40" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>')
     S=d['stations']; w=520; gap=90; y=168; h=470
+    BALL=('<svg viewBox="0 0 100 100" width="80" height="80" style="position:absolute;left:%dpx;top:300px;%s"><defs><radialGradient id="bg" cx="35%%" cy="30%%"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#ff8a3c"/></radialGradient></defs><circle cx="50" cy="50" r="46" fill="url(#bg)" stroke="#fff" stroke-width="4"/><path d="M8 40Q50 62 92 40M10 66Q50 44 90 66" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>')
     for i,s in enumerate(S):
-        x=90+i*(w+gap)
+        x=90+i*(w+gap); st=i+1
         if i>0:
-            o+=stp(f'<img src="{EM("soccer_ball")}" style="position:absolute;left:{x-gap+5}px;top:300px;width:80px;{sh()}">'
-                   f'<div class="a" style="left:{x-gap}px;top:400px;width:{gap}px;transform:scale(.45);transform-origin:left top">{ARROW}</div>',i+1)
-        o+=stp(glass(x,y,w,h,'',r=64)
-               +f'<img src="{EM(s["emoji"])}" style="position:absolute;left:{x+w//2-90}px;top:{y+26}px;width:180px;{sh()}">'
-               +f'<div class="a" style="left:{x}px;top:{y+226}px;width:{w}px;display:flex;justify-content:center">{grad_chip(s["grad"],s["name"],52,"8px 44px")}</div>'
-               +f'<div class="a" style="left:{x+20}px;top:{y+318}px;width:{w-40}px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">'+''.join(ch(c,t,36,'6px 18px') for c,t in s['chips'])+'</div>',i+1,pills=True)
-    by=670; bh=318
+            o+=stp(BALL%(x-gap+5,sh()),st)
+            o+=stp(f'<div class="a" style="left:{x-gap}px;top:400px;width:{gap}px;transform:scale(.45);transform-origin:left top">{ARROW}</div>',st)
+        o+=stp(glass(x,y,w,h,'',r=64),st)
+        o+=stp(f'<img src="{EM(s["emoji"])}" style="position:absolute;left:{x+w//2-90}px;top:{y+26}px;width:180px;{sh()}">',st)
+        o+=stp(f'<div class="a" style="left:{x}px;top:{y+226}px;width:{w}px;display:flex;justify-content:center">{grad_chip(s["grad"],s["name"],52,"8px 44px")}</div>',st)
+        o+=stp(f'<div class="a" style="left:{x+20}px;top:{y+318}px;width:{w-40}px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">'+''.join(ch(c,t,36,'6px 18px') for c,t in s['chips'])+'</div>',st,pills=True)
+    by=670; bh=318; k=len(S)
     pain=d['pain']; pw=190
-    o+=stp(glass(90,by,880,bh,'',r=56),1)
+    o+=stp(glass(90,by,880,bh,'',r=56),k+1)
     for i,(f,lab) in enumerate(pain):
-        x=120+i*(pw+20); o+=stp(pic(x+20,by+28,150,150,f,26,fit='contain')+f'<div class="a" style="left:{x}px;top:{by+192}px;width:{pw}px;display:flex;justify-content:center">{ch("c3",lab,36,"4px 18px")}</div>',1)
-    o+=stp(f'<div class="a mu" style="left:120px;top:{by+240}px;width:820px;font-size:34px">Where does it hurt?</div>',1)
+        x=120+i*(pw+20); o+=stp(pic(x+20,by+28,150,150,f,26,fit='contain'),k+1)+stp(f'<div class="a" style="left:{x}px;top:{by+192}px;width:{pw}px;display:flex;justify-content:center">{ch("c3",lab,36,"4px 18px")}</div>',k+1)
+    o+=stp(f'<div class="a mu" style="left:120px;top:{by+250}px;width:820px;font-size:34px">Where does it hurt?</div>',k+1)
     V=d['verbs']; vw=130
-    o+=stp(glass(1000,by,830,bh,'',r=56),1)
+    o+=stp(glass(1000,by,830,bh,'',r=56),k+2)
     for i,(f,t) in enumerate(V):
-        x=1034+i*(vw+28); o+=stp(pic(x,by+40,vw,vw,f,26,fit='contain')+f'<div class="a" style="left:{x-10}px;top:{by+190}px;width:{vw+20}px;display:flex;justify-content:center">{ch("c2",t,38,"4px 16px")}</div>',1)
-    o+=stp(f'<div class="a mu" style="left:1034px;top:{by+250}px;width:780px;font-size:34px">What did you do?</div>',1)
+        x=1034+i*(vw+28); o+=stp(pic(x,by+40,vw,vw,f,26,fit='contain'),k+2)+stp(f'<div class="a" style="left:{x-10}px;top:{by+190}px;width:{vw+20}px;display:flex;justify-content:center">{ch("c2",t,38,"4px 16px")}</div>',k+2)
+    o+=stp(f'<div class="a mu" style="left:1034px;top:{by+250}px;width:780px;font-size:34px">What did you do?</div>',k+2)
     return o
 
 
@@ -378,23 +379,23 @@ CNX=['#7b3cf0','#17b890','#ff9f1c','#ff4f7a']
 def connect_html(d,sid):
     """Three columns (yesterday / now / after). Tap a tile in one column, then its partner in another: they slide onto one row and an arrow draws.
     {'rows':[{'cause':f,'now':f,'adv':f,'c':[(cls,t)],'n':[(cls,t)],'a':[(cls,t)]}]}"""
-    R=d['rows']; n=len(R); W,ROW,TOP=480,155,250; X=[90,720,1350]
-    ordr=[[2,0,3,1],[1,3,0,2],[3,2,1,0]] if n==4 else [[(i+c)%n for i in range(n)] for c in range(3)]
+    R=d['rows']; n=len(R); W,ROW,TOP,TH=480,205,240,180; X=[90,720,1350]
+    ordr=[[(i+c)%n for i in range(n)] for c in range(3)]
     o=header(d['phase'],d.get('title'))
     for c,(g,t) in enumerate([('rose','yesterday'),('sky','now'),('teal','after')]):
         o+=f'<div class="a" style="left:{X[c]}px;top:172px;width:{W}px;display:flex;justify-content:center">{grad_chip(g,t,40,"6px 40px")}</div>'
-    o+=f'<svg id="cv-{sid}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;z-index:1;overflow:visible"><defs>'+''.join(f'<marker id="ah{sid}{i}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="{CNX[i%4]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></marker>' for i in range(n))+'</defs><g id="ag-'+sid+'"></g></svg>'
+    o+=f'<svg id="cv-{sid}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;z-index:1;overflow:visible"><defs>'+''.join(f'<marker id="ah{sid}{i}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="{CNX[i%4]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></marker>' for i in range(n))+f'<filter id="rf{sid}" x="-5%" y="-30%" width="110%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="6"/></filter></defs><g id="ag-'+sid+f'" filter="url(#rf{sid})"></g></svg>'
     keys=['cause','now','adv']; sk=['c','n','a']
     for c in range(3):
         for slot,i in enumerate(ordr[c]):
             r=R[i]
             o+=(f'<div class="cn" data-c="{c}" data-id="{i}" style="left:{X[c]}px;top:{TOP+slot*ROW}px">'
-                +pic(12,12,116,116,r[keys[c]],30)
-                +'<div class="tx">'+''.join(ch(a,b,34,'6px 16px') for a,b in r[sk[c]])+'</div></div>')
-    o+=f'<div class="gl cfull" id="cf-{sid}" style="left:90px;top:890px;width:1740px;height:128px;border-radius:64px;display:flex;align-items:center;justify-content:center;gap:12px;opacity:0"></div>'
-    full=[''.join(ch(a,b,46,'8px 22px') for a,b in (R[i]['n']+[('c4','because')]+R[i]['c']+R[i]['a'])) for i in range(n)]
+                +pic(12,12,TH-24,TH-24,r[keys[c]],34)
+                +'<div class="tx">'+''.join(ch(a,b,38,'6px 18px') for a,b in r[sk[c]])+'</div></div>')
+    o+=f'<div class="gl cfull" id="cf-{sid}" style="left:90px;top:846px;width:1620px;height:170px;border-radius:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0"></div>'
+    full=['<div style="display:flex;gap:12px">'+''.join(ch(a,b,42,"4px 20px") for a,b in R[i]["n"])+'</div><div style="display:flex;gap:12px">'+''.join(ch(a,b,42,'4px 20px') for a,b in ([('c4','because')]+R[i]['c']+R[i]['a']))+'</div>' for i in range(n)]
     import json as _j
-    o+=f'<script type="application/json" id="d-{sid}">{_j.dumps({"n":n,"full":full,"col":CNX,"row":ROW,"top":TOP,"x":X,"w":W})}</script>'
+    o+=f'<script type="application/json" id="d-{sid}">{_j.dumps({"n":n,"full":full,"col":CNX,"row":ROW,"top":TOP,"x":X,"w":W,"h":TH})}</script>'
     return o
 
 @module('connect')

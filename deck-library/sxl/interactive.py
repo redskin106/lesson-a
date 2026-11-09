@@ -35,7 +35,9 @@ def chat_markup(d, sid):
     for i, l in enumerate(L):
         s, c, bank = C.parts(l); pc = l[3] if len(l) > 3 else None
         left = s in ('N', 'D'); a = EM(av.get(s, AV[s]))
-        if isinstance(c, str):
+        if isinstance(c, dict):
+            inner = f'<img src="{ART}{c["img"]}" style="height:150px;width:266px;border-radius:30px;background:#fff;object-fit:contain">'; gaps = []; pc = 'x' if False else pc
+        elif isinstance(c, str):
             inner = f'<div style="font-family:O;font-weight:800;font-size:52px;color:#1c1b2e">{c}</div>'; gaps = []
         else:
             parts_ = []; gaps = []
@@ -45,7 +47,7 @@ def chat_markup(d, sid):
                 else: parts_.append(ch(c_, t, 46, '8px 26px'))
             inner = '<div style="display:flex;gap:12px;align-items:center">' + ''.join(parts_) + '</div>'
         pimg = (f'<img src="{ART}{pc}" style="height:112px;width:112px;border-radius:26px;margin-left:30px;background:#fff;object-fit:contain">' if pc else '')
-        bub = f'<div class="gl" style="position:static;height:130px;border-radius:65px;display:flex;align-items:center;padding:0 {18 if pc else 46}px 0 46px;{"" if left else "background:rgba(214,190,255,.75);"}">{inner}{pimg}</div>'
+        bub = f'<div class="gl" style="position:static;height:{170 if isinstance(c, dict) else 130}px;border-radius:{70 if isinstance(c, dict) else 65}px;display:flex;align-items:center;padding:0 {18 if (pc or isinstance(c, dict)) else 46}px 0 {18 if isinstance(c, dict) else 46}px;{"" if left else "background:rgba(214,190,255,.75);"}">{inner}{pimg}</div>'
         avh = f'<div class="gl" style="position:static;width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff"><img src="{a}" style="width:78px"></div>'
         rows += f'<div class="row" data-i="{i}" style="align-self:{"flex-start" if left else "flex-end"};display:none;align-items:center;gap:22px;{"" if left else "flex-direction:row-reverse"}">{avh}{bub}</div>'
         bk = bank or d.get('bank') if gaps else None
@@ -76,7 +78,7 @@ def sort_markup(d, sid):
         def slot(k, cls, col, w):
             return (f'<span class="slot" data-i="{i}" data-t="{a[k]}"><span class="op">{gap(col, w, "…", h=gh)}</span>'
                     f'<span class="fl" style="display:none">{tintch(ch(cls, a[k], fs, f"{ps}px {int(fs * .55)}px"), a[k])}</span></span>')
-        slots = slot(0, 'c2', '#9a5cff', 420) + ('' if end else slot(1, 'c3', '#ff7a3c', 470))
+        vw = max(240, int(max(len(t) for r2 in rows for t in ([r2.get('ans')] if isinstance(r2.get('ans'), str) else (r2.get('ans') or ['xxxxx']))) * fs * .56 + fs * 1.3)); slots = slot(0, 'c2', '#9a5cff', vw) + ('' if end else slot(1, 'c3', '#ff7a3c', 470))
         out += (f'<div class="gl" style="left:{x0}px;top:{y}px;width:{1830 - x0}px;height:{h}px;border-radius:{int(h * .4)}px;display:flex;align-items:center;gap:22px;padding:0 50px">'
                 + (ch(pre[0], pre[1], fs, f'{ps}px {int(fs * .55)}px') if pre else '') + slots
                 + (ch(end[0], end[1], fs, f'{ps}px {int(fs * .55)}px') if end else '') + '</div>')
@@ -149,10 +151,10 @@ def connect_markup(d, sid):
 BUILD = {'connect': connect_markup, 'pick': pick_markup, 'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
 
 
-CSS_EXTRA = """.cn{position:absolute;width:480px;height:140px;border-radius:44px;background:rgba(255,255,255,.66);border:5px solid rgba(255,255,255,.92);box-shadow:0 10px 26px rgba(60,30,140,.16);cursor:pointer;z-index:2;transition:top .7s cubic-bezier(.3,.9,.3,1),background .3s,border-color .3s,transform .2s}
-.cn .tx{position:absolute;left:146px;top:0;width:322px;height:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;opacity:0;transition:opacity .4s}
+CSS_EXTRA = """.cn{position:absolute;width:480px;height:180px;border-radius:50px;background:rgba(255,255,255,.66);border:5px solid rgba(255,255,255,.92);box-shadow:0 10px 26px rgba(60,30,140,.16);cursor:pointer;z-index:2;transition:top .7s cubic-bezier(.3,.9,.3,1),background .3s,border-color .3s,transform .2s}
+.cn .tx{position:absolute;left:182px;top:0;width:286px;height:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;opacity:0;transition:opacity .4s}
 .cn.rv .tx{opacity:1}.cn.sel{border-color:#7b3cf0;transform:scale(1.04)}
-.cd{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:cdr .5s .55s ease-out forwards}@keyframes cdr{to{stroke-dashoffset:0}}
+.cd{fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:cdr var(--du,.45s) var(--dl,.05s) ease-out forwards}@keyframes cdr{to{stroke-dashoffset:0}}
 .cn.okp{animation:cok .6s}@keyframes cok{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .cfull{transition:opacity .4s}
 .pk{border:0;background:none;padding:0;cursor:pointer;transition:transform .2s,opacity .3s}.pk:hover{transform:translateY(-4px)}.pk.off{opacity:.32;transform:none}.pk.pickd{transform:scale(1.04);filter:drop-shadow(0 0 28px rgba(79,207,122,.8))}
@@ -323,7 +325,15 @@ INIT.connect=function(s){
  var pos=[[],[],[]],els={},rowOf={},nextRow=0,linked={},sel=null,done=0;
  ts.forEach(function(e){var c=+e.dataset.c,id=+e.dataset.id,sl=Math.round((parseInt(e.style.top)-D.top)/D.row);pos[c][sl]=id;els[c+'_'+id]=e;e.onclick=function(){tap(e)}});
  function place(c,id,r){var cur=pos[c].indexOf(id),o=pos[c][r];if(cur===r)return;pos[c][r]=id;pos[c][cur]=o;els[c+'_'+id].style.top=(D.top+r*D.row)+'px';els[c+'_'+o].style.top=(D.top+cur*D.row)+'px'}
- function arrow(id,r,a,b){var y=D.top+r*D.row+70,x1=D.x[a]+D.w+10,x2=D.x[b]-14,p=document.createElementNS(NS,'path');p.setAttribute('class','cd');p.setAttribute('pathLength','1');p.setAttribute('stroke',D.col[id%4]);p.setAttribute('marker-end','url(#ah'+sid+(id%4)+')');p.dataset.g=id;p.setAttribute('d','M'+x1+' '+y+'L'+x2+' '+y);svg.appendChild(p)}
+ function stroke(d,w,col,g,dl,du){var p=document.createElementNS(NS,'path');p.setAttribute('class','cd');p.setAttribute('pathLength','1');p.setAttribute('stroke',col);p.setAttribute('stroke-width',w);p.style.setProperty('--dl',dl+'s');p.style.setProperty('--du',du+'s');p.dataset.g=g;p.setAttribute('d',d);svg.appendChild(p)}
+ function arrow(id,r,a,b){var y=D.top+r*D.row+D.h/2,x1=D.x[a]+D.w+12,x2=D.x[b]-16,col=D.col[id%4],m=(x1+x2)/2,st=(id+a)%2;
+  if(st===0){/* marker: wobbly straight line, then two short head strokes */
+   stroke('M'+x1+' '+(y+3)+'Q'+m+' '+(y-6)+' '+x2+' '+y,9,col,id,.05,.42);
+   stroke('M'+(x2-34)+' '+(y-26)+'L'+x2+' '+y,9,col,id,.47,.14);stroke('M'+(x2-34)+' '+(y+26)+'L'+x2+' '+y,9,col,id,.58,.14)}
+  else{/* brush: curved thick stroke, then a loose chevron head */
+   var cy=(a===0&&b===2)?60:46;
+   stroke('M'+x1+' '+(y+12)+'C'+(x1+40)+' '+(y-cy)+' '+(x2-50)+' '+(y+cy)+' '+x2+' '+(y-4),14,col,id,.05,.5);
+   stroke('M'+(x2-38)+' '+(y-34)+'Q'+(x2-16)+' '+(y-16)+' '+x2+' '+(y-4),13,col,id,.53,.14);stroke('M'+(x2-34)+' '+(y+30)+'Q'+(x2-14)+' '+(y+12)+' '+x2+' '+(y-4),13,col,id,.64,.14)}}
  function tap(e){var c=+e.dataset.c,id=+e.dataset.id;e.classList.add('rv');
   if(!sel){sel=e;e.classList.add('sel');P('tick');return}
   if(sel===e){e.classList.remove('sel');sel=null;return}

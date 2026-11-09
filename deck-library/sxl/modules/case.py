@@ -28,26 +28,26 @@ def evidence_board(d):
 
 @module('cast')
 def cast(d):
+    """Pictures appear one by one, then the label pills pop in together."""
     n=len(d['items']); w=int((1740-30*(n-1))/n); out=header(d['phase'],d.get('title'),d.get('grad','amber'))
     for i,it in enumerate(d['items']):
-        x=90+i*(w+30); out+=art(x,170,w,640,it['pic'],r=48,label=it['pic'],fit=it.get('fit','cover'))
-        out+=f'<div class="a" style="left:{x}px;top:830px;width:{w}px;display:flex;justify-content:center">{grad_chip(it.get("grad","amber"),it["label"],44,"10px 40px")}</div>'
-        if it.get('cap'): out+=f'<div class="a mu" style="left:{x}px;top:925px;width:{w}px;text-align:center;font-size:34px">{it["cap"]}</div>'
+        x=90+i*(w+30); out+=stp(art(x,170,w,640,it['pic'],r=48,label=it['pic'],fit=it.get('fit','cover')),i+1)
+        out+=stp(f'<div class="a" style="left:{x}px;top:830px;width:{w}px;display:flex;justify-content:center">{grad_chip(it.get("grad","amber"),it["label"],44,"10px 40px")}</div>',n+1,pills=True)
+        if it.get('cap'): out+=stp(f'<div class="a mu" style="left:{x}px;top:925px;width:{w}px;text-align:center;font-size:34px">{it["cap"]}</div>',n+1)
     return out
 
 @module('verb_pairs')
 def verb_pairs(d):
-    """Large picture cards: picture on top, today chip then yesterday chip underneath (pictures carry the meaning)."""
+    """Pictures first, then the 'now' pills pop in, then arrows + 'then' pills (reveal rule: picture before text)."""
     R=d['rows']; n=len(R); w=min(400,int((1740-30*(n-1))/n)); gx=int((1740-w*n)/(n-1)) if n>1 else 0
     x0=90+(1740-(w*n+gx*(n-1)))//2
     fs=max(44,int(w*.17))
     out=header(d['phase'],d.get('title','Yesterday'),d.get('grad','violet'))
     for i,r in enumerate(R):
-        x=x0+i*(w+gx)
-        out+=art(x,190,w,w,r['pic'],r=48,label=r['pic'],fit='contain')
-        out+=(f'<div class="a" style="left:{x}px;top:{190+w+40}px;width:{w}px;display:flex;flex-direction:column;align-items:center;gap:18px">'
-              f'{ch("c2",r["now"],fs,"8px 30px")}<div style="font-family:O;font-weight:800;font-size:{int(fs*.9)}px;color:#9a5cff;line-height:.7">↓</div>'
-              f'{grad_chip("violet",r["then"],int(fs*1.15),"10px 36px")}</div>')
+        x=x0+i*(w+gx); y=190+w+40
+        out+=stp(art(x,190,w,w,r['pic'],r=48,label=r['pic'],fit='contain'),1)
+        out+=stp(f'<div class="a" style="left:{x}px;top:{y}px;width:{w}px;display:flex;justify-content:center">{ch("c2",r["now"],fs,"8px 30px")}</div>',2,pills=True)
+        out+=stp(f'<div class="a" style="left:{x}px;top:{y+fs+30}px;width:{w}px;display:flex;flex-direction:column;align-items:center;gap:18px"><div style="font-family:O;font-weight:800;font-size:{int(fs*.9)}px;color:#9a5cff;line-height:.7">↓</div>{grad_chip("violet",r["then"],int(fs*1.15),"10px 36px")}</div>',3,pills=True)
     return out
 
 @module('timeline')
@@ -80,12 +80,15 @@ def sound_sort(d):
 
 @module('role_cards')
 def role_cards(d):
+    """Three role cards: picture, name, job, then the sentence that role says (chips inside the card)."""
     C=d['cards']; n=len(C); w=int((1740-40*(n-1))/n); out=header(d['phase'],d.get('title'),d.get('grad','amber'))
     for i,c in enumerate(C):
-        x=90+i*(w+40); out+=glass(x,170,w,620,'',r=64)
-        out+=em(c['emoji'],x+w//2-150,230,300)+f'<div class="a" style="left:{x}px;top:560px;width:{w}px;display:flex;justify-content:center">{grad_chip(c["grad"],c["name"],64,"12px 56px")}</div>'
-        out+=f'<div class="a mu" style="left:{x}px;top:690px;width:{w}px;text-align:center;font-size:40px">{c["job"]}</div>'
-    if d.get('qs'): out+='<div class="gl" style="left:90px;top:830px;width:1740px;height:150px;border-radius:75px;display:flex;align-items:center;gap:20px;padding:0 50px">'+''.join(ch(*q[:2],54,'8px 30px') for q in d['qs'])+'</div>'
+        x=90+i*(w+40); out+=stp(glass(x,170,w,820,'',r=64),i+1)
+        out+=stp(em(c['emoji'],x+w//2-130,215,260),i+1)
+        out+=stp(f'<div class="a" style="left:{x}px;top:500px;width:{w}px;display:flex;justify-content:center">{grad_chip(c["grad"],c["name"],64,"12px 56px")}</div>',i+1)
+        out+=stp(f'<div class="a mu" style="left:{x}px;top:620px;width:{w}px;text-align:center;font-size:38px">{c["job"]}</div>',i+1)
+        if c.get('says'):
+            out+=stp(f'<div class="a" style="left:{x+20}px;top:720px;width:{w-40}px;height:230px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px 14px">'+''.join(ch(k,t,46,'8px 24px') for k,t in c['says'])+'</div>',n+1+i,pills=True)
     return out
 
 @module('match_pairs')
