@@ -142,10 +142,20 @@ def pick_markup(d, sid):
     from .modules.kit import pick_html
     return pick_html(d, True) + f'<script type="application/json" id="d-{sid}">{json.dumps({"ok": d["ok"]})}</script>'
 
-BUILD = {'pick': pick_markup, 'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
+def connect_markup(d, sid):
+    from .modules.kit import connect_html
+    return connect_html(d, sid)
+
+BUILD = {'connect': connect_markup, 'pick': pick_markup, 'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
 
 
-CSS_EXTRA = """.pk{border:0;background:none;padding:0;cursor:pointer;transition:transform .2s,opacity .3s}.pk:hover{transform:translateY(-4px)}.pk.off{opacity:.32;transform:none}.pk.pickd{transform:scale(1.04);filter:drop-shadow(0 0 28px rgba(79,207,122,.8))}
+CSS_EXTRA = """.cn{position:absolute;width:480px;height:140px;border-radius:44px;background:rgba(255,255,255,.66);border:5px solid rgba(255,255,255,.92);box-shadow:0 10px 26px rgba(60,30,140,.16);cursor:pointer;z-index:2;transition:top .7s cubic-bezier(.3,.9,.3,1),background .3s,border-color .3s,transform .2s}
+.cn .tx{position:absolute;left:146px;top:0;width:322px;height:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;opacity:0;transition:opacity .4s}
+.cn.rv .tx{opacity:1}.cn.sel{border-color:#7b3cf0;transform:scale(1.04)}
+.cd{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:cdr .5s .55s ease-out forwards}@keyframes cdr{to{stroke-dashoffset:0}}
+.cn.okp{animation:cok .6s}@keyframes cok{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.cfull{transition:opacity .4s}
+.pk{border:0;background:none;padding:0;cursor:pointer;transition:transform .2s,opacity .3s}.pk:hover{transform:translateY(-4px)}.pk.off{opacity:.32;transform:none}.pk.pickd{transform:scale(1.04);filter:drop-shadow(0 0 28px rgba(79,207,122,.8))}
 .vplay{width:132px;height:132px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#ff4fa3);box-shadow:0 14px 28px rgba(106,53,232,.4),inset 0 2px 0 rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;padding:0 0 0 8px;margin-top:6px;transition:transform .15s}
 .vplay:active{transform:scale(.92)}
 #vov{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(28,20,70,.62);backdrop-filter:blur(8px)}
@@ -308,6 +318,26 @@ INIT.match_pairs=function(s){
  ps.forEach(function(p){p.onclick=function(){ps.forEach(function(x){x.classList.remove('sel')});sp=(sp===p)?null:p;if(sp){sp.classList.add('sel');P('tick')}}});
  ws.forEach(function(w){w.onclick=function(){if(!sp){w.classList.add('pulse');setTimeout(function(){w.classList.remove('pulse')},1700);P('tick');return}
   if(sp.dataset.i===w.dataset.i){var g=$('.mg',w);g.innerHTML='<span class="chip c1 mo" style="font-size:42px;padding:2px 20px;border-radius:44px">'+(+sp.dataset.i+1)+'</span>';sp.classList.remove('sel');sp.classList.add('ok');w.classList.add('ok');sp=null;P('pop');setTimeout(function(){P('tick')},90);if(--left==0)finish(s)}else{wrong(sp);sp.classList.remove('sel');sp=null}}})};
+INIT.connect=function(s){
+ var D=JSON.parse($('#d-'+s.dataset.id).textContent),ts=$$('.cn',s),svg=$('#ag-'+s.dataset.id),full=$('#cf-'+s.dataset.id),NS='http://www.w3.org/2000/svg',sid=s.dataset.id;
+ var pos=[[],[],[]],els={},rowOf={},nextRow=0,linked={},sel=null,done=0;
+ ts.forEach(function(e){var c=+e.dataset.c,id=+e.dataset.id,sl=Math.round((parseInt(e.style.top)-D.top)/D.row);pos[c][sl]=id;els[c+'_'+id]=e;e.onclick=function(){tap(e)}});
+ function place(c,id,r){var cur=pos[c].indexOf(id),o=pos[c][r];if(cur===r)return;pos[c][r]=id;pos[c][cur]=o;els[c+'_'+id].style.top=(D.top+r*D.row)+'px';els[c+'_'+o].style.top=(D.top+cur*D.row)+'px'}
+ function arrow(id,r,a,b){var y=D.top+r*D.row+70,x1=D.x[a]+D.w+10,x2=D.x[b]-14,p=document.createElementNS(NS,'path');p.setAttribute('class','cd');p.setAttribute('pathLength','1');p.setAttribute('stroke',D.col[id%4]);p.setAttribute('marker-end','url(#ah'+sid+(id%4)+')');p.dataset.g=id;p.setAttribute('d','M'+x1+' '+y+'L'+x2+' '+y);svg.appendChild(p)}
+ function tap(e){var c=+e.dataset.c,id=+e.dataset.id;e.classList.add('rv');
+  if(!sel){sel=e;e.classList.add('sel');P('tick');return}
+  if(sel===e){e.classList.remove('sel');sel=null;return}
+  if(+sel.dataset.c===c){sel.classList.remove('sel');sel=e;e.classList.add('sel');P('tick');return}
+  var a=sel;sel=null;a.classList.remove('sel');
+  if(+a.dataset.id===id){link(a,e)}else{wrong(a);wrong(e)}}
+ function link(a,b){var id=+a.dataset.id;if(rowOf[id]===undefined)rowOf[id]=nextRow++;var r=rowOf[id];linked[id]=linked[id]||{};var before=Object.keys(linked[id]).length;linked[id][a.dataset.c]=1;linked[id][b.dataset.c]=1;
+  if(Object.keys(linked[id]).length===before)return;
+  for(var c in linked[id]){place(+c,id,r);var m=els[c+'_'+id];m.classList.add('rv');m.style.background=D.col[id%4]+'30';m.style.borderColor=D.col[id%4];m.classList.remove('okp');void m.offsetWidth;m.classList.add('okp')}
+  P('pop');setTimeout(function(){P('tick')},90);
+  $$('path',svg).forEach(function(p){if(+p.dataset.g===id)p.remove()});var L=linked[id];
+  if(L[0]&&L[1])arrow(id,r,0,1);if(L[1]&&L[2])arrow(id,r,1,2);if(L[0]&&L[2]&&!L[1])arrow(id,r,0,2);
+  if(L[0]&&L[1]&&L[2]){done++;full.innerHTML=D.full[id];full.style.opacity=1;$$('.chip',full).forEach(function(c){c.classList.add('mo')});P('good');if(done===D.n)finish(s)}}
+};
 INIT.pick=function(s){
  var ok=JSON.parse($('#d-'+s.dataset.id).textContent).ok,bs=$$('.pk',s),done=0;
  bs.forEach(function(b){b.onclick=function(){if(done)return;if(+b.dataset.i===ok){done=1;bs.forEach(function(x){if(x!==b)x.classList.add('off')});b.classList.add('ok','pickd');P('pop');setTimeout(function(){P('tick')},90);finish(s)}else{b.classList.add('off');wrong(b)}}})};

@@ -41,6 +41,11 @@ spec=[
  {'m':'pic_rows','phase':S_,'title':'Now and yesterday','rows':[
    {'label':'Now','grad':'sky','chips':[('c2','Does'),('c1','your stomach'),('c2','hurt?')],'pics':['v3_stomach.jpg','v3_m2.jpg','v3_m3.jpg'],'cap':'Yes, it does.'},
    {'label':'Yesterday','grad':'rose','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')],'pics':['v3_m4.jpg','v3_m5.jpg','v3_m6.jpg'],'cap':'Yes, I did.'}]},
+ {'m':'connect','phase':S_,'title':'Connect','rows':[
+   {'cause':'l2c_1_cause.jpg','now':'l2c_1_effect.jpg','adv':'v3_adv_1.jpg','c':[('c1','I'),('c2','ate'),('c3','spicy food.')],'n':[('c1','My stomach'),('c2','hurts')],'a':[('c2','Drink'),('c3','water.')]},
+   {'cause':'l2c_3_cause.jpg','now':'l2c_3_effect.jpg','adv':'v3_adv_2.jpg','c':[('c1','I'),('c2','slept'),('c3','on the floor.')],'n':[('c1','My back'),('c2','hurts')],'a':[('c2','Sleep'),('c3','on a bed.')]},
+   {'cause':'l2c_4_cause.jpg','now':'l2c_4_effect.jpg','adv':'v3_adv_3.jpg','c':[('c1','I'),('c2','fell'),('c3','off a bike.')],'n':[('c1','My arm'),('c2','hurts')],'a':[('c2','Rest'),('c3','your arm.')]},
+   {'cause':'l2c_2_cause.jpg','now':'l2c_2_effect.jpg','adv':'v3_adv_4.jpg','c':[('c1','I'),('c2','went'),('c3','out in the rain.')],'n':[('c1','I'),('c2','have'),('c3','a cold')],'a':[('c2','Stay'),('c3','warm.')]}]},
  {'m':'chat','phase':S_,'title':'Help the robot nurse','window':4,'avatars':{'N':'robot'},'lines':[
    ('N',[C('c2','Does'),C('c1','your arm'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')]),('P','Yes, it does.'),
    ('N',[C('c2','Did'),C('c1','you'),G('c2','fall?')],[('c2','fall?'),('c2','fell?')]),('P','Yes, I did.'),
@@ -51,7 +56,7 @@ spec=[
    ('N','When did it start?'),('P','Last night.'),
    ('N',[C('c2','Did'),C('c1','you'),G('c2','eat'),C('c3','anything?')],[('c2','eat'),('c2','ate')]),
    ('P','Yes, I did.')]},
- {'m':'pick','phase':S_,'title':'Why?','effect':'l2c_5_effect.jpg','options':['l2c_6_cause.jpg','l2c_5_cause.jpg','l2c_3_cause.jpg'],'ok':1},
+ {'m':'pick','phase':S_,'title':'Why?','optional':True,'effect':'l2c_5_effect.jpg','options':['l2c_6_cause.jpg','l2c_5_cause.jpg','l2c_3_cause.jpg'],'ok':1},
  {'m':'pick','phase':S_,'title':'Why?','optional':True,'effect':'l2c_2_effect.jpg','options':['l2c_5_cause.jpg','l2c_4_cause.jpg','l2c_2_cause.jpg'],'ok':2},
  {'m':'timer','phase':S_,'title':'Your turn','optional':True,'min':2,'icons':['face_with_thermometer'],'note':'Tell your partner one thing you did yesterday.'},
  # ---------- ACTIVATE ----------

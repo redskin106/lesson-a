@@ -75,4 +75,7 @@ im,d=base((255,246,236)); d.line([(0,640),(W,640)],fill=(220,215,235),width=6); 
 
 # ---- robot nurse
 im,d=base((240,250,250)); d.line([(0,640),(W,640)],fill=(220,215,235),width=6); emo(im,'robot',640,400,420); save(im,'v3_robot.jpg')
+# ---- advice pictures (connect exercise)
+for i,(e,bg) in enumerate([('droplet',(236,246,255)),('bed',(240,238,255)),('adhesive_bandage',(255,244,236)),('scarf',(255,240,244))],1):
+    im=Image.new('RGB',(720,720),bg); emo(im,e,360,360,440); save(im,f'v3_adv_{i}.jpg')
 print('ok',[f for f in os.listdir(OUT) if f.startswith('v3_')])

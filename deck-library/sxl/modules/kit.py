@@ -372,3 +372,30 @@ def ball_circle(d):
         x=1034+i*(vw+28); o+=stp(pic(x,by+40,vw,vw,f,26,fit='contain')+f'<div class="a" style="left:{x-10}px;top:{by+190}px;width:{vw+20}px;display:flex;justify-content:center">{ch("c2",t,38,"4px 16px")}</div>',1)
     o+=stp(f'<div class="a mu" style="left:1034px;top:{by+250}px;width:780px;font-size:34px">What did you do?</div>',1)
     return o
+
+
+CNX=['#7b3cf0','#17b890','#ff9f1c','#ff4f7a']
+def connect_html(d,sid):
+    """Three columns (yesterday / now / after). Tap a tile in one column, then its partner in another: they slide onto one row and an arrow draws.
+    {'rows':[{'cause':f,'now':f,'adv':f,'c':[(cls,t)],'n':[(cls,t)],'a':[(cls,t)]}]}"""
+    R=d['rows']; n=len(R); W,ROW,TOP=480,155,250; X=[90,720,1350]
+    ordr=[[2,0,3,1],[1,3,0,2],[3,2,1,0]] if n==4 else [[(i+c)%n for i in range(n)] for c in range(3)]
+    o=header(d['phase'],d.get('title'))
+    for c,(g,t) in enumerate([('rose','yesterday'),('sky','now'),('teal','after')]):
+        o+=f'<div class="a" style="left:{X[c]}px;top:172px;width:{W}px;display:flex;justify-content:center">{grad_chip(g,t,40,"6px 40px")}</div>'
+    o+=f'<svg id="cv-{sid}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;z-index:1;overflow:visible"><defs>'+''.join(f'<marker id="ah{sid}{i}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="{CNX[i%4]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></marker>' for i in range(n))+'</defs><g id="ag-'+sid+'"></g></svg>'
+    keys=['cause','now','adv']; sk=['c','n','a']
+    for c in range(3):
+        for slot,i in enumerate(ordr[c]):
+            r=R[i]
+            o+=(f'<div class="cn" data-c="{c}" data-id="{i}" style="left:{X[c]}px;top:{TOP+slot*ROW}px">'
+                +pic(12,12,116,116,r[keys[c]],30)
+                +'<div class="tx">'+''.join(ch(a,b,34,'6px 16px') for a,b in r[sk[c]])+'</div></div>')
+    o+=f'<div class="gl cfull" id="cf-{sid}" style="left:90px;top:890px;width:1740px;height:128px;border-radius:64px;display:flex;align-items:center;justify-content:center;gap:12px;opacity:0"></div>'
+    full=[''.join(ch(a,b,46,'8px 22px') for a,b in (R[i]['n']+[('c4','because')]+R[i]['c']+R[i]['a'])) for i in range(n)]
+    import json as _j
+    o+=f'<script type="application/json" id="d-{sid}">{_j.dumps({"n":n,"full":full,"col":CNX,"row":ROW,"top":TOP,"x":X,"w":W})}</script>'
+    return o
+
+@module('connect')
+def connect(d): return connect_html(d,'x')
