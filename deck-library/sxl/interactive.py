@@ -148,7 +148,25 @@ def connect_markup(d, sid):
     from .modules.kit import connect_html
     return connect_html(d, sid)
 
-BUILD = {'connect': connect_markup, 'pick': pick_markup, 'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
+def build_markup(d, sid):
+    P = d.get('pics', []); parts = d['parts']; extra = d.get('extra', []); fs = d.get('fs', 52); ps = int(fs * .17); gh = int(fs * 1.3 + 2 * ps)
+    out = header(d['phase'], d.get('title', 'Build the sentence'), 'violet'); n = len(P); w, h = (560, 360) if n < 3 else (440, 330); gx = 80
+    x0 = int(960 - (n * w + (n - 1) * gx) / 2)
+    for k, f in enumerate(P): out += art(x0 + k * (w + gx), 168, w, h, f, r=56, label=f)
+    COL = {'c1': '#34d0f2', 'c2': '#9a5cff', 'c3': '#ff7a3c', 'c4': '#ffb21f'}; sl = ''
+    for k, (c, t) in enumerate(parts):
+        wd = max(130, int(len(t) * fs * .56 + fs * 1.2))
+        sl += (f'<span class="bs" data-k="{k}" data-t="{t}" data-c="{c}"><span class="op">{gap(COL[c], wd, "…", h=gh)}</span>'
+               f'<span class="fl" style="display:none">{ch(c, t, fs, f"{ps}px {int(fs * .55)}px")}</span></span>')
+    py = 168 + h + 40
+    out += f'<div class="gl" style="left:90px;top:{py}px;width:1740px;height:{gh + 70}px;border-radius:70px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px 18px;padding:0 40px" id="bs-{sid}">{sl}</div>'
+    bank = d.get('bank') or [(c, t) for c, t in parts] + [tuple(e) for e in extra]
+    btn = ''.join(f'<button class="bk" data-t="{t}" data-c="{c}">{ch(c, t, 44, "8px 26px")}</button>' for c, t in bank)
+    by = py + gh + 70 + 36
+    out += f'<div class="gl" style="left:90px;top:{by}px;width:1740px;height:{988 - by}px;border-radius:64px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:16px 22px;padding:0 44px" id="bk-{sid}">{btn}</div>'
+    return out + f'<script type="application/json" id="d-{sid}">{json.dumps({"n": len(parts)})}</script>'
+
+BUILD = {'build': build_markup, 'connect': connect_markup, 'pick': pick_markup, 'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
 
 
 CSS_EXTRA = """.cn{position:absolute;width:480px;height:180px;border-radius:50px;background:rgba(255,255,255,.66);border:5px solid rgba(255,255,255,.92);box-shadow:0 10px 26px rgba(60,30,140,.16);cursor:pointer;z-index:2;transition:top .7s cubic-bezier(.3,.9,.3,1),background .3s,border-color .3s,transform .2s}
@@ -177,6 +195,7 @@ body{width:100%!important;height:100%!important}
 button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .bk{display:inline-block;transition:transform .2s}.bk:active{transform:scale(.94)}.bk.sel{transform:translateY(-14px) scale(1.06);filter:drop-shadow(0 20px 18px rgba(80,40,160,.35))}
 .bk.used{opacity:.25;pointer-events:none}
+.okline{box-shadow:0 0 0 6px rgba(79,207,122,.55),0 20px 50px rgba(79,207,122,.35)!important;transition:box-shadow .5s}.gl.hov{box-shadow:0 0 0 6px rgba(154,92,255,.45)}
 .shake{animation:sh .35s}@keyframes sh{20%{transform:translateX(-14px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
 .mo{animation:moc .5s cubic-bezier(.2,1.6,.4,1)}@keyframes moc{from{transform:scale(.4)}to{transform:scale(1)}}
 .card{position:absolute;transition:left .6s cubic-bezier(.3,1.2,.4,1),top .6s cubic-bezier(.3,1.2,.4,1),transform .5s}
@@ -300,6 +319,24 @@ INIT.sort=function(s){
    if(t&&t.slot&&t.slot.dataset.t===b.dataset.t){clone.remove();ok(t.slot,b)}
    else{if(t&&t.row){wrong(t.row)}else P('tick');var r=b.getBoundingClientRect(),sr=s.getBoundingClientRect();clone.classList.add('back');clone.style.left=((r.left-sr.left)/k)+'px';clone.style.top=((r.top-sr.top)/k)+'px';var c=clone;setTimeout(function(){c.remove()},380)}}
   document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up)});};
+/* ---- build: put the pills in order to make the whole sentence ---- */
+INIT.build=function(s){
+ var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),bar=$('#bk-'+id),slots=$$('.bs',s),k=0,sel=null,miss=0;
+ function nextPulse(){var t=slots[k];if(t){t.classList.add('pulse');setTimeout(function(){t.classList.remove('pulse')},1500)}}
+ function fill(b){var sl=slots[k];put(sl);b.classList.add('used');k++;miss=0;if(k>=D.n){$('#bs-'+id).classList.add('okline');P('good');finish(s)}}
+ bar.onclick=function(e){var b=e.target.closest('.bk');if(!b||b.classList.contains('used')||k>=D.n)return;
+  if(b.dataset.t===slots[k].dataset.t&&b.dataset.c===slots[k].dataset.c)fill(b);else{wrong(b);if(++miss>=2)nextPulse()}};
+ /* drag a pill onto the sentence (tap works too) */
+ var dragged=false,oc=bar.onclick;bar.onclick=function(e){if(dragged){dragged=false;return}oc(e)};
+ bar.addEventListener('pointerdown',function(e){var b=e.target.closest('.bk');if(!b||b.classList.contains('used')||k>=D.n||e.button>0)return;var x0=e.clientX,y0=e.clientY,clone=null,kk=s.getBoundingClientRect().width/1920,line=$('#bs-'+id);
+  function over(ev){var el=document.elementFromPoint(ev.clientX,ev.clientY);return el&&el.closest('#bs-'+id)}
+  function mv(ev){var dx=ev.clientX-x0,dy=ev.clientY-y0;if(!clone){if(dx*dx+dy*dy<64)return;clone=b.cloneNode(true);clone.classList.add('drag');b.classList.add('ghost');s.appendChild(clone);P('pop')}
+   var r=s.getBoundingClientRect();clone.style.left=((ev.clientX-r.left)/kk-clone.offsetWidth/2)+'px';clone.style.top=((ev.clientY-r.top)/kk-clone.offsetHeight/2)+'px';line.classList.toggle('hov',!!over(ev))}
+  function up(ev){document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);if(!clone)return;dragged=true;setTimeout(function(){dragged=false},60);line.classList.remove('hov');b.classList.remove('ghost');
+   if(over(ev)&&b.dataset.t===slots[k].dataset.t&&b.dataset.c===slots[k].dataset.c){clone.remove();fill(b)}
+   else{if(over(ev)){wrong(line);if(++miss>=2)nextPulse()}else P('tick');var r=b.getBoundingClientRect(),sr=s.getBoundingClientRect();clone.classList.add('back');clone.style.left=((r.left-sr.left)/kk)+'px';clone.style.top=((r.top-sr.top)/kk)+'px';var c=clone;setTimeout(function(){c.remove()},380)}}
+  document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up)});
+ wait(700).then(nextPulse)};
 /* ---- timeline: tap the card that happened next ---- */
 INIT.timeline=function(s){
  var cards=$$('.card',s),slots=$$('.slotn',s),k=0;

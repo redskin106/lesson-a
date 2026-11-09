@@ -9,7 +9,7 @@ spec=[
  {'m':'pic_question','phase':E_,'pic':'v3_back.jpg','q':('What’s',['wrong?'])},
  {'m':'pic_rows','phase':E_,'title':'','rows':[{'label':'Why does it hurt?','grad':'violet','chips':[('c4','Because'),('c1','I'),('c2','slept'),('c3','on the floor.')],'pics':['v3_hook1.jpg','v3_hook2.jpg','v3_hook3.jpg']}]},
  # ---------- STUDY ----------
- {'m':'today','phase':S_,'emoji':'thinking_face','title':'Now and before','fs':62,'rows':[
+ {'m':'today','phase':S_,'emoji':'thinking_face','title':'Then and now','fs':62,'rows':[
    {'icon':'face_with_thermometer','chips':[('c1','My stomach'),('c2','hurts.')]},
    {'icon':'red_question_mark','chips':[('c4','Why'),('c2','does'),('c1','it'),('c2','hurt?')]},
    {'icon':'hot_pepper','chips':[('c4','Because'),('c1','I'),('c2','ate'),('c3','spicy food.')]}]},
@@ -45,7 +45,7 @@ spec=[
    ([('c4','Because','B'),('c1','I','S'),('c2','ate','V'),('c3','spicy food.','O')],'because → why')]},
  {'m':'contrast','phase':S_,'title':'Silver · habits','optional':True,'left':{'label':'Every day','grad':'sky','pic':'l2c_1_cause.jpg','chips':[('c2','Do'),('c1','you'),('c2','eat'),('c3','spicy food?')]},
    'right':{'label':'Yesterday','grad':'rose','pic':'l2c_1_cause.jpg','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')]}},
- {'m':'pic_rows','phase':S_,'title':'Now and yesterday','rows':[
+ {'m':'pic_rows','phase':S_,'title':'Now and yesterday','optional':True,'rows':[
    {'label':'Now','grad':'sky','chips':[('c2','Does'),('c1','your stomach'),('c2','hurt?')],'pics':['v3_stomach.jpg','v3_m2.jpg','v3_m3.jpg'],'cap':'Yes, it does.'},
    {'label':'Yesterday','grad':'rose','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')],'pics':['v3_m4.jpg','v3_m5.jpg','v3_m6.jpg'],'cap':'Yes, I did.'}]},
  {'m':'connect','phase':S_,'title':'Connect','rows':[
@@ -67,6 +67,10 @@ spec=[
  {'m':'timer','phase':S_,'title':'Your turn','optional':True,'min':2,'icons':['face_with_thermometer'],'note':'Tell your partner one thing you did yesterday.'},
  # ---------- ACTIVATE ----------
  {'m':'title_card','phase':A_,'line1':'The','line2':'Clinic','arch':[('woman_health_worker',1450,480,300,8),('face_with_thermometer',1280,640,260,-6),('stethoscope',1290,230,380,-8)]},
+ {'m':'build','phase':A_,'title':'Build the sentence','pics':['l2c_3_effect.jpg','l2c_3_cause.jpg'],'parts':[('c1','My back'),('c2','hurts'),('c4','because'),('c1','I'),('c2','slept'),('c3','on the floor.')],
+  'bank':[('c2','slept'),('c1','I'),('c3','on the floor.'),('c2','hurt'),('c4','because'),('c1','My back'),('c2','sleep'),('c2','hurts')]},
+ {'m':'build','phase':A_,'title':'Build the question','optional':True,'pics':['l2c_1_cause.jpg'],'parts':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')],
+  'bank':[('c3','spicy food?'),('c2','ate'),('c2','Did'),('c1','you'),('c2','eat'),('c2','Does')]},
  {'m':'role_cards','phase':A_,'title':'Three jobs · pass the ball','cards':[
    {'emoji':'face_with_thermometer','name':'Patient','grad':'rose','job':'mimes the pain','says':[('c1','My head'),('c2','hurts.')]},
    {'emoji':'woman_health_worker','name':'Nurse','grad':'teal','job':'asks about now','says':[('c2','Does'),('c1','your head'),('c2','hurt?')]},
@@ -80,6 +84,7 @@ spec=[
               {'emoji':'man_health_worker','name':'Doctor','grad':'violet','chips':[('c2','Did'),('c1','you'),('c2','sleep…?')]}],
   'pain':[('v3s_head.jpg','head'),('v3s_stomach.jpg','stomach'),('v3s_back.jpg','back'),('v3s_arm.jpg','arm')],
   'verbs':[('v2_eat.jpg','ate'),('v2_drink.jpg','drank'),('v2_sleep.jpg','slept'),('v2_fall.jpg','fell'),('v2_go.jpg','went')]},
+ {'m':'today','phase':A_,'emoji':'stethoscope','role':'Case notes','title':'Write two lines','fs':62,'min':4,'rows':[{'icon':'face_with_thermometer','chips':[('c1','His stomach'),('c2','hurts.')]},{'icon':'hot_pepper','chips':[('c4','Because'),('c1','he'),('c2','ate'),('c3','spicy food.')]}]},
  {'m':'recap','phase':'RECAP','rows':[([('c1','My stomach'),('c2','hurts.')],'now'),([('c4','Because'),('c1','I'),('c2','ate'),('c3','spicy food.')],'yesterday'),([('c2','Does'),('c1','your stomach'),('c2','hurt?')],'ask'),([('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')],'ask')],'emoji':'face_with_thermometer'},
  {'m':'closing','phase':E_,'stack':True,'line1':'Thank','line2':'you!','sub':'See you next time.','emoji':'waving_hand'},
 ]
