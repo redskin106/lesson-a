@@ -224,7 +224,8 @@ def cards(d):
         o+=stp(f'<div class="gl" style="left:{x}px;top:168px;width:{w}px;height:820px;border-radius:72px;display:flex;flex-direction:column;align-items:center;gap:36px;padding:{70 if n<4 else 90}px 24px 0">'
             f'<img src="{EM(c["emoji"])}" style="width:{260 if n<4 else 210}px;{sh()}"><div class="chip" style="font-size:{64 if n<4 else 52}px;padding:12px {56 if n<4 else 40}px;border-radius:999px;background:{G(c["grad"])}">{c["name"]}</div>'
             f'<div style="font-family:O;font-weight:800;font-size:{46 if n<4 else 44}px;color:#1c1b2e;text-align:center;line-height:1.15;padding:0 20px">{c.get("text","")}</div>'
-            +(f'<div class="pill" style="font-size:38px;padding:10px 36px;color:#6a35e8">{c["foot"]}</div>' if c.get('foot') else '')+'</div>',i+1)
+            +(f'<div class="pill" style="font-size:38px;padding:10px 36px;color:#6a35e8">{c["foot"]}</div>' if c.get('foot') else '')
+            +(f'<button class="vplay" data-v="{c["video"]}" aria-label="Play video"><svg width="64" height="64" viewBox="0 0 64 64"><path d="M22 14L52 32L22 50Z" fill="#fff" stroke="#fff" stroke-width="6" stroke-linejoin="round"/></svg></button>' if c.get('video') else '')+'</div>',i+1)
     if d.get('note'): o+=f'<div class="pill" style="position:absolute;left:150px;top:900px;font-size:36px;padding:10px 36px">{d["note"]}</div>'
     return o
 

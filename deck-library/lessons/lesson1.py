@@ -63,7 +63,7 @@ spec=[
  {'m':'chat','phase':A_,'title':'Watch the twist','window':4,'lines':[
    ('P','I have a headache.'),('N',[C('c1','You'),C('c2','should'),C('c3','drink water.')]),('P','No! I don’t want to!'),('D',[C('c1','You'),C('c2','have to'),C('c3','drink water.')])]},
  {'m':'cards','phase':A_,'title':'Your twist','rg':'orange','cards':[
-   {'emoji':'zany_face','name':'Gibberish','grad':'orange','text':'“Blah blah blah…”'},{'emoji':'face_with_open_mouth','name':'Drama','grad':'orange','text':'“I’m dying!”'},
+   {'emoji':'zany_face','name':'Gibberish','grad':'orange','text':'“Blah blah blah…”','video':'gib'},{'emoji':'face_with_open_mouth','name':'Drama','grad':'orange','text':'“I’m dying!”'},
    {'emoji':'face_with_symbols_on_mouth','name':'Stubborn','grad':'orange','text':'“I don’t want to!”'},{'emoji':'old_woman','name':'Neighbour','grad':'orange','text':'“My neighbour says…”'}]},
  {'m':'slot','phase':A_,'rows':[('face_with_head-bandage',4,'zany_face',1),('sneezing_face',2,'face_with_open_mouth',1),('face_with_thermometer',3,'face_with_symbols_on_mouth',1),('nauseated_face',5,'old_woman',1),('tooth',1,'zany_face',1)]},
  {'m':'prep','phase':A_,'role':'Nurse','grad':'teal','status':('face_with_head-bandage',4,'zany_face'),'lal':'start',

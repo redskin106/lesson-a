@@ -22,6 +22,7 @@ def inline_assets(html):
     cache = {}
     def rep(m):
         u = m.group(0); p = u[len('file://'):]
+        if p.endswith('.mp4'): return 'data:video/mp4;base64,' + base64.b64encode(open(p,'rb').read()).decode()
         if u not in cache:
             kind = 'font' if p.endswith('.woff2') else 'art' if '/art/' in p else 'emoji'
             cache[u] = _b64(p, kind)
@@ -140,7 +141,14 @@ def fib_markup(d, sid):
 BUILD = {'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
 
 
-CSS_EXTRA = """
+CSS_EXTRA = """.vplay{width:132px;height:132px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#ff4fa3);box-shadow:0 14px 28px rgba(106,53,232,.4),inset 0 2px 0 rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;padding:0 0 0 8px;margin-top:6px;transition:transform .15s}
+.vplay:active{transform:scale(.92)}
+#vov{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(28,20,70,.62);backdrop-filter:blur(8px)}
+#vov.on{display:flex}
+#vov video{display:none;width:min(82vw,146vh);max-height:82vh;border-radius:26px;background:#000;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+#vov video.on{display:block}
+#vx{position:absolute;top:3vh;right:3vw;width:64px;height:64px;border-radius:50%;border:0;cursor:pointer;background:#fff;color:#6a35e8;font-size:34px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eeeef3}
 body{width:100%!important;height:100%!important}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
@@ -221,7 +229,9 @@ $('#pv').onclick=function(){go(cur-1)};
 function finish(s){s.__done=1;P('done');wait(500).then(function(){if(cur<slides.length-1)$('#nx').classList.add('on')})}
 function adv(){var s=slides[cur];return !!(s&&s.__adv&&s.__adv())}
 $('#nx').onclick=function(){if(adv())return;P('open');go(cur+1)};
-addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
+var VOV=$('#vov');function vclose(){if(!VOV)return;VOV.classList.remove('on');$$('video',VOV).forEach(function(v){v.pause();v.classList.remove('on')})}
+if(VOV){document.addEventListener('click',function(e){var b=e.target.closest('.vplay');if(b){e.stopPropagation();var v=$('#vid-'+b.dataset.v);if(!v)return;$$('video',VOV).forEach(function(x){x.classList.remove('on')});v.classList.add('on');v.currentTime=0;VOV.classList.add('on');v.play();P('pop');return}if(e.target===VOV||e.target.id==='vx')vclose()},true)}
+addEventListener('keydown',function(e){if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
 var cfgs=['On','Calm','Off'],ci=0;
 $('#mo').onclick=function(){ci=(ci+1)%3;SXL.cfg.calm=ci==1;SXL.cfg.off=ci==2;document.body.className=['','calm','off'][ci];this.textContent='Motion: '+cfgs[ci]};
 $('#sf').onclick=function(){var on=SXLSound.toggle();this.textContent='Sound: '+(on?'On':'Off')};
@@ -231,7 +241,7 @@ var INIT={};
 /* ---- chat: tap-to-fill, auto-scroll, free scroll-back ---- */
 INIT.chat=function(s){
  var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),th=$('#th-'+id),bar=$('#bk-'+id),rows=$$('.row',th),i=-1;
- function next(){i++;if(i>=D.n){finish(s);return}var r=rows[i];r.classList.add('show');if(i>0)P('arrive');th.scrollTo({top:th.scrollHeight,behavior:SXL.cfg.off?'auto':'smooth'});
+ function next(){i++;if(i>=D.n){finish(s);return}var r=rows[i];r.classList.add('show');if(i>0)P('arrive');var need=r.offsetTop+r.offsetHeight+16-th.clientHeight;if(need>th.scrollTop+2)th.scrollTo({top:need,behavior:SXL.cfg.off?'auto':'smooth'});
   if(D.gapn[i]){bar.innerHTML=D.banks[i];bar.style.visibility='visible';bar.__r=r}else{bar.style.visibility='hidden';wait(1100).then(next)}}
  bar.onclick=function(e){var b=e.target.closest('.bk');if(!b||!bar.__r)return;var g=$$('.gp',bar.__r).filter(function(x){return !x.__f})[0];if(!g)return;
   if(b.dataset.t===g.dataset.t&&b.dataset.c===g.dataset.c){g.__f=1;put(g);b.classList.add('used');if(!$$('.gp',bar.__r).some(function(x){return !x.__f})){bar.__r=null;wait(900).then(next)}}else wrong(b)};
@@ -309,7 +319,7 @@ INIT.view=function(s){
   s.__adv=function(){if(ix>mx)return false;var g=0;stp.forEach(function(e){if(+e.dataset.s===ix){e.classList.remove('sh');g=Math.max(g,+(e.dataset.g||0));if(e.dataset.pills){var cs=$$('.chip',e);cs.forEach(function(c,j){setTimeout(function(){c.classList.remove('pin');c.classList.add('pp');P(j%2?'tick':'pop')},260*j+150)})}}});
    if(ix===mx){stp.forEach(function(e){e.classList.remove('dim')})}else if(g){stp.forEach(function(e){if(e.dataset.g&&+e.dataset.g<g)e.classList.add('dim')})}
    if(ix===1)P('open');else if(!stp.some(function(e){return +e.dataset.s===ix&&e.dataset.pills}))P('pop');ix++;if(ix>mx)P('good');return true};
-  s.addEventListener('click',function(e){if(e.target.closest('.tstart,.spinbtn,.dstop'))return;s.__adv()});}
+  s.addEventListener('click',function(e){if(e.target.closest('.tstart,.spinbtn,.dstop,.vplay'))return;s.__adv()});}
  var kids=$$(':scope > *',s).filter(function(e){return !e.hasAttribute('data-s')&&!e.classList.contains('orb')&&!e.querySelector('.tag')&&!e.classList.contains('tag')&&e.tagName!=='SCRIPT'});
  var skip=false;kids.forEach(function(k){k.classList.add('vh')});
  var i=0;function step(){if(i>=kids.length){s.__done=1;wait(300).then(function(){if(cur<slides.length-1)$('#nx').classList.add('on')});return}
@@ -326,6 +336,12 @@ INIT.view=function(s){
 go(0);
 """
 
+def vov_markup(spec):
+    import json as _j
+    keys=sorted({c['video'] for d in spec for c in d.get('cards',[]) if c.get('video')})
+    if not keys: return ''
+    return '<div id="vov">'+''.join(f'<video id="vid-{k}" playsinline controls preload="none" src="file:///home/claude/work/lesson/media/{k}.mp4"></video>' for k in keys)+'<button id="vx" aria-label="Close">&#10005;</button></div>'
+
 def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
     secs = ''; allspec = list(spec)
     for n, d in enumerate(allspec):
@@ -336,7 +352,8 @@ def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
     html = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>'
             f'<style>{css("day")}{CSS_EXTRA}</style></head><body><div id="stage">{secs}</div>'
             '<div id="ctl"><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
-            f'<script>{SFX_JS}</script><script>{APP_JS}</script></body></html>')
+            +vov_markup(spec)
+            +f'<script>{SFX_JS}</script><script>{APP_JS}</script></body></html>')
     html = inline_assets(html)
     pathlib.Path(out).write_text(html, encoding='utf-8')
     return len(html)
