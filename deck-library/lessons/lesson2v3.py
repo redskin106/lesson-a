@@ -9,9 +9,10 @@ spec=[
  {'m':'pic_question','phase':E_,'pic':'v3_back.jpg','q':('What’s',['wrong?'])},
  {'m':'pic_rows','phase':E_,'title':'Why?','rows':[{'label':'Why?','grad':'violet','chips':[('c1','My back hurts'),BECAUSE,('c1','I'),('c2','slept'),('c3','on the floor.')],'pics':['v3_hook1.jpg','v3_hook2.jpg','v3_hook3.jpg']}]},
  # ---------- STUDY ----------
- {'m':'today','phase':S_,'emoji':'thinking_face','title':'Now and before','fs':34,'rows':[
-   {'icon':'red_question_mark','chips':[('c4','Why?')]},
-   {'icon':'hot_pepper','chips':[('c1','My stomach'),('c2','hurts'),('c4','because'),('c1','I'),('c2','ate'),('c3','spicy food.')]}]},
+ {'m':'today','phase':S_,'emoji':'thinking_face','title':'Why? … because','tfs':96,'fs':58,'rows':[
+   [('c1','My stomach'),('c2','hurts.')],
+   [('c4','Why?'),('c2','does'),('c1','it'),('c2','hurt?')],
+   [('c4','because'),('c1','I'),('c2','ate'),('c3','spicy food.')]]},
  {'m':'cast','phase':S_,'title':'Where does it hurt?','items':[
    {'pic':'v3p_head.jpg','label':'My head hurts','grad':'violet','fit':'contain'},{'pic':'v3p_stomach.jpg','label':'My stomach hurts','grad':'violet','fit':'contain'},
    {'pic':'v3p_back.jpg','label':'My back hurts','grad':'violet','fit':'contain'},{'pic':'v3p_arm.jpg','label':'My arm hurts','grad':'violet','fit':'contain'}]},
@@ -20,15 +21,14 @@ spec=[
  {'m':'chat','phase':S_,'title':'The nurse asks','window':4,'lines':[
    ('N','What’s wrong?'),('P',{'img':'v3_head.jpg'}),
    ('N',[C('c2','Does'),C('c1','your head'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')]),('P',{'img':'v3_yes.jpg'}),
-   ('N','Anything else?'),('P',{'img':'v3_stomach.jpg'}),
-   ('N',[C('c2','Does'),C('c1','your stomach'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')]),('P',{'img':'v3_yes.jpg'})]},
+   ('N',[C('c2','Does'),C('c1','your stomach'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')]),('P',{'img':'v3_no.jpg'})]},
  {'m':'verb_pairs','phase':S_,'title':'Yesterday','rows':[
    {'pic':'v2_eat.jpg','now':'eat','then':'ate'},{'pic':'v2_drink.jpg','now':'drink','then':'drank'},{'pic':'v2_sleep.jpg','now':'sleep','then':'slept'},
    {'pic':'v2_fall.jpg','now':'fall','then':'fell'},{'pic':'v2_go.jpg','now':'go','then':'went'}]},
  {'m':'verb_pairs','phase':S_,'title':'Yesterday · more','optional':True,'rows':[
    {'pic':'v2_take.jpg','now':'take','then':'took'},{'pic':'v2_feel.jpg','now':'feel','then':'felt'},{'pic':'v2_have.jpg','now':'have','then':'had'},{'pic':'v2_start.jpg','now':'start','then':'started'}]},
- {'m':'contrast','phase':S_,'title':'Today and yesterday','left':{'label':'Today','grad':'sky','pic':'v2_rice.jpg','fit':'contain','chips':[('c1','I'),('c2','eat'),('c3','rice.')]},
-   'right':{'label':'Yesterday','grad':'rose','pic':'l2c_1_cause.jpg','fit':'contain','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]}},
+ {'m':'contrast','phase':S_,'title':'Yesterday and today','left':{'label':'Yesterday','grad':'rose','pic':'l2c_1_cause.jpg','fit':'contain','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]},
+   'right':{'label':'Today','grad':'sky','pic':'v2_rice.jpg','fit':'contain','chips':[('c1','I'),('c2','eat'),('c3','rice.')]}},
  {'m':'sort','phase':S_,'title':'Why does it hurt? (1)','bank':['sleep','ate','fall','fell','eat','slept'],'rows':[
    {'pic':'l2c_1_effect.jpg','pre':('c4','because I'),'end':('c3','spicy food.'),'ans':['ate']},
    {'pic':'l2c_3_effect.jpg','pre':('c4','because I'),'end':('c3','on the floor.'),'ans':['slept']},
