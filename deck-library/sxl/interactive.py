@@ -227,6 +227,10 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .rp.react{animation:react .8s}@keyframes react{25%{transform:scale(1.14) rotate(-3deg)}55%{transform:scale(.97) rotate(2deg)}100%{transform:none}}
 .spk{position:absolute;opacity:0;pointer-events:none;z-index:30}.spk.go{animation:spk 1.1s both}@keyframes spk{0%{opacity:0;transform:scale(.3) rotate(-20deg)}30%{opacity:1;transform:scale(1.2) rotate(10deg)}100%{opacity:0;transform:translateY(-50px) scale(1)}}
 #nx.on{display:flex;animation:up .5s both}
+#nx.pr{animation:nxp .42s cubic-bezier(.3,1.5,.5,1)}@keyframes nxp{0%{transform:scale(1)}30%{transform:scale(.84)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+#nx::after{content:'';position:absolute;inset:0;border-radius:50%;border:6px solid rgba(154,92,255,.7);opacity:0;pointer-events:none}#nx.pr::after{animation:nxr .55s ease-out}@keyframes nxr{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.9)}}
+#nx.pr svg{animation:nxa .42s ease-out}@keyframes nxa{0%{transform:translateX(0)}40%{transform:translateX(14px)}100%{transform:translateX(0)}}
+body.off #nx.pr,body.off #nx.pr::after,body.off #nx.pr svg{animation:none}
 """
 
 # general layer: primer SXLSound engine (copied from vocab-primer/live-test/motion/vp-motion.js) + shared helpers
@@ -266,10 +270,11 @@ function upd(){$('#cnt').textContent=(cur+1)+' / '+slides.length;$('#pv').style.
 $('#pv').onclick=function(){go(cur-1)};
 function finish(s){s.__done=1;P('done');wait(500).then(function(){if(cur<slides.length-1)$('#nx').classList.add('on')})}
 function adv(){var s=slides[cur];return !!(s&&s.__adv&&s.__adv())}
-$('#nx').onclick=function(){if(adv())return;P('open');go(cur+1)};
+function nxFx(){var n=$('#nx');n.classList.remove('pr');void n.offsetWidth;n.classList.add('pr');setTimeout(function(){n.classList.remove('pr')},600)}
+$('#nx').onclick=function(){nxFx();if(adv())return;P('open');go(cur+1)};
 var VOV=$('#vov');function vclose(){if(!VOV)return;VOV.classList.remove('on');$$('video',VOV).forEach(function(v){v.pause();v.classList.remove('on')})}
 if(VOV){document.addEventListener('click',function(e){var b=e.target.closest('.vplay');if(b){e.stopPropagation();var v=$('#vid-'+b.dataset.v);if(!v)return;$$('video',VOV).forEach(function(x){x.classList.remove('on')});v.classList.add('on');v.currentTime=0;VOV.classList.add('on');v.play();P('pop');return}if(e.target===VOV||e.target.id==='vx')vclose()},true)}
-addEventListener('keydown',function(e){if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
+addEventListener('keydown',function(e){if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){nxFx();if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
 var cfgs=['On','Calm','Off'],ci=0;
 $('#mo').onclick=function(){ci=(ci+1)%3;SXL.cfg.calm=ci==1;SXL.cfg.off=ci==2;document.body.className=['','calm','off'][ci];this.textContent='Motion: '+cfgs[ci]};
 $('#sf').onclick=function(){var on=SXLSound.toggle();this.textContent='Sound: '+(on?'On':'Off')};
