@@ -87,14 +87,6 @@ def sort_markup(d, sid):
         a = r.get('ans'); a = [a] if isinstance(a, str) else (a or [])
         for t in a: need[t] = need.get(t, 0) + 1
     two = len(bank) > 8; bfs = 42 if two else (44 if len(bank) > 6 else (58 if len(bank) > 4 else 64)); btn = ''
-    import random as _r
-    segs = [[]]
-    for b in bank:
-        if b == '|': segs.append([])
-        else: segs[-1].append(b)
-    _rg = _r.Random(11)
-    for sg in segs: _rg.shuffle(sg)
-    bank = [x for k, sg in enumerate(segs) for x in (sg + (['|'] if k < len(segs) - 1 else []))]
     for b in bank:
         if b == '|': btn += ('<div style="flex-basis:100%;height:0"></div>' if two else '<div style="width:6px;height:70px;border-radius:3px;background:#b9a6f5;margin:0 10px"></div>'); continue
         c, t = b if isinstance(b, tuple) else ('c2', b)

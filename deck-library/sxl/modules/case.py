@@ -89,7 +89,7 @@ def role_cards(d):
         out+=stp(f'<div class="a" style="left:{x}px;top:500px;width:{w}px;display:flex;justify-content:center">{grad_chip(c["grad"],c["name"],64,"12px 56px")}</div>',i+1)
         out+=stp(f'<div class="a mu" style="left:{x}px;top:620px;width:{w}px;text-align:center;font-size:38px">{c["job"]}</div>',i+1)
         if c.get('says'):
-            out+=stp(f'<div class="a" style="left:{x+20}px;top:720px;width:{w-40}px;height:230px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px 14px">'+''.join(ch(k,t,46,'8px 24px') for k,t in c['says'])+'</div>',n+1+i,pills=True)
+            out+=stp(f'<div class="a" style="left:{x+20}px;top:740px;width:{w-40}px;height:230px;display:flex;flex-wrap:wrap;align-content:flex-start;justify-content:center;gap:12px 14px">'+''.join(ch(k,t,46,'8px 24px') for k,t in c['says'])+'</div>',n+1+i,pills=True)
     return out
 
 @module('match_pairs')

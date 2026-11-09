@@ -304,8 +304,8 @@ def rules(d):
         body=''.join(f'<div style="display:flex;flex-direction:column;align-items:center;gap:6px">{ch(c,t,48,"8px 24px")}<span style="font-family:O;font-weight:800;font-size:34px;color:#7b3cf0">{l}</span></div>' for c,t,l in cs)
         o+=stp(f'<div class="gl" style="left:90px;top:{y}px;width:1500px;height:170px;border-radius:70px;display:flex;align-items:center;gap:18px;padding:0 44px">{body}<span style="margin-left:auto">{spill(g,None,40,"8px 30px")}</span></div>',k+1,pills=True)
     key=[('c1','S','Subject'),('c2','V','Verb'),('c3','O','Object'),('c4','B','because')]
-    o+=stp('<div class="gl" style="left:90px;top:850px;width:1500px;height:110px;border-radius:55px;display:flex;align-items:center;justify-content:center;gap:34px">'+''.join(f'<div style="display:flex;align-items:center;gap:10px">{ch(c,l,36,"4px 20px")}<span style="font-family:O;font-weight:700;font-size:34px;color:#4a3a8a">{t}</span></div>' for c,l,t in key)+'</div>',nr+1)
-    if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1640px;top:300px;width:230px;{sh()}">',nr+1)
+    o+='<div class="gl" style="left:90px;top:850px;width:1500px;height:110px;border-radius:55px;display:flex;align-items:center;justify-content:center;gap:34px">'+''.join(f'<div style="display:flex;align-items:center;gap:10px">{ch(c,l,36,"4px 20px")}<span style="font-family:O;font-weight:700;font-size:34px;color:#4a3a8a">{t}</span></div>' for c,l,t in key)+'</div>'
+    if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1640px;top:300px;width:230px;{sh()}">',nr)
     return o
 
 @module('exit')
@@ -394,7 +394,7 @@ CNX=['#7b3cf0','#17b890','#ff9f1c','#ff4f7a']
 def connect_html(d,sid):
     """Three columns (yesterday / now / after). Tap a tile in one column, then its partner in another: they slide onto one row and an arrow draws.
     {'rows':[{'cause':f,'now':f,'adv':f,'c':[(cls,t)],'n':[(cls,t)],'a':[(cls,t)]}]}"""
-    R=d['rows']; n=len(R); W,ROW,TOP,TH=480,205,240,180; X=[90,720,1350]
+    R=d['rows']; n=len(R); W,ROW,TOP,TH=480,186,236,168; X=[90,720,1350]
     ordr=[[(i+c)%n for i in range(n)] for c in range(3)]
     o=header(d['phase'],d.get('title'))
     for c,(g,t) in enumerate([('rose','yesterday'),('sky','now'),('teal','after')]):
@@ -407,8 +407,9 @@ def connect_html(d,sid):
             o+=(f'<div class="cn" data-c="{c}" data-id="{i}" style="left:{X[c]}px;top:{TOP+slot*ROW}px">'
                 +pic(12,12,TH-24,TH-24,r[keys[c]],34)
                 +'<div class="tx">'+''.join(ch(a,b,38,'6px 18px') for a,b in r[sk[c]])+'</div></div>')
-    o+=f'<div class="gl cfull" id="cf-{sid}" style="left:90px;top:846px;width:1620px;height:170px;border-radius:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0"></div>'
-    full=['<div style="display:flex;gap:12px">'+''.join(ch(a,b,42,"4px 20px") for a,b in R[i]["n"])+'</div><div style="display:flex;gap:12px">'+''.join(ch(a,b,42,'4px 20px') for a,b in ([('c4','because')]+R[i]['c']+R[i]['a']))+'</div>' for i in range(n)]
+    o+=f'<div class="gl cfull" id="cf-{sid}" style="left:90px;top:800px;width:1620px;height:216px;border-radius:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0"></div>'
+    L=lambda cs:'<div style="display:flex;gap:12px">'+''.join(ch(a,b,40,'3px 20px') for a,b in cs)+'</div>'
+    full=[L(R[i]['n'])+L([('c4','because')]+R[i]['c'])+L(R[i]['a']) for i in range(n)]
     import json as _j
     o+=f'<script type="application/json" id="d-{sid}">{_j.dumps({"n":n,"full":full,"col":CNX,"row":ROW,"top":TOP,"x":X,"w":W,"h":TH})}</script>'
     return o
