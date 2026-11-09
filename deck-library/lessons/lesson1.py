@@ -16,7 +16,7 @@ spec=[
  {'m':'contrast','phase':S_,'title':'Boss says','left':{'label':'Boss says','grad':'s4','sc':4,'pic':'05a_p3.jpg','chips':[YOU,('c2','have to'),('c3','save the planet.')],'cap':'Needed.'},
    'right':{'label':'Boss says','grad':'s2','sc':2,'pic':'06_p2.jpg','chips':[YOU,('c2','don’t have to'),('c3','save the planet.')],'cap':'Not needed.'}},
  {'m':'pic_rows','phase':S_,'rows':[
-   {'label':'Neighbour','grad':'s3','sc':3,'chips':[YOU,('c2','should'),('c3','put a banana on your head.')],'pics':[f'09a_p{k}.jpg' for k in range(1,5)],'cap':'Good idea?'},
+   {'label':'Neighbour','grad':'s3','sc':3,'chips':[YOU,('c2','should'),('c3','drink hot water.')],'pics':['09a_p1.jpg','09c_p2.jpg','09c_p3.jpg','09c_p4.jpg'],'cap':'Good idea?'},
    {'label':'Pharmacist','grad':'s4','sc':4,'chips':[YOU,('c2','have to'),('c3','take this pill.')],'pics':['09b_p1.jpg','09b_p2.jpg','09b_p3.jpg','09b_p4.jpg'],'cap':'Needed.'}]},
  {'m':'dial_ladder','tinted':True,'phase':S_,'title':'How strong?','start':4,'stops':[
    {'word':'mustn’t','focus':(0.47, 0.5, 0.85),'pic':'hw_5.jpg','grad':'red','chips':[YOU,('c2','mustn’t'),('c3','copy.')],'gloss':'Not allowed'},
