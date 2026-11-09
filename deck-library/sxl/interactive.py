@@ -227,10 +227,9 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .rp.react{animation:react .8s}@keyframes react{25%{transform:scale(1.14) rotate(-3deg)}55%{transform:scale(.97) rotate(2deg)}100%{transform:none}}
 .spk{position:absolute;opacity:0;pointer-events:none;z-index:30}.spk.go{animation:spk 1.1s both}@keyframes spk{0%{opacity:0;transform:scale(.3) rotate(-20deg)}30%{opacity:1;transform:scale(1.2) rotate(10deg)}100%{opacity:0;transform:translateY(-50px) scale(1)}}
 #nx.on{display:flex;animation:up .5s both}
-#nx.pr{animation:nxp .42s cubic-bezier(.3,1.5,.5,1)}@keyframes nxp{0%{transform:scale(1)}30%{transform:scale(.84)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
-#nx::after{content:'';position:absolute;inset:0;border-radius:50%;border:6px solid rgba(154,92,255,.7);opacity:0;pointer-events:none}#nx.pr::after{animation:nxr .55s ease-out}@keyframes nxr{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.9)}}
 #nx.pr svg{animation:nxa .42s ease-out}@keyframes nxa{0%{transform:translateX(0)}40%{transform:translateX(14px)}100%{transform:translateX(0)}}
-body.off #nx.pr,body.off #nx.pr::after,body.off #nx.pr svg{animation:none}
+body.off #nx.pr svg{animation:none}
+#nx:not(.on){display:flex;opacity:.3;box-shadow:none}
 """
 
 # general layer: primer SXLSound engine (copied from vocab-primer/live-test/motion/vp-motion.js) + shared helpers
@@ -259,7 +258,7 @@ PHBG={ENGAGE:'linear-gradient(135deg,#ffd27a,#ff9fb8 45%,#ffb066)',STUDY:'linear
 addEventListener('resize',fit);fit();
 var slides=$$('.sl'),cur=-1;
 [$('#stage')].concat(slides).forEach(function(e){e.addEventListener('scroll',function(){if(e.id==='stage'||!e.classList.contains('thread')){e.scrollTop=0;e.scrollLeft=0}})});
-function go(i){if(i<0||i>=slides.length)return;tickClk();slides.forEach(function(s){s.classList.remove('on')});cur=i;lastI=i;lastT=Date.now();upd();var s=slides[i];s.classList.add('on');bgfit();$('#nx').classList.toggle('on',s.dataset.m==='view');if(!s.__init){s.__init=1;INIT[s.dataset.m](s)}else if(s.__done)$('#nx').classList.add('on');}
+function go(i){if(i<0||i>=slides.length)return;tickClk();slides.forEach(function(s){s.classList.remove('on')});cur=i;lastI=i;lastT=Date.now();upd();var s=slides[i];s.classList.add('on');bgfit();$('#nx').classList.toggle('on',s.dataset.m==='view'&&i<slides.length-1);$('#nx').style.visibility=(i<slides.length-1)?'visible':'hidden';if(!s.__init){s.__init=1;INIT[s.dataset.m](s)}else if(s.__done)$('#nx').classList.add('on');}
 var T0=Date.now(),SL=[],lastT=Date.now(),lastI=-1,showClk=false;
 function fmt(s){s=Math.round(s);return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
 function tickClk(){var now=Date.now();if(lastI>=0)SL[lastI]=(SL[lastI]||0)+(now-lastT)/1000;lastT=now;if(!showClk)return;var tot=SL.reduce(function(a,b){return a+(b||0)},0),plan=0,pc=0;slides.forEach(function(s,i){var m=+s.dataset.min||0;if(!s.dataset.opt)plan+=m;if(i<=cur&&!s.dataset.opt)pc+=m});$('#clk').textContent='slide '+fmt((SL[cur]||0))+'  ·  total '+fmt(tot)+' / plan '+fmt(pc*60)+' (core '+fmt(plan*60)+')'}
@@ -271,7 +270,7 @@ $('#pv').onclick=function(){go(cur-1)};
 function finish(s){s.__done=1;P('done');wait(500).then(function(){if(cur<slides.length-1)$('#nx').classList.add('on')})}
 function adv(){var s=slides[cur];return !!(s&&s.__adv&&s.__adv())}
 function nxFx(){var n=$('#nx');n.classList.remove('pr');void n.offsetWidth;n.classList.add('pr');setTimeout(function(){n.classList.remove('pr')},600)}
-$('#nx').onclick=function(){nxFx();if(adv())return;P('open');go(cur+1)};
+$('#nx').onclick=function(){if(!this.classList.contains('on')){wrong(this);return}nxFx();if(adv())return;P('open');go(cur+1)};
 var VOV=$('#vov');function vclose(){if(!VOV)return;VOV.classList.remove('on');$$('video',VOV).forEach(function(v){v.pause();v.classList.remove('on')})}
 if(VOV){document.addEventListener('click',function(e){var b=e.target.closest('.vplay');if(b){e.stopPropagation();var v=$('#vid-'+b.dataset.v);if(!v)return;$$('video',VOV).forEach(function(x){x.classList.remove('on')});v.classList.add('on');v.currentTime=0;VOV.classList.add('on');v.play();P('pop');return}if(e.target===VOV||e.target.id==='vx')vclose()},true)}
 addEventListener('keydown',function(e){if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){nxFx();if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
