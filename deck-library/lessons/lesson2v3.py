@@ -53,10 +53,10 @@ spec=[
    {'cause':'l2c_3_cause.jpg','now':'l2c_3_effect.jpg','adv':'v3_adv_2.jpg','c':[('c1','I'),('c2','slept'),('c3','on the floor.')],'n':[('c1','My back'),('c2','hurts')],'a':[('c2','Sleep'),('c3','on a bed.')]},
    {'cause':'l2c_4_cause.jpg','now':'l2c_4_effect.jpg','adv':'v3_adv_3.jpg','c':[('c1','I'),('c2','fell'),('c3','off a bike.')],'n':[('c1','My arm'),('c2','hurts')],'a':[('c2','Rest'),('c3','your arm.')]}]},
  {'m':'chat','phase':S_,'title':'Help the robot nurse','window':4,'avatars':{'N':'robot'},'lines':[
-   ('P',{'img':'v3_arm.jpg'}),
-   ('N',[C('c2','Did'),C('c1','you'),G('c2','fall?')],[('c2','fall?'),('c2','fell?')]),('P',{'img':'l2c_4_cause.jpg'}),
-   ('N',[C('c2','Did'),C('c1','you'),G('c2','go'),C('c3','to hospital?')],[('c2','go'),('c2','went')]),('P',{'img':'v3_hospital.jpg'}),
-   ('N',[C('c2','Does'),C('c1','your arm'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')]),('P',{'img':'v3_yes.jpg'})]},
+   ('P',{'img':'l2c_4_cause.jpg'}),
+   ('N',[C('c2','Did'),C('c1','you'),G('c2','fall?')],[('c2','fall?'),('c2','fell?')]),('P',{'img':'v3_arm.jpg'}),
+   ('N',[C('c2','Does'),C('c1','your arm'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')]),('P',{'img':'v3_yes.jpg'}),
+   ('N',[C('c2','Did'),C('c1','you'),G('c2','go'),C('c3','to hospital?')],[('c2','go'),('c2','went')]),('P',{'img':'v3_hospital.jpg'})]},
  {'m':'chat','phase':S_,'title':'The nurse asks','window':4,'lines':[
    ('N','What’s wrong?'),('P',{'img':'v3_stomach.jpg'}),
    ('N',[C('c2','Did'),C('c1','you'),G('c2','eat'),C('c3','anything?')],[('c2','eat'),('c2','ate')]),('P',{'img':'l2c_1_cause.jpg'}),
@@ -69,7 +69,7 @@ spec=[
  {'m':'title_card','phase':A_,'line1':'The','line2':'Clinic','arch':[('woman_health_worker',1450,480,300,8),('face_with_thermometer',1280,640,260,-6),('stethoscope',1290,230,380,-8)]},
  {'m':'build','phase':A_,'title':'Build the sentence','pics':['l2c_3_effect.jpg','l2c_3_cause.jpg'],'parts':[('c1','My back'),('c2','hurts'),('c4','because'),('c1','I'),('c2','slept'),('c3','on the floor.')],
   'bank':[('c2','slept'),('c1','I'),('c3','on the floor.'),('c2','hurt'),('c4','because'),('c1','My back'),('c2','sleep'),('c2','hurts')]},
- {'m':'build','phase':A_,'title':'Build the question','optional':True,'pics':['l2c_1_cause.jpg'],'parts':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')],
+ {'m':'build','phase':A_,'title':'Build the question','optional':True,'pics':[],'fs':70,'bfs':60,'parts':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')],
   'bank':[('c3','spicy food?'),('c2','ate'),('c2','Did'),('c1','you'),('c2','eat'),('c2','Does')]},
  {'m':'role_cards','phase':A_,'title':'Three jobs · pass the ball','cards':[
    {'emoji':'face_with_thermometer','name':'Patient','grad':'rose','job':'mimes the pain','says':[('c1','My head'),('c2','hurts.')]},

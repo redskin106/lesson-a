@@ -151,7 +151,8 @@ def connect_markup(d, sid):
 def build_markup(d, sid):
     P = d.get('pics', []); parts = d['parts']; extra = d.get('extra', []); fs = d.get('fs', 52); ps = int(fs * .17); gh = int(fs * 1.3 + 2 * ps)
     out = header(d['phase'], d.get('title', 'Build the sentence'), 'violet'); n = len(P); w, h = (560, 360) if n < 3 else (440, 330); gx = 80
-    x0 = int(960 - (n * w + (n - 1) * gx) / 2)
+    if not n: h = 130
+    x0 = int(960 - (n * w + (n - 1) * gx) / 2) if n else 0
     for k, f in enumerate(P): out += art(x0 + k * (w + gx), 168, w, h, f, r=56, label=f)
     COL = {'c1': '#34d0f2', 'c2': '#9a5cff', 'c3': '#ff7a3c', 'c4': '#ffb21f'}; sl = ''
     for k, (c, t) in enumerate(parts):
@@ -161,7 +162,7 @@ def build_markup(d, sid):
     py = 168 + h + 40
     out += f'<div class="gl" style="left:90px;top:{py}px;width:1740px;height:{gh + 70}px;border-radius:70px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px 18px;padding:0 40px" id="bs-{sid}">{sl}</div>'
     bank = d.get('bank') or [(c, t) for c, t in parts] + [tuple(e) for e in extra]
-    btn = ''.join(f'<button class="bk" data-t="{t}" data-c="{c}">{ch(c, t, 44, "8px 26px")}</button>' for c, t in bank)
+    btn = ''.join(f'<button class="bk" data-t="{t}" data-c="{c}">{ch(c, t, d.get("bfs", 44), "8px 26px")}</button>' for c, t in bank)
     by = py + gh + 70 + 36
     out += f'<div class="gl" style="left:90px;top:{by}px;width:1740px;height:{988 - by}px;border-radius:64px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:16px 22px;padding:0 44px" id="bk-{sid}">{btn}</div>'
     return out + f'<script type="application/json" id="d-{sid}">{json.dumps({"n": len(parts)})}</script>'
