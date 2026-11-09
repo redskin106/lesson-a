@@ -108,7 +108,7 @@ def pic_rows(d):
     """Rows of pictures with a label chip + sentence. {'rows':[{'label','grad','chips':[..],'pics':[files],'cap':'...'}]}"""
     R=d['rows']; n=len(R); o=header(d['phase'],d.get('title')); st=1
     for j,r in enumerate(R):
-        y=168+j*425; k=len(r['pics']); w=int((1740-30*(k-1))/k); w=min(w,520 if k==3 else 405); h=int(w*9/16); gx=int((1740-w*k)/(k-1)) if k>1 else 0
+        y=168+j*425+(150 if n==1 else 0); k=len(r['pics']); w=int((1740-30*(k-1))/k); w=min(w,(560 if n==1 else 520) if k==3 else 405); h=int(w*9/16); gx=int((1740-w*k)/(k-1)) if k>1 else 0
         for i,f in enumerate(r['pics']): o+=stp(pic(90+i*(w+gx),y+90,w,h,f,36),st+i)
         o+=stp(f'<div class="a" style="left:90px;top:{y}px;display:flex;align-items:center;gap:0"><div class="chip" style="font-size:44px;padding:10px 40px;border-radius:999px;background:{G(r["grad"])}">{r["label"]}</div><div style="width:6px;height:54px;border-radius:3px;background:rgba(124,70,230,.4);margin:0 44px"></div>{chiprow(r["chips"])}</div>',st+k,pills=True)
         used=k+1
@@ -342,3 +342,33 @@ def pick_html(d,btn=False):
 
 @module('pick')
 def pick(d): return pick_html(d)
+
+@module('ball_circle')
+def ball_circle(d):
+    """The ball circle: three stations joined by ball arrows, a word bank (pain pictures + past verbs) that stays on screen, and a timer.
+    {'phase','title','min','stations':[{'emoji','name','grad','chips':[(cls,text)]}],'pain':[(pic,label)],'verbs':[(pic,past)]}"""
+    sec=int(d.get('min',10)*60); o=header(d['phase'],d.get('title'))
+    o+=(f'<div class="a tclock" data-sec="{sec}" style="left:1380px;top:34px;width:300px;text-align:center;font-family:O;font-weight:800;font-size:92px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>'
+        f'<div class="a tstart" style="left:1700px;top:44px;width:130px;height:84px;border-radius:42px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="40" height="40" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>')
+    S=d['stations']; w=520; gap=90; y=168; h=470
+    for i,s in enumerate(S):
+        x=90+i*(w+gap)
+        if i>0:
+            o+=stp(f'<img src="{EM("soccer_ball")}" style="position:absolute;left:{x-gap+5}px;top:300px;width:80px;{sh()}">'
+                   f'<div class="a" style="left:{x-gap}px;top:400px;width:{gap}px;transform:scale(.45);transform-origin:left top">{ARROW}</div>',i+1)
+        o+=stp(glass(x,y,w,h,'',r=64)
+               +f'<img src="{EM(s["emoji"])}" style="position:absolute;left:{x+w//2-90}px;top:{y+26}px;width:180px;{sh()}">'
+               +f'<div class="a" style="left:{x}px;top:{y+226}px;width:{w}px;display:flex;justify-content:center">{grad_chip(s["grad"],s["name"],52,"8px 44px")}</div>'
+               +f'<div class="a" style="left:{x+20}px;top:{y+318}px;width:{w-40}px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">'+''.join(ch(c,t,36,'6px 18px') for c,t in s['chips'])+'</div>',i+1,pills=True)
+    by=670; bh=318
+    pain=d['pain']; pw=190
+    o+=stp(glass(90,by,880,bh,'',r=56),1)
+    for i,(f,lab) in enumerate(pain):
+        x=120+i*(pw+20); o+=stp(pic(x+20,by+28,150,150,f,26,fit='contain')+f'<div class="a" style="left:{x}px;top:{by+192}px;width:{pw}px;display:flex;justify-content:center">{ch("c3",lab,36,"4px 18px")}</div>',1)
+    o+=stp(f'<div class="a mu" style="left:120px;top:{by+240}px;width:820px;font-size:34px">Where does it hurt?</div>',1)
+    V=d['verbs']; vw=130
+    o+=stp(glass(1000,by,830,bh,'',r=56),1)
+    for i,(f,t) in enumerate(V):
+        x=1034+i*(vw+28); o+=stp(pic(x,by+40,vw,vw,f,26,fit='contain')+f'<div class="a" style="left:{x-10}px;top:{by+190}px;width:{vw+20}px;display:flex;justify-content:center">{ch("c2",t,38,"4px 16px")}</div>',1)
+    o+=stp(f'<div class="a mu" style="left:1034px;top:{by+250}px;width:780px;font-size:34px">What did you do?</div>',1)
+    return o
