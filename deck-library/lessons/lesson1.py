@@ -23,7 +23,7 @@ spec=[
    {'word':'shouldn’t','focus':(0.45, 0.5, 0.8),'pic':'hw_3.jpg','grad':'orange','chips':[YOU,('c2','shouldn’t'),('c3','work.')],'gloss':'Bad idea?'},
    {'word':'don’t have to','focus':(0.42, 0.5, 0.8),'pic':'hw_1.jpg','grad':'teal','chips':[YOU,('c2','don’t have to'),('c3','rush.')],'gloss':'Not needed'},
    {'word':'should','focus':(0.35, 0.5, 1.0),'pic':'hw_4.jpg','grad':'sky','chips':[YOU,('c2','should'),('c3','start.')],'gloss':'Good idea?'},
-   {'word':'have to','focus':(0.3, 0.5, 1.0),'pic':'hw_2.jpg','grad':'violet','chips':[YOU,('c2','have to'),('c3','finish.')],'gloss':'Needed'}]},
+   {'word':'have to','focus':(0.3, 0.5, 1.0),'alt':'must','pic':'hw_2.jpg','grad':'violet','chips':[YOU,('c2','have to'),('c3','finish.')],'gloss':'Needed'}]},
  {'m':'timer','phase':S_,'title':'Pair talk','optional':True,'min':2,'icons':['speech_balloon','speech_balloon'],'note':'One thing you should / shouldn’t do tonight'},
  {'m':'contrast','phase':S_,'title':'Not the same!','left':{'label':'Not allowed','grad':'s0','sc':0,'cap':'Not allowed','pic':'mu_1.jpg','chips':[YOU,('c2','mustn’t'),('c3','drink alcohol.')]},
    'right':{'label':'Not needed','grad':'s2','sc':2,'cap':'Not needed','pic':'mu_2.jpg','chips':[YOU,('c2','don’t have to'),('c3','take it with food.')]}},
@@ -34,7 +34,7 @@ spec=[
  {'m':'pic_rows','phase':S_,'title':'Swap!','optional':True,'rows':[
    {'label':'Boss','grad':'s3','chips':[YOU,('c2','should'),('c3','rest.')],'pics':['sw_1t.jpg','sw_2a.jpg','sw_3.jpg']},
    {'label':'Friend','grad':'s4','chips':[YOU,('c2','have to'),('c3','rest.')],'pics':['sw_1t.jpg','sw_2b.jpg','sw_3.jpg']}]},
- {'m':'sort','phase':S_,'title':'Fill the gaps','bank':['have to','should','don’t have to','|',('c3','go to hospital'),('c3','sleep'),('c3','stay in bed')],'rows':[{'pic':'sc_1.jpg','ans':['have to','go to hospital']},{'pic':'sc_2.jpg','ans':['should','sleep']},{'pic':'sc2_3.jpg','ans':['don’t have to','stay in bed']}]},
+ {'m':'sort','phase':S_,'title':'Fill the gaps','bank':['have to','should','don’t have to','shouldn’t','|',('c3','go to hospital'),('c3','sleep'),('c3','stay in bed'),('c3','drive'),('c3','eat spicy food')],'rows':[{'pic':'sc_1.jpg','ans':['have to','go to hospital']},{'pic':'sc_2.jpg','ans':['should','sleep']},{'pic':'sc2_3.jpg','ans':['don’t have to','stay in bed']}]},
  {'m':'sort','phase':S_,'title':'Fill the gaps','bank':['have to','should','shouldn’t','mustn’t'],'rows':[
    {'pic':'sc2_1.jpg','end':('c3','eat spicy food.'),'ans':'shouldn’t'},{'pic':'sc2_2.jpg','end':('c3','see a doctor.'),'ans':'have to'},{'pic':'sc2_4.jpg','end':('c3','drive.'),'ans':'mustn’t'}]},
  {'m':'today','phase':S_,'emoji':'red_question_mark','title':'Questions','fs':60,'tfs':96,'rows':[
@@ -53,8 +53,8 @@ spec=[
    ('D',[C('c1','You'),G('c2','have to'),C('c3','take this medicine.')],SHOULDBANK),('P','Can I miss a day?'),
    ('D','Yes.'),('D',[C('c1','You'),G('c2','don’t have to'),C('c3','take it every day.')],[('c2','have to'),('c2','don’t have to'),('c2','should')]),('P','OK. Thank you, doctor.')]},
  {'m':'chat','phase':S_,'title':'The neighbour twist','optional':True,'window':4,'lines':[
-   ('P','My neighbour says: put a banana on your head.'),('N',[C('c1','You'),G('c2','shouldn’t'),C('c3','put a banana on your head.')],SHOULDBANK),
-   ('P','I don’t want to take medicine!'),('D',[C('c1','You'),G('c2','have to'),C('c3','take it.')],SHOULDBANK)]},
+   ('P','My neighbour says: drink hot water.'),('N',[C('c1','You'),G('c2','should'),C('c3','drink hot water.')],[('c2','should'),('c2','shouldn’t'),('c2','have to'),('c2','mustn’t')]),
+   ('P','I don’t want to take medicine!'),('D',[C('c1','You'),G('c2','have to'),C('c3','take it.')],[('c2','have to'),('c2','don’t have to'),('c2','shouldn’t')])]},
  {'m':'title_card','phase':A_,'line1':'The','line2':'Hotline','arch':[('telephone_receiver',1260,230,420,-10),('woman_health_worker',1450,480,300,8),('face_with_thermometer',1280,640,260,-6)]},
  {'m':'cards','phase':A_,'cards':[
    {'emoji':'face_with_thermometer','name':'Patient','grad':'rose','text':'has the problem<br>and the twist'},
@@ -65,7 +65,7 @@ spec=[
  {'m':'cards','phase':A_,'title':'Your twist','rg':'orange','cards':[
    {'emoji':'zany_face','name':'Gibberish','grad':'orange','text':'“Blah blah blah…”','video':'gib'},{'emoji':'face_with_open_mouth','name':'Drama','grad':'orange','text':'“I’m dying!”'},
    {'emoji':'face_with_symbols_on_mouth','name':'Stubborn','grad':'orange','text':'“I don’t want to!”'},{'emoji':'old_woman','name':'Neighbour','grad':'orange','text':'“My neighbour says…”'}]},
- {'m':'slot','phase':A_,'rows':[('face_with_head-bandage',4,'zany_face',1),('sneezing_face',2,'face_with_open_mouth',1),('face_with_thermometer',3,'face_with_symbols_on_mouth',1),('nauseated_face',5,'old_woman',1),('tooth',1,'zany_face',1)]},
+ {'m':'slot','phase':A_,'rows':[('face_with_head-bandage',4,'zany_face',1),('sneezing_face',2,'face_with_open_mouth',1),('face_with_thermometer',3,'face_with_symbols_on_mouth',1),('nauseated_face',5,'old_woman',1),('cold_face',1,'zany_face',1)]},
  {'m':'prep','phase':A_,'role':'Nurse','grad':'teal','status':('face_with_head-bandage',4,'zany_face'),'lal':'start',
   'left':[('chips',[[('c4','Where'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','How much'),('c2','does'),('c1','it'),('c3','hurt?')],[('c4','When'),('c2','did'),('c1','it'),('c3','start?')],[('c2','Did'),('c1','you'),('c2','take'),('c3','anything?')]])],
   'right':[('lead',[YOU,('c2','should')]),('bigtiles',[('sleeping_face','sleep'),('glass_of_milk','drink water')])]},

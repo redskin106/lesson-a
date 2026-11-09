@@ -65,7 +65,7 @@ def tintch(html, word):
     return html.replace('style="', f'style="background:linear-gradient(135deg,{a},{b});color:{tc};', 1)
 
 def sort_markup(d, sid):
-    rows = d['rows']; n = len(rows); top, bot = 168, 812; step = (bot - top) / n; h = min(int(step - 18), 190); fs = min(64, int(h * .36)); ps = max(8, int(h * .1)); gh = int(fs * 1.3 + 2 * ps)
+    rows = d['rows']; n = len(rows); top, bot = 168, (772 if len(d['bank']) > 8 else 812); step = (bot - top) / n; h = min(int(step - 18), 190); fs = min(64, int(h * .36)); ps = max(8, int(h * .1)); gh = int(fs * 1.3 + 2 * ps)
     out = header(d['phase'], d.get('title')); bank = d['bank']; plain = [b if isinstance(b, tuple) else ('c2', b) for b in bank if b != '|']
     for i, r in enumerate(rows):
         y = int(top + i * step); pre = r.get('pre', ('c1', 'You')) if r.get('pre', 1) else None; end = r.get('end')
@@ -84,12 +84,12 @@ def sort_markup(d, sid):
     for r in rows:
         a = r.get('ans'); a = [a] if isinstance(a, str) else (a or [])
         for t in a: need[t] = need.get(t, 0) + 1
-    bfs = 44 if len(bank) > 6 else (58 if len(bank) > 4 else 64); btn = ''
+    two = len(bank) > 8; bfs = 42 if two else (44 if len(bank) > 6 else (58 if len(bank) > 4 else 64)); btn = ''
     for b in bank:
-        if b == '|': btn += '<div style="width:6px;height:70px;border-radius:3px;background:#b9a6f5;margin:0 10px"></div>'; continue
+        if b == '|': btn += ('<div style="flex-basis:100%;height:0"></div>' if two else '<div style="width:6px;height:70px;border-radius:3px;background:#b9a6f5;margin:0 10px"></div>'); continue
         c, t = b if isinstance(b, tuple) else ('c2', b)
         btn += f'<button class="bk" data-t="{t}" data-n="{need.get(t, 1)}">{ch(c, t, bfs, "10px 30px" if bfs < 58 else "10px 34px")}</button>'
-    out += f'<div class="gl" style="left:90px;top:830px;width:1740px;height:158px;border-radius:79px;display:flex;align-items:center;gap:22px;padding:0 44px" id="bk-{sid}">{btn}</div>'
+    out += (f'<div class="gl" style="left:90px;top:790px;width:1740px;height:198px;border-radius:64px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:14px 22px;padding:0 44px" id="bk-{sid}">{btn}</div>' if two else f'<div class="gl" style="left:90px;top:830px;width:1740px;height:158px;border-radius:79px;display:flex;align-items:center;gap:22px;padding:0 44px" id="bk-{sid}">{btn}</div>')
     return out
 
 def timeline_markup(d, sid):

@@ -106,13 +106,14 @@ def strip(d):
 @module('pic_rows')
 def pic_rows(d):
     """Rows of pictures with a label chip + sentence. {'rows':[{'label','grad','chips':[..],'pics':[files],'cap':'...'}]}"""
-    R=d['rows']; n=len(R); o=header(d['phase'],d.get('title'))
+    R=d['rows']; n=len(R); o=header(d['phase'],d.get('title')); st=1
     for j,r in enumerate(R):
         y=168+j*425; k=len(r['pics']); w=int((1740-30*(k-1))/k); w=min(w,520 if k==3 else 405); h=int(w*9/16); gx=int((1740-w*k)/(k-1)) if k>1 else 0
-        st=j*(k+1)+1
-        o+=stp(f'<div class="a" style="left:90px;top:{y}px;display:flex;align-items:center;gap:0"><div class="chip" style="font-size:44px;padding:10px 40px;border-radius:999px;background:{G(r["grad"])}">{r["label"]}</div><div style="width:6px;height:54px;border-radius:3px;background:rgba(124,70,230,.4);margin:0 44px"></div>{chiprow(r["chips"])}</div>',st,pills=True)
-        for i,f in enumerate(r['pics']): o+=stp(pic(90+i*(w+gx),y+90,w,h,f,36),st+1+i)
-        if r.get('cap'): o+=stp(f'<div class="a" style="left:90px;top:{y+90+h+8}px">{spill(r["cap"],r.get("sc"),34,"6px 28px")}</div>',st+k)
+        for i,f in enumerate(r['pics']): o+=stp(pic(90+i*(w+gx),y+90,w,h,f,36),st+i)
+        o+=stp(f'<div class="a" style="left:90px;top:{y}px;display:flex;align-items:center;gap:0"><div class="chip" style="font-size:44px;padding:10px 40px;border-radius:999px;background:{G(r["grad"])}">{r["label"]}</div><div style="width:6px;height:54px;border-radius:3px;background:rgba(124,70,230,.4);margin:0 44px"></div>{chiprow(r["chips"])}</div>',st+k,pills=True)
+        used=k+1
+        if r.get('cap'): o+=stp(f'<div class="a" style="left:90px;top:{y+90+h+8}px">{spill(r["cap"],r.get("sc"),34,"6px 28px")}</div>',st+k+1); used+=1
+        st+=used
     return o
 
 @module('qgrid')
@@ -121,7 +122,7 @@ def qgrid(d):
     o=header(d['phase'],d.get('title','Question it'))
     for i,it in enumerate(d['items'][:4]):
         r,c=divmod(i,2); x=90+c*920; y=168+r*420
-        o+=stp(pic(x+140,y,540,304,it['pic'],40),i+1)+stp(f'<div class="a" style="left:{x}px;top:{y+322}px;width:820px;display:flex;gap:12px;justify-content:center">'+''.join(ch(a,b,46,'8px 26px') for a,b in it['chips'])+'</div>',i+1,pills=True)
+        o+=stp(pic(x+140,y,540,304,it['pic'],40),2*i+1)+stp(f'<div class="a" style="left:{x}px;top:{y+322}px;width:820px;display:flex;gap:12px;justify-content:center">'+''.join(ch(a,b,46,'8px 26px') for a,b in it['chips'])+'</div>',2*i+2,pills=True)
     return o
 
 @module('dial')
@@ -202,7 +203,8 @@ def dial_ladder(d):
         o+=(f'<div class="dlr{" sel" if i==st else ""}" data-i="{i}" data-y="{y}" style="position:absolute;left:{x0}px;top:{y}px;width:{w}px;height:{rh}px;cursor:pointer">'
             f'<div class="gl" style="left:0;top:0;width:{w}px;height:{rh}px;border-radius:{rh//2}px;{("background:linear-gradient(90deg,"+tc(i)[0]+"55,"+tc(i)[0]+"22);border-color:"+tc(i)[0]+"aa") if tinted else ""}"></div>'
             f'<div style="position:absolute;left:14px;top:14px;width:{sz}px;height:{sz}px;border-radius:50%;border:6px solid #fff;box-sizing:border-box;background:#fff;overflow:hidden;box-shadow:0 8px 18px rgba(40,20,90,.25)"><img src="{ART}{s["pic"]}" style="position:absolute;height:{ins*f[2]:.0f}px;width:auto;left:{ins/2-f[0]*ins*f[2]*1.7917:.0f}px;top:{ins/2-f[1]*ins*f[2]:.0f}px"></div>'
-            f'<div style="position:absolute;left:{sz+50}px;top:0;height:{rh}px;display:flex;align-items:center"><span class="chip" style="font-size:50px;padding:8px 34px;border-radius:999px;background:{("linear-gradient(135deg,"+tc(i)[0]+","+tc(i)[1]+");color:"+tc(i)[2]) if tinted else G(s["grad"])};white-space:nowrap">{s["word"]}</span></div>'
+            f'<div style="position:absolute;left:{sz+50}px;top:0;height:{rh}px;display:flex;align-items:center"><span class="chip" style="font-size:50px;padding:8px 34px;border-radius:999px;background:{("linear-gradient(135deg,"+tc(i)[0]+","+tc(i)[1]+");color:"+tc(i)[2]) if tinted else G(s["grad"])};white-space:nowrap">{s["word"]}</span>'
+            +(f'<span style="margin-left:22px;font-family:O;font-weight:800;font-size:32px;color:#8a86a3;background:rgba(255,255,255,.6);padding:4px 22px;border-radius:999px">{s["alt"]}</span>' if s.get("alt") else '')+'</div>'
             f'<div style="position:absolute;right:40px;top:0;height:{rh}px;display:flex;align-items:center"><span class="pill" style="font-size:40px;padding:8px 32px;color:#6a35e8;white-space:nowrap">{s["gloss"]}</span></div></div>')
     o+=f'<div class="dlm" style="position:absolute;left:{x0-8}px;top:{ys[st]-8}px;width:{w+16}px;height:{rh+16}px;border-radius:{rh//2+8}px;border:7px solid #9a5cff;box-shadow:0 0 0 6px rgba(154,92,255,.25),0 14px 34px rgba(106,53,232,.35);pointer-events:none;transition:top .55s cubic-bezier(.3,1.4,.5,1)"></div>'
     o+='<div class="gl" style="left:1230px;top:168px;width:600px;height:820px;border-radius:72px"></div>'
