@@ -18,8 +18,11 @@ def apply(spec,rows):
     return spec
 
 L2V2=[('Cover','1','Show the title; no talking needed'),('What happened?','2','Pictures first: students guess in any language'),('Where does it hurt?','2','Four problems: point and say each one'),
-('Why? (1)','3','Cause, arrow, result, then the sentence: stomach, cold'),('Why? (2)','2','Back, arm: say the because-sentence together'),('Yesterday (5 verbs)','2','eat/ate, drink/drank, sleep/slept, fall/fell, go/went'),
-('Yesterday (4 more verbs)','1','OPTIONAL: take/took, feel/felt, have/had, start/started'),('Every day / yesterday','2','Pink time word: the verb changes'),('Sort: because I ...','4','Drag the past verb; wrong springs back'),
-('Why? check (1)','1','CHECK: tap the cause; watch who hesitates'),('Why? check (2)','1','OPTIONAL'),('Nurse chat','5','What\u2019s wrong? Why? When did it start? Did you eat?'),
-('Roles','2','Patient knows the cause; nurse asks why'),('Choose a patient','1','Pairs pick Patient 1-4'),('Slot machine','1','OPTIONAL: one spin, new patients'),('Find the cause (pairs)','12','Nurse asks, patient answers, swap'),
-('Patients helped','2','Shared board: no scores'),('Thank you','0','Close')]
+('Today we learn','1','Read the two sentences aloud once: Why? / because'),('Why? (1)','3','Cause, arrow, result, then the sentence: stomach, cold'),('Why? (2)','2','Back, arm: say the because-sentence together'),
+('Yesterday (5 verbs)','2','eat/ate, drink/drank, sleep/slept, fall/fell, go/went'),('Yesterday (4 more verbs)','1','OPTIONAL: take/took, feel/felt, have/had, start/started'),
+('Every day / yesterday','2','Pink time word: the verb changes'),('Time words','2','OPTIONAL: Yesterday / last night / this morning'),('Sort: because I ...','4','Drag the past verb; wrong springs back'),('Sort 2: drank, took','2','OPTIONAL'),
+('Why? check (1)','1','CHECK: tap the cause; watch who hesitates'),('Why? check (2)','1','OPTIONAL'),('Statement / question','2','I ate spicy food. / Did you eat spicy food? The verb goes back to eat'),('Nurse chat','5','What\u2019s wrong? Why? When did it start? Did you eat?'),
+('Your turn','2','OPTIONAL: tell your partner one thing you did yesterday'),('Doctor chat','3','OPTIONAL: imperatives only (Don\u2019t eat / Drink)'),
+('The Clinic','1','Title only'),('Roles','2','Patient knows the cause; nurse asks why'),('Watch the model','1','Read the exchange together before pairs'),('Patient card','1','Patient sees the cause; nurse sees the problem'),
+('Nurse prep','3','Question builder; 3:00 timer'),('Patient prep','2','Sentence frames and past verbs'),('Choose a patient','1','Pairs pick Patient 1-6'),('Slot machine','1','OPTIONAL: one spin, new patients'),
+('Find the cause (pairs)','9','Nurse asks, patient answers, swap'),('Patients helped','2','Shared board: no scores'),('Recap','2','Read down the page together'),('Thank you','0','Close')]
