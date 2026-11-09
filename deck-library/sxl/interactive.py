@@ -147,7 +147,7 @@ CSS_EXTRA = """.vplay{width:132px;height:132px;border-radius:50%;border:0;cursor
 #vov.on{display:flex}
 #vov video{display:none;width:min(82vw,146vh);max-height:82vh;border-radius:26px;background:#000;box-shadow:0 30px 80px rgba(0,0,0,.5)}
 #vov video.on{display:block}
-#vx{position:absolute;top:3vh;right:3vw;width:64px;height:64px;border-radius:50%;border:0;cursor:pointer;background:#fff;color:#6a35e8;font-size:34px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+#vx{position:absolute;top:3vh;right:3vw;width:72px;height:72px;border-radius:50%;border:0;cursor:pointer;background:#fff;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 8px 20px rgba(0,0,0,.3)}
 
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eeeef3}
 body{width:100%!important;height:100%!important}
@@ -340,7 +340,7 @@ def vov_markup(spec):
     import json as _j
     keys=sorted({c['video'] for d in spec for c in d.get('cards',[]) if c.get('video')})
     if not keys: return ''
-    return '<div id="vov">'+''.join(f'<video id="vid-{k}" playsinline controls preload="none" src="file:///home/claude/work/lesson/media/{k}.mp4"></video>' for k in keys)+'<button id="vx" aria-label="Close">&#10005;</button></div>'
+    return '<div id="vov">'+''.join(f'<video id="vid-{k}" playsinline controls preload="none" src="file:///home/claude/work/lesson/media/{k}.mp4"></video>' for k in keys)+'<button id="vx" aria-label="Close"><svg width="30" height="30" viewBox="0 0 30 30"><path d="M6 6L24 24M24 6L6 24" stroke="#6a35e8" stroke-width="5" stroke-linecap="round"/></svg></button></div>'
 
 def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
     secs = ''; allspec = list(spec)
