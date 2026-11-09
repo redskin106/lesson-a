@@ -348,7 +348,7 @@ def pick_html(d,btn=False):
     """Concept check: a picture and 'Why?', tap the right cause. {'effect':f,'options':[f,f,f],'ok':index}"""
     o=header(d['phase'],d.get('title','Why?'),'violet')
     o+=pic(90,170,640,360,d['effect'],44)
-    o+=f'<div class="a" style="left:780px;top:200px;display:flex;align-items:center;gap:26px">{ch("c4","Why?",96,"10px 54px")}</div>'
+    o+=f'<div class="a" style="left:780px;top:200px;display:flex;align-items:center;gap:26px">{ch("c4","Why does it hurt?",76,"10px 46px")}</div>'
     o+=f'<div class="a psay" style="left:780px;top:400px;width:1050px;display:flex;flex-wrap:wrap;gap:12px;opacity:0;transition:opacity .5s">'+''.join(ch(c,t,44,"6px 22px") for c,t in d.get('say',[]))+'</div>'
     n=len(d['options']); w=int((1740-50*(n-1))/n); h=int(w*9/16); y=600
     for i,f in enumerate(d['options']):
