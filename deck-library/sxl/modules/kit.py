@@ -312,3 +312,33 @@ def timer(d):
       +f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:440px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:330px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>'
       +f'<div class="a tstart" style="left:860px;top:830px;width:200px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="56" height="56" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>'
       +(f'<div class="a mu" style="left:90px;top:730px;width:1740px;text-align:center;font-size:44px">{d["note"]}</div>' if d.get('note') else ''))
+
+ARROW='<svg width="200" height="120" viewBox="0 0 200 120"><defs><linearGradient id="ar" x1="0" x2="1"><stop offset="0" stop-color="#7b3cf0"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient></defs><path d="M20 60H165M122 22L168 60L122 98" fill="none" stroke="url(#ar)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+
+@module('cause_chain')
+def cause_chain(d):
+    """Cause -> consequence stories. Pictures first, then the sentence. {'rows':[{'cause':f,'effect':f,'sent':[(cls,text)..]}]}"""
+    R=d['rows']; n=len(R); o=header(d['phase'],d.get('title')); st=1; w,h=480,270; pitch=420 if n>1 else 0; y0=170 if n>1 else 250
+    x0=int((1920-(2*w+200))/2)
+    for j,r in enumerate(R):
+        y=y0+j*pitch
+        o+=stp(pic(x0,y,w,h,r['cause'],40),st)
+        o+=stp(f'<div class="a" style="left:{x0+w}px;top:{y+h//2-60}px;width:200px">{ARROW}</div>',st+1)
+        o+=stp(pic(x0+w+200,y,w,h,r['effect'],40),st+1)
+        o+=stp(f'<div class="a" style="left:90px;top:{y+h+22}px;width:1740px;display:flex;gap:12px;justify-content:center">'+''.join(ch(c,t,46,'8px 26px') for c,t in r['sent'])+'</div>',st+2,pills=True)
+        st+=3
+    return o
+
+def pick_html(d,btn=False):
+    """Concept check: a picture and 'Why?', tap the right cause. {'effect':f,'options':[f,f,f],'ok':index}"""
+    o=header(d['phase'],d.get('title','Why?'),'violet')
+    o+=pic(90,170,640,360,d['effect'],44)
+    o+=f'<div class="a" style="left:780px;top:260px;display:flex;align-items:center;gap:26px">{ch("c4","Why?",96,"10px 54px")}</div>'
+    n=len(d['options']); w=int((1740-50*(n-1))/n); h=int(w*9/16); y=600
+    for i,f in enumerate(d['options']):
+        x=90+i*(w+50); card=pic(0 if btn else x,0 if btn else y,w,h,f,40)
+        o+=(f'<button class="pk" data-i="{i}" style="position:absolute;left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:40px">{card}</button>' if btn else card)
+    return o
+
+@module('pick')
+def pick(d): return pick_html(d)

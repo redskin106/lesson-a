@@ -138,10 +138,15 @@ def fib_markup(d, sid):
               +f'<button class="tf" data-k="{k}" data-v="0" data-ok="{int(ok)}" style="position:absolute;left:1260px;top:{y+250}px;width:110px;height:110px">'+f'<img src="{E}cross_mark.png" style="width:110px">'+'</button>')
     return out+f'<script type="application/json" id="d-{sid}">{json.dumps({"n":len(d["statements"])})}</script>'
 
-BUILD = {'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
+def pick_markup(d, sid):
+    from .modules.kit import pick_html
+    return pick_html(d, True) + f'<script type="application/json" id="d-{sid}">{json.dumps({"ok": d["ok"]})}</script>'
+
+BUILD = {'pick': pick_markup, 'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
 
 
-CSS_EXTRA = """.vplay{width:132px;height:132px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#ff4fa3);box-shadow:0 14px 28px rgba(106,53,232,.4),inset 0 2px 0 rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;padding:0 0 0 8px;margin-top:6px;transition:transform .15s}
+CSS_EXTRA = """.pk{border:0;background:none;padding:0;cursor:pointer;transition:transform .2s,opacity .3s}.pk:hover{transform:translateY(-4px)}.pk.off{opacity:.32;transform:none}.pk.pickd{transform:scale(1.04);filter:drop-shadow(0 0 28px rgba(79,207,122,.8))}
+.vplay{width:132px;height:132px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#ff4fa3);box-shadow:0 14px 28px rgba(106,53,232,.4),inset 0 2px 0 rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;padding:0 0 0 8px;margin-top:6px;transition:transform .15s}
 .vplay:active{transform:scale(.92)}
 #vov{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(28,20,70,.62);backdrop-filter:blur(8px)}
 #vov.on{display:flex}
@@ -303,6 +308,9 @@ INIT.match_pairs=function(s){
  ps.forEach(function(p){p.onclick=function(){ps.forEach(function(x){x.classList.remove('sel')});sp=(sp===p)?null:p;if(sp){sp.classList.add('sel');P('tick')}}});
  ws.forEach(function(w){w.onclick=function(){if(!sp){w.classList.add('pulse');setTimeout(function(){w.classList.remove('pulse')},1700);P('tick');return}
   if(sp.dataset.i===w.dataset.i){var g=$('.mg',w);g.innerHTML='<span class="chip c1 mo" style="font-size:42px;padding:2px 20px;border-radius:44px">'+(+sp.dataset.i+1)+'</span>';sp.classList.remove('sel');sp.classList.add('ok');w.classList.add('ok');sp=null;P('pop');setTimeout(function(){P('tick')},90);if(--left==0)finish(s)}else{wrong(sp);sp.classList.remove('sel');sp=null}}})};
+INIT.pick=function(s){
+ var ok=JSON.parse($('#d-'+s.dataset.id).textContent).ok,bs=$$('.pk',s),done=0;
+ bs.forEach(function(b){b.onclick=function(){if(done)return;if(+b.dataset.i===ok){done=1;bs.forEach(function(x){if(x!==b)x.classList.add('off')});b.classList.add('ok','pickd');P('pop');setTimeout(function(){P('tick')},90);finish(s)}else{b.classList.add('off');wrong(b)}}})};
 /* ---- true or a fib: tick or cross under each sentence ---- */
 INIT.spot_fib=function(s){
  var n=JSON.parse($('#d-'+s.dataset.id).textContent).n,left=n;
