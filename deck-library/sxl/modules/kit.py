@@ -407,9 +407,10 @@ def connect_html(d,sid):
             o+=(f'<div class="cn" data-c="{c}" data-id="{i}" style="left:{X[c]}px;top:{TOP+slot*ROW}px">'
                 +pic(12,12,TH-24,TH-24,r[keys[c]],34)
                 +'<div class="tx">'+''.join(ch(a,b,38,'6px 18px') for a,b in r[sk[c]])+'</div></div>')
-    o+=f'<div class="gl cfull" id="cf-{sid}" style="left:90px;top:800px;width:1620px;height:216px;border-radius:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0"></div>'
-    L=lambda cs:'<div style="display:flex;gap:12px">'+''.join(ch(a,b,40,'3px 20px') for a,b in cs)+'</div>'
-    full=[L(R[i]['n'])+L([('c4','because')]+R[i]['c'])+L(R[i]['a']) for i in range(n)]
+    o+=f'<div class="gl cfull" id="cf-{sid}" style="left:90px;top:800px;width:1620px;height:216px;border-radius:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0"></div>'
+    L=lambda cs:'<div style="display:flex;gap:12px">'+''.join(ch(a,b,38,'2px 18px') for a,b in cs)+'</div>'
+    o=o.replace('opacity:0"></div>','opacity:0">'+''.join(f'<div class="fl" data-id="{i}" style="opacity:0;transition:opacity .4s;display:flex;gap:12px;justify-content:center">'+L(R[i]['n']+[('c4','because')]+R[i]['c'])[len('<div style="display:flex;gap:12px">'):-6]+'</div>' for i in range(n))+'</div>',1)
+    full=[]
     import json as _j
     o+=f'<script type="application/json" id="d-{sid}">{_j.dumps({"n":n,"full":full,"col":CNX,"row":ROW,"top":TOP,"x":X,"w":W,"h":TH})}</script>'
     return o

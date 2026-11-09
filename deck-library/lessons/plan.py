@@ -32,7 +32,7 @@ L2V3=[('Cover','1','Show the title; no talking needed'),('What’s wrong?','2','
 ('Today we learn','1','Now: hurts. Before: ate. One sentence carries both'),('Where does it hurt?','2','Four pains: point and say My ___ hurts'),
 ('Does your head hurt?','2','Statement / question: the verb goes back to hurt'),('Nurse chat 1','2','Does your ___ hurt? Two gaps'),
 ('Yesterday (5 verbs)','2','eat/ate, drink/drank, sleep/slept, fall/fell, go/went'),('Yesterday (4 more verbs)','1','OPTIONAL: take/took, feel/felt, have/had, start/started'),
-('Today / yesterday','2','Pink time word: the verb changes'),('Sort: because I ...','3','Drag the past verb; wrong springs back'),('Sort 2: drank, took','2','OPTIONAL'),
+('Today / yesterday','2','Pink time word: the verb changes'),('Sort 1: because I ...','3','Drag the past verb; wrong springs back'),('Sort 2: because I ...','3','Same job, new bank: went, drank, took'),
 ('I ate / Did you eat?','2','The same rule as hurt: after did the verb goes back to plain'),('Three little rules','1','Read down: Does → hurt, Did → eat, because → the reason'),('Silver: habits (optional)','2','OPTIONAL: Do you ... every day? / Did you ... yesterday?'),('Model strip: now and yesterday','3','Row 1 asks about now (Does). Row 2 asks about before (Did)'),('Connect: before, now, after','3','Tap a picture, then its partner: they slide into one row and an arrow draws. Say each finished sentence together'),
 ('Help the robot nurse','2','Fix the robot: hurt / fall / drink. CUT the third gap if short'),('Nurse chat 2','3','Why? Because I ate ... Did you eat anything?'),
 ('Why? check (1)','1','OPTIONAL: tap the cause; watch who hesitates'),('Why? check (2)','1','OPTIONAL'),('Your turn','2','OPTIONAL: tell your partner one thing you did yesterday'),

@@ -29,12 +29,12 @@ spec=[
    {'pic':'v2_take.jpg','now':'take','then':'took'},{'pic':'v2_feel.jpg','now':'feel','then':'felt'},{'pic':'v2_have.jpg','now':'have','then':'had'},{'pic':'v2_start.jpg','now':'start','then':'started'}]},
  {'m':'contrast','phase':S_,'title':'Today and yesterday','left':{'label':'Today','grad':'sky','pic':'v2_rice.jpg','fit':'contain','chips':[('c1','I'),('c2','eat'),('c3','rice.')]},
    'right':{'label':'Yesterday','grad':'rose','pic':'l2c_1_cause.jpg','fit':'contain','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]}},
- {'m':'sort','phase':S_,'title':'Why does it hurt?','bank':['eat','went','sleep','fell','go','ate','fall','slept'],'rows':[
+ {'m':'sort','phase':S_,'title':'Why does it hurt? (1)','bank':['sleep','ate','fall','fell','eat','slept'],'rows':[
    {'pic':'l2c_1_effect.jpg','pre':('c4','because I'),'end':('c3','spicy food.'),'ans':['ate']},
-   {'pic':'l2c_2_effect.jpg','pre':('c4','because I'),'end':('c3','out in the rain.'),'ans':['went']},
    {'pic':'l2c_3_effect.jpg','pre':('c4','because I'),'end':('c3','on the floor.'),'ans':['slept']},
    {'pic':'l2c_4_effect.jpg','pre':('c4','because I'),'end':('c3','off a bike.'),'ans':['fell']}]},
- {'m':'sort','phase':S_,'title':'Why? (2)','optional':True,'bank':['take','drank','drink','took'],'rows':[
+ {'m':'sort','phase':S_,'title':'Why does it hurt? (2)','bank':['took','go','drink','take','went','drank'],'rows':[
+   {'pic':'l2c_2_effect.jpg','pre':('c4','because I'),'end':('c3','out in the rain.'),'ans':['went']},
    {'pic':'l2c_5_effect.jpg','pre':('c4','because I'),'end':('c3','too much coffee.'),'ans':['drank']},
    {'pic':'l2c_6_effect.jpg','pre':('c4','because I'),'end':('c3','medicine.'),'ans':['took']}]},
  {'m':'contrast','phase':S_,'title':'I ate. Did you eat?','left':{'label':'Statement','grad':'violet','pic':'l2c_1_cause.jpg','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]},
