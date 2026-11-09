@@ -55,8 +55,8 @@ spec=[
  {'m':'chat','phase':S_,'title':'Help the robot nurse','window':4,'avatars':{'N':'robot'},'lines':[
    ('P',{'img':'l2c_4_cause.jpg'}),
    ('N',[C('c2','Did'),C('c1','you'),G('c2','fall?')],[('c2','fall?'),('c2','fell?')]),('P',{'img':'v3_arm.jpg'}),
-   ('N',[C('c2','Does'),C('c1','your arm'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')]),('P',{'img':'v3_yes.jpg'}),
-   ('N',[C('c2','Did'),C('c1','you'),G('c2','go'),C('c3','to hospital?')],[('c2','go'),('c2','went')]),('P',{'img':'v3_hospital.jpg'})]},
+   ('N',[C('c2','Does'),C('c1','your arm'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')]),('P',{'img':'v3_hospital.jpg'}),
+   ('N',[C('c2','Did'),C('c1','you'),G('c2','go'),C('c3','to hospital?')],[('c2','go'),('c2','went')]),('P',{'img':'v3_yes.jpg'})]},
  {'m':'chat','phase':S_,'title':'The nurse asks','window':4,'lines':[
    ('N','What’s wrong?'),('P',{'img':'v3_stomach.jpg'}),
    ('N',[C('c2','Did'),C('c1','you'),G('c2','eat'),C('c3','anything?')],[('c2','eat'),('c2','ate')]),('P',{'img':'l2c_1_cause.jpg'}),
