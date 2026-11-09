@@ -170,7 +170,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eeeef3;tra
 body{width:100%!important;height:100%!important}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
 .sl{position:absolute;inset:0;display:none;overflow:hidden}.sl.on{display:block}
-.thread{position:absolute;left:90px;top:168px;width:1740px;height:712px;overflow-y:auto;display:flex;flex-direction:column;gap:48px;scrollbar-width:thin;scrollbar-color:#b9a6f5 transparent;padding:6px 8px}
+.thread{position:absolute;left:40px;top:122px;width:1840px;height:768px;overflow-y:auto;display:flex;flex-direction:column;gap:48px;scrollbar-width:thin;scrollbar-color:#b9a6f5 transparent;padding:52px 58px 12px;box-sizing:border-box;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%)}
 .row:first-child{margin-top:auto}
 .row.show{display:flex!important;animation:up .5s cubic-bezier(.2,.9,.3,1.2) both}
 @keyframes up{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
