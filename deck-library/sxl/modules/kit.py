@@ -293,6 +293,21 @@ def recap(d):
     if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1520px;top:{300 if not d.get("side") else 770}px;width:{260 if not d.get("side") else 190}px;{sh()}">',nr+len(d.get('side') or [])+(0 if d.get('side') else 1))
     return o+'<div class="a mu" style="left:90px;bottom:22px;font-size:22px">Emoji: Microsoft Fluent Emoji (MIT)</div>'
 
+@module('rules')
+def rules(d):
+    """Rows of colour-coded pills with a small letter under each (S subject, V verb, O object, B because) + a key at the bottom.
+    {'rows':[([(cls,text,letter)],'gloss')]}"""
+    o=header(d['phase'])+f'<div class="a h" style="left:90px;top:130px;font-size:68px">{d.get("title","Three little rules")}</div>'
+    nr=len(d['rows'])
+    for k,(cs,g) in enumerate(d['rows']):
+        y=230+k*200
+        body=''.join(f'<div style="display:flex;flex-direction:column;align-items:center;gap:6px">{ch(c,t,48,"8px 24px")}<span style="font-family:O;font-weight:800;font-size:34px;color:#7b3cf0">{l}</span></div>' for c,t,l in cs)
+        o+=stp(f'<div class="gl" style="left:90px;top:{y}px;width:1500px;height:170px;border-radius:70px;display:flex;align-items:center;gap:18px;padding:0 44px">{body}<span style="margin-left:auto">{spill(g,None,40,"8px 30px")}</span></div>',k+1,pills=True)
+    key=[('c1','S','Subject'),('c2','V','Verb'),('c3','O','Object'),('c4','B','because')]
+    o+=stp('<div class="gl" style="left:90px;top:850px;width:1500px;height:110px;border-radius:55px;display:flex;align-items:center;justify-content:center;gap:34px">'+''.join(f'<div style="display:flex;align-items:center;gap:10px">{ch(c,l,36,"4px 20px")}<span style="font-family:O;font-weight:700;font-size:34px;color:#4a3a8a">{t}</span></div>' for c,l,t in key)+'</div>',nr+1)
+    if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1640px;top:300px;width:230px;{sh()}">',nr+1)
+    return o
+
 @module('exit')
 def exit_(d):
     """{'phase':'EXIT','line1':'One useful','line2':'question.','prompt':'Ask the person next to you','emoji':'light_bulb'}"""
@@ -333,7 +348,8 @@ def pick_html(d,btn=False):
     """Concept check: a picture and 'Why?', tap the right cause. {'effect':f,'options':[f,f,f],'ok':index}"""
     o=header(d['phase'],d.get('title','Why?'),'violet')
     o+=pic(90,170,640,360,d['effect'],44)
-    o+=f'<div class="a" style="left:780px;top:260px;display:flex;align-items:center;gap:26px">{ch("c4","Why?",96,"10px 54px")}</div>'
+    o+=f'<div class="a" style="left:780px;top:200px;display:flex;align-items:center;gap:26px">{ch("c4","Why?",96,"10px 54px")}</div>'
+    o+=f'<div class="a psay" style="left:780px;top:400px;width:1050px;display:flex;flex-wrap:wrap;gap:12px;opacity:0;transition:opacity .5s">'+''.join(ch(c,t,44,"6px 22px") for c,t in d.get('say',[]))+'</div>'
     n=len(d['options']); w=int((1740-50*(n-1))/n); h=int(w*9/16); y=600
     for i,f in enumerate(d['options']):
         x=90+i*(w+50); card=pic(0 if btn else x,0 if btn else y,w,h,f,40)
@@ -355,7 +371,6 @@ def ball_circle(d):
     for i,s in enumerate(S):
         x=90+i*(w+gap); st=i+1
         if i>0:
-            o+=stp(BALL%(x-gap+5,sh()),st)
             o+=stp(f'<div class="a" style="left:{x-gap}px;top:400px;width:{gap}px;transform:scale(.45);transform-origin:left top">{ARROW}</div>',st)
         o+=stp(glass(x,y,w,h,'',r=64),st)
         o+=stp(f'<img src="{EM(s["emoji"])}" style="position:absolute;left:{x+w//2-90}px;top:{y+26}px;width:180px;{sh()}">',st)
@@ -384,7 +399,7 @@ def connect_html(d,sid):
     o=header(d['phase'],d.get('title'))
     for c,(g,t) in enumerate([('rose','yesterday'),('sky','now'),('teal','after')]):
         o+=f'<div class="a" style="left:{X[c]}px;top:172px;width:{W}px;display:flex;justify-content:center">{grad_chip(g,t,40,"6px 40px")}</div>'
-    o+=f'<svg id="cv-{sid}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;z-index:1;overflow:visible"><defs>'+''.join(f'<marker id="ah{sid}{i}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="{CNX[i%4]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></marker>' for i in range(n))+f'<filter id="rf{sid}" x="-5%" y="-30%" width="110%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="6"/></filter></defs><g id="ag-'+sid+f'" filter="url(#rf{sid})"></g></svg>'
+    o+=f'<svg id="cv-{sid}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;z-index:1;overflow:visible"><defs>'+''.join(f'<marker id="ah{sid}{i}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="{CNX[i%4]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></marker>' for i in range(n))+f'<filter id="rf{sid}" x="-5%" y="-30%" width="110%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter></defs><g id="ag-'+sid+f'" filter="url(#rf{sid})"></g></svg>'
     keys=['cause','now','adv']; sk=['c','n','a']
     for c in range(3):
         for slot,i in enumerate(ordr[c]):

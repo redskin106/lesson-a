@@ -87,6 +87,14 @@ def sort_markup(d, sid):
         a = r.get('ans'); a = [a] if isinstance(a, str) else (a or [])
         for t in a: need[t] = need.get(t, 0) + 1
     two = len(bank) > 8; bfs = 42 if two else (44 if len(bank) > 6 else (58 if len(bank) > 4 else 64)); btn = ''
+    import random as _r
+    segs = [[]]
+    for b in bank:
+        if b == '|': segs.append([])
+        else: segs[-1].append(b)
+    _rg = _r.Random(11)
+    for sg in segs: _rg.shuffle(sg)
+    bank = [x for k, sg in enumerate(segs) for x in (sg + (['|'] if k < len(segs) - 1 else []))]
     for b in bank:
         if b == '|': btn += ('<div style="flex-basis:100%;height:0"></div>' if two else '<div style="width:6px;height:70px;border-radius:3px;background:#b9a6f5;margin:0 10px"></div>'); continue
         c, t = b if isinstance(b, tuple) else ('c2', b)
@@ -326,7 +334,7 @@ INIT.connect=function(s){
  ts.forEach(function(e){var c=+e.dataset.c,id=+e.dataset.id,sl=Math.round((parseInt(e.style.top)-D.top)/D.row);pos[c][sl]=id;els[c+'_'+id]=e;e.onclick=function(){tap(e)}});
  function place(c,id,r){var cur=pos[c].indexOf(id),o=pos[c][r];if(cur===r)return;pos[c][r]=id;pos[c][cur]=o;els[c+'_'+id].style.top=(D.top+r*D.row)+'px';els[c+'_'+o].style.top=(D.top+cur*D.row)+'px'}
  function stroke(d,w,col,g,dl,du){var p=document.createElementNS(NS,'path');p.setAttribute('class','cd');p.setAttribute('pathLength','1');p.setAttribute('stroke',col);p.setAttribute('stroke-width',w);p.style.setProperty('--dl',dl+'s');p.style.setProperty('--du',du+'s');p.dataset.g=g;p.setAttribute('d',d);svg.appendChild(p)}
- function arrow(id,r,a,b){var y=D.top+r*D.row+D.h/2,x1=D.x[a]+D.w+12,x2=D.x[b]-16,col=D.col[id%4],m=(x1+x2)/2,st=(id+a)%2;
+ function arrow(id,r,a,b){var y=D.top+r*D.row+D.h/2,x1=D.x[a]+D.w+12,x2=D.x[b]-16,col=D.col[id%4],m=(x1+x2)/2,st=0;
   if(st===0){/* marker: wobbly straight line, then two short head strokes */
    stroke('M'+x1+' '+(y+3)+'Q'+m+' '+(y-6)+' '+x2+' '+y,9,col,id,.05,.42);
    stroke('M'+(x2-34)+' '+(y-26)+'L'+x2+' '+y,9,col,id,.47,.14);stroke('M'+(x2-34)+' '+(y+26)+'L'+x2+' '+y,9,col,id,.58,.14)}
@@ -350,7 +358,7 @@ INIT.connect=function(s){
 };
 INIT.pick=function(s){
  var ok=JSON.parse($('#d-'+s.dataset.id).textContent).ok,bs=$$('.pk',s),done=0;
- bs.forEach(function(b){b.onclick=function(){if(done)return;if(+b.dataset.i===ok){done=1;bs.forEach(function(x){if(x!==b)x.classList.add('off')});b.classList.add('ok','pickd');P('pop');setTimeout(function(){P('tick')},90);finish(s)}else{b.classList.add('off');wrong(b)}}})};
+ bs.forEach(function(b){b.onclick=function(){if(done)return;if(+b.dataset.i===ok){done=1;bs.forEach(function(x){if(x!==b)x.classList.add('off')});b.classList.add('ok','pickd');var sy=$('.psay',s);if(sy)sy.style.opacity=1;P('pop');setTimeout(function(){P('tick')},90);finish(s)}else{b.classList.add('off');wrong(b)}}})};
 /* ---- true or a fib: tick or cross under each sentence ---- */
 INIT.spot_fib=function(s){
  var n=JSON.parse($('#d-'+s.dataset.id).textContent).n,left=n;

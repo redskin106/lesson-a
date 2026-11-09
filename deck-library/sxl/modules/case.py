@@ -28,26 +28,27 @@ def evidence_board(d):
 
 @module('cast')
 def cast(d):
-    """Pictures appear one by one, then the label pills pop in together."""
+    """Click 1: picture appears. Click 2: its label pill pops in. Repeat for each item."""
     n=len(d['items']); w=int((1740-30*(n-1))/n); out=header(d['phase'],d.get('title'),d.get('grad','amber'))
     for i,it in enumerate(d['items']):
-        x=90+i*(w+30); out+=stp(art(x,170,w,640,it['pic'],r=48,label=it['pic'],fit=it.get('fit','cover')),i+1)
-        out+=stp(f'<div class="a" style="left:{x}px;top:830px;width:{w}px;display:flex;justify-content:center">{grad_chip(it.get("grad","amber"),it["label"],44,"10px 40px")}</div>',n+1,pills=True)
-        if it.get('cap'): out+=stp(f'<div class="a mu" style="left:{x}px;top:925px;width:{w}px;text-align:center;font-size:34px">{it["cap"]}</div>',n+1)
+        x=90+i*(w+30); out+=stp(art(x,170,w,640,it['pic'],r=48,label=it['pic'],fit=it.get('fit','cover')),2*i+1)
+        out+=stp(f'<div class="a" style="left:{x}px;top:830px;width:{w}px;display:flex;justify-content:center">{grad_chip(it.get("grad","amber"),it["label"],44,"10px 40px")}</div>',2*i+2,pills=True)
+        if it.get('cap'): out+=stp(f'<div class="a mu" style="left:{x}px;top:925px;width:{w}px;text-align:center;font-size:34px">{it["cap"]}</div>',2*i+2)
     return out
 
 @module('verb_pairs')
 def verb_pairs(d):
-    """Pictures first, then the 'now' pills pop in, then arrows + 'then' pills (reveal rule: picture before text)."""
+    """One picture, then its 'now' pill, then arrow + past pill, one item at a time. The arrow sits midway between the two pills."""
     R=d['rows']; n=len(R); w=min(400,int((1740-30*(n-1))/n)); gx=int((1740-w*n)/(n-1)) if n>1 else 0
     x0=90+(1740-(w*n+gx*(n-1)))//2
-    fs=max(44,int(w*.17))
+    fs=max(44,int(w*.17)); nh=int(fs*1.35)+16; ah=64; gp=22
     out=header(d['phase'],d.get('title','Yesterday'),d.get('grad','violet'))
     for i,r in enumerate(R):
-        x=x0+i*(w+gx); y=190+w+40
-        out+=stp(art(x,190,w,w,r['pic'],r=48,label=r['pic'],fit='contain'),1)
-        out+=stp(f'<div class="a" style="left:{x}px;top:{y}px;width:{w}px;display:flex;justify-content:center">{ch("c2",r["now"],fs,"8px 30px")}</div>',2,pills=True)
-        out+=stp(f'<div class="a" style="left:{x}px;top:{y+fs+30}px;width:{w}px;display:flex;flex-direction:column;align-items:center;gap:18px"><div style="font-family:O;font-weight:800;font-size:{int(fs*.9)}px;color:#9a5cff;line-height:.7">↓</div>{grad_chip("violet",r["then"],int(fs*1.15),"10px 36px")}</div>',3,pills=True)
+        x=x0+i*(w+gx); y=190+w+36; b=3*i
+        out+=stp(art(x,190,w,w,r['pic'],r=48,label=r['pic'],fit='contain'),b+1)
+        out+=stp(f'<div class="a" style="left:{x}px;top:{y}px;width:{w}px;display:flex;justify-content:center">{ch("c2",r["now"],fs,"8px 30px")}</div>',b+2,pills=True)
+        out+=stp(f'<div class="a" style="left:{x}px;top:{y+nh+gp}px;width:{w}px;display:flex;justify-content:center"><svg width="46" height="{ah}" viewBox="0 0 46 64"><path d="M23 4 L23 52 M7 36 L23 54 L39 36" fill="none" stroke="#9a5cff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>',b+3)
+        out+=stp(f'<div class="a" style="left:{x}px;top:{y+nh+gp+ah+gp}px;width:{w}px;display:flex;justify-content:center">{grad_chip("violet",r["then"],int(fs*1.15),"10px 36px")}</div>',b+3,pills=True)
     return out
 
 @module('timeline')
