@@ -10,9 +10,11 @@ def minutes(label,m): spec[at(label)]['min']=float(m)
 # 1. Fill the gaps (2): five items, mustn't and don't have to side by side
 d=spec[at('Sort 2 (negatives)')]
 d['bank']=['have to','should','shouldn’t','mustn’t','don’t have to']
-d['rows']=[{'pic':'sc2_1.jpg','end':('c3','eat spicy food.'),'ans':'shouldn’t'},{'pic':'sc2_2.jpg','end':('c3','see a doctor.'),'ans':'have to'},
-           {'pic':'sc2_4.jpg','end':('c3','drive.'),'ans':'mustn’t'},{'pic':'mu_2.jpg','end':('c3','take it with food.'),'ans':'don’t have to'},
-           {'pic':'mu_1.jpg','end':('c3','drink alcohol.'),'ans':'mustn’t'}]
+d['rows']=[{'pic':'sc2_2.jpg','end':('c3','see a doctor.'),'ans':'have to'},{'pic':'sc2_4.jpg','end':('c3','drive.'),'ans':'mustn’t'},
+           {'pic':'mu_2.jpg','end':('c3','take it with food.'),'ans':'don’t have to'},{'pic':'mu_1.jpg','end':('c3','drink alcohol.'),'ans':'mustn’t'}]
+# Fill the gaps (1): a fourth line (shouldn't)
+s1=spec[at('Sort 1 (pick words)')]
+s1['rows'].append({'pic':'sc_3.jpg','ans':['shouldn’t','eat spicy food']})
 minutes('Sort 2 (negatives)',5)
 
 # 3. Pair talk becomes core, with the five dial pictures as prompts
@@ -25,10 +27,11 @@ d['label']='Pair talk (pictures)'
 minutes('Boss strip',1); minutes('Friend strip',1)
 
 # 4. Build the question (optional) before the nurse chat
-bq={'m':'build','phase':'STUDY','title':'Build the question','optional':True,'pics':[],'fs':70,'bfs':60,'label':'Build the question','min':1.0,
-    'parts':[('c4','Where'),('c2','does'),('c1','it'),('c3','hurt?')],
-    'bank':[('c3','hurt?'),('c4','Where'),('c2','does'),('c1','it'),('c2','do'),('c3','hurts?'),('c4','When')]}
-spec.insert(at('Question it')+1,bq)
+def bq(parts,bank):
+    return {'m':'build','phase':'STUDY','title':'Build the question','optional':True,'pics':[],'fs':70,'bfs':60,'label':'Build the question','min':1.0,'parts':parts,'bank':bank}
+b1=bq([('c4','How much'),('c2','does'),('c1','it'),('c3','hurt?')],[('c3','hurt?'),('c4','How much'),('c2','does'),('c1','it'),('c2','do'),('c4','Where')])
+b2=bq([('c4','When'),('c2','did'),('c1','it'),('c3','start?')],[('c3','start?'),('c4','When'),('c2','did'),('c1','it'),('c2','does'),('c3','started?')])
+spec.insert(at('Question it')+1,b2); spec.insert(at('Question it')+1,b1)
 
 # 2. Find the mistakes (as in Lesson 2) closes the Study phase
 sp={'m':'spot','phase':'STUDY','title':'Find the mistakes','label':'Find the mistakes','min':2.0,'lines':[
