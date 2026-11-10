@@ -243,8 +243,8 @@ def reelp(n,spin=False):
 @module('slot')
 def slot(d):
     """Slot machine: every row = (problem emoji, pain 1-5, twist emoji, spinning?). Heads are data."""
-    heads=d.get('heads',['PROBLEM','PAIN','TWIST'])
-    o=header(d['phase'])+'<div class="a" style="left:300px;top:176px;display:flex;gap:20px;font-family:O;font-weight:700;font-size:28px;letter-spacing:.14em;color:#4a5a7a">'+''.join(f'<div style="width:500px;text-align:center">{t}</div>' for t in heads)+'</div>'
+    heads=d.get('heads',['PROBLEM','HOW MUCH?','TWIST'])
+    o=header(d['phase'])+'<div class="a" style="left:254px;top:176px;display:flex;gap:20px;font-family:O;font-weight:700;font-size:28px;letter-spacing:.14em;color:#4a5a7a">'+''.join(f'<div style="width:500px;text-align:center">{t}</div>' for t in heads)+'</div>'
     o+=f'<div class="spinbtn" style="position:absolute;left:1650px;top:60px;width:180px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:44px;color:#fff;{GR}">SPIN</div>'
     o+='<div class="srows" style="position:absolute;left:90px;top:226px;width:1740px;height:770px;display:flex;flex-direction:column;justify-content:center;gap:20px">'
     for k_,(a,p,t,sp) in enumerate(d['rows']):

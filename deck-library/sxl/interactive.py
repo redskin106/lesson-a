@@ -215,7 +215,7 @@ body{width:100%!important;height:100%!important}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
 .sl{position:absolute;inset:0;display:none;overflow:hidden}.sl.on{display:block}
 .thread{position:absolute;left:40px;top:122px;width:1840px;height:768px;overflow-y:auto;display:flex;flex-direction:column;gap:48px;scrollbar-width:thin;scrollbar-color:#b9a6f5 transparent;padding:52px 58px 12px;box-sizing:border-box;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%)}
-.row:first-child{margin-top:auto}.thread.sp{left:20px;width:1050px;height:768px;padding:52px 20px 12px 70px}.zoomv{position:absolute;left:0;top:0;width:1920px;height:1080px;background:rgba(24,12,60,.62);z-index:60;display:none;align-items:center;justify-content:center;cursor:zoom-out}.zoomv.on{display:flex}.zoomv img{width:1740px;height:980px;object-fit:contain;background:#fff;border-radius:64px;box-shadow:0 30px 90px rgba(0,0,0,.4)}
+.row:first-child{margin-top:auto}.thread.sp{left:20px;width:1050px;height:768px;padding:52px 20px 12px 70px}.zoomv{position:absolute;left:0;top:0;width:1920px;height:1080px;background:rgba(24,12,60,.62);z-index:60;display:none;align-items:center;justify-content:center;cursor:zoom-out}.zoomv.on{display:flex}.zoomv img{width:1000px;height:562px;object-fit:contain;background:#fff;border-radius:56px;box-shadow:0 30px 90px rgba(0,0,0,.4)}img[data-z]{cursor:zoom-in}
 .row.show{display:flex!important;animation:up .5s cubic-bezier(.2,.9,.3,1.2) both}
 @keyframes up{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
 button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -230,15 +230,15 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .card.done{pointer-events:none}
 .pulse{animation:pu .8s 2}@keyframes pu{50%{transform:scale(1.05)}}
 .calm *,.off *{animation-duration:.01s!important;transition-duration:.01s!important}
-#ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;z-index:50;display:flex;gap:14px}
+#ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:53px;z-index:50;display:flex;gap:14px;align-items:center}
 #ctl button{font:700 24px Outfit,O,sans-serif;padding:4px 20px;border-radius:999px;background:rgba(255,255,255,.8);border:3px solid #fff;color:#6a35e8;box-shadow:0 8px 20px rgba(80,60,160,.15)}
 #nx{position:absolute;right:90px;bottom:34px;z-index:40;width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#9a5cff,#6a35e8);color:#fff;font:800 56px O;display:none;align-items:center;justify-content:center;box-shadow:0 20px 40px rgba(80,40,200,.4)}
 #clk{position:absolute;right:150px;bottom:44px;z-index:40;font:700 26px O;color:#4a3a8a;background:rgba(255,255,255,.75);padding:6px 18px;border-radius:999px;display:none}
 #rpt{position:absolute;inset:60px 200px;z-index:80;background:rgba(255,255,255,.96);border-radius:40px;padding:30px 40px;font:500 24px O;overflow:auto;display:none;box-shadow:0 30px 80px rgba(40,20,90,.35)}
 #rpt table{border-collapse:collapse;width:100%}#rpt td,#rpt th{padding:4px 10px;border-bottom:1px solid #ddd;text-align:left}#rpt tr.o td{background:#f1e9ff}
 .tstart{cursor:pointer}.tclock.run{animation:none}
-#pv{position:absolute;left:30px;bottom:34px;z-index:40;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.7);color:#6a35e8;font:800 36px O;display:flex;align-items:center;justify-content:center;opacity:.55}
-#cnt{position:absolute;left:110px;bottom:46px;z-index:40;font:700 24px O;color:#6a6a7e}
+#pv{position:absolute;left:30px;bottom:50px;z-index:40;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.7);color:#6a35e8;font:800 36px O;display:flex;align-items:center;justify-content:center;opacity:.55}
+#cnt{position:absolute;left:110px;bottom:67px;z-index:40;font:700 24px/30px O;color:#6a6a7e}
 .sl.night{background:#0b0a10;color:#f6f3ff}.night .mu{color:#a9a3cc}.night .gl,.night .tag,.night .pill{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18)}.night .grad{background:linear-gradient(90deg,#c9a2ff,#ff8cc6);-webkit-background-clip:text;color:transparent}
 .vh{opacity:0;transform:translateY(24px) scale(.97)}.vs{transition:opacity .45s,transform .5s cubic-bezier(.2,.9,.3,1.2)}.vh.vs{opacity:0}
 .gl.tp{animation:pu .5s}
@@ -319,11 +319,21 @@ $('#mo').onclick=function(){ci=(ci+1)%3;SXL.cfg.calm=ci==1;SXL.cfg.off=ci==2;doc
 $('#sf').onclick=function(){var on=SXLSound.toggle();this.textContent='Sound: '+(on?'On':'Off')};
 function wrong(el){P('boop');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
 function put(slotEl){$('.op',slotEl).style.display='none';var f=$('.fl',slotEl);f.style.display='inline-block';f.classList.add('mo');P('pop');setTimeout(function(){P('tick')},90)}
+/* ---- generic tap-to-zoom on pictures (about half the screen) ---- */
+(function(){var NOZ='.cn,.pkc,.bk,.drag,.dlr,.dpb,.cbt,.slot,[data-nz]';
+ function cur(){return document.querySelector('.sl.on')}
+ function open(im){var s=cur();if(!s)return;var z=s.querySelector('.zoomv.gz');if(!z){z=document.createElement('div');z.className='zoomv gz';z.innerHTML='<img>';s.appendChild(z)}z.querySelector('img').src=im.src;z.classList.add('on');P('pop')}
+ function close(){var z=document.querySelector('.sl.on .zoomv.gz.on');if(!z)return false;z.classList.remove('on');P('tick');return true}
+ document.addEventListener('click',function(e){var z=e.target.closest('.zoomv.gz.on');if(z){e.stopPropagation();close();return}
+  var im=e.target.closest('img[data-z]');if(!im)return;var s=cur();if(!s||!s.contains(im))return;var m=s.dataset.mod;if(m==='cover'||m==='title_card'||m==='closing')return;
+  if(im.closest(NOZ))return;if(im.closest('.zoomv'))return;
+  if(im.getBoundingClientRect().width<60)return;e.stopPropagation();open(im)},true);
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
+})();
 var INIT={};
 /* ---- chat: tap-to-fill, auto-scroll, free scroll-back ---- */
  INIT.chat=function(s){
  var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),th=$('#th-'+id),bar=$('#bk-'+id),rows=$$('.row',th),i=-1,pi=$('#pi-'+id),pn=$('#pn-'+id),zv=$('#zv-'+id);
- if(zv)th.addEventListener('click',function(e){var im=e.target.closest('.zp');if(!im)return;$('img',zv).src=im.src;zv.classList.add('on');P('pop')});
  if(pn)pn.onclick=function(){if(!pi.getAttribute('src'))return;$('img',zv).src=pi.src;zv.classList.add('on');P('pop')};
  if(zv){zv.onclick=function(){zv.classList.remove('on');P('tick')}}
  function show(r){r.classList.add('show');if(i>0)P('arrive');var need=r.offsetTop+r.offsetHeight+16-th.clientHeight;if(need>th.scrollTop+2)th.scrollTo({top:need,behavior:SXL.cfg.off?'auto':'smooth'});
@@ -507,6 +517,7 @@ def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
             '<div id="ctl"><button id="gt" title="Settings"><svg width="32" height="32" viewBox="-16 -16 32 32"><g fill="#6a35e8"><circle r="9.5"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(0)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(45)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(90)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(135)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(180)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(225)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(270)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(315)"/></g><circle r="4" fill="#fff"/></svg></button><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button><div id="bgs"></div></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
             +vov_markup(spec)
             +f'<script>{SFX_JS}</script><script>{APP_JS}</script></body></html>')
+    html = re.sub(r'<img (?=[^>]*src="file:///home/claude/work/lesson/art/)', '<img data-z="1" ', html)
     html = inline_assets(html)
     pathlib.Path(out).write_text(html, encoding='utf-8')
     return len(html)
