@@ -37,10 +37,20 @@ drama=chat('Twist · Drama',[
 neighbour=chat('Twist · Neighbour',[
   ('P','My neighbour says: drink beer.'),('N',[YOU,G('c2','shouldn’t'),C('c3','drink beer.')],SB),
   ('P','But my neighbour says…'),('D',[YOU,G('c2','mustn’t'),C('c3','drink alcohol.')],SB),('P','OK. Thank you.')],True)
+from sxl.core import EM
+def mime(text, emoji):
+    return (f'Blah blah… <img src="{EM(emoji)}" style="height:62px;vertical-align:middle;margin:0 6px">'
+            f'<span style="font-weight:700;font-size:36px;color:#6a35e8">({text})</span>')
 gibberish=chat('Twist · Gibberish',[
-  ('P','Blah blah blah…'),('N','Sorry? Where does it hurt?'),('P','Blah… my head!'),
-  ('N',[G('c4','How much'),C('c2','does'),C('c1','it'),C('c3','hurt?')],[('c4','How much'),('c4','When'),('c4','Where')]),('P','Blah… 4!'),
-  ('N',[YOU,G('c2','should'),C('c3','rest.')],SB),('D',[YOU,G('c2','have to'),C('c3','take this medicine.')],HB),('P','OK. Thank you.')],True)
+  ('P',mime('points at head','face_with_head-bandage')),
+  ('N',[G('c1','Your head'),C('c2','hurts?')],[('c1','Your head'),('c1','Your back'),('c1','Your arm')]),
+  ('P',mime('nods','thumbs_up')),
+  ('N',[G('c4','How much'),C('c2','does'),C('c1','it'),C('c3','hurt?')],[('c4','How much'),('c4','When'),('c4','Where')]),
+  ('P',mime('holds up four fingers','raised_hand')),
+  ('N',[C('c3','Four.'),YOU,G('c2','should'),C('c3','rest.')],SB),
+  ('D',[C('c2','Did'),C('c1','you'),C('c2','take'),C('c3','anything?')]),
+  ('P',mime('shakes head','shaking_face')),
+  ('D',[C('c3','No?'),YOU,G('c2','have to'),C('c3','take this medicine.')],HB)],True)
 
 # old 1-based positions; 20 (neighbour twist) and 23 (watch the twist) are replaced by the four twist scripts
 order = [1,2,3, 4,5,6,8,13, 7, 11,9,10,12, 14,15, 16,17,18, 19, 21,22]
@@ -51,6 +61,6 @@ spec += [old[23]]; r2 += [rows[23]]                      # Your twist cards
 spec += new_after_cards
 r2 += [('Twist: Drama','1','OPTIONAL: I’m dying! The nurse asks How much; the doctor calms (don’t have to worry)'),
        ('Twist: Neighbour','1','OPTIONAL: neighbour says drink beer. shouldn’t, then the doctor: mustn’t'),
-       ('Twist: Gibberish','1','OPTIONAL: repair first (Sorry? Where does it hurt?), then the normal questions')]
+       ('Twist: Gibberish','1','OPTIONAL: all gibberish plus mime (brackets). The nurse says what she understood: Your head hurts?')]
 spec += [old[i-1] for i in range(25,31)]; r2 += [rows[i-1] for i in range(25,31)]
 apply(spec, r2)

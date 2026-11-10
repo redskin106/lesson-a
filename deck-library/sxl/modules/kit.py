@@ -65,7 +65,7 @@ def columns(d):
                 o+=stp(f'<div class="a" style="left:{x}px;top:{yy}px;width:{cw}px;display:flex;gap:8px;justify-content:center">'+''.join(ch(a,b,40,'6px 16px') for a,b in r)+'</div>',st,g,pills=True); st+=1
             if c.get('gloss'):
                 gl=c['gloss']; gl=[(gl,None)] if isinstance(gl,str) else gl
-                o+=stp(f'<div class="a" style="left:{x}px;top:872px;width:{cw}px;display:flex;gap:10px;justify-content:center">'+''.join(spill(t,ix,38,'8px 22px' if len(gl)>1 else '8px 32px') for t,ix in gl)+'</div>',st,g)
+                o+=stp(f'<div class="a" style="left:{x}px;top:872px;width:{cw}px;display:flex;gap:10px;justify-content:center">'+''.join(spill(t,ix,38,'8px 22px' if len(gl)>1 else '8px 32px') for t,ix in gl)+'</div>',st,g); st+=1
         return o
     for i,c in enumerate(C):
         x=90+i*(w+gx)
