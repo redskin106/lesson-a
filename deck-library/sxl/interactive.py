@@ -229,6 +229,7 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #nx.on{display:flex;animation:up .5s both}
 #nx.pr svg{animation:nxa .42s ease-out}@keyframes nxa{0%{transform:translateX(0)}40%{transform:translateX(14px)}100%{transform:translateX(0)}}
 body.off #nx.pr svg{animation:none}
+#ck,#rp{display:none!important}
 #nx:not(.on){display:flex;opacity:.3;box-shadow:none}
 """
 
