@@ -37,7 +37,7 @@ def chat_markup(d, sid):
         s, c, bank = C.parts(l); pc = l[3] if len(l) > 3 else None
         left = s in ('N', 'D'); a = EM(av.get(s, AV[s]))
         if isinstance(c, dict):
-            inner = f'<img src="{ART}{c["img"]}" style="height:150px;width:266px;border-radius:30px;background:#fff;object-fit:contain">'; gaps = []
+            inner = f'<img class="zp" src="{ART}{c["img"]}" style="cursor:zoom-in;height:150px;width:266px;border-radius:30px;background:#fff;object-fit:contain">'; gaps = []
         elif isinstance(c, str):
             inner = f'<div style="font-family:O;font-weight:800;font-size:{tz}px;color:#1c1b2e">{c}</div>'; gaps = []
         else:
@@ -48,7 +48,7 @@ def chat_markup(d, sid):
                 else: parts_.append(ch(c_, t, fz, '8px 26px'))
             inner = f'<div style="display:flex;gap:12px;align-items:center;{"flex-wrap:wrap;row-gap:10px" if sp else ""}">' + ''.join(parts_) + '</div>'
         showpic = pc and not sp
-        pimg = (f'<img src="{ART}{pc}" style="height:112px;width:112px;border-radius:26px;margin-left:30px;background:#fff;object-fit:contain">' if showpic else '')
+        pimg = (f'<img class="zp" src="{ART}{pc}" style="cursor:zoom-in;height:112px;width:112px;border-radius:26px;margin-left:30px;background:#fff;object-fit:contain">' if showpic else '')
         hh = f'min-height:{124 if sp else 130}px;height:auto' if sp else f'height:{170 if isinstance(c, dict) else 130}px'
         bub = f'<div class="gl" style="position:static;{hh};border-radius:{62 if sp else (70 if isinstance(c, dict) else 65)}px;display:flex;align-items:center;padding:{"12px 40px" if sp else "0 "+str(18 if (pc or isinstance(c, dict)) else 46)+"px 0 "+str(18 if isinstance(c, dict) else 46)+"px"};{"" if left else "background:rgba(214,190,255,.75);"}">{inner}{pimg}</div>'
         avh = f'<div class="gl" style="position:static;width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff"><img src="{a}" style="width:78px"></div>'
@@ -63,6 +63,7 @@ def chat_markup(d, sid):
         panel = (f'<div class="gl pnl" id="pn-{sid}" style="left:1090px;top:160px;width:770px;height:640px;border-radius:64px;padding:14px;cursor:zoom-in"><img id="pi-{sid}" style="width:100%;height:100%;object-fit:contain;border-radius:50px;background:#fff;opacity:0;transition:opacity .45s;display:block">'
                  '<svg width="54" height="54" viewBox="0 0 54 54" style="position:absolute;right:26px;bottom:26px;opacity:.75"><circle cx="23" cy="23" r="14" fill="rgba(255,255,255,.85)" stroke="#6a35e8" stroke-width="5"/><path d="M33 33L46 46M23 17V29M17 23H29" stroke="#6a35e8" stroke-width="5" stroke-linecap="round"/></svg></div>'
                  f'<div class="zoomv" id="zv-{sid}"><img></div>')
+    if not sp: panel = f'<div class="zoomv" id="zv-{sid}"><img></div>'
     return (header(d['phase'], d.get('title')) +
             f'<div class="thread{" sp" if sp else ""}" id="th-{sid}">{rows}<div style="height:30px;flex-shrink:0"></div></div>' + panel +
             f'<div class="gl bankbar" id="bk-{sid}" style="left:90px;top:896px;width:{1000 if sp else 1740}px;height:100px;border-radius:50px;display:flex;align-items:center;gap:20px;padding:0 40px"></div>'
@@ -322,7 +323,9 @@ var INIT={};
 /* ---- chat: tap-to-fill, auto-scroll, free scroll-back ---- */
  INIT.chat=function(s){
  var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),th=$('#th-'+id),bar=$('#bk-'+id),rows=$$('.row',th),i=-1,pi=$('#pi-'+id),pn=$('#pn-'+id),zv=$('#zv-'+id);
- if(pn){pn.onclick=function(){if(!pi.getAttribute('src'))return;$('img',zv).src=pi.src;zv.classList.add('on');P('pop')};zv.onclick=function(){zv.classList.remove('on');P('tick')}}
+ if(zv)th.addEventListener('click',function(e){var im=e.target.closest('.zp');if(!im)return;$('img',zv).src=im.src;zv.classList.add('on');P('pop')});
+ if(pn)pn.onclick=function(){if(!pi.getAttribute('src'))return;$('img',zv).src=pi.src;zv.classList.add('on');P('pop')};
+ if(zv){zv.onclick=function(){zv.classList.remove('on');P('tick')}}
  function show(r){r.classList.add('show');if(i>0)P('arrive');var need=r.offsetTop+r.offsetHeight+16-th.clientHeight;if(need>th.scrollTop+2)th.scrollTo({top:need,behavior:SXL.cfg.off?'auto':'smooth'});
   if(D.gapn[i]){bar.innerHTML=D.banks[i];bar.style.visibility='visible';bar.__r=r}else{bar.style.visibility='hidden';wait(1100).then(next)}}
  function next(){i++;if(i>=D.n){finish(s);return}var r=rows[i],pp=r.dataset.pic;
