@@ -38,17 +38,27 @@ def cast(d):
 
 @module('verb_pairs')
 def verb_pairs(d):
-    """One picture, then its 'now' pill, then arrow + past pill, one item at a time. The arrow sits midway between the two pills."""
-    R=d['rows']; n=len(R); w=min(400,int((1740-30*(n-1))/n)); gx=int((1740-w*n)/(n-1)) if n>1 else 0
-    x0=90+(1740-(w*n+gx*(n-1)))//2
+    """One picture, then its 'now' pill, then arrow + past pill, one item at a time. kind 'irr' (default): zig-zag orange arrow + legend 'irregular';
+    kind 'reg': straight arrow with a '+ed' pill."""
+    R=d['rows']; n=len(R); kd=d.get('kind','plain'); w=min(360 if kd!='plain' else 400,int((1740-30*(n-1))/n)); gx=int((1740-w*n)/(n-1)) if n>1 else 0
+    x0=90+(1740-(w*n+gx*(n-1)))//2; kind=kd
     fs=max(44,int(w*.17)); nh=int(fs*1.35)+16; ah=64; gp=22
     out=header(d['phase'],d.get('title','Yesterday'),d.get('grad','violet'))
+    ZZ='<svg width="46" height="64" viewBox="0 0 46 64"><path d="M30 4 L14 22 L32 34 L16 50 M6 38 L16 52 L32 40" fill="none" stroke="#ff7a3c" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    ST='<svg width="46" height="64" viewBox="0 0 46 64"><path d="M23 4 L23 52 M7 36 L23 54 L39 36" fill="none" stroke="#9a5cff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    if kind=='plain': pass
+    elif kind=='irr':
+        out+=f'<div class="a gl" style="right:90px;top:50px;height:84px;padding:0 34px 0 22px;border-radius:42px;display:flex;align-items:center;gap:14px;position:absolute"><svg width="34" height="46" viewBox="0 0 46 64"><path d="M30 4 L14 22 L32 34 L16 50 M6 38 L16 52 L32 40" fill="none" stroke="#ff7a3c" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-family:O;font-weight:800;font-size:40px;color:#e0601c">irregular</span></div>'
+    else:
+        out+=f'<div class="a gl" style="right:90px;top:50px;height:84px;padding:0 34px 0 22px;border-radius:42px;display:flex;align-items:center;gap:14px;position:absolute"><span class="chip" style="font-size:40px;padding:2px 22px;border-radius:999px;background:linear-gradient(135deg,#ffb21f,#ff7a3c);color:#fff">+ ed</span><span style="font-family:O;font-weight:800;font-size:40px;color:#6a35e8">regular</span></div>'
     for i,r in enumerate(R):
         x=x0+i*(w+gx); y=190+w+36; b=3*i
         out+=stp(art(x,190,w,w,r['pic'],r=48,label=r['pic'],fit='contain'),b+1)
         out+=stp(f'<div class="a" style="left:{x}px;top:{y}px;width:{w}px;display:flex;justify-content:center">{ch("c2",r["now"],fs,"8px 30px")}</div>',b+2,pills=True)
-        out+=stp(f'<div class="a" style="left:{x}px;top:{y+nh+gp}px;width:{w}px;display:flex;justify-content:center"><svg width="46" height="{ah}" viewBox="0 0 46 64"><path d="M23 4 L23 52 M7 36 L23 54 L39 36" fill="none" stroke="#9a5cff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>',b+3)
-        out+=stp(f'<div class="a" style="left:{x}px;top:{y+nh+gp+ah+gp}px;width:{w}px;display:flex;justify-content:center">{grad_chip("violet",r["then"],int(fs*1.15),"10px 36px")}</div>',b+3,pills=True)
+        arrow=ZZ if kind=='irr' else ST
+        extra=('' if kind!='reg' else f'<span class="chip" style="margin-left:16px;font-size:{int(fs*.62)}px;padding:2px 18px;border-radius:999px;background:linear-gradient(135deg,#ffb21f,#ff7a3c);color:#fff;align-self:center">+ed</span>')
+        out+=stp(f'<div class="a" style="left:{x}px;top:{y+nh+gp}px;width:{w}px;display:flex;justify-content:center;align-items:center">{arrow}{extra}</div>',b+3)
+        out+=stp(f'<div class="a" style="left:{x}px;top:{y+nh+gp+ah+gp}px;width:{w}px;display:flex;justify-content:center">{grad_chip("rose" if kind=="irr" else "violet",r["then"],int(fs*1.15),"10px 36px")}</div>',b+3,pills=True)
     return out
 
 @module('timeline')

@@ -4,6 +4,7 @@ from ..core import *
 def col(x,c,s):
     return (stp(f'<div class="chip" style="position:absolute;left:{x}px;top:176px;font-size:40px;padding:10px 40px;border-radius:999px;background:{GRAD.get(c["grad"],c["grad"])}">{c["label"]}</div>',s)
       +stp(pic(x,252,840,440,c['pic'],48,fit=c.get('fit','cover')),s)
+      +(stp(f'<div class="a" style="left:{x+840-132}px;top:{252+18}px;width:104px;height:104px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:76px;color:#fff;background:linear-gradient(135deg,#17b890,#2fd0f0);box-shadow:0 8px 22px rgba(20,120,140,.35);border:5px solid #fff">?</div>',s) if c.get('qmark') else '')
       +stp(f'<div class="a" style="left:{x}px;top:722px;width:840px;display:flex;flex-wrap:wrap;gap:14px 12px">'+chips(c['chips'],50,'8px 28px')+'</div>',s+1,pills=True)
       +(stp(f'<div class="a" style="left:{x}px;top:930px">{spill(c["cap"],c.get("sc"),42,"8px 34px")}</div>',s+1) if c.get('cap') else ''))
 @module('contrast')

@@ -300,11 +300,11 @@ def rules(d):
     o=header(d['phase'])+f'<div class="a h" style="left:90px;top:130px;font-size:68px">{d.get("title","Three little rules")}</div>'
     nr=len(d['rows'])
     for k,(cs,g) in enumerate(d['rows']):
-        y=230+k*200
+        pitch=200 if nr<4 else 168; rh=170 if nr<4 else 146; y=222+k*pitch
         body=''.join(f'<div style="display:flex;flex-direction:column;align-items:center;gap:6px">{ch(c,t,48,"8px 24px")}<span style="font-family:O;font-weight:800;font-size:34px;color:#7b3cf0">{l}</span></div>' for c,t,l in cs)
-        o+=stp(f'<div class="gl" style="left:90px;top:{y}px;width:1500px;height:170px;border-radius:70px;display:flex;align-items:center;gap:18px;padding:0 44px">{body}<span style="margin-left:auto">{spill(g,None,40,"8px 30px")}</span></div>',k+1,pills=True)
+        o+=stp(f'<div class="gl" style="left:90px;top:{y}px;width:1500px;height:{rh}px;border-radius:70px;display:flex;align-items:center;gap:18px;padding:0 44px">{body}<span style="margin-left:auto">{spill(g,None,40,"8px 30px")}</span></div>',k+1,pills=True)
     key=[('c1','S','Subject'),('c2','V','Verb'),('c3','O','Object'),('c4','B','because')]
-    o+='<div class="gl" style="left:90px;top:850px;width:1500px;height:110px;border-radius:55px;display:flex;align-items:center;justify-content:center;gap:34px">'+''.join(f'<div style="display:flex;align-items:center;gap:10px">{ch(c,l,36,"4px 20px")}<span style="font-family:O;font-weight:700;font-size:34px;color:#4a3a8a">{t}</span></div>' for c,l,t in key)+'</div>'
+    o+=f'<div class="gl" style="left:90px;top:{890 if nr>=4 else 850}px;width:1500px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;gap:34px">'+''.join(f'<div style="display:flex;align-items:center;gap:10px">{ch(c,l,36,"4px 20px")}<span style="font-family:O;font-weight:700;font-size:34px;color:#4a3a8a">{t}</span></div>' for c,l,t in key)+'</div>'
     if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1640px;top:300px;width:230px;{sh()}">',nr)
     return o
 
@@ -326,6 +326,7 @@ def timer(d):
       +f'<div class="a" style="left:90px;top:230px;width:1740px;display:flex;gap:60px;justify-content:center">{icons}</div>'
       +f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:440px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:330px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>'
       +f'<div class="a tstart" style="left:860px;top:830px;width:200px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="56" height="56" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>'
+      +''.join(f'<div class="a tadj" data-d="{dd}" style="left:{xx}px;top:840px;width:150px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.85);border:4px solid #fff;color:#6a35e8;font-family:O;font-weight:800;font-size:46px;box-shadow:0 8px 20px rgba(80,60,160,.16);cursor:pointer;user-select:none">{tt}</div>' for dd,xx,tt in (('-60',660,'− 1 min'),('60',1110,'+ 1 min')))
       +(f'<div class="a mu" style="left:90px;top:730px;width:1740px;text-align:center;font-size:44px">{d["note"]}</div>' if d.get('note') else ''))
 
 ARROW='<svg width="200" height="120" viewBox="0 0 200 120"><defs><linearGradient id="ar" x1="0" x2="1"><stop offset="0" stop-color="#7b3cf0"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient></defs><path d="M20 60H165M122 22L168 60L122 98" fill="none" stroke="url(#ar)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></svg>'
@@ -421,17 +422,29 @@ def connect(d): return connect_html(d,'x')
 
 @module('make_patient')
 def make_patient(d):
-    """Groups invent a patient: pick a pain and a secret cause from picture banks, then fill the handover frame.
-    {'phase':'ACTIVATE','title':'Make a patient','pains':[files],'causes':[files],'frame':[[chips],[chips]]}"""
+    """Groups invent a patient: tap a pain, tap a secret cause; the words fill the handover frame.
+    {'pains':[(file,'stomach')],'causes':[(file,'eat','spicy food','ate')]}"""
     out=header(d['phase'],d.get('title','Make a patient'),'violet')
-    P=d['pains']; C=d['causes']; COL={'c1':'#34d0f2','c2':'#9a5cff','c3':'#ff7a3c','c4':'#ffb21f'}
-    out+=stp(f'<div class="a" style="left:90px;top:158px">{ch("c4","Where does it hurt?",54,"6px 34px")}</div>',1,'p')
+    P=d['pains']; C=d['causes']
+    out+=stp(f'<div class="a" style="left:90px;top:146px">{ch("c4","Where does it hurt?",50,"4px 32px")}</div>',1,'p')
     w=int((1740-3*40)/4)
-    for k,f in enumerate(P): out+=stp(art(90+k*(w+40),240,w,230,f,r=44,label=f,fit='contain'),1,'p')
-    out+=stp(f'<div class="a" style="left:90px;top:488px">{ch("c4","Why?",54,"6px 34px")}</div>',2,'c')
+    for k,(f,lab) in enumerate(P):
+        card=art(90+k*(w+40),222,w,196,f,r=44,label=f,fit='contain').replace('<div class="gl"','<div class="gl pkc" data-grp="p" data-v="'+lab+'"',1)
+        out+=stp(card,1,'p')
+    out+=stp(f'<div class="a" style="left:90px;top:436px">{ch("c4","Why?",50,"4px 32px")}</div>',2,'c')
     w2=int((1740-4*30)/5)
-    for k,f in enumerate(C): out+=stp(art(90+k*(w2+30),570,w2,230,f,r=44,label=f,fit='contain'),2,'c')
-    out+=stp('<div class="gl" style="left:90px;top:826px;width:1740px;height:170px;border-radius:72px"></div>',3,'f')
-    for r,row in enumerate(d.get('frame',[])):
-        out+=stp(f'<div class="a" style="left:150px;top:{840+r*72}px;display:flex;gap:14px;align-items:center">'+''.join(ch(c,t,40,'2px 22px') if t else gap(COL[c],150,'…',h=56,fs=34) for c,t in row)+'</div>',3,'f')
+    for k,(f,v,o,pst) in enumerate(C):
+        card=art(90+k*(w2+30),512,w2,196,f,r=44,label=f,fit='contain').replace('<div class="gl"','<div class="gl pkc" data-grp="c" data-v="'+v+'|'+o+'|'+pst+'"',1)
+        out+=stp(card,2,'c')
+    def slot(key,col,w_,h_,fs_): return f'<span class="fs" data-slot="{key}"><span class="op">{gap(col,w_,"…",h=h_,fs=fs_)}</span><span class="fl" style="display:none">{ch(col2cls[col],"x",40,"2px 22px")}</span></span>'
+    col2cls={'#34d0f2':'c1','#9a5cff':'c2','#ff7a3c':'c3'}
+    rows=[
+      [ch('c1','His',40,'2px 22px'),slot('p0','#34d0f2',190,56,32),ch('c2','hurts.',40,'2px 22px')],
+      [ch('c2','Did',40,'2px 22px'),ch('c1','he',40,'2px 22px'),slot('c0','#9a5cff',130,56,32),slot('c1','#ff7a3c',240,56,32)],
+      [ch('c4','Because',40,'2px 22px'),ch('c1','he',40,'2px 22px'),slot('c3','#9a5cff',130,56,32),slot('c1b','#ff7a3c',220,56,32)]]
+    fy=736
+    fr='<div class="gl" style="left:90px;top:%dpx;width:1560px;height:%dpx;border-radius:64px"></div>'%(fy,236)
+    out+=stp(fr,3,'f')
+    for r,row in enumerate(rows):
+        out+=stp(f'<div class="a" style="left:150px;top:{fy+18+r*72}px;display:flex;gap:14px;align-items:center">'+''.join(row)+'</div>',3,'f')
     return out

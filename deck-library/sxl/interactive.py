@@ -31,33 +31,41 @@ def inline_assets(html):
 
 # ---------- slide builders (markup identical to static modules; behaviour via data-* hooks) ----------
 def chat_markup(d, sid):
-    L = d['lines']; av = d.get('avatars', {}); data = []; rows = ''
+    L = d['lines']; av = d.get('avatars', {}); data = []; rows = ''; sp = bool(d.get('split'))
+    fz = 40 if sp else 46; tz = 44 if sp else 52
     for i, l in enumerate(L):
         s, c, bank = C.parts(l); pc = l[3] if len(l) > 3 else None
         left = s in ('N', 'D'); a = EM(av.get(s, AV[s]))
         if isinstance(c, dict):
-            inner = f'<img src="{ART}{c["img"]}" style="height:150px;width:266px;border-radius:30px;background:#fff;object-fit:contain">'; gaps = []; pc = 'x' if False else pc
+            inner = f'<img src="{ART}{c["img"]}" style="height:150px;width:266px;border-radius:30px;background:#fff;object-fit:contain">'; gaps = []
         elif isinstance(c, str):
-            inner = f'<div style="font-family:O;font-weight:800;font-size:52px;color:#1c1b2e">{c}</div>'; gaps = []
+            inner = f'<div style="font-family:O;font-weight:800;font-size:{tz}px;color:#1c1b2e">{c}</div>'; gaps = []
         else:
             parts_ = []; gaps = []
             for c_, t, g in c:
                 if g:
-                    gaps.append([c_, t]); parts_.append(f'<span class="gp" data-c="{c_}" data-t="{t}"><span class="op">{gapchip(c_, t)}</span><span class="fl" style="display:none">{ch(c_, t, 46, "8px 26px")}</span></span>')
-                else: parts_.append(ch(c_, t, 46, '8px 26px'))
-            inner = '<div style="display:flex;gap:12px;align-items:center">' + ''.join(parts_) + '</div>'
-        pimg = (f'<img src="{ART}{pc}" style="height:112px;width:112px;border-radius:26px;margin-left:30px;background:#fff;object-fit:contain">' if pc else '')
-        bub = f'<div class="gl" style="position:static;height:{170 if isinstance(c, dict) else 130}px;border-radius:{70 if isinstance(c, dict) else 65}px;display:flex;align-items:center;padding:0 {18 if (pc or isinstance(c, dict)) else 46}px 0 {18 if isinstance(c, dict) else 46}px;{"" if left else "background:rgba(214,190,255,.75);"}">{inner}{pimg}</div>'
+                    gaps.append([c_, t]); parts_.append(f'<span class="gp" data-c="{c_}" data-t="{t}"><span class="op">{gapchip(c_, t)}</span><span class="fl" style="display:none">{ch(c_, t, fz, "8px 26px")}</span></span>')
+                else: parts_.append(ch(c_, t, fz, '8px 26px'))
+            inner = f'<div style="display:flex;gap:12px;align-items:center;{"flex-wrap:wrap;row-gap:10px" if sp else ""}">' + ''.join(parts_) + '</div>'
+        showpic = pc and not sp
+        pimg = (f'<img src="{ART}{pc}" style="height:112px;width:112px;border-radius:26px;margin-left:30px;background:#fff;object-fit:contain">' if showpic else '')
+        hh = f'min-height:{124 if sp else 130}px;height:auto' if sp else f'height:{170 if isinstance(c, dict) else 130}px'
+        bub = f'<div class="gl" style="position:static;{hh};border-radius:{62 if sp else (70 if isinstance(c, dict) else 65)}px;display:flex;align-items:center;padding:{"12px 40px" if sp else "0 "+str(18 if (pc or isinstance(c, dict)) else 46)+"px 0 "+str(18 if isinstance(c, dict) else 46)+"px"};{"" if left else "background:rgba(214,190,255,.75);"}">{inner}{pimg}</div>'
         avh = f'<div class="gl" style="position:static;width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff"><img src="{a}" style="width:78px"></div>'
-        rows += f'<div class="row" data-i="{i}" style="align-self:{"flex-start" if left else "flex-end"};display:none;align-items:center;gap:22px;{"" if left else "flex-direction:row-reverse"}">{avh}{bub}</div>'
+        rows += f'<div class="row" data-i="{i}"{(" data-pic=" + chr(34) + ART + pc + chr(34)) if (sp and pc) else ""} style="align-self:{"flex-start" if left else "flex-end"};display:none;align-items:center;gap:22px;{"" if left else "flex-direction:row-reverse"}">{avh}{bub}</div>'
         bk = bank or d.get('bank') if gaps else None
         data.append({'gaps': gaps, 'bank': [[a_, b_] for a_, b_ in (bk or [])]})
     bankhtml = {}
     for i, x in enumerate(data):
-        bankhtml[i] = ''.join(f'<button class="bk" data-c="{c_}" data-t="{t}">{ch(c_, t, 46, "8px 26px")}</button>' for c_, t in x['bank'])
+        bankhtml[i] = ''.join(f'<button class="bk" data-c="{c_}" data-t="{t}">{ch(c_, t, fz, "8px 26px")}</button>' for c_, t in x['bank'])
+    panel = ''
+    if sp:
+        panel = (f'<div class="gl pnl" id="pn-{sid}" style="left:1090px;top:160px;width:770px;height:640px;border-radius:64px;padding:14px;cursor:zoom-in"><img id="pi-{sid}" style="width:100%;height:100%;object-fit:contain;border-radius:50px;background:#fff;opacity:0;transition:opacity .45s;display:block">'
+                 '<svg width="54" height="54" viewBox="0 0 54 54" style="position:absolute;right:26px;bottom:26px;opacity:.75"><circle cx="23" cy="23" r="14" fill="rgba(255,255,255,.85)" stroke="#6a35e8" stroke-width="5"/><path d="M33 33L46 46M23 17V29M17 23H29" stroke="#6a35e8" stroke-width="5" stroke-linecap="round"/></svg></div>'
+                 f'<div class="zoomv" id="zv-{sid}"><img></div>')
     return (header(d['phase'], d.get('title')) +
-            f'<div class="thread" id="th-{sid}">{rows}<div style="height:30px;flex-shrink:0"></div></div>'
-            f'<div class="gl bankbar" id="bk-{sid}" style="left:90px;top:896px;width:1740px;height:100px;border-radius:50px;display:flex;align-items:center;gap:20px;padding:0 40px"></div>'
+            f'<div class="thread{" sp" if sp else ""}" id="th-{sid}">{rows}<div style="height:30px;flex-shrink:0"></div></div>' + panel +
+            f'<div class="gl bankbar" id="bk-{sid}" style="left:90px;top:896px;width:{1000 if sp else 1740}px;height:100px;border-radius:50px;display:flex;align-items:center;gap:20px;padding:0 40px"></div>'
             f'<script type="application/json" id="d-{sid}">{json.dumps({"banks": bankhtml, "n": len(L), "gapn": [len(x["gaps"]) for x in data]})}</script>')
 
 def tintch(html, word):
@@ -142,7 +150,7 @@ def fib_markup(d, sid):
 
 def pick_markup(d, sid):
     from .modules.kit import pick_html
-    return pick_html(d, True) + f'<script type="application/json" id="d-{sid}">{json.dumps({"ok": d["ok"]})}</script>'
+    return pick_html(d, True) + f'<script type="application/json" id="d-{sid}">{json.dumps({"ok": d["ok"], "steps": bool(d.get("steps"))})}</script>'
 
 def connect_markup(d, sid):
     from .modules.kit import connect_html
@@ -168,16 +176,17 @@ def build_markup(d, sid):
     return out + f'<script type="application/json" id="d-{sid}">{json.dumps({"n": len(parts)})}</script>'
 
 def spot_markup(d, sid):
-    out = header(d['phase'], d.get('title', 'Find the mistakes'), 'violet'); L = d['lines']; y = 190; n_bad = 0
+    out = header(d['phase'], d.get('title', 'Find the mistakes'), 'violet'); L = d['lines']; n_bad = 0; big = len(L) <= 5
+    y = 190 if big else 150; pitch = 200 if big else 122; bh = 150 if big else 104; fsz = 58 if big else 46; avs = 130 if big else 104
     for k, (side, chips_) in enumerate(L):
         bad = any(len(c) > 2 for c in chips_); n_bad += bad
-        inner = ''.join((f'<span class="spc" data-fix="{c[2]}">' if len(c) > 2 else '<span class="spc">') + ch(c[0], c[1], 58, '8px 30px') + '</span>' for c in chips_)
+        inner = ''.join((f'<span class="spc" data-fix="{c[2]}">' if len(c) > 2 else '<span class="spc">') + ch(c[0], c[1], fsz, '6px 26px' if not big else '8px 30px') + '</span>' for c in chips_)
         left = side in ('N', 'D'); a = EM(AV[side]) if side in AV else EM('woman_health_worker')
         side_css = 'left:90px;' if left else 'right:90px;'
         out += (f'<div class="a sp" data-bad="{1 if bad else 0}" style="{side_css}top:{y}px;display:flex;align-items:center;gap:26px;cursor:pointer">'
-                f'<div class="gl" style="position:static;width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff"><img src="{a}" style="width:92px"></div>'
-                f'<div class="gl spb" style="position:static;height:150px;border-radius:75px;display:flex;align-items:center;gap:14px;padding:0 46px">{inner}</div></div>')
-        y += 200
+                f'<div class="gl" style="position:static;width:{avs}px;height:{avs}px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff"><img src="{a}" style="width:{int(avs*.7)}px"></div>'
+                f'<div class="gl spb" style="position:static;height:{bh}px;border-radius:{bh//2}px;display:flex;align-items:center;gap:14px;padding:0 46px">{inner}</div></div>')
+        y += pitch
     marks = ''.join(f'<img class="spm" src="{EM("cross_mark")}" data-ok="{EM("check_mark_button")}" style="width:84px">' for _ in range(n_bad))
     out += f'<div class="a" style="right:90px;top:56px;display:flex;gap:16px" id="spm-{sid}">{marks}</div>'
     return out + f'<script type="application/json" id="d-{sid}">{json.dumps({"n": n_bad})}</script>'
@@ -191,7 +200,7 @@ CSS_EXTRA = """.cn{position:absolute;width:480px;height:180px;border-radius:50px
 .cd{fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:cdr var(--du,.45s) var(--dl,.05s) ease-out forwards}@keyframes cdr{to{stroke-dashoffset:0}}
 .cn.okp{animation:cok .6s}@keyframes cok{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .cfull{transition:opacity .4s}
-.pk{border:0;background:none;padding:0;cursor:pointer;transition:transform .2s,opacity .3s}.pk:hover{transform:translateY(-4px)}.pk.off{opacity:.32;transform:none}.pk.pickd{transform:scale(1.04);filter:drop-shadow(0 0 28px rgba(79,207,122,.8))}
+.pk{border:0;background:none;padding:0;cursor:pointer;transition:transform .2s,opacity .3s}.pk.hid{opacity:0;transform:translateY(26px) scale(.95);pointer-events:none}.pk:hover{transform:translateY(-4px)}.pk.off{opacity:.32;transform:none}.pk.pickd{transform:scale(1.04);filter:drop-shadow(0 0 28px rgba(79,207,122,.8))}
 .vplay{width:132px;height:132px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#ff4fa3);box-shadow:0 14px 28px rgba(106,53,232,.4),inset 0 2px 0 rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;padding:0 0 0 8px;margin-top:6px;transition:transform .15s}
 .vplay:active{transform:scale(.92)}
 #vov{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(28,20,70,.62);backdrop-filter:blur(8px)}
@@ -205,7 +214,7 @@ body{width:100%!important;height:100%!important}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
 .sl{position:absolute;inset:0;display:none;overflow:hidden}.sl.on{display:block}
 .thread{position:absolute;left:40px;top:122px;width:1840px;height:768px;overflow-y:auto;display:flex;flex-direction:column;gap:48px;scrollbar-width:thin;scrollbar-color:#b9a6f5 transparent;padding:52px 58px 12px;box-sizing:border-box;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%)}
-.row:first-child{margin-top:auto}
+.row:first-child{margin-top:auto}.thread.sp{left:20px;width:1050px;height:768px;padding:52px 20px 12px 70px}.zoomv{position:absolute;left:0;top:0;width:1920px;height:1080px;background:rgba(24,12,60,.62);z-index:60;display:none;align-items:center;justify-content:center;cursor:zoom-out}.zoomv.on{display:flex}.zoomv img{width:1740px;height:980px;object-fit:contain;background:#fff;border-radius:64px;box-shadow:0 30px 90px rgba(0,0,0,.4)}
 .row.show{display:flex!important;animation:up .5s cubic-bezier(.2,.9,.3,1.2) both}
 @keyframes up{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
 button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -237,6 +246,7 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .bk{touch-action:none}.bk.ghost{opacity:.3}.bk.drag{position:absolute;z-index:60;pointer-events:none;transform:scale(1.12) rotate(-3deg);filter:drop-shadow(0 18px 22px rgba(40,20,90,.35));transition:none}.bk.drag.back{transition:left .35s cubic-bezier(.3,1.4,.5,1),top .35s cubic-bezier(.3,1.4,.5,1)}
 .cbt{transition:transform .25s}.cbt.sel{transform:translateY(-8px) scale(1.04);filter:drop-shadow(0 0 0 #9a5cff)}.cbt.sel>div:first-child,.cbt.sel>div:first-of-type{box-shadow:0 0 0 8px #9a5cff,0 14px 30px rgba(106,53,232,.4)}.cbp,.dpp{transition:opacity .35s}.dlr{transition:transform .25s}.dlr.sel{transform:scale(1.015)}.dpb{transition:transform .3s}.dpb.sel{transform:scale(1.18) translateY(-6px)}.dpb.sel .dpc{border-color:#9a5cff!important;box-shadow:0 0 0 6px rgba(154,92,255,.35),0 14px 30px rgba(106,53,232,.4)!important}
 .gsel{position:absolute;top:70px;z-index:5;width:76px;height:76px;border-radius:50%;background:rgba(255,255,255,.7);font:800 38px O;color:#6a35e8;display:flex;align-items:center;justify-content:center;cursor:pointer}.gsel.sel{background:linear-gradient(135deg,#9a5cff,#6a35e8);color:#fff}.gslab{position:absolute;top:84px;font:700 26px O;color:#4a5a7a;letter-spacing:.12em}
+.pkc.pksel{outline:6px solid #7b3cf0;outline-offset:2px;transform:scale(1.03)}.pkc.pkdim{opacity:.4}.pkc{transition:opacity .3s,transform .2s}.fs .fl.pp{animation:fpp .5s}@keyframes fpp{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
 .gp.hov{box-shadow:0 0 0 6px rgba(154,92,255,.6);border-radius:30px}
 .gl.hov{box-shadow:0 0 0 6px rgba(154,92,255,.55),0 0 40px rgba(154,92,255,.5)}
 .rp.react{animation:react .8s}@keyframes react{25%{transform:scale(1.14) rotate(-3deg)}55%{transform:scale(.97) rotate(2deg)}100%{transform:none}}
@@ -244,7 +254,7 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #nx.on{display:flex;animation:up .5s both}
 #nx.pr svg{animation:nxa .42s ease-out}@keyframes nxa{0%{transform:translateX(0)}40%{transform:translateX(14px)}100%{transform:translateX(0)}}
 body.off #nx.pr svg{animation:none}
-#gt{width:52px;height:52px;padding:0!important;font-size:30px!important;line-height:1;opacity:.45;transition:opacity .2s}#gt:hover,#ctl.open #gt{opacity:1}#ctl>*:not(#gt){display:none!important}#ctl.open>#sf,#ctl.open>#mo{display:block!important}#ctl.open>#bgs{display:flex!important}
+#gt{width:52px;height:52px;padding:0!important;display:flex;align-items:center;justify-content:center;opacity:.45;transition:opacity .2s}#gt:hover,#ctl.open #gt{opacity:1}#ctl>*:not(#gt){display:none!important}#ctl.open>#sf,#ctl.open>#mo{display:block!important}#ctl.open>#bgs{display:flex!important}
 #bgs{display:flex;gap:10px;align-items:center;padding:0 6px}#bgs i{width:34px;height:34px;border-radius:50%;border:4px solid #fff;box-shadow:0 6px 16px rgba(80,60,160,.25);cursor:pointer;transition:transform .2s}#bgs i.on{transform:scale(1.25);border-color:#6a35e8}
 body[data-bg=white] .sl:not(.night){background:#fafbff}body[data-bg=white] .sl .orb{opacity:.14}
 body[data-bg=sunset] .sl{background:linear-gradient(135deg,#ffc27a,#ff8fa3 50%,#c98bff)}body[data-bg=sunset] .sl .orb{display:none}
@@ -310,10 +320,13 @@ function wrong(el){P('boop');el.classList.remove('shake');void el.offsetWidth;el
 function put(slotEl){$('.op',slotEl).style.display='none';var f=$('.fl',slotEl);f.style.display='inline-block';f.classList.add('mo');P('pop');setTimeout(function(){P('tick')},90)}
 var INIT={};
 /* ---- chat: tap-to-fill, auto-scroll, free scroll-back ---- */
-INIT.chat=function(s){
- var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),th=$('#th-'+id),bar=$('#bk-'+id),rows=$$('.row',th),i=-1;
- function next(){i++;if(i>=D.n){finish(s);return}var r=rows[i];r.classList.add('show');if(i>0)P('arrive');var need=r.offsetTop+r.offsetHeight+16-th.clientHeight;if(need>th.scrollTop+2)th.scrollTo({top:need,behavior:SXL.cfg.off?'auto':'smooth'});
+ INIT.chat=function(s){
+ var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),th=$('#th-'+id),bar=$('#bk-'+id),rows=$$('.row',th),i=-1,pi=$('#pi-'+id),pn=$('#pn-'+id),zv=$('#zv-'+id);
+ if(pn){pn.onclick=function(){if(!pi.getAttribute('src'))return;$('img',zv).src=pi.src;zv.classList.add('on');P('pop')};zv.onclick=function(){zv.classList.remove('on');P('tick')}}
+ function show(r){r.classList.add('show');if(i>0)P('arrive');var need=r.offsetTop+r.offsetHeight+16-th.clientHeight;if(need>th.scrollTop+2)th.scrollTo({top:need,behavior:SXL.cfg.off?'auto':'smooth'});
   if(D.gapn[i]){bar.innerHTML=D.banks[i];bar.style.visibility='visible';bar.__r=r}else{bar.style.visibility='hidden';wait(1100).then(next)}}
+ function next(){i++;if(i>=D.n){finish(s);return}var r=rows[i],pp=r.dataset.pic;
+  if(pp&&pi&&pi.dataset.cur!==pp){pi.dataset.cur=pp;pi.style.opacity=0;bar.style.visibility='hidden';wait(320).then(function(){pi.src=pp;pi.style.opacity=1;P('pop')});wait(1250).then(function(){show(r)})}else show(r)}
  bar.onclick=function(e){var b=e.target.closest('.bk');if(!b||!bar.__r)return;var g=$$('.gp',bar.__r).filter(function(x){return !x.__f})[0];if(!g)return;
   if(b.dataset.t===g.dataset.t&&b.dataset.c===g.dataset.c){g.__f=1;put(g);b.classList.add('used');if(!$$('.gp',bar.__r).some(function(x){return !x.__f})){bar.__r=null;wait(900).then(next)}}else wrong(b)};
  /* drag and react (tap still works) */
@@ -430,7 +443,10 @@ INIT.connect=function(s){
   if(L[0]&&L[1]&&L[2]){done++;var fl=$('.fl[data-id="'+id+'"]',full);fl.style.opacity=1;$$('.chip',fl).forEach(function(c){c.classList.add('mo')});full.style.opacity=1;P('good');if(done===D.n)finish(s)}}
 };
 INIT.pick=function(s){
- var ok=JSON.parse($('#d-'+s.dataset.id).textContent).ok,bs=$$('.pk',s),done=0;
+ var PD=JSON.parse($('#d-'+s.dataset.id).textContent),ok=PD.ok,bs=$$('.pk',s),done=0,shown=!PD.steps;
+ if(PD.steps){bs.forEach(function(b){b.classList.add('hid')});$('#nx').classList.add('on')}
+ s.__adv=function(){if(shown)return false;shown=true;bs.forEach(function(b,k){setTimeout(function(){b.classList.remove('hid');P(k%2?'tick':'pop')},k*260)});if(!done)$('#nx').classList.remove('on');return true};
+ s.addEventListener('click',function(e){if(!e.target.closest('.pk'))s.__adv()});
  bs.forEach(function(b){b.onclick=function(){if(done)return;if(+b.dataset.i===ok){done=1;bs.forEach(function(x){if(x!==b)x.classList.add('off')});b.classList.add('ok','pickd');var sy=$('.psay',s);if(sy)sy.style.opacity=1;P('pop');setTimeout(function(){P('tick')},90);finish(s)}else{b.classList.add('off');wrong(b)}}})};
 /* ---- true or a fib: tick or cross under each sentence ---- */
 INIT.spot_fib=function(s){
@@ -448,7 +464,7 @@ INIT.view=function(s){
   s.__adv=function(){if(ix>mx)return false;var g=0;stp.forEach(function(e){if(+e.dataset.s===ix){e.classList.remove('sh');g=Math.max(g,+(e.dataset.g||0));if(e.dataset.pills){var cs=$$('.chip',e);cs.forEach(function(c,j){setTimeout(function(){c.classList.remove('pin');c.classList.add('pp');P(j%2?'tick':'pop')},260*j+150)})}}});
    if(ix===mx){stp.forEach(function(e){e.classList.remove('dim')})}else if(g){stp.forEach(function(e){if(e.dataset.g&&+e.dataset.g<g)e.classList.add('dim')})}
    if(ix===1)P('open');else if(!stp.some(function(e){return +e.dataset.s===ix&&e.dataset.pills}))P('pop');ix++;if(ix>mx)P('good');return true};
-  s.addEventListener('click',function(e){if(e.target.closest('.tstart,.spinbtn,.dstop,.vplay'))return;s.__adv()});}
+  s.addEventListener('click',function(e){if(e.target.closest('.tstart,.tadj,.pkc,.spinbtn,.dstop,.vplay'))return;s.__adv()});}
  var kids=$$(':scope > *',s).filter(function(e){return !e.hasAttribute('data-s')&&!e.classList.contains('orb')&&!e.querySelector('.tag')&&!e.classList.contains('tag')&&e.tagName!=='SCRIPT'});
  var skip=false;kids.forEach(function(k){k.classList.add('vh')});
  var i=0;function step(){if(i>=kids.length){s.__done=1;wait(300).then(function(){if(cur<slides.length-1)$('#nx').classList.add('on')});return}
@@ -459,7 +475,11 @@ INIT.view=function(s){
  var nr=$$('.sr',s).length;if(nr){var lb=document.createElement('div');lb.className='gslab';lb.style.left='640px';lb.textContent='GROUPS';s.appendChild(lb);for(var q=2;q<=nr;q++){var gb=document.createElement('div');gb.className='gsel'+(q===nr?' sel':'');gb.dataset.n=q;gb.textContent=q;gb.style.left=(790+(q-2)*96)+'px';s.appendChild(gb)}}
  var gs=$$('.gsel',s);gs.forEach(function(g){g.onclick=function(e){e.stopPropagation();var n=+g.dataset.n;gs.forEach(function(x){x.classList.toggle('sel',x===g)});$$('.sr',s).forEach(function(r){r.style.display=(+r.dataset.k<n)?'flex':'none'});P('tick')}});
  var sp=$('.spinbtn',s);if(sp){sp.style.cursor='pointer';sp.onclick=function(){if(sp.__d)return;sp.__d=1;var n=0,iv=setInterval(function(){P('tick');if(++n>8){clearInterval(iv);$$('.reelp,.reelc',s).forEach(function(r){if(r.dataset.real)r.innerHTML=r.dataset.real});$$('img',s).forEach(function(im){if(im.style.filter&&im.style.filter.indexOf('blur')>-1){im.style.filter='none';im.style.opacity=1;im.style.transform='none'}});P('good')}},110)}}
- var ts=$('.tstart',s);if(ts){var tc=$('.tclock',s),left=+tc.dataset.sec,iv2=null;ts.onclick=function(){if(iv2){clearInterval(iv2);iv2=null;return}P('tick');iv2=setInterval(function(){left--;tc.innerHTML='<span class="grad">'+Math.floor(left/60)+':'+('0'+left%60).slice(-2)+'</span>';if(left<=0){clearInterval(iv2);iv2=null;P('done');tc.classList.add('tp')}},1000)}}
+
+ $$('.pkc',s).forEach(function(c){c.style.cursor='pointer';c.onclick=function(e){e.stopPropagation();var g=c.dataset.grp;$$('.pkc[data-grp="'+g+'"]',s).forEach(function(x){x.classList.toggle('pksel',x===c);x.classList.toggle('pkdim',x!==c)});
+  function put_(k,txt){var sl=$('[data-slot="'+k+'"]',s);if(!sl)return;$('.op',sl).style.display='none';var f=$('.fl',sl);f.style.display='';var ch=$('.chip',f);if(ch)ch.textContent=txt;f.classList.remove('pp');void f.offsetWidth;f.classList.add('pp')}
+  var v=c.dataset.v.split('|');if(g==='p'){put_('p0',v[0])}else{put_('c0',v[0]);put_('c1',v[1]+'?');put_('c3',v[2]);put_('c1b',v[1]+'.')}P('pop');setTimeout(function(){P('tick')},90)}});
+ var ts=$('.tstart',s);if(ts){var tc=$('.tclock',s),left=+tc.dataset.sec,iv2=null;var tshow=function(){tc.innerHTML='<span class="grad">'+Math.floor(left/60)+':'+('0'+left%60).slice(-2)+'</span>'};$$('.tadj',s).forEach(function(b){b.onclick=function(e){e.stopPropagation();left=Math.max(60,left+(+b.dataset.d));tc.classList.remove('tp');tshow();P('tick')}});ts.onclick=function(){if(iv2){clearInterval(iv2);iv2=null;return}P('tick');iv2=setInterval(function(){left--;tshow();if(left<=0){clearInterval(iv2);iv2=null;P('done');tc.classList.add('tp')}},1000)}}
  $$('.dstop',s).forEach(function(d){d.style.cursor='pointer';d.onclick=function(e){e.stopPropagation();d.classList.remove('tp');void d.offsetWidth;d.classList.add('tp');P('pop')}});
 };
 go(0);
@@ -480,7 +500,7 @@ def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
         secs += f'<section class="sl{" night" if night else ""}" data-ph="{"night" if night else (ph_ or "")}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}" data-min="{d.get("min",0)}" data-label="{d.get("label",d.get("title") or d["m"])}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
     html = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>'
             f'<style>{css("day")}{CSS_EXTRA}</style></head><body><div id="stage">{secs}</div>'
-            '<div id="ctl"><button id="gt" title="Settings">&#9881;</button><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button><div id="bgs"></div></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
+            '<div id="ctl"><button id="gt" title="Settings"><svg width="32" height="32" viewBox="-16 -16 32 32"><g fill="#6a35e8"><circle r="9.5"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(0)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(45)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(90)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(135)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(180)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(225)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(270)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(315)"/></g><circle r="4" fill="#fff"/></svg></button><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button><div id="bgs"></div></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
             +vov_markup(spec)
             +f'<script>{SFX_JS}</script><script>{APP_JS}</script></body></html>')
     html = inline_assets(html)
