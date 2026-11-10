@@ -321,13 +321,14 @@ PAL['RECAP']=PAL['EXIT']=PAL['ENGAGE']
 def timer(d):
     """Activity slide with a visible countdown. {'phase':'ACTIVATE','title':'Group practice','min':8,'icons':['face_with_thermometer',..],'note':'Everyone speaks at once'}"""
     sec=int(d.get('min',3)*60); icons=''.join(f'<img src="{EM(e)}" style="width:190px;{sh()}">' for e in d.get('icons',['stopwatch']))
+    if d.get('pics'): icons=''.join(pic(0,0,300,169,f,34).replace('style="left:0px;top:0px;','style="position:relative;flex-shrink:0;',1) for f in d['pics'])
     return (header(d['phase'],d['title'],d.get('rg','violet'))
       +'<div class="gl" style="left:90px;top:168px;width:1740px;height:820px;border-radius:72px"></div>'
-      +f'<div class="a" style="left:90px;top:230px;width:1740px;display:flex;gap:60px;justify-content:center">{icons}</div>'
-      +f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:440px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:330px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>'
+      +f'<div class="a" style="left:90px;top:{215 if d.get("pics") else 230}px;width:1740px;display:flex;gap:{30 if d.get("pics") else 60}px;justify-content:center">{icons}</div>'
+      +f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:{470 if d.get("pics") else 440}px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:{250 if d.get("pics") else 330}px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>'
       +f'<div class="a tstart" style="left:860px;top:830px;width:200px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="56" height="56" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>'
       +''.join(f'<div class="a tadj" data-d="{dd}" style="left:{xx}px;top:840px;width:150px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.85);border:4px solid #fff;color:#6a35e8;font-family:O;font-weight:800;font-size:46px;box-shadow:0 8px 20px rgba(80,60,160,.16);cursor:pointer;user-select:none">{tt}</div>' for dd,xx,tt in (('-60',660,'− 1 min'),('60',1110,'+ 1 min')))
-      +(f'<div class="a mu" style="left:90px;top:730px;width:1740px;text-align:center;font-size:44px">{d["note"]}</div>' if d.get('note') else ''))
+      +(f'<div class="a mu" style="left:90px;top:{740 if d.get("pics") else 730}px;width:1740px;text-align:center;font-size:44px">{d["note"]}</div>' if d.get('note') else ''))
 
 ARROW='<svg width="200" height="120" viewBox="0 0 200 120"><defs><linearGradient id="ar" x1="0" x2="1"><stop offset="0" stop-color="#7b3cf0"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient></defs><path d="M20 60H165M122 22L168 60L122 98" fill="none" stroke="url(#ar)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 

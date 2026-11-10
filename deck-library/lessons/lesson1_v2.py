@@ -56,8 +56,8 @@ gibberish=chat('Twist · Gibberish',[
 order = [1,2,3, 4,5,6,8,13, 7, 11,9,10,12, 14,15, 16,17,18, 19, 21,22]
 new_after_cards = [drama,neighbour,gibberish]
 spec=[old[i-1] for i in order]; r2=[rows[i-1] for i in order]
+spec += [old[23]]; r2 += [rows[23]]                      # Your twist cards first
 spec += [stubborn]; r2 += [('Watch the twist: Stubborn','2','Nurse advises (should), the patient refuses, the doctor steps in (have to). Fill the gaps together')]
-spec += [old[23]]; r2 += [rows[23]]                      # Your twist cards
 spec += new_after_cards
 r2 += [('Twist: Drama','1','OPTIONAL: I’m dying! The nurse asks How much; the doctor calms (don’t have to worry)'),
        ('Twist: Neighbour','1','OPTIONAL: neighbour says drink beer. shouldn’t, then the doctor: mustn’t'),
