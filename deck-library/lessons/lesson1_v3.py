@@ -14,7 +14,7 @@ d['rows']=[{'pic':'sc2_2.jpg','end':('c3','see a doctor.'),'ans':'have to'},{'pi
            {'pic':'mu_2.jpg','end':('c3','take it with food.'),'ans':'don’t have to'},{'pic':'mu_1.jpg','end':('c3','drink alcohol.'),'ans':'mustn’t'}]
 # Fill the gaps (1): a fourth line (shouldn't)
 s1=spec[at('Sort 1 (pick words)')]
-s1['rows'].append({'pic':'sc_3.jpg','ans':['shouldn’t','eat spicy food']})
+s1['rows'].append({'pic':'sc2_1.jpg','ans':['shouldn’t','eat spicy food']})
 minutes('Sort 2 (negatives)',5)
 
 # 3. Pair talk becomes core, with the five dial pictures as prompts
@@ -42,3 +42,8 @@ sp={'m':'spot','phase':'STUDY','title':'Find the mistakes','label':'Find the mis
   ('N',[('c1','You'),('c2','have to'),('c3','take this medicine.')]),
   ('D',[('c1','You'),('c2','don’t have to'),('c3','worry.')])]}
 spec.insert(at('Doctor chat')+1,sp)
+
+# Nurse chat: open with a vague complaint so "headache" and "head hurts" don't repeat
+nc=spec[at('Nurse chat (running)')]
+nc['lines']=[(l[0],'I don’t feel so good.') if l==('P','I have a headache.') else l for l in nc['lines']]
+assert any(l==('P','I don’t feel so good.') for l in nc['lines'])
