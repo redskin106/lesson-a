@@ -28,19 +28,23 @@ spec=[
    ('P',{'img':'v3_no.jpg'}),
    ('N',[C('c2','Does'),G('c1','your head'),C('c2','hurt?')],[('c1','your head'),('c1','your arm'),('c1','your back')]),
    ('P',[C('c1','No, it'),G('c2','doesn’t.')],[('c2','doesn’t.'),('c2','does.'),('c2','don’t.'),('c2','didn’t.')])]},
+ {'m':'contrast','phase':S_,'title':'Some verbs change','left':{'label':'Today','grad':'sky','pic':'v2_eat.jpg','fit':'contain','chips':[('c1','I'),('c2','eat.')]},
+  'right':{'label':'Yesterday','grad':'rose','pic':'v2_eat.jpg','fit':'contain','chips':[('c1','I'),('c2','ate.')]}},
  {'m':'verb_pairs','phase':S_,'kind':'irr','title':'Yesterday','rows':[
    {'pic':'v2_eat.jpg','now':'eat','then':'ate'},{'pic':'v2_drink.jpg','now':'drink','then':'drank'},{'pic':'v2_sleep.jpg','now':'sleep','then':'slept'},
    {'pic':'v2_fall.jpg','now':'fall','then':'fell'},{'pic':'v2_go.jpg','now':'go','then':'went'}]},
  {'m':'verb_pairs','phase':S_,'title':'Yesterday · more','kind':'irr','optional':True,'rows':[
    {'pic':'v2_take.jpg','now':'take','then':'took'},{'pic':'v2_feel.jpg','now':'feel','then':'felt'},{'pic':'v2_have.jpg','now':'have','then':'had'},{'pic':'v2_be.jpg','now':'be','then':'was'}]},
+ {'m':'contrast','phase':S_,'title':'Some verbs add +ed','left':{'label':'Today','grad':'sky','pic':'v2_walk.jpg','fit':'contain','chips':[('c1','I'),('c2','walk.')]},
+  'right':{'label':'Yesterday','grad':'rose','pic':'v2_walk.jpg','fit':'contain','chips':[('c1','I'),('c2','walked.')]}},
  {'m':'verb_pairs','phase':S_,'title':'Regular verbs','kind':'reg','rows':[
    {'pic':'v2_start.jpg','now':'start','then':'started'},{'pic':'v2_call.jpg','now':'call','then':'called'},{'pic':'v2_cook.jpg','now':'cook','then':'cooked'},{'pic':'v2_walk.jpg','now':'walk','then':'walked'}]},
- {'m':'rules','phase':S_,'title':'Past: two rules','emoji':'hourglass_not_done','rows':[
-   ([('c1','I','S'),('c2','ate','V'),('c3','spicy food.','O')],'irregular: eat → ate'),
-   ([('c1','I','S'),('c2','was','V'),('c3','tired.','O')],'irregular: be → was'),
-   ([('c1','I','S'),('c2','walked','V'),('c3','home.','O')],'regular: walk + ed')]},
  {'m':'contrast','phase':S_,'title':'Yesterday and today','left':{'label':'Yesterday','grad':'rose','pic':'l2c_1_cause.jpg','fit':'contain','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]},
    'right':{'label':'Today','grad':'sky','pic':'v2_rice.jpg','fit':'contain','chips':[('c1','I'),('c2','eat'),('c3','rice.')]}},
+ {'m':'contrast','phase':S_,'title':'I ate. Did you eat?','left':{'label':'Statement','grad':'violet','pic':'l2c_1_cause.jpg','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]},
+   'right':{'label':'Question','grad':'teal','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')]}},
+ {'m':'contrast','phase':S_,'title':'Silver · habits','optional':True,'left':{'label':'Every day','grad':'sky','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Do'),('c1','you'),('c2','eat'),('c3','spicy food?')]},
+   'right':{'label':'Yesterday','grad':'rose','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')]}},
  {'m':'sort','phase':S_,'title':'Why does it hurt? (1)','bank':['sleep','ate','fall','fell','eat','slept'],'rows':[
    {'pic':'l2c_1_effect.jpg','pre':('c4','Because I'),'end':('c3','spicy food.'),'ans':['ate']},
    {'pic':'l2c_3_effect.jpg','pre':('c4','Because I'),'end':('c3','on the floor.'),'ans':['slept']},
@@ -49,14 +53,10 @@ spec=[
    {'pic':'l2c_2_effect.jpg','pre':('c4','Because I'),'end':('c3','out in the rain.'),'ans':['went']},
    {'pic':'l2c_5_effect.jpg','pre':('c4','Because I'),'end':('c3','too much coffee.'),'ans':['drank']},
    {'pic':'l2c_6_effect.jpg','pre':('c4','Because I'),'end':('c3','medicine.'),'ans':['took']}]},
- {'m':'contrast','phase':S_,'title':'I ate. Did you eat?','left':{'label':'Statement','grad':'violet','pic':'l2c_1_cause.jpg','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]},
-   'right':{'label':'Question','grad':'teal','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')]}},
  {'m':'rules','phase':S_,'title':'Three little rules','emoji':'light_bulb','rows':[
    ([('c2','Does','V'),('c1','your head','S'),('c2','hurt?','V')],'Does → hurt'),
    ([('c2','Did','V'),('c1','you','S'),('c2','eat?','V')],'Did → eat'),
    ([('c4','Because','B'),('c1','I','S'),('c2','ate','V'),('c3','spicy food.','O')],'because → why')]},
- {'m':'contrast','phase':S_,'title':'Silver · habits','optional':True,'left':{'label':'Every day','grad':'sky','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Do'),('c1','you'),('c2','eat'),('c3','spicy food?')]},
-   'right':{'label':'Yesterday','grad':'rose','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')]}},
  {'m':'connect','phase':S_,'title':'Connect','rows':[
    {'cause':'l2c_1_cause.jpg','now':'l2c_1_effect.jpg','adv':'v3_adv_1.jpg','c':[('c1','I'),('c2','ate'),('c3','spicy food.')],'n':[('c1','My stomach'),('c2','hurts')],'a':[('c2','Drink'),('c3','water.')]},
    {'cause':'l2c_3_cause.jpg','now':'l2c_3_effect.jpg','adv':'v3_adv_2.jpg','c':[('c1','I'),('c2','slept'),('c3','on the floor.')],'n':[('c1','My back'),('c2','hurts')],'a':[('c2','Sleep'),('c3','on a bed.')]},
