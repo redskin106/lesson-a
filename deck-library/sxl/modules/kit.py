@@ -417,3 +417,21 @@ def connect_html(d,sid):
 
 @module('connect')
 def connect(d): return connect_html(d,'x')
+
+
+@module('make_patient')
+def make_patient(d):
+    """Groups invent a patient: pick a pain and a secret cause from picture banks, then fill the handover frame.
+    {'phase':'ACTIVATE','title':'Make a patient','pains':[files],'causes':[files],'frame':[[chips],[chips]]}"""
+    out=header(d['phase'],d.get('title','Make a patient'),'violet')
+    P=d['pains']; C=d['causes']; COL={'c1':'#34d0f2','c2':'#9a5cff','c3':'#ff7a3c','c4':'#ffb21f'}
+    out+=stp(f'<div class="a" style="left:90px;top:158px">{ch("c4","Where does it hurt?",54,"6px 34px")}</div>',1,'p')
+    w=int((1740-3*40)/4)
+    for k,f in enumerate(P): out+=stp(art(90+k*(w+40),240,w,230,f,r=44,label=f,fit='contain'),1,'p')
+    out+=stp(f'<div class="a" style="left:90px;top:488px">{ch("c4","Why?",54,"6px 34px")}</div>',2,'c')
+    w2=int((1740-4*30)/5)
+    for k,f in enumerate(C): out+=stp(art(90+k*(w2+30),570,w2,230,f,r=44,label=f,fit='contain'),2,'c')
+    out+=stp('<div class="gl" style="left:90px;top:826px;width:1740px;height:170px;border-radius:72px"></div>',3,'f')
+    for r,row in enumerate(d.get('frame',[])):
+        out+=stp(f'<div class="a" style="left:150px;top:{840+r*72}px;display:flex;gap:14px;align-items:center">'+''.join(ch(c,t,40,'2px 22px') if t else gap(COL[c],150,'…',h=56,fs=34) for c,t in row)+'</div>',3,'f')
+    return out

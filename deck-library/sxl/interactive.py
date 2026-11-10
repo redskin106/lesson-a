@@ -167,7 +167,22 @@ def build_markup(d, sid):
     out += f'<div class="gl" style="left:90px;top:{by}px;width:1740px;height:{988 - by}px;border-radius:64px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:16px 22px;padding:0 44px" id="bk-{sid}">{btn}</div>'
     return out + f'<script type="application/json" id="d-{sid}">{json.dumps({"n": len(parts)})}</script>'
 
-BUILD = {'build': build_markup, 'connect': connect_markup, 'pick': pick_markup, 'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
+def spot_markup(d, sid):
+    out = header(d['phase'], d.get('title', 'Find the mistakes'), 'violet'); L = d['lines']; y = 190; n_bad = 0
+    for k, (side, chips_) in enumerate(L):
+        bad = any(len(c) > 2 for c in chips_); n_bad += bad
+        inner = ''.join((f'<span class="spc" data-fix="{c[2]}">' if len(c) > 2 else '<span class="spc">') + ch(c[0], c[1], 58, '8px 30px') + '</span>' for c in chips_)
+        left = side in ('N', 'D'); a = EM(AV[side]) if side in AV else EM('woman_health_worker')
+        side_css = 'left:90px;' if left else 'right:90px;'
+        out += (f'<div class="a sp" data-bad="{1 if bad else 0}" style="{side_css}top:{y}px;display:flex;align-items:center;gap:26px;cursor:pointer">'
+                f'<div class="gl" style="position:static;width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff"><img src="{a}" style="width:92px"></div>'
+                f'<div class="gl spb" style="position:static;height:150px;border-radius:75px;display:flex;align-items:center;gap:14px;padding:0 46px">{inner}</div></div>')
+        y += 200
+    marks = ''.join(f'<img class="spm" src="{EM("cross_mark")}" data-ok="{EM("check_mark_button")}" style="width:84px">' for _ in range(n_bad))
+    out += f'<div class="a" style="right:90px;top:56px;display:flex;gap:16px" id="spm-{sid}">{marks}</div>'
+    return out + f'<script type="application/json" id="d-{sid}">{json.dumps({"n": n_bad})}</script>'
+
+BUILD = {'spot': spot_markup, 'build': build_markup, 'connect': connect_markup, 'pick': pick_markup, 'chat': chat_markup, 'sort': sort_markup, 'timeline': timeline_markup, 'sound_sort': sound_markup, 'match_pairs': match_markup, 'spot_fib': fib_markup}
 
 
 CSS_EXTRA = """.cn{position:absolute;width:480px;height:180px;border-radius:50px;background:rgba(255,255,255,.66);border:5px solid rgba(255,255,255,.92);box-shadow:0 10px 26px rgba(60,30,140,.16);cursor:pointer;z-index:2;transition:top .7s cubic-bezier(.3,.9,.3,1),background .3s,border-color .3s,transform .2s}
@@ -355,6 +370,15 @@ INIT.build=function(s){
    else{if(over(ev)){wrong(line);if(++miss>=2)nextPulse()}else P('tick');var r=b.getBoundingClientRect(),sr=s.getBoundingClientRect();clone.classList.add('back');clone.style.left=((r.left-sr.left)/kk)+'px';clone.style.top=((r.top-sr.top)/kk)+'px';var c=clone;setTimeout(function(){c.remove()},380)}}
   document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up)});
  wait(700).then(nextPulse)};
+/* ---- spot: tap the sentences that are wrong ---- */
+INIT.spot=function(s){
+ var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),marks=$$('.spm',s),done=0;
+ $$('.sp',s).forEach(function(r){r.addEventListener('click',function(){
+  if(r.classList.contains('fx'))return;var c=r.querySelector('.spc[data-fix]');
+  if(!c){wrong(r.querySelector('.spb'));return}
+  r.classList.add('fx');var chip=c.firstChild;chip.textContent=c.dataset.fix;chip.classList.add('pop');chip.style.outline='6px solid #4fcf7a';P('good');
+  var m=marks[done++];if(m){m.src=m.dataset.ok}
+  if(done>=D.n){wait(500).then(function(){P('done');finish(s)})}})})};
 /* ---- timeline: tap the card that happened next ---- */
 INIT.timeline=function(s){
  var cards=$$('.card',s),slots=$$('.slotn',s),k=0;

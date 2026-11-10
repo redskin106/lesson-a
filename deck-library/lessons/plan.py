@@ -39,3 +39,21 @@ L2V3=[('Cover','1','Show the title; no talking needed'),('What’s wrong?','2','
 ('The Clinic','1','Title only'),('Build the sentence','3','Tap the pills in order: My back hurts because I slept on the floor. Wrong pill bounces back; read it aloud together'),('Build the question','2','OPTIONAL: Did you eat spicy food? Does/Did and eat/ate are the distractors'),('Roles','1','Patient mimes and answers; Nurse asks Does...; Doctor asks Did...'),('Watch the circle','2','Teacher demonstrates once: mime, ball, ball'),('Think','1','Choose a pain and a cause. Keep it secret'),
 ('Ball circle','10','Circles of five. Word bank stays on screen. Teacher listens and notes mistakes'),
 ('Case notes','4','Groups of five write two lines about one patient: His stomach hurts. / Because he ate spicy food. Put it on the wall; no names'),('Recap','2','Read down the page together. Mistakes noted in the circle are repaired here'),('Thank you','0','Close')]
+
+
+L2V4=[('Cover','1','Show the title; no talking needed'),('What’s wrong?','2','One picture. Students say it in any language; teacher says: My back hurts.'),
+('Why? (hook strip)','2','Dog, floor, back. Watch first, then say: because I slept on the floor'),
+('Then and now','1','Now: hurts. Before: ate. One sentence carries both'),('Where does it hurt?','2','Four pains: point and say My ___ hurt'.replace('hurt','hurts')),
+('Does your head hurt?','2','Statement / question: the verb goes back to hurt'),('The nurse guesses','2','Reverse: the picture shows the cause, students decide what hurts'),
+('Yesterday (5 verbs)','2','eat/ate, drink/drank, sleep/slept, fall/fell, go/went'),('Yesterday (4 more verbs)','1','OPTIONAL: take/took, feel/felt, have/had, start/started'),
+('Today / yesterday','2','Pink time word: the verb changes'),('Sort 1: because I ...','3','Drag the past verb; wrong springs back'),('Sort 2: because I ...','3','OPTIONAL: same job, new bank: went, drank, took'),
+('I ate / Did you eat?','2','The same rule as hurt: after did the verb goes back to plain'),('Three little rules','1','Read down: Does → hurt, Did → eat, because → the reason'),('Silver: habits (optional)','2','OPTIONAL: Do you ... every day? / Did you ... yesterday?'),
+('Connect: before, now, after','3','Tap a picture, then its partner: they slide into one row and an arrow draws. Say each finished sentence together'),
+('Find the mistakes','3','Two sentences are wrong. Tap them; they fix themselves. Ask: what rule?'),
+('The handover (watch)','2','Nurse and doctor talk about a patient. Watch and listen; no gaps yet'),('Finish the handover','3','Same conversation with gaps: eat/ate, hurt/hurts, ate, drink'),
+('Why? check (1)','1','OPTIONAL: tap the cause; watch who hesitates'),('Why? check (2)','1','OPTIONAL'),('Your turn','2','OPTIONAL: tell your partner one thing you did yesterday'),
+('The Clinic','1','Title only'),('Build the sentence','3','Tap or drag the pills in order: My back hurts because I slept on the floor'),('Build the question','2','OPTIONAL: Did you eat spicy food? Does/Did and eat/ate are the distractors'),
+('Make a patient','5','Groups of 4-5 invent a patient from the picture banks (or draw their own). The cause stays secret. The patient is made up, never a real person. Fill the frame: His ___ hurts. Did he ___?'),
+('Nurse, doctor, class','1','Two students act as nurse and doctor. The class holds the ball'),('The class decides','1','Class guesses the cause (Because he...) then advice (He should...)'),
+('Play','10','Three or four groups present. Doctor asks Did/Does; nurse answers yes/no. The class passes the ball to guess and advise. No scores'),
+('Recap','2','Read down the page together. Mistakes noted in the circle are repaired here'),('Thank you','0','Close')]
