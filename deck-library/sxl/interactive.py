@@ -244,6 +244,7 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #nx.on{display:flex;animation:up .5s both}
 #nx.pr svg{animation:nxa .42s ease-out}@keyframes nxa{0%{transform:translateX(0)}40%{transform:translateX(14px)}100%{transform:translateX(0)}}
 body.off #nx.pr svg{animation:none}
+#gt{width:52px;height:52px;padding:0!important;font-size:30px!important;line-height:1;opacity:.45;transition:opacity .2s}#gt:hover,#ctl.open #gt{opacity:1}#ctl>*:not(#gt){display:none!important}#ctl.open>#sf,#ctl.open>#mo{display:block!important}#ctl.open>#bgs{display:flex!important}
 #bgs{display:flex;gap:10px;align-items:center;padding:0 6px}#bgs i{width:34px;height:34px;border-radius:50%;border:4px solid #fff;box-shadow:0 6px 16px rgba(80,60,160,.25);cursor:pointer;transition:transform .2s}#bgs i.on{transform:scale(1.25);border-color:#6a35e8}
 body[data-bg=white] .sl:not(.night){background:#fafbff}body[data-bg=white] .sl .orb{opacity:.14}
 body[data-bg=sunset] .sl{background:linear-gradient(135deg,#ffc27a,#ff8fa3 50%,#c98bff)}body[data-bg=sunset] .sl .orb{display:none}
@@ -299,6 +300,7 @@ if(VOV){document.addEventListener('click',function(e){var b=e.target.closest('.v
 addEventListener('keydown',function(e){if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){nxFx();if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
 var cfgs=['On','Calm','Off'],ci=0;
 var BGS=[['day','conic-gradient(#ffd27a,#ff9fb8,#b98cff,#7fd3ff,#9fe8c4,#ffd27a)','#eeeef3'],['white','#fafbff','#fafbff'],['night','#14122b','#14122b'],['sunset','linear-gradient(135deg,#ffc27a,#ff8fa3,#c98bff)','linear-gradient(135deg,#ffc27a,#ff8fa3 50%,#c98bff)']];
+$('#gt').onclick=function(){P('tick');$('#ctl').classList.toggle('open')};
 function setbg(i){var b=BGS[i];document.body.setAttribute('data-bg',b[0]);document.body.dataset.bgi=i;$$('.sl').forEach(function(e){if(e.dataset.ph!=='night')e.classList.toggle('nm',b[0]==='night')});$$('#bgs i').forEach(function(e,k){e.classList.toggle('on',k==i)});try{localStorage.setItem('sxlbg2',i)}catch(e){}bgfit()}
 (function(){var h='';BGS.forEach(function(b,i){h+='<i data-i="'+i+'" style="background:'+b[1]+'"></i>'});$('#bgs').innerHTML=h;
  $('#bgs').onclick=function(e){var t=e.target.closest('i');if(t){P('tick');setbg(+t.dataset.i)}};var v=0;try{v=+localStorage.getItem('sxlbg2')||0}catch(e){}setbg(v)})();
@@ -478,7 +480,7 @@ def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
         secs += f'<section class="sl{" night" if night else ""}" data-ph="{"night" if night else (ph_ or "")}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}" data-min="{d.get("min",0)}" data-label="{d.get("label",d.get("title") or d["m"])}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
     html = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>'
             f'<style>{css("day")}{CSS_EXTRA}</style></head><body><div id="stage">{secs}</div>'
-            '<div id="ctl"><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button><div id="bgs"></div></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
+            '<div id="ctl"><button id="gt" title="Settings">&#9881;</button><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button><div id="bgs"></div></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
             +vov_markup(spec)
             +f'<script>{SFX_JS}</script><script>{APP_JS}</script></body></html>')
     html = inline_assets(html)
