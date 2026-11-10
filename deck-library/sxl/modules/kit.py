@@ -443,3 +443,25 @@ def make_patient(d):
     body=''.join(f'<div class="pfrow" data-g="{g}" style="display:none;gap:14px;align-items:center;margin-bottom:14px">'+''.join(r)+'</div>' for g,r in rows)
     out+=f'<div class="gl pfrm" style="left:90px;top:736px;width:1560px;height:236px;border-radius:64px;padding:22px 60px;display:none">{body}</div>'
     return out
+
+
+@module('round_flow')
+def round_flow(d):
+    """How a round works, one speech row per click. rows: [{'who':emoji,'tag':'Nurse','grad':'teal','groups':[[(cls,text)|('gap',cls,w)]]}]; 'hint' = last line."""
+    out=header(d['phase'],d.get('title','A round'),'violet'); R=d['rows']; COL={'c1':'#34d0f2','c2':'#9a5cff','c3':'#ff7a3c','c4':'#ffb21f'}
+    pitch=150; y0=168
+    for k,r in enumerate(R):
+        y=y0+k*pitch
+        out+=stp(f'<div class="gl" style="left:90px;top:{y}px;width:128px;height:128px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff"><img src="{EM(r["who"])}" style="width:92px"></div>',k+1)
+        out+=stp(f'<div class="a" style="left:236px;top:{y+36}px;width:190px;display:flex;justify-content:center">{grad_chip(r["grad"],r["tag"],38,"4px 26px")}</div>',k+1)
+        body=''
+        for gi,grp in enumerate(r['groups']):
+            if gi: body+='<span style="font-family:O;font-weight:800;font-size:40px;color:#9a8fd0;margin:0 10px">/</span>'
+            for it in grp:
+                body+= (gap(COL[it[1]],it[2],'…',h=64,fs=34) if it[0]=='gap' else ch(it[0],it[1],40,'4px 22px'))
+        out+=stp(f'<div class="gl" style="left:446px;top:{y}px;width:1280px;height:128px;border-radius:64px;display:flex;align-items:center;gap:12px;padding:0 40px">{body}</div>',k+1)
+        if r.get('ball'): out+=stp(f'<img src="{EM("soccer_ball")}" style="position:absolute;left:1640px;top:{y+14}px;width:100px;{sh()}">',k+1)
+    if d.get('hint'):
+        k=len(R); y=y0+k*pitch+6
+        out+=stp(f'<div class="a" style="left:446px;top:{y}px;display:flex;align-items:center;gap:20px"><img src="{EM("speech_balloon")}" style="width:84px">{grad_chip("sky",d["hint"],44,"6px 34px")}</div>',k+1)
+    return out

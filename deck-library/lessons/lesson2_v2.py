@@ -91,17 +91,17 @@ spec=[
   'bank':[('c2','hurt?'),('c1','your back'),('c2','Does'),('c2','hurts?'),('c2','Did'),('c1','my back')]},
  {'m':'build','phase':A_,'title':'Build the question','optional':True,'pics':[],'fs':70,'bfs':60,'parts':[('c2','Did'),('c1','you'),('c2','sleep'),('c3','on the floor?')],
   'bank':[('c3','on the floor?'),('c2','slept'),('c2','Did'),('c1','you'),('c2','sleep'),('c2','Does')]},
- {'m':'make_patient','phase':A_,'title':'Make a patient','min':5,
+ {'m':'make_patient','phase':A_,'title':'Ideas for a patient','optional':True,
   'pains':[('v3p_head.jpg','head'),('v3p_stomach.jpg','stomach'),('v3p_back.jpg','back'),('v3p_arm.jpg','arm')],
   'causes':[('l2c_1_cause.jpg','eat','spicy food','ate'),('l2c_3_cause.jpg','sleep','on the floor','slept'),('l2c_4_cause.jpg','fall','off a bike','fell'),('l2c_2_cause.jpg','go','out in the rain','went'),('l2c_5_cause.jpg','drink','too much coffee','drank')]},
- {'m':'role_cards','phase':A_,'title':'Nurse · Doctor · Class','cards':[
-   {'emoji':'woman_health_worker','name':'Nurse','grad':'teal','job':'knows the secret','says':[('c1','His stomach'),('c2','hurts.')]},
-   {'emoji':'man_health_worker','name':'Doctor','grad':'violet','job':'asks questions','says':[('c2','Did'),('c1','he'),('c2','eat…?')]},
-   {'emoji':'soccer_ball','name':'Class','grad':'orange','job':'ball: guess and help','says':[('c4','Because'),('c1','he'),('c2','ate…')]}]},
- {'m':'today','phase':A_,'emoji':'soccer_ball','role':'The class decides','title':'Pass the ball','fs':62,'rows':[
-   {'icon':'thinking_face','chips':[('c4','Because'),('c1','he'),('c2','ate'),('c3','spicy food.')]},
-   {'icon':'light_bulb','chips':[('c1','He'),('c2','should'),('c2','drink'),('c3','water.')]}]},
- {'m':'timer','phase':A_,'title':'Play','min':10,'icons':['woman_health_worker','man_health_worker','soccer_ball'],'note':'Nurse and doctor talk. The class asks, guesses, helps.'},
+ {'m':'timer','phase':A_,'title':'Invent a patient','min':5,'icons':['face_with_thermometer','red_question_mark','light_bulb'],'note':'Make up your patient together: where does it hurt, why, and what helps? Keep the cause secret.'},
+ {'m':'round_flow','phase':A_,'title':'A round','hint':'Your own words are OK too.','rows':[
+   {'who':'woman_health_worker','tag':'Nurse','grad':'teal','groups':[[('c1','Room 4.'),('c1','His'),('gap','c1',200),('c2','hurts.')]]},
+   {'who':'man_health_worker','tag':'Doctor','grad':'violet','groups':[[('c2','Does'),('c1','his'),('gap','c1',150),('c2','hurt?')],[('c2','Did'),('c1','he'),('gap','c2',120),('gap','c3',170)]]},
+   {'who':'woman_health_worker','tag':'Nurse','grad':'teal','groups':[[('c1','Yes, he'),('c2','did.')],[('c1','No, he'),('c2','didn’t.')]]},
+   {'who':'soccer_ball','tag':'Class','grad':'orange','ball':True,'groups':[[('c4','Because'),('c1','he'),('gap','c2',150),('gap','c3',220)]]},
+   {'who':'soccer_ball','tag':'Class','grad':'orange','ball':True,'groups':[[('c1','He'),('c2','should'),('gap','c2',150),('gap','c3',220)]]}]},
+ {'m':'timer','phase':A_,'title':'Play','min':10,'icons':['woman_health_worker','man_health_worker','soccer_ball'],'note':'Nurse and doctor talk at the front. The class listens, guesses and helps.'},
  {'m':'recap','phase':'RECAP','rows':[([('c1','My stomach'),('c2','hurts.')],'now'),([('c4','Because'),('c1','I'),('c2','ate'),('c3','spicy food.')],'yesterday'),([('c2','Does'),('c1','your stomach'),('c2','hurt?')],'ask'),([('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')],'ask')],'emoji':'face_with_thermometer'},
  {'m':'closing','phase':E_,'stack':True,'line1':'Thank','line2':'you!','sub':'See you next time.','emoji':'waving_hand'},
 ]
