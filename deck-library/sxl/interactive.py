@@ -229,6 +229,8 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #nx.on{display:flex;animation:up .5s both}
 #nx.pr svg{animation:nxa .42s ease-out}@keyframes nxa{0%{transform:translateX(0)}40%{transform:translateX(14px)}100%{transform:translateX(0)}}
 body.off #nx.pr svg{animation:none}
+#bgs{display:flex;gap:10px;align-items:center;padding:0 6px}#bgs i{width:34px;height:34px;border-radius:50%;border:4px solid #fff;box-shadow:0 6px 16px rgba(80,60,160,.25);cursor:pointer;transition:transform .2s}#bgs i.on{transform:scale(1.25);border-color:#6a35e8}
+body[data-bg] .sl:not(.night) .orb{display:none}body[data-bg] .sl:not(.night){background:var(--bgc)}
 #ck,#rp{display:none!important}
 #nx:not(.on){display:flex;opacity:.3;box-shadow:none}
 """
@@ -255,7 +257,7 @@ SFX_JS = r"""
 APP_JS = r"""
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var P=function(n){SXLSound.play(n)}, wait=function(ms){return new Promise(function(r){setTimeout(r,SXL.cfg.off?0:ms)})};
-PHBG={ENGAGE:'linear-gradient(135deg,#ffd27a,#ff9fb8 45%,#ffb066)',STUDY:'linear-gradient(135deg,#b98cff,#8fb4ff 50%,#7fd3ff)',ACTIVATE:'linear-gradient(135deg,#9fe8c4,#7fe0d8 50%,#a8e6ff)',night:'#0b0a10'};function bgfit(){var on=document.querySelector('.sl.on');var pb=on&&PHBG[on.dataset.ph];document.body.style.background=(innerWidth/innerHeight>1920/1080+0.01&&pb)?pb:'#eeeef3'}function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);var st=$('#stage');st.style.transform='scale('+s+')';st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px';bgfit()}
+PHBG={ENGAGE:'linear-gradient(135deg,#ffd27a,#ff9fb8 45%,#ffb066)',STUDY:'linear-gradient(135deg,#b98cff,#8fb4ff 50%,#7fd3ff)',ACTIVATE:'linear-gradient(135deg,#9fe8c4,#7fe0d8 50%,#a8e6ff)',night:'#0b0a10'};function bgfit(){var on=document.querySelector('.sl.on');var pb=on&&PHBG[on.dataset.ph];var bc=document.body.getAttribute('data-bg');document.body.style.background=bc?getComputedStyle(document.body).getPropertyValue('--bgc'):((innerWidth/innerHeight>1920/1080+0.01&&pb)?pb:'#eeeef3')}function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);var st=$('#stage');st.style.transform='scale('+s+')';st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px';bgfit()}
 addEventListener('resize',fit);fit();
 var slides=$$('.sl'),cur=-1;
 [$('#stage')].concat(slides).forEach(function(e){e.addEventListener('scroll',function(){if(e.id==='stage'||!e.classList.contains('thread')){e.scrollTop=0;e.scrollLeft=0}})});
@@ -276,6 +278,10 @@ var VOV=$('#vov');function vclose(){if(!VOV)return;VOV.classList.remove('on');$$
 if(VOV){document.addEventListener('click',function(e){var b=e.target.closest('.vplay');if(b){e.stopPropagation();var v=$('#vid-'+b.dataset.v);if(!v)return;$$('video',VOV).forEach(function(x){x.classList.remove('on')});v.classList.add('on');v.currentTime=0;VOV.classList.add('on');v.play();P('pop');return}if(e.target===VOV||e.target.id==='vx')vclose()},true)}
 addEventListener('keydown',function(e){if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){nxFx();if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
 var cfgs=['On','Calm','Off'],ci=0;
+var BGS=[['','conic-gradient(#ffd27a,#ff9fb8,#b98cff,#7fd3ff,#9fe8c4,#ffd27a)'],['#f7f8fc','#f7f8fc'],['#fff3dc','#fff3dc'],['#d8efff','#d8efff'],['#dcf6e9','#dcf6e9'],['#ece3ff','#ece3ff']];
+(function(){var h='';BGS.forEach(function(b,i){h+='<i data-i="'+i+'" style="background:'+b[1]+'"></i>'});$('#bgs').innerHTML=h;
+ function setbg(i){var b=BGS[i];if(b[0]){document.body.setAttribute('data-bg',i);document.body.style.setProperty('--bgc',b[0])}else{document.body.removeAttribute('data-bg')}$$('#bgs i').forEach(function(e,k){e.classList.toggle('on',k==i)});try{localStorage.setItem('sxlbg',i)}catch(e){}bgfit()}
+ $('#bgs').onclick=function(e){var t=e.target.closest('i');if(t){P('tick');setbg(+t.dataset.i)}};var v=0;try{v=+localStorage.getItem('sxlbg')||0}catch(e){}setbg(v)})();
 $('#mo').onclick=function(){ci=(ci+1)%3;SXL.cfg.calm=ci==1;SXL.cfg.off=ci==2;document.body.className=['','calm','off'][ci];this.textContent='Motion: '+cfgs[ci]};
 $('#sf').onclick=function(){var on=SXLSound.toggle();this.textContent='Sound: '+(on?'On':'Off')};
 function wrong(el){P('boop');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
@@ -443,7 +449,7 @@ def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
         secs += f'<section class="sl{" night" if night else ""}" data-ph="{"night" if night else (ph_ or "")}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}" data-min="{d.get("min",0)}" data-label="{d.get("label",d.get("title") or d["m"])}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
     html = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>'
             f'<style>{css("day")}{CSS_EXTRA}</style></head><body><div id="stage">{secs}</div>'
-            '<div id="ctl"><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
+            '<div id="ctl"><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button><div id="bgs"></div></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
             +vov_markup(spec)
             +f'<script>{SFX_JS}</script><script>{APP_JS}</script></body></html>')
     html = inline_assets(html)
