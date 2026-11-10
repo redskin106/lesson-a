@@ -291,7 +291,7 @@ def recap(d):
         o+=stp('<div class="gl" style="left:1080px;top:240px;width:750px;height:728px;border-radius:72px"></div>',nr+1)
         for k,q in enumerate(d['side']): o+=stp(f'<div class="a" style="left:1100px;top:{300+k*150}px;width:710px;display:flex;gap:10px;justify-content:center">'+''.join(ch(a,b,44,'8px 22px') for a,b in q)+'</div>',nr+1+k,pills=True)
     if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:1520px;top:{300 if not d.get("side") else 770}px;width:{260 if not d.get("side") else 190}px;{sh()}">',nr+len(d.get('side') or [])+(0 if d.get('side') else 1))
-    return o+'<div class="a mu" style="left:90px;bottom:22px;font-size:22px">Emoji: Microsoft Fluent Emoji (MIT)</div>'
+    return o+'<div class="a mu" style="right:36px;bottom:12px;font-size:15px;opacity:.55">Emoji: Microsoft Fluent Emoji (MIT)</div>'
 
 @module('rules')
 def rules(d):
