@@ -20,8 +20,16 @@ for d in old: strip_caps(d)
 for d in old:
     if d['m']=='slot': d['heads']=['PROBLEM','HOW MUCH?','TWIST']
 
+def watch(lines):
+    # twists are quick demos, not exercises: no gaps, lines appear on their own
+    out=[]
+    for l in lines:
+        if len(l)>1 and isinstance(l[1],list):
+            out.append((l[0],[(c,t,False) for c,t,g in l[1]]))
+        else: out.append((l[0],l[1]))
+    return out
 def chat(title, lines, optional=False):
-    d={'m':'chat','phase':A_,'title':title,'window':4,'lines':lines}
+    d={'m':'chat','phase':A_,'title':title,'window':5,'pace':2100,'lines':watch(lines)}
     if optional: d['optional']=True
     return d
 SB=[('c2','should'),('c2','shouldn’t'),('c2','have to'),('c2','mustn’t')]
@@ -57,7 +65,7 @@ order = [1,2,3, 4,5,6,8,13, 7, 11,9,10,12, 14,15, 16,17,18, 19, 21,22]
 new_after_cards = [drama,neighbour,gibberish]
 spec=[old[i-1] for i in order]; r2=[rows[i-1] for i in order]
 spec += [old[23]]; r2 += [rows[23]]                      # Your twist cards first
-spec += [stubborn]; r2 += [('Watch the twist: Stubborn','2','Nurse advises (should), the patient refuses, the doctor steps in (have to). Fill the gaps together')]
+spec += [stubborn]; r2 += [('Watch the twist: Stubborn','1','Quick demo, lines appear by themselves: nurse advises (should), the patient refuses, the doctor steps in (have to)')]
 spec += new_after_cards
 r2 += [('Twist: Drama','1','OPTIONAL: I’m dying! The nurse asks How much; the doctor calms (don’t have to worry)'),
        ('Twist: Neighbour','1','OPTIONAL: neighbour says drink beer. shouldn’t, then the doctor: mustn’t'),

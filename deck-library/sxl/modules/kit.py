@@ -109,6 +109,7 @@ def pic_rows(d):
     R=d['rows']; n=len(R); o=header(d['phase'],d.get('title')); st=1
     for j,r in enumerate(R):
         y=168+j*425+(150 if n==1 else 0); k=len(r['pics']); w=int((1740-30*(k-1))/k); w=min(w,(560 if n==1 else 440) if k==3 else 405); h=int(w*9/16); gx=(60 if n>1 else int((1740-w*k)/(k-1))) if k>1 else 0
+        if n>1 and k>=4: gx=60; w=int((1740-gx*(k-1))/k); h=int(w*9/16)   # fill the row so the right margin matches the left
         for i,f in enumerate(r['pics']): o+=stp(pic(90+i*(w+gx),y+90,w,h,f,36),st+i)
         o+=stp(f'<div class="a" style="left:90px;top:{y}px;display:flex;align-items:center;gap:0"><div class="chip" style="font-size:44px;padding:10px 40px;border-radius:999px;background:{G(r["grad"])}">{r["label"]}</div><div style="width:6px;height:54px;border-radius:3px;background:rgba(124,70,230,.4);margin:0 44px"></div>{chiprow(r["chips"])}</div>',st+k,pills=True)
         used=k+1

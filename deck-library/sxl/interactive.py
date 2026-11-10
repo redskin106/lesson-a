@@ -67,7 +67,7 @@ def chat_markup(d, sid):
     return (header(d['phase'], d.get('title')) +
             f'<div class="thread{" sp" if sp else ""}" id="th-{sid}">{rows}<div style="height:30px;flex-shrink:0"></div></div>' + panel +
             f'<div class="gl bankbar" id="bk-{sid}" style="left:90px;top:896px;width:{1000 if sp else 1740}px;height:100px;border-radius:50px;display:flex;align-items:center;gap:20px;padding:0 40px"></div>'
-            f'<script type="application/json" id="d-{sid}">{json.dumps({"banks": bankhtml, "n": len(L), "gapn": [len(x["gaps"]) for x in data]})}</script>')
+            f'<script type="application/json" id="d-{sid}">{json.dumps({"banks": bankhtml, "n": len(L), "gapn": [len(x["gaps"]) for x in data], "pace": d.get("pace", 1100)})}</script>')
 
 def tintch(html, word):
     i = SIDX.get(word.lower().strip('.'))
@@ -348,7 +348,7 @@ var INIT={};
  var id=s.dataset.id,D=JSON.parse($('#d-'+id).textContent),th=$('#th-'+id),bar=$('#bk-'+id),rows=$$('.row',th),i=-1,pi=$('#pi-'+id),pn=$('#pn-'+id),zv=$('#zv-'+id);
  if(pn)pn.onclick=function(){if(!pi.getAttribute('src'))return;SXLzoom(pi)};
  function show(r){r.classList.add('show');if(i>0)P('arrive');var need=r.offsetTop+r.offsetHeight+16-th.clientHeight;if(need>th.scrollTop+2)th.scrollTo({top:need,behavior:SXL.cfg.off?'auto':'smooth'});
-  if(D.gapn[i]){bar.innerHTML=D.banks[i];bar.style.visibility='visible';bar.__r=r}else{bar.style.visibility='hidden';wait(1100).then(next)}}
+  if(D.gapn[i]){bar.innerHTML=D.banks[i];bar.style.visibility='visible';bar.__r=r}else{bar.style.visibility='hidden';wait(D.pace||1100).then(next)}}
  function next(){i++;if(i>=D.n){finish(s);return}var r=rows[i],pp=r.dataset.pic;
   if(pp&&pi&&pi.dataset.cur!==pp){pi.dataset.cur=pp;pi.style.opacity=0;bar.style.visibility='hidden';wait(320).then(function(){pi.src=pp;pi.style.opacity=1;P('pop')});wait(1250).then(function(){show(r)})}else show(r)}
  bar.onclick=function(e){var b=e.target.closest('.bk');if(!b||!bar.__r)return;var g=$$('.gp',bar.__r).filter(function(x){return !x.__f})[0];if(!g)return;
