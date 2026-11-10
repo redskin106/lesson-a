@@ -230,7 +230,12 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #nx.pr svg{animation:nxa .42s ease-out}@keyframes nxa{0%{transform:translateX(0)}40%{transform:translateX(14px)}100%{transform:translateX(0)}}
 body.off #nx.pr svg{animation:none}
 #bgs{display:flex;gap:10px;align-items:center;padding:0 6px}#bgs i{width:34px;height:34px;border-radius:50%;border:4px solid #fff;box-shadow:0 6px 16px rgba(80,60,160,.25);cursor:pointer;transition:transform .2s}#bgs i.on{transform:scale(1.25);border-color:#6a35e8}
-body[data-bg] .sl:not(.night) .orb{display:none}body[data-bg] .sl:not(.night){background:var(--bgc)}
+body[data-bg=white] .sl:not(.night){background:#fafbff}body[data-bg=white] .sl .orb{opacity:.14}
+body[data-bg=sunset] .sl{background:linear-gradient(135deg,#ffc27a,#ff8fa3 50%,#c98bff)}body[data-bg=sunset] .sl .orb{display:none}
+body[data-bg=night] .sl:not(.night){background:#12102a}body[data-bg=night] .sl .orb{opacity:.13}body[data-bg=night] #cnt{color:#cfc8f5}
+.sl.nm{color:#f6f3ff}.nm .mu{color:#a9a3cc}.nm .gl,.nm .tag,.nm .pill{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.2)}.nm .grad{background:linear-gradient(90deg,#c9a2ff,#ff8cc6);-webkit-background-clip:text;color:transparent}
+.nm [style*="#1c1b2e"],.nm [style*="color:#2"]{color:#f6f3ff!important}.nm .bs .op,.nm .ph{opacity:.9}
+.sl.nm[data-ph="ACTIVATE"] .row[style*="flex-end"] .gl{background:rgba(255,150,200,.28)!important}
 #ck,#rp{display:none!important}
 #nx:not(.on){display:flex;opacity:.3;box-shadow:none}
 """
@@ -257,7 +262,7 @@ SFX_JS = r"""
 APP_JS = r"""
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var P=function(n){SXLSound.play(n)}, wait=function(ms){return new Promise(function(r){setTimeout(r,SXL.cfg.off?0:ms)})};
-PHBG={ENGAGE:'linear-gradient(135deg,#ffd27a,#ff9fb8 45%,#ffb066)',STUDY:'linear-gradient(135deg,#b98cff,#8fb4ff 50%,#7fd3ff)',ACTIVATE:'linear-gradient(135deg,#9fe8c4,#7fe0d8 50%,#a8e6ff)',night:'#0b0a10'};function bgfit(){var on=document.querySelector('.sl.on');var pb=on&&PHBG[on.dataset.ph];var bc=document.body.getAttribute('data-bg');document.body.style.background=bc?getComputedStyle(document.body).getPropertyValue('--bgc'):((innerWidth/innerHeight>1920/1080+0.01&&pb)?pb:'#eeeef3')}function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);var st=$('#stage');st.style.transform='scale('+s+')';st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px';bgfit()}
+PHBG={ENGAGE:'linear-gradient(135deg,#ffd27a,#ff9fb8 45%,#ffb066)',STUDY:'linear-gradient(135deg,#b98cff,#8fb4ff 50%,#7fd3ff)',ACTIVATE:'linear-gradient(135deg,#9fe8c4,#7fe0d8 50%,#a8e6ff)',night:'#0b0a10'};function bgfit(){var on=document.querySelector('.sl.on');var pb=on&&PHBG[on.dataset.ph];var bi=+document.body.dataset.bgi||0;document.body.style.background=(innerWidth/innerHeight>1920/1080+0.01&&pb&&bi==0)?pb:(typeof BGS==='undefined'?'#eeeef3':BGS[bi][2])}function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);var st=$('#stage');st.style.transform='scale('+s+')';st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px';bgfit()}
 addEventListener('resize',fit);fit();
 var slides=$$('.sl'),cur=-1;
 [$('#stage')].concat(slides).forEach(function(e){e.addEventListener('scroll',function(){if(e.id==='stage'||!e.classList.contains('thread')){e.scrollTop=0;e.scrollLeft=0}})});
@@ -278,10 +283,10 @@ var VOV=$('#vov');function vclose(){if(!VOV)return;VOV.classList.remove('on');$$
 if(VOV){document.addEventListener('click',function(e){var b=e.target.closest('.vplay');if(b){e.stopPropagation();var v=$('#vid-'+b.dataset.v);if(!v)return;$$('video',VOV).forEach(function(x){x.classList.remove('on')});v.classList.add('on');v.currentTime=0;VOV.classList.add('on');v.play();P('pop');return}if(e.target===VOV||e.target.id==='vx')vclose()},true)}
 addEventListener('keydown',function(e){if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){nxFx();if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
 var cfgs=['On','Calm','Off'],ci=0;
-var BGS=[['','conic-gradient(#ffd27a,#ff9fb8,#b98cff,#7fd3ff,#9fe8c4,#ffd27a)'],['#f7f8fc','#f7f8fc'],['#fff3dc','#fff3dc'],['#d8efff','#d8efff'],['#dcf6e9','#dcf6e9'],['#ece3ff','#ece3ff']];
+var BGS=[['day','conic-gradient(#ffd27a,#ff9fb8,#b98cff,#7fd3ff,#9fe8c4,#ffd27a)','#eeeef3'],['white','#fafbff','#fafbff'],['night','#14122b','#14122b'],['sunset','linear-gradient(135deg,#ffc27a,#ff8fa3,#c98bff)','linear-gradient(135deg,#ffc27a,#ff8fa3 50%,#c98bff)']];
+function setbg(i){var b=BGS[i];document.body.setAttribute('data-bg',b[0]);document.body.dataset.bgi=i;$$('.sl').forEach(function(e){if(e.dataset.ph!=='night')e.classList.toggle('nm',b[0]==='night')});$$('#bgs i').forEach(function(e,k){e.classList.toggle('on',k==i)});try{localStorage.setItem('sxlbg2',i)}catch(e){}bgfit()}
 (function(){var h='';BGS.forEach(function(b,i){h+='<i data-i="'+i+'" style="background:'+b[1]+'"></i>'});$('#bgs').innerHTML=h;
- function setbg(i){var b=BGS[i];if(b[0]){document.body.setAttribute('data-bg',i);document.body.style.setProperty('--bgc',b[0])}else{document.body.removeAttribute('data-bg')}$$('#bgs i').forEach(function(e,k){e.classList.toggle('on',k==i)});try{localStorage.setItem('sxlbg',i)}catch(e){}bgfit()}
- $('#bgs').onclick=function(e){var t=e.target.closest('i');if(t){P('tick');setbg(+t.dataset.i)}};var v=0;try{v=+localStorage.getItem('sxlbg')||0}catch(e){}setbg(v)})();
+ $('#bgs').onclick=function(e){var t=e.target.closest('i');if(t){P('tick');setbg(+t.dataset.i)}};var v=0;try{v=+localStorage.getItem('sxlbg2')||0}catch(e){}setbg(v)})();
 $('#mo').onclick=function(){ci=(ci+1)%3;SXL.cfg.calm=ci==1;SXL.cfg.off=ci==2;document.body.className=['','calm','off'][ci];this.textContent='Motion: '+cfgs[ci]};
 $('#sf').onclick=function(){var on=SXLSound.toggle();this.textContent='Sound: '+(on?'On':'Off')};
 function wrong(el){P('boop');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
