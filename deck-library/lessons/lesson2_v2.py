@@ -24,7 +24,10 @@ spec=[
    ('P',[C('c1','Yes, it'),G('c2','does'),C('c4','because'),C('c1','I'),G('c2','ate'),C('c3','spicy food.')],[('c2','does'),('c2','ate'),('c2','do'),('c2','eat')]),
    ('P',{'img':'l2c_3_cause.jpg'}),
    ('N',[C('c2','Does'),G('c1','your back'),C('c2','hurt?')],[('c1','your back'),('c1','your arm'),('c1','your head')]),
-   ('P',[C('c1','Yes, it'),G('c2','does'),C('c4','because'),C('c1','I'),G('c2','slept'),C('c3','on the floor.')],[('c2','slept'),('c2','does'),('c2','sleep'),('c2','do')])]},
+   ('P',[C('c1','Yes, it'),G('c2','does'),C('c4','because'),C('c1','I'),G('c2','slept'),C('c3','on the floor.')],[('c2','slept'),('c2','does'),('c2','sleep'),('c2','do')]),
+   ('P',{'img':'v3_no.jpg'}),
+   ('N',[C('c2','Does'),G('c1','your head'),C('c2','hurt?')],[('c1','your head'),('c1','your arm'),('c1','your back')]),
+   ('P',[C('c1','No, it'),G('c2','doesn’t.')],[('c2','doesn’t.'),('c2','does.'),('c2','don’t.'),('c2','didn’t.')])]},
  {'m':'verb_pairs','phase':S_,'kind':'irr','title':'Yesterday','rows':[
    {'pic':'v2_eat.jpg','now':'eat','then':'ate'},{'pic':'v2_drink.jpg','now':'drink','then':'drank'},{'pic':'v2_sleep.jpg','now':'sleep','then':'slept'},
    {'pic':'v2_fall.jpg','now':'fall','then':'fell'},{'pic':'v2_go.jpg','now':'go','then':'went'}]},
@@ -32,6 +35,10 @@ spec=[
    {'pic':'v2_take.jpg','now':'take','then':'took'},{'pic':'v2_feel.jpg','now':'feel','then':'felt'},{'pic':'v2_have.jpg','now':'have','then':'had'},{'pic':'v2_be.jpg','now':'be','then':'was'}]},
  {'m':'verb_pairs','phase':S_,'title':'Regular verbs','kind':'reg','rows':[
    {'pic':'v2_start.jpg','now':'start','then':'started'},{'pic':'v2_call.jpg','now':'call','then':'called'},{'pic':'v2_cook.jpg','now':'cook','then':'cooked'},{'pic':'v2_walk.jpg','now':'walk','then':'walked'}]},
+ {'m':'rules','phase':S_,'title':'Past: two rules','emoji':'hourglass_not_done','rows':[
+   ([('c1','I','S'),('c2','ate','V'),('c3','spicy food.','O')],'irregular: eat → ate'),
+   ([('c1','I','S'),('c2','was','V'),('c3','tired.','O')],'irregular: be → was'),
+   ([('c1','I','S'),('c2','walked','V'),('c3','home.','O')],'regular: walk + ed')]},
  {'m':'contrast','phase':S_,'title':'Yesterday and today','left':{'label':'Yesterday','grad':'rose','pic':'l2c_1_cause.jpg','fit':'contain','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]},
    'right':{'label':'Today','grad':'sky','pic':'v2_rice.jpg','fit':'contain','chips':[('c1','I'),('c2','eat'),('c3','rice.')]}},
  {'m':'sort','phase':S_,'title':'Why does it hurt? (1)','bank':['sleep','ate','fall','fell','eat','slept'],'rows':[
@@ -44,11 +51,10 @@ spec=[
    {'pic':'l2c_6_effect.jpg','pre':('c4','Because I'),'end':('c3','medicine.'),'ans':['took']}]},
  {'m':'contrast','phase':S_,'title':'I ate. Did you eat?','left':{'label':'Statement','grad':'violet','pic':'l2c_1_cause.jpg','chips':[('c1','I'),('c2','ate'),('c3','spicy food.')]},
    'right':{'label':'Question','grad':'teal','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')]}},
- {'m':'rules','phase':S_,'title':'Four little rules','emoji':'light_bulb','rows':[
+ {'m':'rules','phase':S_,'title':'Three little rules','emoji':'light_bulb','rows':[
    ([('c2','Does','V'),('c1','your head','S'),('c2','hurt?','V')],'Does → hurt'),
    ([('c2','Did','V'),('c1','you','S'),('c2','eat?','V')],'Did → eat'),
-   ([('c4','Because','B'),('c1','I','S'),('c2','ate','V'),('c3','spicy food.','O')],'because → why'),
-   ([('c1','I','S'),('c2','walked','V'),('c3','home.','O')],'walk + ed')]},
+   ([('c4','Because','B'),('c1','I','S'),('c2','ate','V'),('c3','spicy food.','O')],'because → why')]},
  {'m':'contrast','phase':S_,'title':'Silver · habits','optional':True,'left':{'label':'Every day','grad':'sky','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Do'),('c1','you'),('c2','eat'),('c3','spicy food?')]},
    'right':{'label':'Yesterday','grad':'rose','qmark':True,'pic':'l2c_1_cause.jpg','chips':[('c2','Did'),('c1','you'),('c2','eat'),('c3','spicy food?')]}},
  {'m':'connect','phase':S_,'title':'Connect','rows':[
@@ -65,12 +71,12 @@ spec=[
    ('N',[('c4','Because'),('c1','he'),('c2','eat','ate'),('c3','spicy food.')])]},
  {'m':'chat','phase':S_,'title':'The handover','split':True,'window':5,'lines':[
    ('N','Room 4. His stomach hurts.',None,'v3_stomach.jpg'),
-   ('D',[C('c2','Did'),C('c1','he'),G('c2','eat'),C('c3','spicy food?')],[('c2','eat'),('c2','ate')],'l2c_1_cause.jpg'),
-   ('N',[C('c1','Yes, he'),C('c2','did.'),C('c1','He'),G('c2','ate'),C('c3','spicy food.')],[('c2','ate'),('c2','eat')]),
    ('D',[C('c2','Does'),C('c1','his head'),G('c2','hurt?')],[('c2','hurt?'),('c2','hurts?')],'v3_head.jpg'),
    ('N','No, it doesn’t.',None,'v3_no.jpg'),
-   ('D','Why does it hurt?'),
-   ('N',[C('c1','His stomach'),C('c2','hurts'),C('c4','because'),C('c1','he'),G('c2','ate'),C('c3','spicy food.')],[('c2','ate'),('c2','eat')]),
+   ('D','Why does it hurt?',None,'v3_stomach.jpg'),
+   ('N',[C('c4','Because'),C('c1','he'),G('c2','ate'),C('c3','spicy food.')],[('c2','ate'),('c2','eat')],'l2c_1_cause.jpg'),
+   ('D',[C('c2','Did'),C('c1','he'),G('c2','drink'),C('c3','water?')],[('c2','drink'),('c2','drank')],'v2_drink.jpg'),
+   ('N','No, he didn’t.',None,'v3_no.jpg'),
    ('D',[C('c1','He'),C('c2','should'),G('c2','drink'),C('c3','water.')],[('c2','drink'),('c2','drank')],'v3_adv_1.jpg')]},
  {'m':'pick','phase':S_,'title':'Why does it hurt?','optional':True,'steps':True,'effect':'l2c_3_effect.jpg','options':['l2c_5_cause.jpg','l2c_3_cause.jpg','l2c_6_cause.jpg'],'ok':1,'say':[('c4','Because'),('c1','I'),('c2','slept'),('c3','on the floor.')]},
  {'m':'pick','phase':S_,'title':'Why do you have a cold?','q':'Why do you have a cold?','optional':True,'steps':True,'effect':'l2c_2_effect.jpg','options':['l2c_5_cause.jpg','l2c_4_cause.jpg','l2c_2_cause.jpg'],'ok':2,'say':[('c4','Because'),('c1','I'),('c2','went'),('c3','out in the rain.')]},

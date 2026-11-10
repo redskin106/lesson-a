@@ -422,29 +422,24 @@ def connect(d): return connect_html(d,'x')
 
 @module('make_patient')
 def make_patient(d):
-    """Groups invent a patient: tap a pain, tap a secret cause; the words fill the handover frame.
+    """Groups invent a patient: tap a pain, tap a secret cause; the sentences appear as each pairing is made.
     {'pains':[(file,'stomach')],'causes':[(file,'eat','spicy food','ate')]}"""
     out=header(d['phase'],d.get('title','Make a patient'),'violet')
     P=d['pains']; C=d['causes']
-    out+=stp(f'<div class="a" style="left:90px;top:146px">{ch("c4","Where does it hurt?",50,"4px 32px")}</div>',1,'p')
+    out+=f'<div class="a" style="left:90px;top:146px">{ch("c4","Where does it hurt?",50,"4px 32px")}</div>'
     w=int((1740-3*40)/4)
     for k,(f,lab) in enumerate(P):
-        card=art(90+k*(w+40),222,w,196,f,r=44,label=f,fit='contain').replace('<div class="gl"','<div class="gl pkc" data-grp="p" data-v="'+lab+'"',1)
-        out+=stp(card,1,'p')
-    out+=stp(f'<div class="a" style="left:90px;top:436px">{ch("c4","Why?",50,"4px 32px")}</div>',2,'c')
+        out+=art(90+k*(w+40),222,w,196,f,r=44,label=f,fit='contain').replace('<div class="gl"','<div class="gl pkc" data-grp="p" data-v="'+lab+'"',1)
+    out+=f'<div class="a" style="left:90px;top:436px">{ch("c4","Why?",50,"4px 32px")}</div>'
     w2=int((1740-4*30)/5)
     for k,(f,v,o,pst) in enumerate(C):
-        card=art(90+k*(w2+30),512,w2,196,f,r=44,label=f,fit='contain').replace('<div class="gl"','<div class="gl pkc" data-grp="c" data-v="'+v+'|'+o+'|'+pst+'"',1)
-        out+=stp(card,2,'c')
-    def slot(key,col,w_,h_,fs_): return f'<span class="fs" data-slot="{key}"><span class="op">{gap(col,w_,"…",h=h_,fs=fs_)}</span><span class="fl" style="display:none">{ch(col2cls[col],"x",40,"2px 22px")}</span></span>'
+        out+=art(90+k*(w2+30),512,w2,196,f,r=44,label=f,fit='contain').replace('<div class="gl"','<div class="gl pkc" data-grp="c" data-v="'+v+'|'+o+'|'+pst+'"',1)
     col2cls={'#34d0f2':'c1','#9a5cff':'c2','#ff7a3c':'c3'}
-    rows=[
-      [ch('c1','His',40,'2px 22px'),slot('p0','#34d0f2',190,56,32),ch('c2','hurts.',40,'2px 22px')],
-      [ch('c2','Did',40,'2px 22px'),ch('c1','he',40,'2px 22px'),slot('c0','#9a5cff',130,56,32),slot('c1','#ff7a3c',240,56,32)],
-      [ch('c4','Because',40,'2px 22px'),ch('c1','he',40,'2px 22px'),slot('c3','#9a5cff',130,56,32),slot('c1b','#ff7a3c',220,56,32)]]
-    fy=736
-    fr='<div class="gl" style="left:90px;top:%dpx;width:1560px;height:%dpx;border-radius:64px"></div>'%(fy,236)
-    out+=stp(fr,3,'f')
-    for r,row in enumerate(rows):
-        out+=stp(f'<div class="a" style="left:150px;top:{fy+18+r*72}px;display:flex;gap:14px;align-items:center">'+''.join(row)+'</div>',3,'f')
+    def slot(key,col,w_,h_,fs_): return f'<span class="fs" data-slot="{key}"><span class="op">{gap(col,w_,"…",h=h_,fs=fs_)}</span><span class="fl" style="display:none">{ch(col2cls[col],"x",40,"2px 22px")}</span></span>'
+    T=lambda c,t:ch(c,t,40,'2px 22px')
+    rows=[('p',[T('c1','His'),slot('p0','#34d0f2',190,56,32),T('c2','hurts.')]),
+          ('c',[T('c2','Did'),T('c1','he'),slot('c0','#9a5cff',130,56,32),slot('c1','#ff7a3c',240,56,32)]),
+          ('c',[T('c4','Because'),T('c1','he'),slot('c3','#9a5cff',130,56,32),slot('c1b','#ff7a3c',240,56,32)])]
+    body=''.join(f'<div class="pfrow" data-g="{g}" style="display:none;gap:14px;align-items:center;margin-bottom:14px">'+''.join(r)+'</div>' for g,r in rows)
+    out+=f'<div class="gl pfrm" style="left:90px;top:736px;width:1560px;height:236px;border-radius:64px;padding:22px 60px;display:none">{body}</div>'
     return out
