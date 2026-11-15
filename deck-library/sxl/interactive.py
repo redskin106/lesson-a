@@ -291,7 +291,7 @@ var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){retu
 var P=function(n){SXLSound.play(n)}, wait=function(ms){return new Promise(function(r){setTimeout(r,SXL.cfg.off?0:ms)})};
 PHBG={ENGAGE:'linear-gradient(135deg,#ffd27a,#ff9fb8 45%,#ffb066)',STUDY:'linear-gradient(135deg,#b98cff,#8fb4ff 50%,#7fd3ff)',ACTIVATE:'linear-gradient(135deg,#9fe8c4,#7fe0d8 50%,#a8e6ff)',night:'#0b0a10'};function bgfit(){var on=document.querySelector('.sl.on');var pb=on&&PHBG[on.dataset.ph];var bi=+document.body.dataset.bgi||0;document.body.style.background=(innerWidth/innerHeight>1920/1080+0.01&&pb&&bi==0)?pb:(typeof BGS==='undefined'?'#eeeef3':BGS[bi][2])}function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);var st=$('#stage');st.style.transform='scale('+s+')';st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px';bgfit()}
 addEventListener('resize',fit);fit();
-var slides=$$('.sl'),cur=-1;
+var slides=$$('.sl:not(.lvx)'),cur=-1;
 [$('#stage')].concat(slides).forEach(function(e){e.addEventListener('scroll',function(){if(e.id==='stage'||!e.classList.contains('thread')){e.scrollTop=0;e.scrollLeft=0}})});
 function go(i){if(i<0||i>=slides.length)return;tickClk();slides.forEach(function(s){s.classList.remove('on')});cur=i;lastI=i;lastT=Date.now();upd();var s=slides[i];s.classList.add('on');bgfit();$('#nx').classList.toggle('on',s.dataset.m==='view'&&i<slides.length-1);$('#nx').style.visibility=(i<slides.length-1)?'visible':'hidden';if(!s.__init){s.__init=1;INIT[s.dataset.m](s)}else if(s.__done)$('#nx').classList.add('on');}
 var T0=Date.now(),SL=[],lastT=Date.now(),lastI=-1,showClk=false;
@@ -308,7 +308,7 @@ function nxFx(){var n=$('#nx');n.classList.remove('pr');void n.offsetWidth;n.cla
 $('#nx').onclick=function(){if(!this.classList.contains('on')){P('tick');return}nxFx();if(adv())return;P('open');go(cur+1)};
 var VOV=$('#vov');function vclose(){if(!VOV)return;VOV.classList.remove('on');$$('video',VOV).forEach(function(v){v.pause();v.classList.remove('on')})}
 if(VOV){document.addEventListener('click',function(e){var b=e.target.closest('.vplay');if(b){e.stopPropagation();var v=$('#vid-'+b.dataset.v);if(!v)return;$$('video',VOV).forEach(function(x){x.classList.remove('on')});v.classList.add('on');v.currentTime=0;VOV.classList.add('on');v.play();P('pop');return}if(e.target===VOV||e.target.id==='vx')vclose()},true)}
-addEventListener('keydown',function(e){if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){nxFx();if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
+addEventListener('keydown',function(e){if(e.target&&e.target.tagName==='TEXTAREA')return;if(VOV&&VOV.classList.contains('on')){if(e.key==='Escape')vclose();return}if(e.key==='ArrowRight'||e.key===' '){nxFx();if(adv())return}if(e.key==='ArrowRight'&&$('#nx').classList.contains('on'))go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
 var cfgs=['On','Calm','Off'],ci=0;
 var BGS=[['day','conic-gradient(#ffd27a,#ff9fb8,#b98cff,#7fd3ff,#9fe8c4,#ffd27a)','#eeeef3'],['white','#fafbff','#fafbff'],['night','#14122b','#14122b'],['sunset','linear-gradient(135deg,#ffc27a,#ff8fa3,#c98bff)','linear-gradient(135deg,#ffc27a,#ff8fa3 50%,#c98bff)']];
 $('#gt').onclick=function(){P('tick');$('#ctl').classList.toggle('open')};
@@ -516,18 +516,37 @@ def vov_markup(spec):
     if not keys: return ''
     return '<div id="vov">'+''.join(f'<video id="vid-{k}" playsinline controls preload="none" src="file:///home/claude/work/lesson/media/{k}.mp4"></video>' for k in keys)+'<button id="vx" aria-label="Close"><svg width="30" height="30" viewBox="0 0 30 30"><path d="M6 6L24 24M24 6L6 24" stroke="#6a35e8" stroke-width="5" stroke-linecap="round"/></svg></button></div>'
 
+def _expand_levels(spec):
+    """slide dict with levels:[{bronze overrides},{silver},{gold}] -> three sections (medals switch between them); lvl = starting level 1-3"""
+    out = []; g = 0
+    for d in spec:
+        if d.get('levels'):
+            g += 1; base = {k: v for k, v in d.items() if k != 'levels'}
+            for k, ov in enumerate(d['levels'], 1):
+                x = dict(base); x.update(ov); x['_lvg'] = g; x['_lv'] = k; x['_lv0'] = d.get('lvl', 2); out.append(x)
+        else: out.append(d)
+    return out
+MEDAL_COL = {1: ('#d9955a', '#b87333'), 2: ('#cfd6e4', '#8a93a6'), 3: ('#ffd84a', '#e0a800')}
+def medals_html(g, lv):
+    b = ''.join(f'<button class="mdl{" on" if k == lv else ""}" data-g="{g}" data-l="{k}" style="background:linear-gradient(135deg,{MEDAL_COL[k][0]},{MEDAL_COL[k][1]})">{"".join("<i></i>" for _ in range(k))}</button>' for k in (1, 2, 3))
+    return f'<div class="mdls">{b}</div>'
 def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
-    secs = ''; allspec = list(spec)
+    spec = _expand_levels(spec); secs = ''; allspec = list(spec)
     for n, d in enumerate(allspec):
         sid = f's{n}'; ph_ = d.get('phase'); night = d.get('mode') == 'night'; orbs = phase_orbs(ph_) if ph_ in PAL and not night else ''
         if d['m'] in BUILD: m = d['m']; body = BUILD[m](d, sid)
+        elif d['m'] in core.BUILD_EXT: m = d['m']; body = core.BUILD_EXT[m](d, sid)
         else: m = 'view'; body = core.MODULES[d['m']](d)
-        secs += f'<section class="sl{" night" if night else ""}" data-ph="{"night" if night else (ph_ or "")}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}" data-min="{d.get("min",0)}" data-label="{d.get("label",d.get("title") or d["m"])}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
+        lvx = ''
+        if d.get('_lvg'):
+            body += medals_html(d['_lvg'], d['_lv']) if d['_lv'] == d['_lv0'] or True else ''
+            lvx = f' data-lvg="{d["_lvg"]}" data-lv="{d["_lv"]}"' + ('' if d['_lv'] == d['_lv0'] else ' lvx=1')
+        secs += f'<section class="sl{" night" if night else ""}{" lvx" if "lvx=1" in lvx else ""}"{lvx.replace(" lvx=1","")} data-ph="{"night" if night else (ph_ or "")}" data-m="{m}" data-id="{sid}" data-mod="{d["m"]}" data-min="{d.get("min",0)}" data-label="{d.get("label",d.get("title") or d["m"])}"{" data-opt=1" if d.get("optional") else ""}>{orbs}{body}</section>'
     html = (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>'
-            f'<style>{css("day")}{CSS_EXTRA}</style></head><body><div id="stage">{secs}</div>'
+            f'<style>{css("day")}{CSS_EXTRA}{''.join(core.EXT_CSS)}</style></head><body><div id="stage">{secs}</div>'
             '<div id="ctl"><button id="gt" title="Settings"><svg width="32" height="32" viewBox="-16 -16 32 32"><g fill="#6a35e8"><circle r="9.5"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(0)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(45)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(90)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(135)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(180)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(225)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(270)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(315)"/></g><circle r="4" fill="#fff"/></svg></button><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button><div id="bgs"></div></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><div id="rpt"></div>'
             +vov_markup(spec)
-            +f'<script>{SFX_JS}</script><script>{APP_JS}</script></body></html>')
+            +f'<script>{SFX_JS}</script><script>{APP_JS.replace('go(0);', ''.join(core.EXT_JS)+'go(0);') if False else APP_JS[:APP_JS.rindex('go(0);')]+''.join(core.EXT_JS)+'go(0);'}</script></body></html>')
     html = re.sub(r'<img (?=[^>]*src="file:///home/claude/work/lesson/art/)', '<img data-z="1" ', html)
     html = inline_assets(html)
     pathlib.Path(out).write_text(html, encoding='utf-8')

@@ -58,6 +58,7 @@ def ph(x,y,w,h,label,fs=32,r=56,dim=False):
     return f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:{r}px;padding:14px;{"opacity:.55;" if dim else ""}"><div style="width:100%;height:100%;border-radius:{r-16}px;background:linear-gradient(135deg,#c8ceda,#9aa5b8);border:4px dashed #6a6a7e;display:flex;align-items:center;justify-content:center;font-size:{fs}px;color:#4a5a6e;text-align:center;line-height:1.3;padding:16px">{label}</div></div>'
 def art(x,y,w,h,f,r=40,label='',fit='cover'):
     """picture if the art file exists, otherwise a labelled placeholder (lets decks build before art arrives)"""
+    if f and "." not in f: return picx(f,x,y,w,h,r)
     return pic(x,y,w,h,f,r,fit) if os.path.exists('/home/claude/work/lesson/art/'+f) else ph(x,y,w,h,label or f,r=r)
 def glass(x,y,w,h,inner='',r=56,ex=''): return f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:{r}px;{ex}">{inner}</div>'
 def chips(row,fs=64,p='10px 34px'):
@@ -123,3 +124,12 @@ def spill(t,i=None,fs=42,p='8px 32px'):
     return f'<span class="pill" style="font-size:{fs}px;padding:{p};background:linear-gradient(135deg,{a},{b});color:{tc};border-color:{a};white-space:nowrap;font-family:O;font-weight:800">{t}</span>'
 def stint(i,a1='66',a2='22'):
     a=STRENGTH[i][0]; return f'background:linear-gradient(180deg,{a}{a1},{a}{a2});border-color:{a}aa'
+
+# ---------- extension hooks (plug-and-play modules: clue.py etc. register markup builders, behaviour JS and CSS here) ----------
+BUILD_EXT={}; EXT_JS=[]; EXT_CSS=[]
+def ejic(ch,x,y,s,r=0): return f'<div class="a" style="left:{x}px;top:{y}px;font-size:{s}px;line-height:1;transform:rotate({r}deg)">{ch}</div>'
+def picx(p,x,y,w,h,r=44,label=''):
+    """art file name -> art()/placeholder; anything else (emoji text) -> glass card with a big emoji, shown until Gemini art arrives"""
+    if '.' in p and '/' not in p[:1] and len(p)<40 and p.rsplit('.',1)[-1] in ('jpg','png','jpeg'): return art(x,y,w,h,p,r=r,label=label or p)
+    fs=int(min(w,h)*.55)
+    return f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:{r}px;display:flex;align-items:center;justify-content:center;font-size:{fs}px;line-height:1">{p}</div>'
