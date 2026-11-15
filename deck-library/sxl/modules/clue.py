@@ -83,6 +83,21 @@ def choice_html(d,sid):
     if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:810px;width:760px;font-size:34px;line-height:1.3">{d["hint"]}</div>'
     return o
 BUILD_EXT['choice']=choice_html
+# ---------------- task_card: one team task shown in lesson style, answers visible (review) ----------------
+@module('task_card')
+def task_card(d):
+    """{'phase','team':'Red','tg':gradient,'r':1,'t':{lab,ic,who,card,key,stretch,w},'unlock':'text','pic':emoji}"""
+    t=d['t']; o=header(d.get('phase','ACTIVATE'),f"{d['team']} team · round {d['r']}",d.get('tg','violet'))
+    o+=picx(d.get('pic','❓'),90,190,420,300,56)
+    o+=f'<div class="a" style="left:90px;top:510px;width:420px;text-align:center">{grad_chip(d.get("tg","violet"),t["ic"]+" "+t["lab"],40,"8px 26px")}</div>'
+    n=len(t['card']); fs=46 if n<150 else 40 if n<230 else 34
+    o+=glass(560,190,1270,350,f'<div style="height:100%;box-sizing:border-box;display:flex;align-items:center;padding:20px 44px;font-family:P;font-weight:500;font-size:{fs}px;line-height:1.4"><div>{t["card"].replace(chr(10),"<br>")}</div></div>',r=52)
+    o+=f'<div class="a mu" style="left:560px;top:556px;width:1270px;font-size:30px">{t["who"]} · {"say it, then write it down" if t["w"] else "aloud only"}</div>'
+    o+=stp(glass(560,620,1270,150,f'<div style="padding:24px 44px;font-family:O;font-weight:800;font-size:40px;line-height:1.25;color:#0b6b55">✔ Answer: {t["key"]}</div>',r=44,ex='background:linear-gradient(135deg,#d6fbea,#c4f3e6)'),1)
+    if t.get('stretch'): o+=stp(glass(560,790,1270,110,f'<div style="padding:20px 44px;font-family:P;font-weight:500;font-size:34px">⭐ Stretch: {t["stretch"]}</div>',r=44,ex='background:linear-gradient(135deg,#fff3c4,#ffe7a8)'),2)
+    o+=stp(glass(90,570,420,330,f'<div style="padding:20px 24px;font-family:P;font-weight:500;font-size:{28 if len(d["unlock"])<90 else 21}px;line-height:1.3"><b style="font-family:O">Unlocks</b><br>{d["unlock"]}</div>',r=44),3)
+    return o
+
 # ---------------- teach: watch, listen, repeat (no tapping to answer, nothing to get wrong) ----------------
 @module('teach')
 def teach(d):
