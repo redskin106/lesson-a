@@ -142,7 +142,7 @@ SXL.say=true;
 /* ---- medals: levels:[...] on a slide give three sections; the medal picks which one is in the deck ---- */
 function setLvl(g,l){var all=$$('.sl[data-lvg="'+g+'"]');all.forEach(function(e){e.classList.toggle('lvx',+e.dataset.lv!==l);e.classList.remove('on')});slides=$$('.sl:not(.lvx)');var n=all.filter(function(e){return +e.dataset.lv===l})[0];P('pop');go(slides.indexOf(n))}
 document.addEventListener('click',function(e){var b=e.target.closest('.mdl');if(b){e.stopPropagation();setLvl(+b.dataset.g,+b.dataset.l)}},true);
-addEventListener('keydown',function(e){if(e.target&&e.target.tagName==='TEXTAREA')return;var s=slides[cur];if(s&&s.dataset.lvg&&'123'.indexOf(e.key)>-1&&e.key.length===1)setLvl(+s.dataset.lvg,+e.key)});
+addEventListener('keydown',function(e){if(e.target&&/^(TEXTAREA|INPUT)$/.test(e.target.tagName))return;var s=slides[cur];if(s&&s.dataset.lvg&&'123'.indexOf(e.key)>-1&&e.key.length===1)setLvl(+s.dataset.lvg,+e.key)});
 /* ---- choice ---- */
 INIT.choice=function(s){
  var items=$$('.chi',s),dots=$$('.chd',s),k=0;
