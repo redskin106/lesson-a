@@ -83,6 +83,24 @@ def choice_html(d,sid):
     if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:810px;width:760px;font-size:34px;line-height:1.3">{d["hint"]}</div>'
     return o
 BUILD_EXT['choice']=choice_html
+# ---------------- teach: watch, listen, repeat (no tapping to answer, nothing to get wrong) ----------------
+@module('teach')
+def teach(d):
+    """{'phase','role','pic':emoji|art,'lines':[sentences]} or {'words':[(emoji,word),...]}  tap a line/card to hear it; each tap or arrow reveals the next"""
+    o=header(d.get('phase','STUDY'),d.get('role','Watch · listen · repeat'),'violet')
+    if d.get('words'):
+        C=d['words']; n=len(C); w=int((1740-30*(n-1))/n)
+        for i,(e,t) in enumerate(C):
+            x=90+i*(w+30)
+            o+=stp(f'<div class="gl tch" data-say="{t}" style="left:{x}px;top:200px;width:{w}px;height:600px;border-radius:56px;cursor:pointer"><div style="position:absolute;left:0;right:0;top:50px;text-align:center;font-size:{int(w*.5)}px;line-height:1">{e}</div><div style="position:absolute;left:0;right:0;bottom:50px;text-align:center;font-family:O;font-weight:800;font-size:68px">{t}</div></div>',i+1)
+    else:
+        L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,640,56)
+        for i,t in enumerate(L):
+            y=190+i*int(660/len(L))
+            o+=stp(f'<div class="gl tch" data-say="{t}" style="left:780px;top:{y}px;width:1050px;height:{int(660/len(L))-24}px;border-radius:48px;cursor:pointer;display:flex;align-items:center;padding:0 44px;box-sizing:border-box;font-family:O;font-weight:800;font-size:{46 if max(len(x) for x in L)<34 else 40}px;line-height:1.15">{t}<span style="margin-left:auto;font-size:44px">🔊</span></div>',i+1)
+    o+=f'<div class="a mu" style="left:90px;top:858px;width:1740px;text-align:center;font-size:36px">{d.get("hint","Listen. Then say it with me.")}</div>'
+    return o
+
 @module('choice')
 def _choice_static(d): return choice_html(d,'x')
 
@@ -142,6 +160,7 @@ EXT_CSS.append("""
 # ---------------- behaviour ----------------
 EXT_JS.append(r"""
 SXL.say=true;
+document.addEventListener('click',function(e){var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;speechSynthesis.speak(u)}catch(x){}P('tick')}});
 /* temporary review skip: hide with ?noskip */
 if(!/noskip/.test(location.search)){var sk=$('#sk');sk.style.display='block';setInterval(function(){sk.style.visibility=(cur<slides.length-1)?'visible':'hidden'},300);sk.onclick=function(){var s=slides[cur];if(s)s.__done=1;P('tick');if(cur<slides.length-1)go(cur+1)}}
 
