@@ -43,7 +43,7 @@ def frames3(d):
     k=n+1
     if d.get('write'):
         wy=180+h+30+(56 if d.get('note') else 0)
-        o+=stp(f'<div class="gl" style="left:90px;top:{wy}px;width:1740px;height:{915-wy}px;border-radius:48px;padding:14px"><textarea placeholder="Write on your tablet…" style="width:100%;height:100%;border:0;background:transparent;font-family:P;font-weight:500;font-size:40px;resize:none;outline:none"></textarea></div>',k);k+=1
+        o+=stp(f'<div class="gl" style="left:90px;top:{wy}px;width:1740px;height:{915-wy}px;border-radius:48px;padding:14px"><textarea placeholder="Write it down…" style="width:100%;height:100%;border:0;background:transparent;font-family:P;font-weight:500;font-size:40px;resize:none;outline:none"></textarea></div>',k);k+=1
     if d.get('note'): o+=stp(f'<div class="a mu" style="left:90px;top:{180+h+30}px;width:1740px;text-align:center;font-size:34px">{d["note"]}</div>',k)
     return o
 
@@ -78,7 +78,7 @@ def choice_html(d,sid):
         o+=f'<div class="chi" style="display:none">'+picx(it.get('pic','❓'),90,180,700,600,56)
         o+=f'<div class="gl" style="left:850px;top:190px;width:980px;border-radius:48px;padding:26px 40px;font-family:O;font-weight:800;font-size:{50 if len(it["q"])<46 else 42}px;line-height:1.2;position:absolute">{it["q"]}</div>'
         o+='<div class="a cho-wrap" style="left:850px;top:400px;width:980px;display:flex;flex-direction:column;gap:18px">'+''.join(f'<button class="cho" data-ok="{1 if t==it["ans"] else 0}" style="font-size:{44 if len(t)<34 else 38}px">{t}</button>' for t in it['opts'])+'</div></div>'
-    if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:930px;font-size:34px">{d["hint"]}</div>'
+    if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:810px;width:760px;font-size:34px;line-height:1.3">{d["hint"]}</div>'
     return o
 BUILD_EXT['choice']=choice_html
 @module('choice')
@@ -88,7 +88,7 @@ def _choice_static(d): return choice_html(d,'x')
 def boss_html(d,sid):
     """{'phase','title','text','q','plain':[glosses],'simple','answer','sec'}"""
     b=d; o=header(d.get('phase','ACTIVATE'),'Optional boss','rose')
-    o+=glass(90,170,1060,470,f'<div style="padding:40px 50px;font-family:P;font-weight:500;font-size:37px;line-height:1.5">{b["text"]}</div>',r=56)
+    o+=glass(90,170,1060,470,f'<div style="padding:40px 50px;font-family:P;font-weight:500;font-size:{37 if len(b["text"])<330 else 31}px;line-height:1.45">{b["text"]}</div>',r=56)
     o+=f'<div class="a" style="left:90px;top:665px;width:1060px;font-family:O;font-weight:800;font-size:54px;line-height:1.1">{b["q"]}</div>'
     o+=f'<div class="a" style="left:90px;top:790px;display:flex;gap:28px;align-items:center"><div class="bstime" style="font-family:O;font-weight:800;font-size:110px;min-width:190px" data-sec="{b.get("sec",90)}"><span class="grad">{b.get("sec",90)}</span></div><button class="bsb bstart">{grad_chip("violet","▶ start",48,"10px 44px")}</button><button class="bsb bgive">{grad_chip("rose","We give up",48,"10px 44px")}</button></div>'
     fp=f'<div style="padding:34px 40px">{grad_chip("amber","Free pass",48,"6px 34px")}<div style="margin-top:20px;font-family:P;font-weight:500;font-size:34px;line-height:1.55">'+'<br>'.join(f'<b>{g.split(" = ")[0]}</b> = {g.split(" = ")[1]}' for g in b['plain'])+f'</div><div style="margin-top:26px;font-family:P;font-weight:500;font-size:36px;line-height:1.4">{b["simple"]}</div><div style="margin-top:26px">{grad_chip("teal",b["answer"],40,"8px 30px")}</div><div style="margin-top:22px;font-size:44px">Too easy? 😄</div></div>'
@@ -102,7 +102,7 @@ def case_board_html(d,sid):
     o=header(d['phase'],d.get('title','Case board'),'amber')
     o+='<div class="a cbcount"></div><div class="a cbsus"></div><div class="a cbgrid"></div><div class="a cbbar"></div><div class="a cbtw"></div>'
     o+='<div class="cbm"><div class="cbmb"></div></div>'
-    data={k:d[k] for k in ('teams','suspects','clues','twist','test','answer','reveal') if k in d}
+    data={k:d[k] for k in ('teams','suspects','clues','twist','test','answer','reveal','debate','rule') if k in d}
     return o+f'<script type="application/json" id="d-{sid}">{json.dumps(data,ensure_ascii=False)}</script>'
 BUILD_EXT['case_board']=case_board_html
 
@@ -120,15 +120,15 @@ EXT_CSS.append("""
 .cbsus{left:90px;top:145px;width:1740px;display:flex;gap:18px}
 .cbs{flex:1;height:140px;border-radius:40px;background:rgba(255,255,255,.7);border:4px solid #fff;box-shadow:0 10px 26px rgba(60,30,140,.14);text-align:center;font-family:O;font-weight:800;font-size:30px;padding-top:6px;transition:opacity .5s,background .5s}
 .cbs b{display:block;font-size:56px;line-height:1.15}.cbs .mk{font-size:28px;height:34px;letter-spacing:2px}.cbs.win{background:linear-gradient(135deg,#bff5df,#7fe0d8);transform:scale(1.04)}.cbs.dim{opacity:.35}
-.cbgrid{left:90px;top:305px;width:1740px;height:520px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.cbgrid{left:90px;top:305px;width:1740px;height:535px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
 .cbcol{display:flex;flex-direction:column;gap:12px;min-height:0}
 .cbh{height:62px;border-radius:24px;color:#fff;font-family:O;font-weight:800;font-size:38px;text-align:center;line-height:62px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4)}
-.cbt{flex:1;min-height:0;border-radius:30px;background:rgba(255,255,255,.55);border:4px solid #fff;display:flex;align-items:center;gap:14px;padding:0 20px;font-family:P;font-weight:500;font-size:25px;line-height:1.2;overflow:hidden;text-align:left;color:#1c1b2e}
+.cbt{flex:1;min-height:0;border-radius:30px;background:rgba(255,255,255,.55);border:4px solid #fff;display:flex;align-items:center;gap:14px;padding:0 20px;font-family:P;font-weight:500;font-size:27px;line-height:1.18;overflow:hidden;text-align:left;color:#1c1b2e;position:relative}.cbt .tx{flex:1;min-width:0}.cbt.ov:after{content:'\2922';position:absolute;right:14px;bottom:4px;font-size:30px;color:#7b3cf0}
 .cbt .pc{font-size:48px;flex-shrink:0}.cbt.lk{opacity:.45}.cbt.rd{cursor:pointer;background:#fff;animation:cbp 1.6s infinite}.cbt.ok{background:#fff;cursor:pointer;box-shadow:0 8px 22px rgba(60,30,140,.18)}
 @keyframes cbp{50%{box-shadow:0 0 0 10px rgba(154,92,255,.2)}}
-.cbbar{left:260px;top:898px;display:flex;gap:16px}
+.cbbar{left:90px;top:866px;display:flex;gap:16px}
 .cbb{border:0;cursor:pointer;font-family:O;font-weight:800;font-size:32px;padding:8px 30px;border-radius:999px;background:rgba(255,255,255,.85);color:#4a2bb8;box-shadow:0 8px 20px rgba(60,30,140,.18)}
-.cbtw{left:90px;top:833px;width:1600px;font-family:O;font-weight:800;font-size:32px;color:#c0306a;display:none;background:#fff;border-radius:999px;padding:10px 30px}
+.cbtw{left:1190px;top:858px;width:640px;font-family:O;font-weight:800;font-size:27px;line-height:1.1;color:#c0306a;display:none;background:#fff;border-radius:40px;padding:8px 26px}
 .cbm{position:absolute;inset:0;background:rgba(40,20,100,.42);display:none;align-items:center;justify-content:center;z-index:8}.cbm.on{display:flex}
 .cbmb{width:1200px;max-height:900px;overflow:auto;background:#fff;border-radius:56px;padding:44px 56px;box-shadow:0 40px 100px rgba(40,20,100,.45);font-family:P;font-weight:500;font-size:36px;line-height:1.4;color:#1c1b2e}
 .cbmb h3{font-family:O;font-weight:800;font-size:56px;margin:0 0 14px}.cbmb .ex{background:#efeaff;border-radius:30px;padding:20px 30px;margin:18px 0;font-size:38px}
@@ -174,24 +174,26 @@ INIT.case_board=function(s){
   var f=fx();sus.innerHTML=D.suspects.map(function(x){return '<div class="cbs'+(won?(x[0]===D.answer?' win':' dim'):'')+'"><b>'+x[2]+'</b>'+x[1]+'<div class="mk"><span style="color:#10a98d">'+new Array(f[x[0]].f+1).join('✔')+'</span> <span style="color:#e0306a">'+new Array(f[x[0]].a+1).join('✖')+'</span></div></div>'}).join('');
   grid.innerHTML=D.teams.map(function(t){var open=true,mine=D.clues.filter(function(c){return c.team===t[0]}).sort(function(a,b){return a.r-b.r});
    return '<div class="cbcol"><div class="cbh" style="background:linear-gradient(135deg,'+t[2]+','+t[3]+')">'+t[1]+'</div>'+mine.map(function(c){var o=ok[c.id],rd=!o&&open;if(!o)open=false;
-    if(o)return '<div class="cbt ok" data-id="'+c.id+'" data-k="read"><span class="pc">'+c.pic+'</span><span>'+txt(c)+'</span></div>';
+    if(o)return '<div class="cbt ok" data-id="'+c.id+'" data-k="read"><span class="pc">'+c.pic+'</span><span class="tx">'+txt(c)+'</span></div>';
     return '<div class="cbt '+(rd?'rd':'lk')+'" data-id="'+c.id+'" data-k="'+(rd?'ask':'')+'"><span class="pc">'+(rd?'✋':'🔒')+'</span><span>'+(rd?'tap when the team is ready':'')+'</span></div>'}).join('')+'</div>'}).join('');
-  if(tw){twb.style.display='block';twb.innerHTML='⚡ '+D.twist.pic+' '+D.twist.text}}
+  fit();if(tw){twb.style.display='block';twb.innerHTML='⚡ '+D.twist.pic+' '+D.twist.text}}
+ function fit(){$$('.cbt.ok',grid).forEach(function(t){var x=$('.tx',t),f=27;x.style.fontSize=f+'px';while(f>17&&(x.scrollHeight>t.clientHeight-8)){f--;x.style.fontSize=f+'px'}if(x.scrollHeight>t.clientHeight-8)t.classList.add('ov')})}
  function sheet(h){mb.innerHTML=h;m.classList.add('on')}
  function close(){m.classList.remove('on')}
  function dialsHtml(c){return c.dials?'<div class="ex">'+Object.keys(c.dials).map(function(k){return '<b>'+k+'</b> '+c.dials[k]}).join('<br>')+'</div>':''}
  grid.onclick=function(e){var t=e.target.closest('.cbt');if(!t||!t.dataset.k)return;var c=clue(t.dataset.id);P('tick');
   if(t.dataset.k==='read'){sheet('<h3>'+c.pic+' '+(c.topic||c.id)+'</h3><div class="ex">'+(c.text||'').replace(/\n/g,'<br>')+'</div>'+dialsHtml(c)+'<button class="bt g" data-a="x">Close</button>');return}
-  var h='<h3>'+c.pic+' '+c.id+'</h3>'+(c.ask?'<div>The team should ask: <b>"'+c.ask+'"</b></div>':'')+'<div class="ex">Listen for the meaning:<br><b>'+c.say+'</b></div><div style="font-size:30px;color:#6a6a7e">Approve on meaning, not grammar. Lesson 4: at least one dial. Another team: "say it differently".</div><div style="margin:16px 0"><span class="tg" data-a="t1">Said aloud</span><span class="tg" data-a="t2">Written on the tablet</span></div><button class="bt" data-a="ap" data-id="'+c.id+'" disabled>Approve · show clue</button><button class="bt g" data-a="x">Not yet</button>';sheet(h)};
+  var h='<h3>'+c.pic+' '+c.id+'</h3>'+(c.ask?'<div>The team should ask: <b>"'+c.ask+'"</b></div>':'')+'<div class="ex">Listen for the meaning:<br><b>'+c.say+'</b></div><div style="font-size:30px;color:#6a6a7e">Approve on meaning, not grammar. '+(D.rule||'')+' Another team: "say it differently".</div><div style="margin:16px 0"><span class="tg" data-a="t1">Said aloud</span><span class="tg" data-a="t2">Written down</span></div><button class="bt" data-a="ap" data-id="'+c.id+'" disabled>Approve · show clue</button><button class="bt g" data-a="x">Not yet</button>';sheet(h)};
  mb.onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a;
   if(a==='x'){close();return}
   if(a==='t1'||a==='t2'){b.classList.toggle('on');P('tick');$('[data-a="ap"]',mb).disabled=!($('[data-a="t1"]',mb).classList.contains('on')&&$('[data-a="t2"]',mb).classList.contains('on'));return}
   if(a==='ap'){var c=clue(b.dataset.id);ok[c.id]=1;close();draw();P('good');if(c.kind==='audio')say(c.text);return}
   if(a==='opt'){var T=D.test;if(+b.dataset.i===T.ans){b.style.background='#2bd9b6';b.style.color='#fff';$('.why',mb).textContent=T.why;P('good')}else{b.style.opacity=.4;wrong(b)}}};
- bar.innerHTML='<button class="cbb" data-b="tw">⚡ Late twist</button><button class="cbb" data-b="test">🧪 Confirming test</button><button class="cbb" data-b="rv">🎬 Reveal</button>';
+ bar.innerHTML='<button class="cbb" data-b="tw">⚡ Late twist</button><button class="cbb" data-b="test">🧪 Confirming test</button><button class="cbb" data-b="rv">🎬 Reveal</button>'+(D.debate?'<button class="cbb" data-b="db">🗣️ Debate</button>':'');
  bar.onclick=function(e){var b=e.target.closest('[data-b]');if(!b)return;P('tick');var k=b.dataset.b;
   if(k==='tw'){tw=true;ok.TW=1;draw();P('open');say(D.twist.text.replace(/["⚡]/g,''))}
   if(k==='test'){var T=D.test;sheet('<h3>🧪 '+T.q+'</h3>'+T.opts.map(function(o,i){return '<button class="bt g" style="display:block;width:100%;text-align:left" data-a="opt" data-i="'+i+'">'+o+'</button>'}).join('')+'<div class="ex why">Let the teams argue first.</div><button class="bt g" data-a="x">Close</button>')}
+  if(k==='db'){var f=fx(),top=D.suspects.slice().sort(function(a,b){return (f[b[0]].f-f[b[0]].a)-(f[a[0]].f-f[a[0]].a)}).slice(0,3);sheet('<h3>🗣️ '+D.debate.title+'</h3><div class="ex">'+top.map(function(x){return '<span class="tg">'+x[2]+' '+x[1]+'</span>'}).join('')+'</div>'+D.debate.lines.map(function(l){return '<div style="margin:8px 0">'+l+'</div>'}).join('')+'<button class="bt g" data-a="x">Close</button>')}
   if(k==='rv'){won=true;draw();var a=D.suspects.filter(function(x){return x[0]===D.answer})[0];P('arrive');sheet('<h3 style="font-size:84px">'+a[2]+' '+a[1]+'</h3><div class="ex">'+D.reveal+'</div><button class="bt g" data-a="x">Close</button>');finish(s)}};
  $('#nx').classList.add('on');draw()};
 """)

@@ -18,8 +18,10 @@ def cover(d):
     """{'tag':'EFL','title':'Lesson <span class="grad">1</span>','phases':['Engage','Study','Activate'],'active':0,'cards':[{'pic':f,'x':1010,'y':150,'w':330,'h':430,'r':-7}]}"""
     o=f'<div class="tag" style="left:110px;top:90px;{GR}font-size:30px">{d["tag"]}</div>' if d.get('tag') else ''
     o+=f'<div class="a h" style="left:104px;top:640px;font-size:210px;line-height:.9;white-space:nowrap">{d["title"]}</div>'
-    o+='<div class="a" style="left:110px;top:900px;display:flex;gap:20px">'+''.join(pill(t,36,i!=d.get('active',0)) for i,t in enumerate(d.get('phases',[])))+'</div>'
+    o+='<div class="a" style="left:110px;top:850px;display:flex;gap:20px">'+''.join(pill(t,36,i!=d.get('active',0)) for i,t in enumerate(d.get('phases',[])))+'</div>'
     for c in d.get('cards',[]):
+        if '.' not in c['pic']:
+            o+=f'<div style="position:absolute;transform:rotate({c.get("r",0)}deg);left:{c["x"]}px;top:{c["y"]}px">'+picx(c['pic'],0,0,c['w'],c['h'],56)+'</div>'; continue
         o+=(f'<div class="gl" style="left:{c["x"]}px;top:{c["y"]}px;width:{c["w"]}px;height:{c["h"]}px;border-radius:56px;padding:14px;transform:rotate({c.get("r",0)}deg);background:rgba(255,255,255,.9)">'
             f'<img src="{ART}{c["pic"]}" style="width:100%;height:100%;object-fit:cover;border-radius:42px;display:block"></div>')
     return o

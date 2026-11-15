@@ -15,7 +15,7 @@ L3_CLUES=[
  dict(id='A4',team='red',r=4,kind='audio',pic='🎧',ask='Have you been bitten by mosquitoes?',text='Yes, a lot. In the garden by the pond, about a week ago.',say='She was bitten by mosquitoes a week ago, so it might be dengue.',fx={'dengue':'for'}),
  dict(id='B1',team='blue',r=1,kind='number',pic='🌡️',text='Temperature: 39.2 °C   (normal: about 37 °C)',say='Her temperature is 39.2. It is higher than normal, so she has a fever.',fx={'appendix':'against'}),
  dict(id='B2',team='blue',r=2,kind='number',pic='💓',text='Pulse: 104 per minute   (normal: 60 – 100)',say='Her pulse is 104. It is a little higher than normal.',fx={}),
- dict(id='B3',team='blue',r=3,kind='number',pic='🩸',text='Platelets: 95   (normal: 150 – 450)\nWhite cells: 3.1   (normal: 4.5 – 11)',say='Her platelets and white cells are lower than normal. That fits dengue.',fx={'dengue':'for'},level='silver'),
+ dict(id='B3',team='blue',r=3,kind='number',pic='🩸',text='Platelets: 95 (normal 150–450)\nWhite cells: 3.1 (normal 4.5–11)',say='Her platelets and white cells are lower than normal. That fits dengue.',fx={'dengue':'for'},level='silver'),
  dict(id='B4',team='blue',r=4,kind='number',pic='🫁',text='Breathing: 18 per minute   (normal: 12 – 20)',say='Her breathing is normal. It is the same as normal.',fx={}),
  dict(id='C1',team='green',r=1,kind='photo',pic='🖐️',text='Red rash on the arms and chest. No rash on the face.',say='She has a rash on her arms and chest, but not on her face. It might be dengue. It is unlikely to be measles.',fx={'dengue':'for','measles':'against'}),
  dict(id='C2',team='green',r=2,kind='photo',pic='👁️',text='Eyes: not red, not watery.',say='Her eyes are not red or watery, so it is unlikely to be measles.',fx={'measles':'against'}),
@@ -24,7 +24,7 @@ L3_CLUES=[
  dict(id='D1',team='yellow',r=1,kind='paper',pic='💉',text='Vaccination card: measles vaccine, 2 doses.',say='She had two measles vaccines, so measles is unlikely.',fx={'measles':'against'}),
  dict(id='D2',team='yellow',r=2,kind='paper',pic='🍱',text='Friend: "We ate the same food. Nobody else is sick."',say='Her friends ate the same food and they are not sick, so food poisoning is less likely.',fx={'food':'against'}),
  dict(id='D3',team='yellow',r=3,kind='paper',pic='🏘️',text='Neighbour: "Two people on our street had a fever last week."',say='Two people on her street were sick, so it might be an infection from mosquitoes.',fx={'dengue':'for'}),
- dict(id='D4',team='yellow',r=4,kind='paper',pic='💊',text='Bottle: paracetamol. She took it yesterday. The fever went down, then came back.',say='She took paracetamol. The fever went down, then came back.',fx={},level='silver'),
+ dict(id='D4',team='yellow',r=4,kind='paper',pic='💊',text='Paracetamol yesterday. The fever went down, then came back.',say='She took paracetamol. The fever went down, then came back.',fx={},level='silver'),
 ]
 L3_TWIST=dict(pic='📞',text='Phone call: "Her sister had flu last week!"',say='Her sister had flu, so flu is possible. But she has no cough and she has a rash.',fx={'flu':'for'})
 L3_TEST=dict(q='It is day 3 of the fever. Which test do we do?',opts=['Dengue blood test (NS1)','Chest X-ray','Stool test'],ans=0,
