@@ -1,1 +1,1 @@
-from . import sort, chat, contrast, storyboard, case, kit, clue, words
+from . import sort, chat, contrast, storyboard, case, kit, clue, words, play
