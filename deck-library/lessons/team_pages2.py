@@ -37,11 +37,12 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-a]')
  if(a==='L'){L=v;draw()}else if(a==='R'){r=+v;draw()}else if(a==='S'){b.style.display='none';$('st').style.display='block'}else if(a==='H'){$('hd').style.display='block';b.style.display='none'}else if(a==='N'){done=Math.min(4,done+1);r=Math.min(3,done);draw()}});
 draw();
 """
+DBG="""window.addEventListener('error',function(e){var d=document.getElementById('dbg');d.style.color='red';d.textContent='ERROR: '+e.message});document.addEventListener('click',function(e){var d=document.getElementById('dbg');if(d.textContent.indexOf('ERROR')<0)d.textContent='page v3 - last tap: '+e.target.tagName+' '+(e.target.textContent||'').slice(0,12)},true);"""
 def page(n,team):
     title,clues,tasks=LESSON[n]; name,c1,c2=COL[team]
     ids=[c['id'] for c in sorted([c for c in clues if c['team']==team],key=lambda c:c['r'])]
     data=dict(name=name,c1=c1,c2=c2,lesson=title,ids=ids,tasks=[tasks[i] for i in ids])
-    html=f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{name} team · L{n}</title><style>{TP.CSS}{EXTRA}</style></head><body><div id="app"></div><div id="dbg" style="font:12px monospace;color:#6a6a7e;padding:6px">page v3</div><script>window.addEventListener('error',function(e){document.getElementById('dbg').style.color='red';document.getElementById('dbg').textContent='ERROR: '+e.message});document.addEventListener('click',function(e){var d=document.getElementById('dbg');if(d&&d.textContent.indexOf('ERROR')<0)d.textContent='page v3 · last tap: '+(e.target.tagName||'')+' '+(e.target.textContent||'').slice(0,12)},true);const D={json.dumps(data,ensure_ascii=False)};{JS}</script></body></html>'
+    html=f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{name} team · L{n}</title><style>{TP.CSS}{EXTRA}</style></head><body><div id="app"></div><div id="dbg" style="font:12px monospace;color:#6a6a7e;padding:6px">page v3</div><script>{DBG}const D={json.dumps(data,ensure_ascii=False)};{JS}</script></body></html>'
     (OUT/f'l{n}-{team}.html').write_text(inline_assets(html),encoding='utf-8')
 for n in (3,4):
     for t in COL: page(n,t)
