@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Case board</title><style>
+*{box-sizing:border-box;margin:0}body{font-family:Poppins,"Segoe UI",system-ui,sans-serif;background:#0f0e1a;color:#f6f3ff;height:100vh;display:flex;flex-direction:column;padding:16px 24px;gap:12px;overflow:hidden}
+header{display:flex;align-items:center;gap:20px}h1{font-size:34px}#left{margin-left:auto;font-size:30px;font-weight:800;background:#ffb21f;color:#1c1b2e;border-radius:999px;padding:8px 26px}
+#sus{display:flex;gap:14px}.s{flex:1;border-radius:24px;background:#1d1b33;padding:10px 16px;text-align:center;font-size:24px;border:3px solid transparent;transition:.4s}.s b{font-size:46px;display:block}.s .m{font-size:20px;min-height:28px}.s.win{border-color:#19b38a;background:#14382e}.s.dim{opacity:.35}
+#grid{flex:1;overflow:hidden;display:grid;grid-template-rows:minmax(0,1fr);grid-template-columns:repeat(4,1fr);gap:14px;min-height:0}.col{display:flex;flex-direction:column;gap:10px;min-height:0}
+.tile{flex:1 1 0;border-radius:22px;padding:10px 14px;background:#24223f;display:flex;flex-direction:column;justify-content:center;font-size:20px;line-height:1.25;border:3px solid transparent;cursor:default;min-height:0;overflow:hidden}
+.tile .p{font-size:36px}.tile.ready{background:#2d2a52;border-color:var(--c);cursor:pointer;animation:pl 1.6s infinite}.tile.ok{background:#fff;color:#1c1b2e;border-color:var(--c)}
+.tile.lock{opacity:.4}@keyframes pl{50%{box-shadow:0 0 0 8px rgba(255,255,255,.12)}}
+.hd{border-radius:18px;padding:8px;text-align:center;font-weight:800;font-size:26px;color:#fff}
+.pips{font-size:16px;opacity:.8}
+footer{display:flex;gap:12px;flex-shrink:0;position:relative;z-index:2}footer button{font:inherit;font-weight:700;font-size:20px;padding:10px 22px;border-radius:999px;border:0;cursor:pointer;background:#fff;color:#1c1b2e}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}#modal.on{display:flex}
+#mb{background:#fff;color:#1c1b2e;border-radius:36px;padding:34px 40px;width:min(900px,92vw);font-size:28px}#mb h3{font-size:36px;margin-bottom:10px}.ex{background:#efeaff;border-radius:20px;padding:14px 20px;margin:14px 0;font-size:26px}
+label{display:block;margin:10px 0;font-size:28px}input[type=checkbox]{width:28px;height:28px;vertical-align:middle;margin-right:10px}
+.bt{font:inherit;font-weight:700;font-size:26px;padding:12px 34px;border-radius:999px;border:0;background:#19b38a;color:#fff;cursor:pointer;margin-right:10px}.bt[disabled]{opacity:.35}.bt.g{background:#ddd;color:#333}
+#twist{background:#ffe0e3;color:#1c1b2e;border-radius:22px;padding:10px 18px;font-size:22px;display:none}
+</style></head><body>
+<header><h1 id="ttl"></h1><div id="left"></div></header><div id="sus"></div><div id="twist"></div><div id="grid"></div>
+<footer><button onclick="twist()" id="btw">⚡ Late twist</button><button onclick="testq()">🧪 Confirming test</button><button onclick="reveal()">🎬 Reveal</button><button onclick="if(confirm('Reset the board?')){localStorage.removeItem(K);location.reload()}" style="margin-left:auto;opacity:.6">reset</button></footer>
+<div id="modal"><div id="mb"></div></div>
+<script>
+const D=__DATA__;const q=new URLSearchParams(location.search);const N=q.get('case')==='4'?4:3;const C=D['l'+N];const K='sxl-board-'+N;
+let st=JSON.parse(localStorage.getItem(K)||'{"ok":{},"twist":false}');const save=()=>localStorage.setItem(K,JSON.stringify(st));
+const $=id=>document.getElementById(id);function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+const clues=C.clues.concat([]);const byId=id=>clues.find(c=>c.id===id);
+function fxAll(){const f={};C.suspects.forEach(s=>f[s[0]]={for:0,against:0});Object.keys(st.ok).forEach(id=>{const c=id==='TW'?C.twist:byId(id);Object.entries(c.fx||{}).forEach(([k,v])=>f[k][v]++)});return f}
+let won=st.won||false;
+function draw(){$('ttl').textContent=C.title;const total=clues.length;const done=Object.keys(st.ok).filter(k=>k!=='TW').length;$('left').textContent=(total-done)+' answers to go';
+ const f=fxAll();$('sus').innerHTML=C.suspects.map(s=>`<div class="s ${won?(s[0]===C.answer?'win':'dim'):''}"><b>${s[2]}</b>${s[1]}<div class="m">${'✔'.repeat(f[s[0]].for)} ${'✖'.repeat(f[s[0]].against)}</div></div>`).join('');
+ $('grid').innerHTML=D.teams.map(t=>{const mine=clues.filter(c=>c.team===t[0]).sort((a,b)=>a.r-b.r);let open=true;return `<div class="col" style="--c:${t[2]}"><div class="hd" style="background:${t[2]}">${t[1]}</div>${mine.map(c=>{const ok=st.ok[c.id];const ready=!ok&&open;if(!ok)open=false;
+  if(ok)return `<div class="tile ok"><div style="display:flex;gap:10px;align-items:center"><span class="p">${c.pic}</span><div>${C.kind==='4'?`<b>${c.topic}</b><br>`:''}${(c.text||'').replace(/\n/g,'<br>')}${c.dials?`<div>${Object.entries(c.dials).map(([k,v])=>`<b>${k}</b> ${v}`).join('<br>')}</div>`:''}</div></div></div>`;
+  return `<div class="tile ${ready?'ready':'lock'}" ${ready?`onclick="openTile('${c.id}')"`:''}><div style="display:flex;gap:10px;align-items:center"><span class="p">${ready?'✋':'🔒'}</span><div>${ready?'tap when the team is ready':'locked'}</div></div></div>`}).join('')}</div>`}).join('');
+ if(st.twist){$('twist').style.display='block';$('twist').innerHTML='⚡ '+C.twist.pic+' '+C.twist.text}}
+function openTile(id){const c=byId(id);let h=`<h3>${c.pic} ${c.id} · ${D.teams.find(t=>t[0]===c.team)[1]} team</h3>`;
+ if(C.kind==='3'&&c.kind==='audio')h+=`<div>The team should ask: <b>"${c.ask}"</b></div>`;
+ h+=`<div class="ex">Meaning to listen for:<br><b>${c.say}</b></div><div class="mu" style="font-size:22px">Approve on meaning, not grammar. At least one dial for Lesson 4. Another team: "say it differently".</div>`;
+ h+=`<label><input type="checkbox" id="c1" onchange="chk()">Said aloud ✔</label><label><input type="checkbox" id="c2" onchange="chk()">Written on the tablet ✔</label><button class="bt" id="ap" disabled onclick="approve('${id}')">Approve · show clue</button><button class="bt g" onclick="$('modal').classList.remove('on')">Not yet</button>`;$('mb').innerHTML=h;$('modal').classList.add('on')}
+function chk(){$('ap').disabled=!($('c1').checked&&$('c2').checked)}
+function approve(id){st.ok[id]=1;save();$('modal').classList.remove('on');draw();const c=byId(id);if(c.kind==='audio')say(c.text)}
+function twist(){st.twist=true;st.ok.TW=1;save();draw();say(C.twist.text.replace(/["⚡]/g,''))}
+function testq(){const T=C.test;$('mb').innerHTML=`<h3>🧪 ${T.q}</h3>`+T.opts.map((o,i)=>`<button class="bt ${i?'g':''}" style="display:block;margin:12px 0;width:100%;text-align:left" onclick="this.style.background=${i===T.ans?"'#19b38a'":"'#ffb0b8'"};${i===T.ans?`document.getElementById('why').textContent=${JSON.stringify(T.why)}`:''}">${o}</button>`).join('')+'<div id="why" class="ex" style="font-size:22px">Let the teams argue first.</div><button class="bt g" onclick="$(\'modal\').classList.remove(\'on\')">Close</button>';$('modal').classList.add('on')}
+function reveal(){won=true;st.won=true;save();draw();const a=C.suspects.find(s=>s[0]===C.answer);$('mb').innerHTML=`<h3 style="font-size:60px">${a[2]} ${a[1]}</h3><div class="ex">${C.reveal}</div><button class="bt g" onclick="$('modal').classList.remove('on')">Close</button>`;$('modal').classList.add('on')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('modal').classList.remove('on')});draw();
+</script></body></html>
