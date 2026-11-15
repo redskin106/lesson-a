@@ -12,7 +12,7 @@ def exch(e,phase='STUDY',**kw):
     fix=lambda it:dict(it,pic='🔁' if e['title'].startswith('How often') else '📅') if len(it['pic'])>4 else it
     d=dict(m='choice',phase=phase,title=e['title'],hint=e['hint'],label='Exercise · '+e['title'],lvl=1,levels=[{'items':[fix(i) for i in e['levels'][k]]} for k in ('bronze','silver','gold')]); d.update(kw); return d
 def board(title,sus,clues,twist,test,ans,reveal,debate,rule=''):
-    return dict(m='case_board',phase='ACTIVATE',title=title,label='Case board · '+title,min=17,teams=[(a,b,c,c2) for (a,b,c),c2 in zip(K.TEAMS,TEAMC)],suspects=sus,clues=clues,twist=twist,test=test,answer=ans,reveal=reveal,debate=debate,rule=rule)
+    return dict(m='case_board',phase='ACTIVATE',title=title,label='Case board · '+title,min=17,teams=[(a,b,c,c2) for (a,b,c),c2 in zip(K.TEAMS,TEAMC)],suspects=sus,clues=[dict(c,task=(K.TASK3 if clues is K.L3_CLUES else K.TASK4)[c['id']]) for c in clues],twist=twist,test=test,answer=ans,reveal=reveal,debate=debate,rule=rule)
 
 # ============================ LESSON 3 ============================
 SYM=[[dict(pic=p,q='Look. Which word?',opts=o,ans=o[0]) for p,o in (('🤒',['fever','cough','rash']),('🤕',['headache','rash','fever']),('😷',['cough','fever','headache']),('🔴',['rash','cough','fever']))],

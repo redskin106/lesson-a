@@ -117,3 +117,45 @@ L4_BOSS=dict(
  plain=['notwithstanding = even though','consumption = how much she drinks','corroborating evidence = clues that agree','ceiling = limit','abrupt cessation = stopping suddenly','precipitate = cause'],
  simple='She says she drinks a little, but the clues say about double the limit. If she stops suddenly she can get a headache and feel nervous. So she should cut down slowly.',
  answer='Because stopping suddenly can give her a headache and make her nervous.')
+
+# ---------------- ACTIVATE TEAM TASKS (see project doc claude/activate-team-exercises-nov2026.md) ----------------
+# type: (label, icon). w = written down required (default True). card uses \n; key is for the approver; stretch is optional.
+TASK_TYPES={'order':('Order it','🔀'),'gap':('Fill the gap','✏️'),'tf':('True or false?','✅'),'mistake':('Spot the mistake','🔍'),'dict':('Number dictation','🔢'),
+ 'match':('Match','🔗'),'chain':('Chain sentence','⛓️'),'opp':('Say the opposite','🙅'),'desc':('Describe it','🤐'),'role':('Role-play','🎭'),'time':('Timeline','⏳'),'cmp':('Compare','⚖️')}
+def T(t,who,card,key,stretch='',w=True): return dict(t=t,lab=TASK_TYPES[t][0],ic=TASK_TYPES[t][1],who=who,card=card,key=key,stretch=stretch,w=w)
+TASK3={
+ 'A1':T('order','B writes · A answers aloud','had  ·  How  ·  have  ·  long  ·  you  ·  a fever?\nPut the words in order. This is your question.','How long have you had a fever?','Say it: "She has had a fever for three days."'),
+ 'A2':T('gap','Everyone says it together','Her ___, her ___ and her ___ hurt.\nIt ___ be flu or dengue.  It ___ be appendicitis.\n\nhead · eyes · muscles · might · can\'t','head, eyes, muscles · might · can\'t','Add: "…because her belly does not hurt."'),
+ 'A3':T('tf','Each person reads one statement','1  She has a cough.\n2  No cough: flu is unlikely.\n3  No cough: measles is likely.\nTrue or false? Fix the false ones.','1 False (no cough) · 2 True · 3 False (unlikely)','Say one fixed sentence with "so".'),
+ 'A4':T('chain','A → B → C → D, one part each','A: "She was bitten by mosquitoes"\nB: "a week ago,"\nC: writes it down\nD: "so it might be dengue."','She was bitten by mosquitoes a week ago, so it might be dengue.','Do it again for a different illness with "unlikely".'),
+ 'B1':T('dict','A reads aloud · C writes (look away!) · B checks','A reads:  39.2   ·   37.5   ·   38.0\nSay them in English: "thirty-nine point two"…','39.2 · 37.5 · 38.0','Say: "39.2 is higher than normal, so she has a fever."'),
+ 'B2':T('mistake','Say the correction together','"Her pulse is 104. It is lower than normal."\nWhat is wrong? Fix it.','higher than normal (a little)','Say the normal range: "Normal is 60 to 100."'),
+ 'B3':T('match','Draw lines on paper','95  ·  3.1  ·  37\nlower than 150  ·  lower than 4.5  ·  about normal','95 ↔ lower than 150 · 3.1 ↔ lower than 4.5 · 37 ↔ about normal','Say: "That fits dengue."'),
+ 'B4':T('mistake','Which one is wrong?','1  "18 is in the normal range."\n2  "18 is higher than 20."\n3  "18 is between 12 and 20."','Number 2','Say a true sentence with "between".',False),
+ 'C1':T('gap','Everyone says it together','There is a red ___ on her ___ and ___, but not on her ___.\n\nrash · arms · chest · face','rash · arms · chest · face','Add: "It might be dengue."'),
+ 'C2':T('opp','A says it wrong · team corrects','A: "Her eyes are red."   Team: "No, her eyes are not red."\nDo it 3 times: red · watery · sore.','three correct negatives','Say: "So measles is unlikely."',False),
+ 'C3':T('role','B nurse · A patient · D concludes','B (mime pressing): "Does it hurt when I press here?"\nA: "No, it doesn\'t."\nD says the conclusion.','It can\'t be appendicitis.','Add "because her belly does not hurt."',False),
+ 'C4':T('order','C writes · D says it','She has no runny nose  /  and her throat is normal,  /  so it is unlikely  /  to be flu.\nPut the pieces in order.','She has no runny nose and her throat is normal, so it is unlikely to be flu.','Change "unlikely" to "can\'t".'),
+ 'D1':T('match','Look at the card · draw lines','Card: measles vaccine ✔ ✔\n2 doses  ·  0 doses\nprotected  ·  not protected','2 doses ↔ protected · 0 doses ↔ not protected','Say: "So measles is unlikely."'),
+ 'D2':T('gap','Everyone says it together','"We ate the same ___. Nobody ___ is ___."\n\nfood · else · sick','food · else · sick','Add: "So food poisoning is less likely."'),
+ 'D3':T('chain','A → B → C → D, one part each','A: "Two people"   B: "on her street"\nC: "had a fever"   D: "last week."\nThen all write it down.','Two people on her street had a fever last week.','Add: "…so it might be an infection from mosquitoes."'),
+ 'D4':T('time','Put them in order · say with "then"','took paracetamol  ·  the fever went down  ·  the fever came back','took paracetamol → fever went down → fever came back','Say: "The fever went down, then it came back."'),
+}
+TASK4={
+ 'R1':T('opp','A says it · team answers','A: "I only drink two cups."\nTeam: "She says two cups, but the card says eight."','She says two cups, but the card says eight.','Add dial D: "That is more than normal."',False),
+ 'R2':T('gap','Everyone says it together','She sleeps ___ hours. Normal is ___ or more.\nShe sleeps ___ than half.\n\n3 · 7 · less','3 · 7 · less','Add: "She has slept badly for two weeks."'),
+ 'R3':T('dict','A reads aloud · C writes (look away!) · B checks','A reads:  108   ·   112   ·   110','108 · 112 · 110','Say: "About 110. It is faster than normal."'),
+ 'R4':T('mistake','Say the correction together','"36.8 °C. She has a fever."\nWhat is wrong?','No fever. 36.8 is normal.','Say: "Normal is about 37 °C."'),
+ 'B1':T('tf','Each person reads one statement','1  She has vomiting.\n2  She has no diarrhoea.\n3  Food poisoning is likely.\nTrue or false? Fix the false ones.','1 False · 2 True · 3 False (unlikely)','Say one fixed sentence with "so".'),
+ 'B2':T('order','C writes · D says it','She  ·  has  ·  studied  ·  until 2 am  ·  for  ·  two weeks.\nPut the words in order.','She has studied until 2 am for two weeks.','Add: "Her classes start at 8 am."'),
+ 'B3':T('match','Draw lines on a 0–10 line','3  ·  5  ·  9\nmild  ·  moderate  ·  severe   (1–3 = mild)','3 ↔ mild · 5 ↔ moderate · 9 ↔ severe','Say: "It is mild. It hurts a little."'),
+ 'B4':T('gap','Everyone says it together','Her pulse goes up ___ she looks at her phone.\nIt is about 15 ___ than normal.\n\nbecause · higher','because · higher','Say: "So it might be stress, not only coffee."'),
+ 'G1':T('desc','D describes · team guesses','D: describe the symptom. Do NOT say "shake" or "coffee".\nUse: hands · after · a cup','shaky hands after coffee','Describe it with dial A or B.',False),
+ 'G2':T('opp','A says it wrong · team corrects','A: "She has a bad cough."   Team: "No, she never coughs."\nDo it 3 times: cough · fever · vomiting.','three correct negatives','Say: "So flu is unlikely."',False),
+ 'G3':T('role','B nurse · A patient','B: "How are you feeling?"   A: "Quite worried."\nB says one kind sentence.','any kind sentence','Use dial C: very · quite · a little.',False),
+ 'G4':T('chain','A → B → C → D, one part each','A: "She is awake at night,"   B: "but"\nC: "very tired in class"   D: "every day for two weeks."','She is awake at night, but very tired in class every day for two weeks.','Add "because …"'),
+ 'Y1':T('time','Put them in order · say with "since"','last month: normal  →  two weeks ago: exams began  →  now: she cannot sleep','She has not slept well since the exams began.','Add dial D.'),
+ 'Y2':T('cmp','Everyone says it together','Saturday pulse: 110.   Sunday pulse: 78.\n"Sunday\'s pulse is ___ than Saturday\'s."','lower','Say: "That is normal (60–100)."'),
+ 'Y3':T('order','C writes · B asks it','Did  ·  your  ·  friends  ·  eat  ·  the  ·  same  ·  lunch?\nPut the words in order.','Did your friends eat the same lunch?','A answers: "Yes, and nobody is sick."'),
+ 'Y4':T('mistake','Say the correction together','"She has fewer exams than normal."\nWhat is wrong?  (Normal: one exam a week.)','more than normal','Add dial A: "three in four days."'),
+}
