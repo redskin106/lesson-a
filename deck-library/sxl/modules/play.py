@@ -61,10 +61,10 @@ function plev(a,b){var m=[],i,j;for(i=0;i<=a.length;i++)m[i]=[i];for(j=0;j<=b.le
 function pstep(s,st,ms){setTimeout(function(){st.k++;if(st.k>=st.n)finish(s);else st.draw()},ms||1900)}
 /* odd one out / wrong chart */
 INIT.odd=function(s){var D=jd(s),I=D.items,st={k:0,n:I.length},mode=D.mode||'pic';
- st.draw=function(){pdots(s,st.k);var it=I[st.k],g=$('.pg',s),w=0,dn=0;g.innerHTML='';pmk('div','gl plq',D.q||(mode==='chart'?'What is wrong with this chart?':'Which one is different?'),g);
+ st.draw=function(){pdots(s,st.k);var it=I[st.k],g=$('.pg',s),w=0,dn=0;g.innerHTML='';var qb=pmk('div','gl plq',D.q||(mode==='chart'?'What is wrong with this chart?':'Which one is different?'),g);
   var box=pmk('div','pbox',null,g),why=pmk('div','pwhy',it.why||'',g);
   var cs=it.cards.map(function(c,i){var b=pmk('button','pcd'+(mode==='chart'?' prow':''),mode==='chart'?'<span>'+c.t+'</span><b>'+c.v+'</b>':(mode==='pic'?'<i>'+(c.e||'')+'</i>':'')+'<span>'+c.t+'</span>',box);
-   b.onclick=function(){if(dn)return;if(i===it.odd){dn=1;b.classList.add('ok');P('good');why.style.opacity=1;psay(it.why||'');pstep(s,st,2400)}else{wrong(b);w++;if(w>=3)cs[it.odd].classList.add('glow')}};return b})};
+   b.onclick=function(){if(dn)return;if(i===it.odd){dn=1;b.classList.add('ok');P('good');if(mode==='chart'){qb.textContent=it.why||'';qb.style.color='#6a35e8'}else why.style.opacity=1;psay(it.why||'');pstep(s,st,2400)}else{wrong(b);w++;if(w>=3)cs[it.odd].classList.add('glow')}};return b})};
  st.draw()};
 /* listen and fix */
 INIT.listen_fix=function(s){var D=jd(s),I=D.items,st={k:0,n:I.length},mode=D.mode||'opts';

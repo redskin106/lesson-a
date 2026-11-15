@@ -74,7 +74,9 @@ def choice_html(d,sid):
     """{'phase','title','hint','items':[{'pic','q','opts':[...],'ans':text}]}   put levels:[...] on the slide for medals"""
     I=d['items']; n=len(I); o=header(d['phase'],d.get('title','Choose'),d.get('grad','violet'))
     o+=f'<div class="a" style="right:{(130 if d.get("_lvg") else 90)}px;top:60px;display:flex;gap:12px">'+''.join(f'<span class="chd" style="width:26px;height:26px;border-radius:50%"></span>' for _ in I)+'</div>'
+    import random
     for k,it in enumerate(I):
+        rest=[t for t in it['opts'] if t!=it['ans']]; random.Random(k*7+len(it['q'])).shuffle(rest); rest.insert((k*5+len(it['q']))%len(it['opts']),it['ans']); it=dict(it,opts=rest)
         o+=f'<div class="chi" style="display:none">'+picx(it.get('pic','❓'),90,180,700,600,56)
         o+=f'<div class="gl" style="left:850px;top:190px;width:980px;border-radius:48px;padding:26px 40px;font-family:O;font-weight:800;font-size:{56 if len(it["q"])<40 else 46}px;line-height:1.2;position:absolute">{it["q"]}</div>'
         o+='<div class="a cho-wrap" style="left:850px;top:400px;width:980px;display:flex;flex-direction:column;gap:24px">'+''.join(f'<button class="cho" data-ok="{1 if t==it["ans"] else 0}" style="font-size:{54 if len(t)<26 else 44 if len(t)<40 else 38}px">{t}</button>' for t in it['opts'])+'</div></div>'
