@@ -43,8 +43,8 @@ def today(d):
         if ic: row=f'<div style="display:flex;gap:28px;align-items:center"><img src="{EM(ic)}" style="width:110px;{sh()}">{row}</div>'
         rows+=stp(f'<div class="rw">{row}</div>',i+2,pills=True)
     return (header(d['phase'],d.get('role','Today we learn'),'violet')
-      +'<div class="gl" style="left:90px;top:168px;width:1740px;height:820px;border-radius:72px"></div>'
-      +f'<div class="a" style="left:200px;top:168px;width:1520px;height:820px;display:flex;align-items:center;gap:90px">'
+      +'<div class="gl" style="left:90px;top:168px;width:1740px;height:740px;border-radius:72px"></div>'
+      +f'<div class="a" style="left:200px;top:168px;width:1520px;height:740px;display:flex;align-items:center;gap:90px">'
       +stp(f'<img src="{EM(d["emoji"])}" style="width:300px;{sh()}">',1)
       +f'<div style="display:flex;flex-direction:column;gap:44px;align-items:flex-start">'+stp(f'<div style="font-family:O;font-weight:800;font-size:{tfs}px;color:#1c1b2e;white-space:nowrap;line-height:1">{d["title"]}</div>',1)
       +rows+'</div></div>')
@@ -326,7 +326,7 @@ def timer(d):
     sec=int(d.get('min',3)*60); icons=''.join(f'<img src="{EM(e)}" style="width:190px;{sh()}">' for e in d.get('icons',['stopwatch']))
     if d.get('pics'): icons=''.join(pic(0,0,300,169,f,34).replace('style="left:0px;top:0px;','style="position:relative;flex-shrink:0;',1) for f in d['pics'])
     return (header(d['phase'],d['title'],d.get('rg','violet'))
-      +'<div class="gl" style="left:90px;top:168px;width:1740px;height:820px;border-radius:72px"></div>'
+      +'<div class="gl" style="left:90px;top:168px;width:1740px;height:740px;border-radius:72px"></div>'
       +f'<div class="a" style="left:90px;top:{215 if d.get("pics") else 230}px;width:1740px;display:flex;gap:{30 if d.get("pics") else 60}px;justify-content:center">{icons}</div>'
       +f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:{470 if d.get("pics") else 440}px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:{250 if d.get("pics") else 330}px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>'
       +f'<div class="a tstart" style="left:860px;top:830px;width:200px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="56" height="56" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>'

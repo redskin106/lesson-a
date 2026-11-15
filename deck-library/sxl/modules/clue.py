@@ -24,7 +24,7 @@ def dials3(d):
     """The dials. {'phase','title','dials':[(letter,name,colour,'ex · ex · ex'),...],'note'}"""
     D=d['dials']; n=len(D); w=int((1740-30*(n-1))/n); o=header(d['phase'],d.get('title','The dials'),'violet')
     for i,(L,name,col,ex) in enumerate(D):
-        x=90+i*(w+30); lines=''.join(f'<div style="margin:14px 0;font-family:P;font-weight:500;font-size:38px;line-height:1.25">{e}</div>' for e in ex.split(' · '))
+        x=90+i*(w+30); lines=''.join(f'<div style="margin:22px 0;font-family:P;font-weight:500;font-size:46px;line-height:1.25">{e}</div>' for e in ex.split(' · '))
         card=glass(x,190,w,640,'',r=56)+f'<div class="a" style="left:{x}px;top:190px;width:{w}px;height:210px;border-radius:56px 56px 0 0;background:{col}"></div>'
         card+=f'<div class="a" style="left:{x+34}px;top:226px;width:{w-68}px;font-family:O;font-weight:800;font-size:{46 if len(name)<18 else 40}px;color:#fff;line-height:1.05">{name}</div>'
         card+=num(x+34,330,L,76)+f'<div class="a" style="left:{x+34}px;top:430px;width:{w-68}px">{lines}</div>'
@@ -38,7 +38,7 @@ def frames3(d):
     G=d['groups']; n=len(G); w=int((1740-30*(n-1))/n); o=header(d['phase'],d.get('title','Say it'),d.get('grad','teal')); h=d.get('h',560 if d.get('write') else 640)
     for i,g in enumerate(G):
         x=90+i*(w+30); fs=g.get('fs',40)
-        body=f'<div style="padding:30px 34px">{grad_chip(g.get("c","violet"),g["t"],44,"6px 30px")}'+''.join(f'<div style="margin:18px 0 0;font-family:P;font-weight:500;font-size:{fs}px;line-height:1.3">{l}</div>' for l in g['l'])+'</div>'
+        body=f'<div style="padding:30px 34px;height:{h}px;box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start">{grad_chip(g.get("c","violet"),g["t"],44,"6px 30px")}<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:20px;align-self:stretch">'+''.join(f'<div style="margin:18px 0 0;font-family:P;font-weight:500;font-size:{fs}px;line-height:1.3">{l}</div>' for l in g['l'])+'</div></div>'
         o+=stp(glass(x,180,w,h,body,r=52),i+1)
     k=n+1
     if d.get('write'):

@@ -18,8 +18,8 @@ def word_html(d,sid,kind):
         o+=f'<div class="a wlisten" style="left:90px;top:180px;width:640px;height:{ph}px;display:none"><div class="gl" style="position:absolute;inset:0;border-radius:56px;display:flex;align-items:center;justify-content:center;font-size:190px">🎧</div></div>'
         if it.get('clue'): o+=f'<div class="gl wclue" style="left:780px;top:190px;width:1050px;border-radius:48px;padding:24px 38px;font-family:O;font-weight:800;font-size:{46 if len(it["clue"])<60 else 38}px;line-height:1.2;position:absolute">{it["clue"]} <button class="wsay" style="border:0;background:none;font-size:46px;cursor:pointer">🔊</button></div>'
         un=kind=='unveil'
-        o+='<div class="a wslots" style="left:780px;top:%dpx;width:1050px;display:flex;flex-wrap:wrap;gap:12px"></div><div class="a whint" style="left:780px;top:%dpx;width:1050px;font-family:O;font-weight:800;font-size:36px;color:#6a35e8;opacity:0"></div>'%(400 if un else 360,670 if un else 530)
-        o+=('<div class="a wbank" style="left:90px;top:730px;width:1740px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center"></div></div>' if un else '<div class="a wbank" style="left:780px;top:610px;width:1050px;display:flex;flex-wrap:wrap;gap:16px;justify-content:flex-start"></div></div>')
+        o+='<div class="a wslots" style="left:780px;top:%dpx;width:1050px;display:flex;flex-wrap:wrap;gap:12px"></div><div class="a whint" style="left:780px;top:%dpx;width:1050px;font-family:O;font-weight:800;font-size:36px;color:#6a35e8;opacity:0"></div>'%(400 if un else 420,670 if un else 610)
+        o+=('<div class="a wbank" style="left:90px;top:730px;width:1740px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center"></div></div>' if un else '<div class="a wbank" style="left:780px;top:690px;width:1050px;display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-start"></div></div>')
     data={'kind':kind,'items':[{'w':i['w'],'cat':i.get('cat',''),'say':i.get('say',i['w'])} for i in I],**{k:d[k] for k in ('mode','showpic','decoys','first','limit','hint') if k in d}}
     return o+f'<script type="application/json" id="d-{sid}">{json.dumps(data,ensure_ascii=False)}</script>'
 BUILD_EXT['spell']=lambda d,sid:word_html(d,sid,'spell')
@@ -27,10 +27,10 @@ BUILD_EXT['scramble']=lambda d,sid:word_html(d,sid,'scramble')
 BUILD_EXT['unveil']=lambda d,sid:word_html(d,sid,'unveil')
 
 EXT_CSS.append("""
-.wt{width:118px;height:132px;border-radius:34px;border:0;color:#fff;font-family:O;font-weight:800;font-size:74px;text-transform:uppercase;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#6a35e8);box-shadow:0 12px 24px rgba(80,60,160,.3),inset 0 4px 0 rgba(255,255,255,.45);transition:transform .2s,opacity .3s}
+.wt{box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;width:118px;height:132px;border-radius:34px;border:0;color:#fff;font-family:O;font-weight:800;font-size:74px;text-transform:uppercase;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#6a35e8);box-shadow:0 12px 24px rgba(80,60,160,.3),inset 0 4px 0 rgba(255,255,255,.45);transition:transform .2s,opacity .3s}
 .wt:active{transform:scale(.94)}.wt.used{opacity:.18;pointer-events:none}.wt.glow{animation:wgl 1s infinite}.wt.k{width:70px;height:80px;font-size:44px;border-radius:24px;background:linear-gradient(135deg,#ffd21f,#ffb21f)}.wt.k.hit{background:linear-gradient(135deg,#2bd9b6,#10a98d)}.wt.k.miss{opacity:.22;pointer-events:none}
 @keyframes wgl{50%{box-shadow:0 0 0 14px rgba(255,210,31,.55)}}
-.ws1{width:100px;height:116px;border-radius:30px;border:5px dashed #b9a6f5;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:68px;text-transform:uppercase;color:#fff;cursor:default;transition:transform .25s}
+.ws1{box-sizing:border-box;width:100px;height:116px;border-radius:30px;border:5px dashed #b9a6f5;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:68px;text-transform:uppercase;color:#fff;cursor:default;transition:transform .25s}
 .ws1.f{border:0;background:linear-gradient(135deg,#ff9a3c,#ff4fa3);box-shadow:0 12px 24px rgba(200,80,100,.3),inset 0 4px 0 rgba(255,255,255,.45);animation:wpop .35s}.ws1.sp{border:0;width:40px}.ws1.lk{background:linear-gradient(135deg,#2bd9b6,#10a98d)}
 @keyframes wpop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
 .wcv{background:linear-gradient(135deg,rgba(154,92,255,.92),rgba(111,60,232,.92));border:3px solid rgba(255,255,255,.7);transition:opacity .6s,transform .6s;display:flex;align-items:center;justify-content:center;color:#fff;font-family:O;font-weight:800;font-size:50px}.wcv.gone{opacity:0;transform:scale(.7);pointer-events:none}
@@ -75,7 +75,7 @@ function wordgame(s){
    var tiles=shufl(need.map(function(e){return e.dataset.c}).concat(dec));
    if(kind==='scramble'&&D.first){var f=need[0];f.textContent=f.dataset.c;f.classList.add('f','lk');tiles.splice(tiles.indexOf(f.dataset.c),1)}
    var filled=[];
-   tiles.forEach(function(c){var b=document.createElement('button');b.className='wt';b.textContent=c;b.dataset.c=c;bank.appendChild(b);
+   tiles.forEach(function(c){var b=document.createElement('button');b.className='wt';b.textContent=c;b.dataset.c=c;b.style.width=sw+'px';b.style.height=Math.round(sw*1.16)+'px';b.style.fontSize=Math.round(sw*.68)+'px';bank.appendChild(b);
     b.onclick=function(){if(done)return;
      if(kind==='spell'){var e=need[next];if(e&&e.dataset.c===c){e.textContent=c;e.classList.add('f');b.classList.add('used');P('pop');setTimeout(function(){P('tick')},80);$$('.wt',bank).forEach(function(x){x.classList.remove('glow')});next++;wrongs=0;if(next===need.length)win()}
       else{wrongs++;wrong(b);if(wrongs>=2){var need2=need[next]&&need[next].dataset.c;if(need2)glowTile(need2)}}}
