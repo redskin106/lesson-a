@@ -27,6 +27,7 @@ L3=[
  {'t':'text','phase':'ACTIVATE','title':'Wait… which can\'t it be?','lines':['Stand up: Dengue / Flu / Measles','Say why: "It can\'t be flu because..."','Change your side if you hear a better reason.'],'note':'Teacher: confirming test on the board → "Which test?"'},
  {'t':'test','phase':'ACTIVATE'},
  {'t':'reveal','phase':'ACTIVATE','title':'The answer','pic':'🦟','answer':'Dengue','note':'Rash · low platelets and white cells · no cough · mosquito bites a week ago.'},
+ {'t':'boss','phase':'BOSS','title':'Boss question','boss':K.L3_BOSS},
  {'t':'handover','phase':'ACTIVATE','title':'Tell the doctor (handover)','frame':'<b>Patient: a young woman. Day 3 of fever.</b><br>Her temperature is ___ (higher / lower than normal).<br>She has ___ and ___.<br>She has no ___.<br>It is probably ___ because ___.<br>It can\'t be ___ because ___.','note':'Write 3 sentences. Read them to your partner. Quiet voices are fine.'},
  {'t':'cover','kicker':'THANK YOU','title':'Well done, detectives','sub':'See you next time.','pic':'🩺','bg':'NIGHT'},
 ]
@@ -50,6 +51,7 @@ L4=[
  {'t':'text','phase':'ACTIVATE','title':'Wait… is it just stress?','lines':['Stand up: coffee / exam stress / broken heart','Say why with a dial: "She has slept badly for two weeks."'],'note':'Teacher: confirming test → "Which test?"'},
  {'t':'test','phase':'ACTIVATE'},
  {'t':'reveal','phase':'ACTIVATE','title':'The reason','pic':'☕','answer':'Too much coffee','note':'8 cups · 3 hours of sleep · pulse 110 · better on the Sunday without coffee.'},
+ {'t':'boss','phase':'BOSS','title':'Boss question','boss':K.L4_BOSS},
  {'t':'frames','phase':'ACTIVATE','title':'"Doctor, I\'m too busy."','groups':[
    {'t':'Patient','c':'#e0408a','l':['"I\'m too busy to sleep."','"I need coffee. I have three exams."'],'fs':40},
    {'t':'You (the nurse)','c':'#19b38a','l':['"You should sleep at least seven hours."','"How many cups do you drink every day?"','"For two weeks? That is more than normal."'],'fs':36},
@@ -59,7 +61,7 @@ L4=[
 ]
 for name,slides,title in [('lesson3',L3,'Lesson 3 · Which illness?'),('lesson4',L4,'Lesson 4 · The Impossible Week')]:
     kind='3' if name=='lesson3' else '4'
-    D={'slides':slides,'dials':K.DIALS,'test':(K.L3_TEST if kind=='3' else K.L4_TEST)}
+    D={'n':kind,'slides':slides,'dials':K.DIALS,'test':(K.L3_TEST if kind=='3' else K.L4_TEST)}
     html=(pathlib.Path(__file__).parent/'deck.html').read_text().replace('__TITLE__',title).replace('__DATA__',json.dumps(D,ensure_ascii=False))
     (OUT/f'{name}.html').write_text(html)
 B=json.dumps(data_board(),ensure_ascii=False)

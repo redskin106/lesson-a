@@ -7,7 +7,7 @@ button.b{font:inherit;font-weight:700;font-size:22px;padding:12px 26px;border-ra
 .w{display:inline-block;font-weight:700;font-size:24px;padding:8px 16px;margin:4px;border-radius:18px;border:3px solid #d9d3f5;background:#fff;cursor:pointer;font-family:inherit}.w.u{opacity:.25}
 textarea{font:inherit;font-size:22px;width:100%;height:120px;border-radius:18px;border:3px solid #d9d3f5;padding:12px}.mu{color:#6a6a7e}.hand{font-size:40px;padding:26px;border-radius:30px;color:#fff;text-align:center;font-weight:800;margin-top:14px}
 .top{display:flex;align-items:center;gap:12px}.rd button{width:56px;height:56px;border-radius:50%;border:3px solid #d9d3f5;background:#fff;font:inherit;font-weight:800;font-size:24px}.rd button.on{background:#6a35e8;color:#fff}
-</style></head><body><div id="app"></div><script>
+</style></head><script>try{localStorage.getItem('x')}catch(e){var _m={};window.__ls={getItem:k=>_m[k]||null,setItem:(k,v)=>{_m[k]=v},removeItem:k=>{delete _m[k]}};Object.defineProperty(window,'localStorage',{get:()=>window.__ls})}</script><body><div id="app"></div><script>
 const D=__DATA__;const q=new URLSearchParams(location.search);const N=q.get('case')==='4'?4:3;const C=D['l'+N];const K='sxl-team';
 let me=JSON.parse(localStorage.getItem(K)||'null')||{};let r=1;const $=id=>document.getElementById(id);const save=()=>localStorage.setItem(K,JSON.stringify(me));
 function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}

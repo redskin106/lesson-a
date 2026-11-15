@@ -77,8 +77,8 @@ L4_CLUES=[
  c4('Y4','yellow',4,'Exams','📅','Three exams in four days.','This week.','A lot of work.','Normal: one exam a week.',{'stress':'for'},level='silver'),
 ]
 L4_TWIST=dict(pic='🗣️',text='A friend says: "It\'s just exam stress!"',say='Her friend thinks it is exam stress. But on Sunday, without coffee, she felt better.',fx={'stress':'for'})
-L4_TEST=dict(q='Which test do we do?',opts=['No coffee for three days. Then check her pulse and sleep.','Chest X-ray','Take a blood test for flu'],ans=0,
-  why='If the pulse and sleep go back to normal when she stops the coffee, the coffee was the cause.')
+L4_TEST=dict(q='Which test do we do?',opts=['Cut down the coffee slowly for a week. Then check her pulse and sleep.','Chest X-ray','Take a blood test for flu'],ans=0,
+  why='If the pulse and sleep go back to normal when she cuts down the coffee, the coffee was the cause. (Stopping suddenly can cause headaches, so we cut down slowly.)')
 L4_ANSWER='coffee'
 
 L4_EX=[
@@ -103,3 +103,17 @@ L4_EX=[
    silver=[dict(pic='☕',words=['She','drinks','eight','cups','every','day.'],extra=['two','always']),dict(pic='🛏️',words=['She','has','slept','badly','for','two','weeks.'],extra=['since','is']),dict(pic='💓',words=['Her','pulse','is','faster','than','normal.'],extra=['more','as'])],
    gold=[dict(pic='☕',words=['She','has','drunk','eight','cups','a','day','since','the','exams','started.'],extra=['for','drinks']),dict(pic='🛏️',words=['She','sleeps','less','than','half','the','normal','time.'],extra=['more','as']),dict(pic='💓',words=['Her','pulse','has','been','faster','than','normal','all','day.'],extra=['is','since'])])),
 ]
+
+# ---------------- BOSS CHALLENGES (optional, for fun) ----------------
+L3_BOSS=dict(
+ text='Had the patient\'s pyrexia been attributable to a bacterial aetiology, one would have anticipated a neutrophilic leucocytosis rather than the leucopenia and thrombocytopenia observed, which, in conjunction with the exanthem, are more consistent with an arboviral infection; antibiotics were therefore withheld.',
+ q='Why did the doctor NOT give antibiotics?',
+ plain=['pyrexia = fever','bacterial = from bacteria','leucopenia = low white cells','thrombocytopenia = low platelets','exanthem = rash','arboviral = a virus from insects (mosquitoes)'],
+ simple='The fever was not from bacteria. Her white cells and platelets were LOW, and she had a rash. That fits a virus carried by mosquitoes (dengue).',
+ answer='Because dengue is a virus. Antibiotics work on bacteria, not on viruses.')
+L4_BOSS=dict(
+ text='Notwithstanding the patient\'s insistence that her consumption is modest, the corroborating evidence indicates a habitual intake of approximately twice the recommended ceiling; abrupt cessation, however, may precipitate withdrawal symptoms such as headache and nervousness, so a gradual reduction is generally advised.',
+ q='Why does the nurse say "cut down slowly" and not "stop today"?',
+ plain=['notwithstanding = even though','consumption = how much she drinks','corroborating evidence = clues that agree','ceiling = limit','abrupt cessation = stopping suddenly','precipitate = cause'],
+ simple='She says she drinks a little, but the clues say about double the limit. If she stops suddenly she can get a headache and feel nervous. So she should cut down slowly.',
+ answer='Because stopping suddenly can give her a headache and make her nervous.')

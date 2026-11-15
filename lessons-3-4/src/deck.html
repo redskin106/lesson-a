@@ -32,9 +32,9 @@ button.b:active{transform:scale(.96)}
 .ans{min-height:130px;border:4px dashed #b9a6f5;border-radius:36px;padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:rgba(255,255,255,.6)}
 .ans .w{background:linear-gradient(135deg,#9a5cff,#6a35e8);color:#fff;border-color:transparent}
 .nav{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:14px;z-index:9;align-items:center}
-.nav button{font:inherit;font-weight:700;font-size:22px;padding:8px 22px;border-radius:999px;border:2px solid #cfc8ee;background:#fff;cursor:pointer}
+.nav button{font:inherit;font-weight:700;font-size:15px;white-space:nowrap;padding:6px 14px;border-radius:999px;border:2px solid #cfc8ee;background:#fff;cursor:pointer}
 .nav .med{border-color:transparent;color:#fff}
-#pg{font-size:18px;color:#6a6a7e;margin:0 8px}
+#pg{white-space:nowrap;font-size:14px;color:#6a6a7e;margin:0 8px}
 .medal{position:absolute;right:110px;top:50px;font-size:40px;font-weight:800;padding:10px 30px;border-radius:999px;color:#fff}
 .bronze{background:#b87333}.silver{background:#8a93a6}.gold{background:#e0a800}
 .mu{color:var(--mu)}
@@ -48,12 +48,12 @@ a.lnk{display:inline-block;font-size:56px;font-weight:800;color:#fff;background:
 <div id="stage"></div>
 <div class="nav"><button onclick="go(-1)">◀</button><span id="pg"></span><button onclick="go(1)">▶</button>
 <span id="medbar" style="display:none;gap:6px"><button class="med bronze" onclick="setLv('bronze')">Bronze</button><button class="med silver" onclick="setLv('silver')">Silver</button><button class="med gold" onclick="setLv('gold')">Gold</button></span>
-<button onclick="music()" id="mb">♪ music</button></div>
+<button onclick="music()" id="mb">♪ music</button><button onclick="menu()">☰ skip</button></div><div id="menu" style="display:none;position:fixed;inset:0;z-index:20;background:rgba(15,14,26,.92);color:#fff;overflow:auto;padding:16px"></div><div id="rot" style="display:none;position:fixed;top:0;left:0;right:0;z-index:30;background:#ffb21f;padding:8px;text-align:center;font-weight:700">📱 Turn your phone sideways</div>
 <script>
 const D=__DATA__;
 const S=D.slides;let cur=0,lv='silver';const $=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
 const stage=document.getElementById('stage');
-function fit(){const k=Math.min(innerWidth/1920,(innerHeight-60)/1080);document.querySelectorAll('.slide').forEach(s=>s.style.transform='scale('+k+')')}
+function fit(){const k=Math.min(innerWidth/1920,(innerHeight-(innerWidth<700?46:60))/1080);document.querySelectorAll('.slide').forEach(s=>s.style.transform='scale('+k+')')}
 addEventListener('resize',fit);
 function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1])}
@@ -73,12 +73,19 @@ exercise:(s,i)=>`<div class="tag">${s.phase||'STUDY'}</div><div class="medal" id
 hunt:s=>`<div class="tag">${s.phase}</div><h2>${s.title}</h2><ul class="l">${s.lines.map(l=>`<li>${l}</li>`).join('')}</ul><a class="lnk" href="${s.href}" target="_blank">Open the case board ▶</a>`,
 test:(s,i)=>`<div class="tag">${s.phase}</div><h2>${D.test.q}</h2><div id="tt${i}" style="max-width:1300px"></div><div id="why${i}" class="sub" style="font-size:38px"></div>`,
 reveal:s=>`<div class="tag">${s.phase}</div><h2>${s.title}</h2><div class="big" id="rv" style="opacity:0;transition:1s">${s.pic} ${s.answer}</div><div class="sub" id="rv2" style="opacity:0;transition:1s .8s;font-size:44px">${s.note}</div><button class="b" onclick="document.getElementById('rv').style.opacity=1;document.getElementById('rv2').style.opacity=1">Reveal</button>`,
+boss:(s,i)=>`<div class="tag">OPTIONAL · BOSS</div><h2 style="margin:40px 0 10px;font-size:64px">${s.title}</h2><div style="font-size:42px;font-weight:800;margin:6px 0">${s.boss.q}</div><div style="display:flex;gap:30px;align-items:center;margin:6px 0 16px"><div style="font-size:56px;font-weight:800;min-width:90px" id="bt${i}">90</div><button class="b" onclick="bossStart(${i})">▶ start</button><button class="b" onclick="bossGive(${i})">We give up</button></div><div class="row" style="align-items:flex-start"><div class="card" style="font-size:31px;line-height:1.45;padding:22px 34px">${s.boss.text}</div><div id="bf${i}" class="card" style="display:none;font-size:27px;line-height:1.4;padding:20px 30px"><b>Free pass.</b><br>${s.boss.plain.join('<br>')}<br><br>${s.boss.simple}<br><br><b style="color:#19b38a">Answer: ${s.boss.answer}</b> Too easy? 😄</div></div>`,
 handover:s=>`<div class="tag">${s.phase}</div><h2>${s.title}</h2><div class="row"><div class="card" style="font-size:40px">${s.frame}</div><div style="flex:1.2"><textarea placeholder="Write your sentences here (tablet)"></textarea><div class="mu" style="font-size:34px;margin-top:10px">${s.note||''}</div></div></div>`,
 };
-function build(){S.forEach((s,i)=>{const e=$(`<div class="slide ph-${s.bg||s.phase||'STUDY'} ${s.bg==='NIGHT'?'NIGHT':''}">${(R[s.t]||R.text)(s,i)}</div>`);stage.appendChild(e);if(s.t==='exercise')renderEx(i);if(s.t==='test')renderTest(i)});fit();show(0)}
+function build(){S.forEach((s,i)=>{const e=$(`<div class="slide ph-${s.bg||(s.phase==='BOSS'?'ENGAGE':s.phase)||'STUDY'} ${s.bg==='NIGHT'?'NIGHT':''}">${(R[s.t]||R.text)(s,i)}</div>`);stage.appendChild(e);if(s.t==='exercise')renderEx(i);if(s.t==='test')renderTest(i)});fit();show(0)}
 function show(i){cur=Math.max(0,Math.min(S.length-1,i));document.querySelectorAll('.slide').forEach((e,k)=>e.classList.toggle('on',k===cur));document.getElementById('pg').textContent=(cur+1)+' / '+S.length;document.getElementById('medbar').style.display=S[cur].t==='exercise'?'flex':'none';location.hash=cur+1}
 function go(d){show(cur+d)}
+function ttl(s){return s.title||(s.ex&&s.ex.title)||(s.boss&&'Boss question')||s.t}
+function menu(){const m=document.getElementById('menu');m.style.display='block';m.innerHTML='<div style="font-size:22px;margin-bottom:10px"><b>Jump to…</b> <button style="font:inherit;padding:6px 16px;border-radius:99px" onclick="this.parentNode.parentNode.style.display=\'none\'">close</button> &nbsp;<a style="color:#9fe8c4" href="board.html?case='+D.n+'">board</a> · <a style="color:#9fe8c4" href="team.html?case='+D.n+'">team page</a> · <a style="color:#9fe8c4" href="index.html">home</a></div>'+S.map((s,i)=>`<div onclick="show(${i});document.getElementById('menu').style.display='none'" style="font-size:24px;padding:12px 14px;margin:4px 0;border-radius:14px;background:${i===cur?'#6a35e8':'#24223f'}">${i+1}. ${ttl(s)}${s.t==='boss'?' (optional)':''}</div>`).join('')}
+let tx=0;addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>70&&!/BUTTON|TEXTAREA/.test(e.target.tagName)){go(dx<0?1:-1)}},{passive:true});
+function rot(){document.getElementById('rot').style.display=(innerHeight>innerWidth&&innerWidth<700)?'block':'none'}addEventListener('resize',rot);rot();
 addEventListener('keydown',e=>{if(['ArrowRight',' ','PageDown'].includes(e.key)&&!/TEXTAREA/.test(e.target.tagName)){e.preventDefault();go(1)}if(e.key==='ArrowLeft')go(-1);if(e.key==='1')setLv('bronze');if(e.key==='2')setLv('silver');if(e.key==='3')setLv('gold')});
+let bt={};function bossStart(i){clearInterval(bt[i]);let n=90;const e=document.getElementById('bt'+i);e.textContent=n;bt[i]=setInterval(()=>{n--;e.textContent=n;if(n<=0){clearInterval(bt[i]);bossGive(i)}},1000)}
+function bossGive(i){clearInterval(bt[i]);document.getElementById('bf'+i).style.display='block'}
 function playScene(b){const fr=b.parentElement.querySelectorAll('.fr');fr.forEach((f,i)=>{f.style.opacity=.15;setTimeout(()=>f.style.opacity=1,900*(i+1))})}
 // ---------- exercises ----------
 function setLv(l){lv=l;S.forEach((s,i)=>{if(s.t==='exercise')renderEx(i)})}
