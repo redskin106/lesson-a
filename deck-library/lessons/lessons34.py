@@ -9,7 +9,7 @@ Q=lambda c,t:(c,t)
 TEAMC=['#e0304a','#2a6ae0','#10a98d','#e89200']
 def lv(items3): return [{'items':i} for i in items3]
 def exch(e,phase='STUDY',**kw):
-    fix=lambda it:dict(it,pic='📅') if len(it['pic'])>3 and it['pic'][:1]==it['pic'][1:2] else it
+    fix=lambda it:dict(it,pic='📅') if len(it['pic'])>4 else it
     d=dict(m='choice',phase=phase,title=e['title'],hint=e['hint'],label='Exercise · '+e['title'],lvl=1,levels=[{'items':[fix(i) for i in e['levels'][k]]} for k in ('bronze','silver','gold')]); d.update(kw); return d
 def board(title,sus,clues,twist,test,ans,reveal,debate,rule=''):
     return dict(m='case_board',phase='ACTIVATE',title=title,label='Case board · '+title,min=17,teams=[(a,b,c,c2) for (a,b,c),c2 in zip(K.TEAMS,TEAMC)],suspects=sus,clues=clues,twist=twist,test=test,answer=ans,reveal=reveal,debate=debate,rule=rule)
@@ -32,13 +32,13 @@ L3=[
  dict(m='odd',phase='STUDY',label='Extra · What is wrong with this chart?',optional=True,min=2,items=G3.CHART,lvl=2,mode='chart'),
  dict(m='guess_who',phase='ACTIVATE',label='Extra · Guess who (warm-up for the Asker)',optional=True,min=4,attrs=G3.AT,patients=G3.PAT,rounds=2,lvl=1,levels=[dict(n=6,ask='full'),dict(n=9,ask='full'),dict(n=12,ask='word')]),
  dict(m='frames3',phase='ACTIVATE',label='Your sentences',min=2,title='Your sentences (they stay on the board)',groups=[
-   {'t':'Easy','c':'teal','l':['She has a fever.','Her pulse is 104.','It might be dengue.']},
-   {'t':'Better','c':'sky','l':['Her temperature is higher than normal.',"It can't be appendicitis because her belly does not hurt."]},
-   {'t':'Stretch','c':'rose','l':['It is unlikely to be flu because she has no cough.','It is probably dengue, because she has a rash and she had mosquito bites.'],'fs':36}],note='Any sentence that carries the meaning is good.'),
+   {'t':'Easy','c':'teal','l':['She has a fever.','Her pulse is 104.','It might be dengue.'],'fs':46},
+   {'t':'Better','c':'sky','l':['Her temperature is higher than normal.',"It can't be appendicitis because her belly does not hurt."],'fs':44},
+   {'t':'Stretch','c':'rose','l':['It is unlikely to be flu because she has no cough.','It is probably dengue, because she has a rash and she had mosquito bites.'],'fs':38}],note='Any sentence that carries the meaning is good.'),
  dict(m='frames3',phase='ACTIVATE',label='How the hunt works',min=2,title='How the hunt works',grad='violet',groups=[
-   {'t':'Teams of 4','c':'violet','l':['Your colour = your clues','Your letter = your job','The job changes every clue: Reader · Asker · Writer · Speaker'],'fs':34},
-   {'t':'One clue','c':'teal','l':['1  Reader gets the clue','2  Asker asks · Reader answers','3  Writer: write the sentence down','4  Speaker: hands up · say it loudly'],'fs':34},
-   {'t':'Then','c':'rose','l':['Teacher: "OK" → the clue appears for everybody','Another team: say it differently','Waiting? Write down what you hear.'],'fs':34}]),
+   {'t':'Teams of 4','c':'violet','l':['Your colour = your clues','Your letter = your job','The job changes every clue: Reader · Asker · Writer · Speaker'],'fs':42},
+   {'t':'One clue','c':'teal','l':['1  Reader gets the clue','2  Asker asks · Reader answers','3  Writer: write the sentence down','4  Speaker: hands up · say it loudly'],'fs':42},
+   {'t':'Then','c':'rose','l':['Teacher: "OK" → the clue appears for everybody','Another team: say it differently','Waiting? Write down what you hear.'],'fs':42}]),
  board('Find the illness',K.L3_SUSPECTS,K.L3_CLUES,K.L3_TWIST,K.L3_TEST,K.L3_ANSWER,'Dengue. Rash on the arms and chest, low platelets and white cells, no cough, mosquito bites a week ago.',
    dict(title="Wait… which can't it be?",lines=['Stand at the illness you believe.','Say why: <b>"It can\'t be flu because…"</b>','Hear a better reason? Move.']),rule='Say it in a full sentence.'),
  dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L3_BOSS,sec=90),
@@ -46,10 +46,10 @@ L3=[
    dict(text='Her temperature is lower than normal',say='Her temperature is higher than normal',opts=['lowest','more']),
    dict(text='She has a cough',say='She has no cough',opts=['not','any']),
    dict(text='The rash is on her face',say='The rash is on her chest',opts=['arm','leg'])],lvl=1,levels=[dict(mode='opts'),dict(mode='opts'),dict(mode='type')]),
- dict(m='frames3',phase='ACTIVATE',label='Tell the doctor (handover)',min=8,title='Tell the doctor',h=510,groups=[
-   {'t':'Easy · fill the gaps','c':'teal','l':['A young woman. Day 3 of fever.','Her temperature is ___ than normal.','She has ___ and ___. She has no ___.','It is probably ___ because ___.'],'fs':32},
-   {'t':'Better · S B A','c':'sky','l':['<b>S</b> Patient: ___. Day ___ of ___.','<b>B</b> She had ___ last week.','<b>A</b> It might be ___. It can\'t be ___ because ___.'],'fs':32},
-   {'t':'Stretch · your patient','c':'rose','l':['Pick 4 facts. Invent your own patient.','<b>S B A</b> + <b>R</b>: "Please check ___."','Use might · can\'t · because.'],'fs':32}],write=True,note='Write it down. Then tell your partner.'),
+ dict(m='frames3',phase='ACTIVATE',label='Tell the doctor (handover)',min=8,title='Tell the doctor',h=540,groups=[
+   {'t':'Easy · fill the gaps','c':'teal','l':['A young woman. Day 3 of fever.','Her temperature is ___ than normal.','She has ___ and ___. No ___.','It is probably ___ because ___.'],'fs':36},
+   {'t':'Better · S B A','c':'sky','l':['<b>S</b>  Patient: ___. Day ___ of ___.','<b>B</b>  She had ___ last week.','<b>A</b>  It might be ___. It can\'t be ___ because ___.'],'fs':36},
+   {'t':'Stretch · your patient','c':'rose','l':['Invent your own patient.','Pick 4 facts. Say <b>S B A</b>.','<b>R</b>  "Please check ___."','Use might · can\'t · because.'],'fs':36}],write=True,note='Write it down. Then tell your partner.'),
  dict(m='taboo',phase='ACTIVATE',label='Extra · Taboo (fun)',optional=True,min=4,items=G3.TB+[dict(w='rash',e='🔴',no=['red','skin','spots','itchy'])],lvl=1,levels=[dict(limit=2),dict(limit=3,secs=60),dict(limit=4,secs=45)]),
  dict(m='exit',phase='EXIT',label='Exit',min=1,line1='One useful',line2='question.',prompt='Ask the person next to you.',emoji='light_bulb'),
 ]
@@ -92,20 +92,20 @@ L4=[
    levels=[dict(mode='tiles',showpic=True,decoys=0),dict(mode='tiles',showpic=False,decoys=4),dict(mode='type',showpic=False)]),
  dict(m='label_reader',phase='STUDY',label='Extra · Read the label (how often, how much)',optional=True,min=3,lab=G3.LAB,qs=G3.QS,lvl=1,levels=[dict(qtext=True),dict(qtext=True),dict(qtext=False)]),
  dict(m='frames3',phase='ACTIVATE',label='Your sentences',min=2,title='Your sentences (they stay on the board)',groups=[
-   {'t':'Easy','c':'teal','l':['She drinks coffee every day.','She is very tired.','Her pulse is high.']},
-   {'t':'Better','c':'sky','l':['She has slept badly for two weeks.','Her pulse is faster than normal.']},
-   {'t':'Stretch','c':'rose','l':['She has drunk eight cups a day since the exams started, which is twice as much as normal.','Friday was the worst night of the week.'],'fs':34}],note='Any sentence that carries the meaning is good.'),
+   {'t':'Easy','c':'teal','l':['She drinks coffee every day.','She is very tired.','Her pulse is high.'],'fs':46},
+   {'t':'Better','c':'sky','l':['She has slept badly for two weeks.','Her pulse is faster than normal.'],'fs':44},
+   {'t':'Stretch','c':'rose','l':['She has drunk eight cups a day since the exams started, which is twice as much as normal.','Friday was the worst night of the week.'],'fs':36}],note='Any sentence that carries the meaning is good.'),
  dict(m='frames3',phase='ACTIVATE',label='Everybody lies',min=2,title='Everybody lies',grad='violet',groups=[
-   {'t':'The patient says…','c':'rose','l':['"I only drink two cups."','"I sleep fine."'],'fs':38},
-   {'t':'The numbers say…','c':'sky','l':['The café card: 8 cups.','The watch: 3 hours of sleep.'],'fs':38},
-   {'t':'You decide','c':'teal','l':['"She says ___, but ___."','Which clue do you believe?'],'fs':38}]),
+   {'t':'The patient says…','c':'rose','l':['"I only drink two cups."','"I sleep fine."'],'fs':48},
+   {'t':'The numbers say…','c':'sky','l':['The café card: 8 cups.','The watch: 3 hours of sleep.'],'fs':48},
+   {'t':'You decide','c':'teal','l':['"She says ___, but ___."','Which clue do you believe?'],'fs':48}]),
  board('Find the reason',K.L4_SUSPECTS,K.L4_CLUES,K.L4_TWIST,K.L4_TEST,K.L4_ANSWER,'Too much coffee: 8 cups a day, 3 hours of sleep, pulse 110, normal temperature, better on the Sunday without coffee.',
    dict(title='Wait… is it just stress?',lines=['Stand at the reason you believe.','Say why with a dial: <b>"She has slept badly for two weeks."</b>','Hear a better reason? Move.']),rule='At least one dial in every sentence.'),
  dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L4_BOSS,sec=90),
  dict(m='frames3',phase='ACTIVATE',label='"Doctor, I\'m too busy."',min=8,title='"Doctor, I\'m too busy."',h=470,groups=[
-   {'t':'Patient','c':'rose','l':['"I\'m too busy to sleep."','"I need coffee. I have three exams."'],'fs':34},
+   {'t':'Patient','c':'rose','l':['"I\'m too busy to sleep."','"I need coffee. I have three exams."'],'fs':38},
    {'t':'You (the nurse)','c':'teal','l':['"You should sleep at least seven hours."','"How many cups do you drink every day?"','"For two weeks? That is more than normal."'],'fs':32},
-   {'t':'Say one thing','c':'violet','l':['Choose a dial.','Make it kind.'],'fs':36}],write=True,note='Write down one kind sentence. Then say it to your partner.'),
+   {'t':'Say one thing','c':'violet','l':['Choose a dial.','Make it kind.'],'fs':42}],write=True,note='Write down one kind sentence. Then say it to your partner.'),
  dict(m='taboo',phase='ACTIVATE',label='Extra · Taboo (fun)',optional=True,min=4,items=[dict(w='coffee',e='☕',no=['cup','drink','morning','caffeine']),dict(w='insomnia',e='🌙',no=['sleep','night','cannot','bed']),dict(w='pulse',e='💓',no=['heart','beat','wrist','minute']),dict(w='headache',e='🤕',no=['head','pain','hurt','tablet'])],lvl=1,levels=[dict(limit=2),dict(limit=3,secs=60),dict(limit=4,secs=45)]),
  dict(m='exit',phase='EXIT',label='Exit',min=1,line1='Sleep well',line2='tonight.',prompt='Tell the person next to you one dial.',emoji='sleeping_face'),
 ]

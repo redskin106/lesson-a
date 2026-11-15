@@ -30,25 +30,25 @@ EXT_CSS.append("""
 .pcd{border:0;cursor:pointer;font-family:O;font-weight:800;color:#2a1c5a;background:rgba(255,255,255,.72);backdrop-filter:blur(14px);border-radius:44px;box-shadow:0 14px 30px rgba(80,60,160,.22),inset 0 4px 0 rgba(255,255,255,.8);padding:22px 30px;font-size:46px;min-width:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:transform .2s,opacity .4s;position:relative}
 .pcd i{font-style:normal;font-size:140px;line-height:1.1}.pcd:active{transform:scale(.96)}
 .pcd.ok{background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff}.pcd.glow{animation:wgl 1s infinite}.pcd.sel{outline:8px solid #ffd21f;transform:scale(1.05)}.pcd.fade{opacity:.18;pointer-events:none}
-.prow{flex-direction:row;justify-content:space-between;width:1000px;min-width:0;padding:18px 44px;font-size:48px}.prow b{color:#6a35e8}.prow.ok b{color:#fff}
+.prow{flex-direction:row;justify-content:space-between;width:1240px;min-width:0;padding:30px 60px;font-size:58px}.prow b{color:#6a35e8}.prow.ok b{color:#fff}
 .pwhy{position:absolute;left:0;top:660px;width:1700px;text-align:center;font-size:44px;color:#6a35e8;opacity:0;transition:opacity .4s}
 .ptq{position:absolute;left:0;top:0;width:1700px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap}.ptq .pcd{min-width:0;font-size:36px;padding:14px 24px}.ptq .pcd i{font-size:70px}
 .pbk{position:absolute;top:260px;width:540px;height:400px;border-radius:44px;border:6px solid;background:rgba(255,255,255,.45);cursor:pointer;display:flex;flex-direction:column;align-items:center;padding-top:14px;font-size:44px}
 .pbk small{font-size:30px;opacity:.8}.pbl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px;padding:0 10px}.pbl .pcd{min-width:0;font-size:26px;padding:8px 14px;border-radius:24px}.pbl .pcd i{font-size:36px}
-.plab{position:absolute;left:0;top:0;width:900px;border-radius:44px;padding:20px 30px}.plab .pcd{width:100%;min-width:0;flex-direction:row;justify-content:flex-start;gap:20px;font-size:36px;margin:8px 0;padding:12px 26px;border-radius:30px;text-align:left}.plab .pcd i{font-size:48px}
-.plab h3{margin:0 0 6px;font-size:52px;text-align:center}
-.pqq{position:absolute;left:950px;top:0;width:750px;border-radius:44px;padding:30px 40px;font-size:50px;line-height:1.2;min-height:300px}
-.ptb{position:absolute;left:0;top:0;width:1000px;height:560px;border-radius:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-size:96px;text-align:center}
+.plab{position:absolute;left:0;top:0;width:900px;border-radius:44px;padding:20px 30px}.plab .pcd{width:100%;min-width:0;flex-direction:row;justify-content:flex-start;gap:22px;font-size:42px;margin:8px 0;padding:14px 30px;border-radius:30px;text-align:left}.plab .pcd i{font-size:56px}
+.plab h3{margin:0 0 8px;font-size:58px;text-align:center}
+.pqq{position:absolute;left:950px;top:0;width:750px;border-radius:44px;padding:36px 44px;font-size:58px;line-height:1.2;min-height:380px}
+.ptb{position:absolute;left:0;top:0;width:1000px;height:740px;border-radius:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-size:96px;text-align:center}
 .ptb ul{list-style:none;padding:0;margin:0;font-size:46px;color:#d3265c}.ptb ul li:before{content:"✖ "}
 .pbt{border:0;cursor:pointer;font-family:O;font-weight:800;font-size:44px;padding:16px 40px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#7b3cf0,#ff4fa3);box-shadow:inset 0 4px 0 rgba(255,255,255,.45);margin:10px}
 .pbt.g{background:linear-gradient(135deg,#2bd9b6,#10a98d)}.pbt.o{background:linear-gradient(135deg,#ffd21f,#ffb21f);color:#2a1c5a}
 .pfs{position:absolute;display:flex;flex-direction:column;align-items:flex-start}
-.pwd{display:inline-block;padding:6px 18px;margin:4px 6px;border-radius:20px;cursor:pointer;font-size:62px;transition:background .3s}.pwd.bad{background:linear-gradient(135deg,#ff9a3c,#ff4fa3);color:#fff}.pwd.fx{background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff}
+.pwd{display:inline-block;padding:6px 18px;margin:4px 6px;border-radius:20px;cursor:pointer;font-size:84px;transition:background .3s}.pwd.bad{background:linear-gradient(135deg,#ff9a3c,#ff4fa3);color:#fff}.pwd.fx{background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff}
 .pmem{position:absolute;left:0;top:0;width:1700px;display:grid;gap:22px;justify-content:center}.pmem .pcd{height:200px;min-width:0;font-size:38px;text-align:center;line-height:1.1;padding:10px}.pmem .pcd i{font-size:96px}
 .pmem .pcd.bk{background:linear-gradient(135deg,#9a5cff,#6a35e8);color:#fff;font-size:90px}.pmem .pcd.m{background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff;pointer-events:none}
 .pfr{position:absolute;top:0;display:flex;gap:30px}.pfr .pcd{width:440px;min-width:0;height:380px;opacity:0;transform:scale(.8);font-size:34px;text-align:center}.pfr .pcd.on{opacity:1;transform:scale(1)}
-.gwg{position:absolute;left:0;top:130px;width:1100px;display:grid;grid-template-columns:repeat(6,1fr);gap:16px}.gwg .pcd{min-width:0;padding:10px;font-size:30px;height:200px}.gwg .pcd i{font-size:70px}.gwg .pcd small{font-size:36px;letter-spacing:4px}
-.gwq{position:absolute;left:1140px;top:130px;width:560px;display:flex;flex-direction:column;gap:10px}.gwq .pcd{min-width:0;flex-direction:row;font-size:30px;padding:10px 22px;border-radius:30px}.gwq .pcd i{font-size:40px}.gwq .pcd.fade{opacity:.35}
+.gwg{position:absolute;left:0;top:130px;width:1100px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.gwg .pcd{min-width:0;padding:10px;font-size:30px;height:200px}.gwg .pcd i{font-size:70px}.gwg .pcd small{font-size:36px;letter-spacing:4px}
+.gwq{position:absolute;left:1140px;top:130px;width:560px;display:flex;flex-direction:column;gap:10px}.gwq .pcd{min-width:0;flex-direction:row;font-size:34px;padding:16px 26px;border-radius:30px;text-align:left}.gwq .pcd i{font-size:46px}.gwg.ga .pcd{height:262px}.gwg.ga .pcd i{font-size:120px}.gwg.ga .pcd small{font-size:56px}.gwg.gb .pcd{height:212px}.gwg.gb .pcd i{font-size:92px}.gwg.gb .pcd small{font-size:46px}.gwq .pcd.fade{opacity:.35}
 """)
 EXT_JS.append(r"""
 /* ---- play modules ---- */
@@ -70,9 +70,9 @@ INIT.odd=function(s){var D=jd(s),I=D.items,st={k:0,n:I.length},mode=D.mode||'pic
 INIT.listen_fix=function(s){var D=jd(s),I=D.items,st={k:0,n:I.length},mode=D.mode||'opts';
  st.draw=function(){pdots(s,st.k);var it=I[st.k],g=$('.pg',s),W=it.text.split(' '),H=it.say.split(' '),bad=-1,dn=0,w=0;for(var i=0;i<W.length;i++)if(W[i]!==H[i]){bad=i;break}
   g.innerHTML='';pmk('div','gl plq','<button class="pbt" style="margin:0 20px 0 0;font-size:44px">🔊 Listen</button>Tap the word that is different.',g).querySelector('button').onclick=function(){psay(it.say)};psay(it.say);
-  var box=pmk('div','gl',null,g);box.style.cssText='position:absolute;left:0;top:170px;width:1700px;border-radius:44px;padding:40px;text-align:center;line-height:1.5';
+  var box=pmk('div','gl',null,g);box.style.cssText='position:absolute;left:0;top:210px;width:1700px;border-radius:44px;padding:80px 40px;text-align:center;line-height:1.5';
   var ws=W.map(function(x,i){var e=pmk('span','pwd',x,box);e.onclick=function(){if(dn)return;if(i!==bad){wrong(e);return}dn=1;e.classList.add('bad');P('pop');ask()};return e});
-  var area=pmk('div','',null,g);area.style.cssText='position:absolute;left:0;top:470px;width:1700px;text-align:center';
+  var area=pmk('div','',null,g);area.style.cssText='position:absolute;left:0;top:640px;width:1700px;text-align:center';
   function fixed(){ws[bad].textContent=H[bad];ws[bad].classList.remove('bad');ws[bad].classList.add('fx');P('good');psay(it.say);pstep(s,st,2200)}
   function ask(){area.innerHTML='<div style="font-size:42px;margin-bottom:14px">Fix it:</div>';
    if(mode==='type'){var inp=pmk('input','wty',null,area);inp.placeholder='type the right word';var b=pmk('button','pbt','Check',area);function chk(){var v=inp.value.trim().toLowerCase(),t=H[bad].toLowerCase().replace(/[^a-z0-9]/g,'');if(v===t||plev(v,t)<=1&&t.length>3){fixed()}else{w++;wrong(inp);if(w>=2)b.textContent='Starts with '+t[0].toUpperCase()}}b.onclick=chk;inp.onkeydown=function(e){if(e.key==='Enter')chk()};try{inp.focus()}catch(e){}}
@@ -93,7 +93,7 @@ INIT.label_reader=function(s){var D=jd(s),Q=D.qs,L=D.lab,st={k:0,n:Q.length};
 /* taboo for nurses */
 INIT.taboo=function(s){var D=jd(s),Q=pshuf(D.items),lim=D.limit||3,done=0,N=D.items.length,shown=0,t=null,tm=D.secs||0,left=tm;pdots(s,0);
  var g=$('.pg',s),card=pmk('div','gl ptb',null,g),btn=pmk('div','',null,g);btn.style.cssText='position:absolute;left:1040px;top:20px;width:660px;text-align:center';
- var info=pmk('div','',null,g);info.style.cssText='position:absolute;left:1040px;top:470px;width:660px;font-size:36px;text-align:center;color:#6a35e8';
+ var info=pmk('div','',null,g);info.style.cssText='position:absolute;left:1040px;top:560px;width:660px;font-size:40px;text-align:center;color:#6a35e8';
  function draw(){var it=Q[0];card.innerHTML=shown?'<div style="font-size:120px">'+(it.e||'')+'</div><div>'+it.w+'</div><ul>'+it.no.slice(0,lim).map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul>':'<div style="font-size:90px">🙈</div><div style="font-size:44px;font-weight:700">Describer only: tap Show.<br>Others: guess! Say it in English.</div>';
   btn.innerHTML='';var a=pmk('button','pbt o',shown?'🙈 Hide':'👀 Show',btn);a.onclick=function(){shown=!shown;P('tick');draw()};
   var b=pmk('button','pbt g','✔ Got it',btn);b.onclick=function(){P('good');Q.shift();done++;pdots(s,done);shown=0;if(!Q.length){finish(s);return}draw();clk()};
@@ -105,7 +105,7 @@ INIT.taboo=function(s){var D=jd(s),Q=pshuf(D.items),lim=D.limit||3,done=0,N=D.it
 INIT.guess_who=function(s){var D=jd(s),R=D.rounds||2,r=0,A=D.attrs,all=D.patients;
  function round(){pdots(s,r);var g=$('.pg',s),P1=pshuf(all).slice(0,D.n||all.length),sec=P1[Math.floor(Math.random()*P1.length)],done=0,asked=0;g.innerHTML='';
   var top=pmk('div','gl plq','Find the secret patient. Ask questions. Then tap your guess.',g);top.style.fontSize='40px';
-  var grid=pmk('div','gwg',null,g),ans=pmk('div','pwhy','',g);ans.style.cssText='left:0;top:600px;font-size:56px;opacity:1;width:1100px';var qs=pmk('div','gwq',null,g);
+  var nrow=Math.ceil(P1.length/(P1.length<=9?3:4)),grid=pmk('div','gwg '+(nrow<=2?'ga':'gb'),null,g),ans=pmk('div','pwhy','',g);grid.style.gridTemplateColumns='repeat('+(P1.length<=9?3:4)+',1fr)';ans.style.cssText='left:0;top:'+(nrow<=2?720:850)+'px;font-size:48px;opacity:1;width:1100px';var qs=pmk('div','gwq',null,g);
   var cs=P1.map(function(p){var b=pmk('button','pcd','<i>'+p.e+'</i><small>'+p.a.map(function(k){return A.filter(function(x){return x.k===k})[0].e}).join('')+'</small>',grid);b.onclick=function(){if(done)return;if(p===sec){done=1;b.classList.add('ok');P('good');ans.textContent='🎉 Yes! That is the patient!';r++;setTimeout(function(){if(r>=R)finish(s);else round()},2000)}else{b.classList.add('fade');wrong(b)}};return b});
   A.forEach(function(a){var b=pmk('button','pcd','<i>'+a.e+'</i><span>'+(D.ask==='word'?a.w:a.q)+'</span>',qs);b.onclick=function(){if(done||b.classList.contains('fade'))return;b.classList.add('fade');var yes=sec.a.indexOf(a.k)>=0;psay(a.q);ans.textContent=(yes?'Yes ✔ ':'No ✖ ')+(yes?'The patient has ':'The patient does not have ')+a.w+'.';P(yes?'pop':'tick');
    P1.forEach(function(p,i){var has=p.a.indexOf(a.k)>=0;if(has!==yes)cs[i].classList.add('fade')})}})}

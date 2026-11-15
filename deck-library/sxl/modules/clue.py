@@ -52,10 +52,10 @@ def timetable(d):
     """Silent timetable. {'phase','title','days':[..],'rows':[(emoji,[cell...])],'note'}"""
     days=d['days']; R=d['rows']; n=len(days); cw=int((1740-170)/n); o=header(d['phase'],d.get('title','A week'),'amber')
     o+=''.join(f'<div class="a" style="left:{260+i*cw}px;top:170px;width:{cw-14}px;text-align:center">{grad_chip("sky",t,38,"4px 24px")}</div>' for i,t in enumerate(days))
-    rh=int(min(190,(860-230)/len(R)))
+    rh=int(min(300 if len(R)<=2 else 190,(860-230)/len(R))); big=rh>=250
     for r,(lab,cells) in enumerate(R):
-        y=230+r*rh; row=glass(90,y,150,rh-16,f'<div style="font-size:74px;text-align:center;line-height:{rh-16}px">{lab}</div>',r=40)
-        row+=''.join(glass(260+i*cw,y,cw-14,rh-16,f'<div style="font-family:O;font-weight:800;font-size:{46 if len(str(c))<8 else 36}px;text-align:center;line-height:{rh-16}px">{c}</div>',r=36) for i,c in enumerate(cells))
+        y=230+r*rh; row=glass(90,y,150,rh-16,f'<div style="font-size:{110 if big else 74}px;text-align:center;line-height:{rh-16}px">{lab}</div>',r=40)
+        row+=''.join(glass(260+i*cw,y,cw-14,rh-16,f'<div style="font-family:O;font-weight:800;font-size:{(84 if big else 46) if len(str(c))<8 else (62 if big else 36)}px;text-align:center;line-height:{rh-16}px">{c}</div>',r=36) for i,c in enumerate(cells))
         o+=stp(row,r+1)
     if d.get('note'): o+=stp(f'<div class="a mu" style="left:90px;top:{230+rh*len(R)+4}px;width:1740px;text-align:center;font-size:36px">{d["note"]}</div>',len(R)+1)
     return o
@@ -76,8 +76,8 @@ def choice_html(d,sid):
     o+=f'<div class="a" style="right:{(130 if d.get("_lvg") else 90)}px;top:60px;display:flex;gap:12px">'+''.join(f'<span class="chd" style="width:26px;height:26px;border-radius:50%"></span>' for _ in I)+'</div>'
     for k,it in enumerate(I):
         o+=f'<div class="chi" style="display:none">'+picx(it.get('pic','❓'),90,180,700,600,56)
-        o+=f'<div class="gl" style="left:850px;top:190px;width:980px;border-radius:48px;padding:26px 40px;font-family:O;font-weight:800;font-size:{50 if len(it["q"])<46 else 42}px;line-height:1.2;position:absolute">{it["q"]}</div>'
-        o+='<div class="a cho-wrap" style="left:850px;top:400px;width:980px;display:flex;flex-direction:column;gap:18px">'+''.join(f'<button class="cho" data-ok="{1 if t==it["ans"] else 0}" style="font-size:{44 if len(t)<34 else 38}px">{t}</button>' for t in it['opts'])+'</div></div>'
+        o+=f'<div class="gl" style="left:850px;top:190px;width:980px;border-radius:48px;padding:26px 40px;font-family:O;font-weight:800;font-size:{56 if len(it["q"])<40 else 46}px;line-height:1.2;position:absolute">{it["q"]}</div>'
+        o+='<div class="a cho-wrap" style="left:850px;top:400px;width:980px;display:flex;flex-direction:column;gap:24px">'+''.join(f'<button class="cho" data-ok="{1 if t==it["ans"] else 0}" style="font-size:{54 if len(t)<26 else 44 if len(t)<40 else 38}px">{t}</button>' for t in it['opts'])+'</div></div>'
     if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:810px;width:760px;font-size:34px;line-height:1.3">{d["hint"]}</div>'
     return o
 BUILD_EXT['choice']=choice_html
@@ -88,10 +88,11 @@ def _choice_static(d): return choice_html(d,'x')
 def boss_html(d,sid):
     """{'phase','title','text','q','plain':[glosses],'simple','answer','sec'}"""
     b=d; o=header(d.get('phase','ACTIVATE'),'Optional boss','rose')
-    o+=glass(90,170,1060,470,f'<div style="padding:40px 50px;font-family:P;font-weight:500;font-size:{37 if len(b["text"])<330 else 31}px;line-height:1.45">{b["text"]}</div>',r=56)
+    o+=glass(90,170,1060,470,f'<div style="padding:40px 50px;font-family:P;font-weight:500;font-size:{37 if len(b["text"])<330 else 31 if len(b["text"])<345 else 28}px;line-height:1.45">{b["text"]}</div>',r=56)
     o+=f'<div class="a" style="left:90px;top:665px;width:1060px;font-family:O;font-weight:800;font-size:54px;line-height:1.1">{b["q"]}</div>'
     o+=f'<div class="a" style="left:90px;top:790px;display:flex;gap:28px;align-items:center"><div class="bstime" style="font-family:O;font-weight:800;font-size:110px;min-width:190px" data-sec="{b.get("sec",90)}"><span class="grad">{b.get("sec",90)}</span></div><button class="bsb bstart">{grad_chip("violet","▶ start",48,"10px 44px")}</button><button class="bsb bgive">{grad_chip("rose","We give up",48,"10px 44px")}</button></div>'
     fp=f'<div style="padding:34px 40px">{grad_chip("amber","Free pass",48,"6px 34px")}<div style="margin-top:20px;font-family:P;font-weight:500;font-size:34px;line-height:1.55">'+'<br>'.join(f'<b>{g.split(" = ")[0]}</b> = {g.split(" = ")[1]}' for g in b['plain'])+f'</div><div style="margin-top:26px;font-family:P;font-weight:500;font-size:36px;line-height:1.4">{b["simple"]}</div><div style="margin-top:26px">{grad_chip("teal",b["answer"],40,"8px 30px")}</div><div style="margin-top:22px;font-size:44px">Too easy? 😄</div></div>'
+    o+=f'<div class="bfl">'+glass(1190,170,640,740,'<div style="padding:60px 40px;text-align:center"><div style="font-size:170px">🔒</div><div style="font-family:O;font-weight:800;font-size:54px;margin-top:20px">Free pass</div><div style="font-family:P;font-weight:500;font-size:36px;margin-top:20px;line-height:1.4">Stuck? Tap <b>We give up</b> when your team is ready.</div></div>',r=56)+'</div>'
     o+=f'<div class="bfp" style="opacity:0;transition:opacity .6s,transform .6s;transform:translateY(40px)">{glass(1190,170,640,740,fp,r=56)}</div>'
     return o
 BUILD_EXT['boss']=boss_html
@@ -113,7 +114,7 @@ EXT_CSS.append("""
 .mdl i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.95);display:block}
 .mdl.on{opacity:1;transform:scale(1.28);box-shadow:0 0 0 8px rgba(255,255,255,.45),0 12px 28px rgba(60,30,140,.35)}
 .chd{background:rgba(255,255,255,.7);border:4px solid #fff;box-shadow:0 4px 12px rgba(60,30,140,.18)}.chd.on{background:#9a5cff;border-color:#fff;transform:scale(1.25)}.chd.dn{background:#2bd9b6}
-.cho{font-family:O;font-weight:800;text-align:left;padding:18px 40px;border-radius:999px;background:rgba(255,255,255,.78);border:5px solid #fff;box-shadow:0 10px 26px rgba(60,30,140,.16);color:#1c1b2e;cursor:pointer;line-height:1.15;transition:transform .2s,opacity .3s,background .3s}
+.cho{font-family:O;font-weight:800;text-align:left;padding:28px 48px;border-radius:999px;background:rgba(255,255,255,.78);border:5px solid #fff;box-shadow:0 10px 26px rgba(60,30,140,.16);color:#1c1b2e;cursor:pointer;line-height:1.15;transition:transform .2s,opacity .3s,background .3s}
 .cho:active{transform:scale(.97)}.cho.ok{background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff;border-color:#fff}.cho.off{opacity:.3;pointer-events:none}.cho.nope{opacity:.4}
 .bsb{border:0;background:none;padding:0;cursor:pointer}
 .cbcount{right:90px;top:58px;font-family:O;font-weight:800;font-size:40px;padding:10px 38px;border-radius:999px;background:linear-gradient(135deg,#ffc13b,#ff9f1c);color:#fff;box-shadow:0 14px 28px rgba(200,120,0,.3)}
@@ -139,6 +140,9 @@ EXT_CSS.append("""
 # ---------------- behaviour ----------------
 EXT_JS.append(r"""
 SXL.say=true;
+/* temporary review skip: hide with ?noskip */
+if(!/noskip/.test(location.search)){var sk=$('#sk');sk.style.display='block';setInterval(function(){sk.style.visibility=(cur<slides.length-1)?'visible':'hidden'},300);sk.onclick=function(){var s=slides[cur];if(s)s.__done=1;P('tick');if(cur<slides.length-1)go(cur+1)}}
+
 /* ---- medals: levels:[...] on a slide give three sections; the medal picks which one is in the deck ---- */
 function setLvl(g,l){var all=$$('.sl[data-lvg="'+g+'"]');all.forEach(function(e){e.classList.toggle('lvx',+e.dataset.lv!==l);e.classList.remove('on')});slides=$$('.sl:not(.lvx)');var n=all.filter(function(e){return +e.dataset.lv===l})[0];P('pop');go(slides.indexOf(n))}
 document.addEventListener('click',function(e){var b=e.target.closest('.mdl');if(b){e.stopPropagation();setLvl(+b.dataset.g,+b.dataset.l)}},true);
@@ -158,7 +162,7 @@ INIT.choice=function(s){
 INIT.boss=function(s){
  var t=$('.bstime',s),left=+t.dataset.sec,iv=null,fp=$('.bfp',s);$('#nx').classList.add('on');
  function draw(){t.innerHTML='<span class="grad">'+left+'</span>'}
- function give(){clearInterval(iv);fp.style.opacity=1;fp.style.transform='none';P('good');finish(s)}
+ function give(){clearInterval(iv);var tz=$('.bfl',s);if(tz)tz.style.display='none';fp.style.opacity=1;fp.style.transform='none';P('good');finish(s)}
  $('.bstart',s).onclick=function(){clearInterval(iv);left=+t.dataset.sec;draw();P('pop');iv=setInterval(function(){left--;draw();if(left<=10&&left>0)P('tick');if(left<=0)give()},1000)};
  $('.bgive',s).onclick=give};
 /* ---- case_board ---- */
@@ -177,7 +181,7 @@ INIT.case_board=function(s){
     if(o)return '<div class="cbt ok" data-id="'+c.id+'" data-k="read"><span class="pc">'+c.pic+'</span><span class="tx">'+txt(c)+'</span></div>';
     return '<div class="cbt '+(rd?'rd':'lk')+'" data-id="'+c.id+'" data-k="'+(rd?'ask':'')+'"><span class="pc">'+(rd?'✋':'🔒')+'</span><span>'+(rd?'tap when the team is ready':'')+'</span></div>'}).join('')+'</div>'}).join('');
   fit();if(tw){twb.style.display='block';twb.innerHTML='⚡ '+D.twist.pic+' '+D.twist.text}}
- function fit(){$$('.cbt.ok',grid).forEach(function(t){var x=$('.tx',t),f=27;x.style.fontSize=f+'px';while(f>17&&(x.scrollHeight>t.clientHeight-8)){f--;x.style.fontSize=f+'px'}if(x.scrollHeight>t.clientHeight-8)t.classList.add('ov')})}
+ function fit(){$$('.cbt.ok',grid).forEach(function(t){var x=$('.tx',t),f=(x.textContent.length<24?38:27);x.style.fontSize=f+'px';while(f>18&&(x.scrollHeight>t.clientHeight-8)){f--;x.style.fontSize=f+'px'}if(x.scrollHeight>t.clientHeight-8)t.classList.add('ov')})}
  function sheet(h){mb.innerHTML=h;m.classList.add('on')}
  function close(){m.classList.remove('on')}
  function dialsHtml(c){return c.dials?'<div class="ex">'+Object.keys(c.dials).map(function(k){return '<b>'+k+'</b> '+c.dials[k]}).join('<br>')+'</div>':''}

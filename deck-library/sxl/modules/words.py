@@ -12,12 +12,14 @@ def word_html(d,sid,kind):
     I=d['items']; o=header(d['phase'],d.get('title',{'spell':'Name the illness','scramble':'Unscramble','unveil':'What is it?'}[kind]),d.get('grad','violet'))
     o+=f'<div class="a" style="right:{(130 if d.get("_lvg") else 90)}px;top:60px;display:flex;gap:12px">'+''.join('<span class="chd" style="width:26px;height:26px;border-radius:50%"></span>' for _ in I)+'</div>'
     for k,it in enumerate(I):
-        o+='<div class="wi" style="display:none">'+f'<div class="wpic">{picx(it.get("pic","❓"),90,180,640,520,56)}</div>'
-        o+=f'<div class="wcov a" style="left:90px;top:180px;width:640px;height:520px;border-radius:56px;overflow:hidden;display:none"></div>'
-        o+=f'<div class="a wlisten" style="left:90px;top:180px;width:640px;height:520px;display:none"><div class="gl" style="position:absolute;inset:0;border-radius:56px;display:flex;align-items:center;justify-content:center;font-size:190px">🎧</div></div>'
+        ph=520 if kind=='unveil' else 640
+        o+='<div class="wi" style="display:none">'+f'<div class="wpic">{picx(it.get("pic","❓"),90,180,640,ph,56)}</div>'
+        o+=f'<div class="wcov a" style="left:90px;top:180px;width:640px;height:{ph}px;border-radius:56px;overflow:hidden;display:none"></div>'
+        o+=f'<div class="a wlisten" style="left:90px;top:180px;width:640px;height:{ph}px;display:none"><div class="gl" style="position:absolute;inset:0;border-radius:56px;display:flex;align-items:center;justify-content:center;font-size:190px">🎧</div></div>'
         if it.get('clue'): o+=f'<div class="gl wclue" style="left:780px;top:190px;width:1050px;border-radius:48px;padding:24px 38px;font-family:O;font-weight:800;font-size:{46 if len(it["clue"])<60 else 38}px;line-height:1.2;position:absolute">{it["clue"]} <button class="wsay" style="border:0;background:none;font-size:46px;cursor:pointer">🔊</button></div>'
-        o+='<div class="a wslots" style="left:780px;top:400px;width:1050px;display:flex;flex-wrap:wrap;gap:12px"></div><div class="a whint" style="left:780px;top:670px;width:1050px;font-family:O;font-weight:800;font-size:36px;color:#6a35e8;opacity:0"></div>'
-        o+='<div class="a wbank" style="left:90px;top:730px;width:1740px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center"></div></div>'
+        un=kind=='unveil'
+        o+='<div class="a wslots" style="left:780px;top:%dpx;width:1050px;display:flex;flex-wrap:wrap;gap:12px"></div><div class="a whint" style="left:780px;top:%dpx;width:1050px;font-family:O;font-weight:800;font-size:36px;color:#6a35e8;opacity:0"></div>'%(400 if un else 360,670 if un else 530)
+        o+=('<div class="a wbank" style="left:90px;top:730px;width:1740px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center"></div></div>' if un else '<div class="a wbank" style="left:780px;top:610px;width:1050px;display:flex;flex-wrap:wrap;gap:16px;justify-content:flex-start"></div></div>')
     data={'kind':kind,'items':[{'w':i['w'],'cat':i.get('cat',''),'say':i.get('say',i['w'])} for i in I],**{k:d[k] for k in ('mode','showpic','decoys','first','limit','hint') if k in d}}
     return o+f'<script type="application/json" id="d-{sid}">{json.dumps(data,ensure_ascii=False)}</script>'
 BUILD_EXT['spell']=lambda d,sid:word_html(d,sid,'spell')
@@ -25,7 +27,7 @@ BUILD_EXT['scramble']=lambda d,sid:word_html(d,sid,'scramble')
 BUILD_EXT['unveil']=lambda d,sid:word_html(d,sid,'unveil')
 
 EXT_CSS.append("""
-.wt{width:92px;height:104px;border-radius:30px;border:0;color:#fff;font-family:O;font-weight:800;font-size:60px;text-transform:uppercase;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#6a35e8);box-shadow:0 12px 24px rgba(80,60,160,.3),inset 0 4px 0 rgba(255,255,255,.45);transition:transform .2s,opacity .3s}
+.wt{width:118px;height:132px;border-radius:34px;border:0;color:#fff;font-family:O;font-weight:800;font-size:74px;text-transform:uppercase;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#6a35e8);box-shadow:0 12px 24px rgba(80,60,160,.3),inset 0 4px 0 rgba(255,255,255,.45);transition:transform .2s,opacity .3s}
 .wt:active{transform:scale(.94)}.wt.used{opacity:.18;pointer-events:none}.wt.glow{animation:wgl 1s infinite}.wt.k{width:70px;height:80px;font-size:44px;border-radius:24px;background:linear-gradient(135deg,#ffd21f,#ffb21f)}.wt.k.hit{background:linear-gradient(135deg,#2bd9b6,#10a98d)}.wt.k.miss{opacity:.22;pointer-events:none}
 @keyframes wgl{50%{box-shadow:0 0 0 14px rgba(255,210,31,.55)}}
 .ws1{width:100px;height:116px;border-radius:30px;border:5px dashed #b9a6f5;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:68px;text-transform:uppercase;color:#fff;cursor:default;transition:transform .25s}
@@ -47,7 +49,7 @@ function wordgame(s){
   var it=items[n],W=D.items[n].w.toLowerCase(),L=W.split(''),slots=$('.wslots',it),bank=$('.wbank',it),hint=$('.whint',it),pic=$('.wpic',it),cov=$('.wcov',it),lis=$('.wlisten',it),wrongs=0,next=0,fails=0,done=0;
   slots.innerHTML='';bank.innerHTML='';
   var sp=L.map(function(c){var e=document.createElement('div');e.className='ws1'+(c===' '?' sp':'');if(c!==' ')e.dataset.c=c;slots.appendChild(e);return e});
-  var nn=L.length,sw=Math.max(46,Math.min(100,Math.floor((1050-12*(nn-1))/nn)));sp.forEach(function(e){if(e.dataset.c){e.style.width=sw+'px';e.style.height=Math.round(sw*1.16)+'px';e.style.fontSize=Math.round(sw*.68)+'px'}});
+  var nn=L.length,sw=Math.max(46,Math.min(130,Math.floor((1050-12*(nn-1))/nn)));sp.forEach(function(e){if(e.dataset.c){e.style.width=sw+'px';e.style.height=Math.round(sw*1.16)+'px';e.style.fontSize=Math.round(sw*.68)+'px'}});
   var need=sp.filter(function(e){return e.dataset.c});
   if(kind==='spell'&&D.showpic===false){pic.style.display='none';lis.style.display='block'}
   if(kind==='scramble'&&D.showpic===false){pic.style.display='none';lis.style.display='block'}
