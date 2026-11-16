@@ -171,6 +171,18 @@ def build_markup(d, sid):
     py = 168 + h + 40
     out += f'<div class="gl" style="left:90px;top:{py}px;width:1740px;height:{gh + 70}px;border-radius:70px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px 18px;padding:0 40px" id="bs-{sid}">{sl}</div>'
     bank = d.get('bank') or [(c, t) for c, t in parts] + [tuple(e) for e in extra]
+    import random as _r
+    bank = list(bank)
+    if not d.get('bank'):
+        _g = _r.Random(sum(map(ord, ''.join(t for _, t in bank))))
+        _o = list(bank)
+        _ot = [t for _, t in _o]
+        for _ in range(200):
+            _g.shuffle(bank)
+            _nt = [t for _, t in bank]
+            if len(bank) < 4: break
+            _adj = {(a, b) for a, b in zip(_ot, _ot[1:])}
+            if _nt[0] != _ot[0] and not any((a, b) in _adj for a, b in zip(_nt, _nt[1:])): break
     btn = ''.join(f'<button class="bk" data-t="{t}" data-c="{c}">{ch(c, t, d.get("bfs", 44), "8px 26px")}</button>' for c, t in bank)
     by = py + gh + 70 + 36
     out += f'<div class="gl" style="left:90px;top:{by}px;width:1740px;height:{920 - by}px;border-radius:64px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:16px 22px;padding:0 44px" id="bk-{sid}">{btn}</div>'

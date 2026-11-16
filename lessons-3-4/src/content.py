@@ -14,9 +14,9 @@ L3_CLUES=[
  dict(id='A3',team='red',r=3,kind='audio',pic='🎧',ask='Do you have a cough?',text='No. No cough.',say='She has no cough, so it is unlikely to be flu or measles.',fx={'flu':'against','measles':'against'}),
  dict(id='A4',team='red',r=4,kind='audio',pic='🎧',ask='Have you been bitten by mosquitoes?',text='Yes, a lot. In the garden by the pond, about a week ago.',say='She was bitten by mosquitoes a week ago, so it might be dengue.',fx={'dengue':'for'}),
  dict(id='B1',team='blue',r=1,kind='number',pic='🌡️',text='Temperature: 39.2 °C   (normal: about 37 °C)',say='Her temperature is 39.2. It is higher than normal, so she has a fever.',fx={'appendix':'against'}),
- dict(id='B2',team='blue',r=2,kind='number',pic='💓',text='Pulse: 104 per minute   (normal: 60 – 100)',say='Her pulse is 104. It is a little higher than normal.',fx={}),
- dict(id='B3',team='blue',r=3,kind='number',pic='🩸',text='Platelets 95 (normal 150–450)\nWhite cells 3.1 (normal 4.5–11)',say='Her platelets and white cells are lower than normal. That fits dengue.',fx={'dengue':'for'},level='silver'),
- dict(id='B4',team='blue',r=4,kind='number',pic='🫁',text='Breathing: 18 per minute   (normal: 12 – 20)',say='Her breathing is normal. It is in the normal range.',fx={}),
+ dict(id='B2',team='blue',r=2,kind='number',pic='💓',text='Pulse: 104 beats per minute   (normal: 60 – 100)',say='Her pulse is 104. It is a little higher than normal.',fx={}),
+ dict(id='B3',team='blue',r=3,kind='number',pic='🩸',text='Platelets 95 ×10⁹/L (normal 150–450)\nWhite cells 3.1 ×10⁹/L (normal 4.5–11)',say='Her platelets and white cells are lower than normal. That fits dengue.',fx={'dengue':'for'},level='silver'),
+ dict(id='B4',team='blue',r=4,kind='number',pic='🫁',text='Breathing: 18 breaths per minute   (normal: 12 – 20)',say='Her breathing is normal. It is in the normal range.',fx={}),
  dict(id='C1',team='green',r=1,kind='photo',pic='🖐️',text='Red rash on the arms and chest. No rash on the face.',say='She has a rash on her arms and chest, but not on her face. It might be dengue. It is unlikely to be measles.',fx={'dengue':'for','measles':'against'}),
  dict(id='C2',team='green',r=2,kind='photo',pic='👁️',text='Eyes: not red, not watery.',say='Her eyes are not red or watery, so it is unlikely to be measles.',fx={'measles':'against'}),
  dict(id='C3',team='green',r=3,kind='photo',pic='🫄',text='Belly: soft. No pain when the nurse presses.',say='Her belly does not hurt when I press it, so it can\'t be appendicitis.',fx={'appendix':'against'}),
@@ -159,3 +159,11 @@ TASK4={
  'Y3':T('order','C writes · B asks it','Did  ·  your  ·  friends  ·  eat  ·  the  ·  same  ·  lunch?\nPut the words in order.','Did your friends eat the same lunch?','A answers: "Yes, and nobody is sick."'),
  'Y4':T('mistake','Say the correction together','"She has fewer exams than normal."\nWhat is wrong?  (Normal: one exam a week.)','more than normal','Add dial A: "three in four days."'),
 }
+
+# ---------------- WHOLE-CLASS CLUE HUNT (decision 16 Nov 2026: groups hold clues, ball carries one question, teacher taps the board) ----------------
+HUNT3=['C1','A3','D2','B1','A4','C3','D3','B3','A2','C2','B2','D1']   # 12 of 16, shuffled so a group is not visible on the board
+HUNT4=['G2','R1','Y3','B1','Y2','G1','R3','B3','Y1','G3','R2','B2']
+TOPIC3=dict(A2='Where it hurts',A3='Cough?',A4='Mosquitoes?',B1='Temperature',B2='Pulse',B3='Blood test',C1='Rash',C2='Eyes',C3='Belly',D1='Vaccination',D2='Friend',D3='Neighbour')
+FRAMES=['Have you got …?','What does your clue say about …?','Does the patient have …?']
+# group = clues it holds (3 each)
+def group_clues(clues,hunt,team): return [c for c in clues if c['team']==team and c['id'] in hunt]

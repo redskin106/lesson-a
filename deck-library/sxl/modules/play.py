@@ -69,11 +69,11 @@ INIT.odd=function(s){var D=jd(s),I=D.items,st={k:0,n:I.length},mode=D.mode||'pic
 /* listen and fix */
 INIT.listen_fix=function(s){var D=jd(s),I=D.items,st={k:0,n:I.length},mode=D.mode||'opts';
  st.draw=function(){pdots(s,st.k);var it=I[st.k],g=$('.pg',s),W=it.text.split(' '),H=it.say.split(' '),bad=-1,dn=0,w=0;for(var i=0;i<W.length;i++)if(W[i]!==H[i]){bad=i;break}
-  g.innerHTML='';pmk('div','gl plq','<button class="pbt" style="margin:0 20px 0 0;font-size:44px">🔊 Listen</button>Tap the word that is different.',g).querySelector('button').onclick=function(){psay(it.say)};psay(it.say);
+  g.innerHTML='';pmk('div','gl plq','<span style="font-size:60px;margin-right:24px">🔊</span>Listen carefully. You hear it once. Tap the word that is different.',g);psay(it.say);
   var box=pmk('div','gl',null,g);box.style.cssText='position:absolute;left:0;top:210px;width:1700px;border-radius:44px;padding:80px 40px;text-align:center;line-height:1.5';
   var ws=W.map(function(x,i){var e=pmk('span','pwd',x,box);e.onclick=function(){if(dn)return;if(i!==bad){wrong(e);return}dn=1;e.classList.add('bad');P('pop');ask()};return e});
   var area=pmk('div','',null,g);area.style.cssText='position:absolute;left:0;top:640px;width:1700px;text-align:center';
-  function fixed(){ws[bad].textContent=H[bad];ws[bad].classList.remove('bad');ws[bad].classList.add('fx');P('good');psay(it.say);pstep(s,st,2200)}
+  function fixed(){ws[bad].textContent=H[bad];ws[bad].classList.remove('bad');ws[bad].classList.add('fx');P('good');pstep(s,st,2200)}
   function ask(){area.innerHTML='<div style="font-size:42px;margin-bottom:14px">Fix it:</div>';
    if(mode==='type'){var inp=pmk('input','wty',null,area);inp.placeholder='type the right word';var b=pmk('button','pbt','Check',area);function chk(){var v=inp.value.trim().toLowerCase(),t=H[bad].toLowerCase().replace(/[^a-z0-9]/g,'');if(v===t||plev(v,t)<=1&&t.length>3){fixed()}else{w++;wrong(inp);if(w>=2)b.textContent='Starts with '+t[0].toUpperCase()}}b.onclick=chk;inp.onkeydown=function(e){if(e.key==='Enter')chk()};try{inp.focus()}catch(e){}}
    else pshuf(it.opts.concat([H[bad]])).forEach(function(o){var b=pmk('button','pcd',o,area);b.style.margin='0 14px';b.style.display='inline-flex';b.onclick=function(){if(o===H[bad]){b.classList.add('ok');fixed()}else wrong(b)}})}};
@@ -94,7 +94,7 @@ INIT.label_reader=function(s){var D=jd(s),Q=D.qs,L=D.lab,st={k:0,n:Q.length};
 INIT.taboo=function(s){var D=jd(s),Q=pshuf(D.items),lim=D.limit||3,done=0,N=D.items.length,shown=0,t=null,tm=D.secs||0,left=tm;pdots(s,0);
  var g=$('.pg',s),card=pmk('div','gl ptb',null,g),btn=pmk('div','',null,g);btn.style.cssText='position:absolute;left:1040px;top:20px;width:660px;text-align:center';
  var info=pmk('div','',null,g);info.style.cssText='position:absolute;left:1040px;top:560px;width:660px;font-size:40px;text-align:center;color:#6a35e8';
- function draw(){var it=Q[0];card.innerHTML=shown?'<div style="font-size:120px">'+(it.e||'')+'</div><div>'+it.w+'</div><ul>'+it.no.slice(0,lim).map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul>':'<div style="font-size:90px">🙈</div><div style="font-size:44px;font-weight:700">Describer only: tap Show.<br>Others: guess! Say it in English.</div>';
+ function draw(){var it=Q[0];card.innerHTML=shown?'<div style="font-size:120px">'+(it.e||'')+'</div><div>'+it.w+'</div><ul>'+it.no.slice(0,lim).map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul>':'<div style="font-size:90px">🙈</div><div style="font-size:44px;font-weight:700">Describer only: tap Show.<br>Others: guess! Say it in English.<br><span style="color:#e0306a">Words only · no miming 🚫</span></div>';
   btn.innerHTML='';var a=pmk('button','pbt o',shown?'🙈 Hide':'👀 Show',btn);a.onclick=function(){shown=!shown;P('tick');draw()};
   var b=pmk('button','pbt g','✔ Got it',btn);b.onclick=function(){P('good');Q.shift();done++;pdots(s,done);shown=0;if(!Q.length){finish(s);return}draw();clk()};
   var c=pmk('button','pbt','↷ Pass',btn);c.onclick=function(){Q.push(Q.shift());shown=0;P('tick');draw();clk()};

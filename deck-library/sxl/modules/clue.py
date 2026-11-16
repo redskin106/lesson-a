@@ -116,6 +116,16 @@ def teach(d):
     o+=f'<div class="a mu" style="left:90px;top:858px;width:1740px;text-align:center;font-size:36px">{d.get("hint","Listen. Then say it with me.")}</div>'
     return o
 
+@module('qr_card')
+def qr_card(d):
+    """{'phase','title','rules':[lines],'qr':data-uri,'url','caption'} rules on the left, QR on the right"""
+    o=header(d['phase'],d['title'],d.get('grad','rose'))
+    body='<div style="padding:34px 44px">'+''.join(f'<div style="margin:0 0 22px;font-family:O;font-weight:800;font-size:{d.get("fs",44)}px;line-height:1.2">{l}</div>' for l in d['rules'])+'</div>'
+    o+=stp(glass(90,180,1030,720,body,r=56),1)
+    q=f'<div style="text-align:center;padding-top:34px"><img src="{d["qr"]}" style="width:480px;height:480px;border-radius:24px;image-rendering:pixelated"><div style="font-family:O;font-weight:800;font-size:40px;margin-top:20px">{d.get("caption","Scan to play")}</div><div style="font-family:P;font-size:24px;color:#6a6a7e;margin-top:8px">{d["url"]}</div></div>'
+    o+=stp(glass(1160,180,670,720,q,r=56),2)
+    return o
+
 @module('choice')
 def _choice_static(d): return choice_html(d,'x')
 
@@ -126,9 +136,9 @@ def boss_html(d,sid):
     o+=glass(90,170,1060,470,f'<div style="padding:40px 50px;font-family:P;font-weight:500;font-size:{37 if len(b["text"])<330 else 31 if len(b["text"])<345 else 28}px;line-height:1.45">{b["text"]}</div>',r=56)
     o+=f'<div class="a" style="left:90px;top:665px;width:1060px;font-family:O;font-weight:800;font-size:54px;line-height:1.1">{b["q"]}</div>'
     o+=f'<div class="a" style="left:90px;top:790px;display:flex;gap:28px;align-items:center"><div class="bstime" style="font-family:O;font-weight:800;font-size:110px;min-width:190px" data-sec="{b.get("sec",90)}"><span class="grad">{b.get("sec",90)}</span></div><button class="bsb bstart">{grad_chip("violet","▶ start",48,"10px 44px")}</button><button class="bsb bgive">{grad_chip("rose","We give up",48,"10px 44px")}</button></div>'
-    fp=f'<div style="padding:34px 40px">{grad_chip("amber","Free pass",48,"6px 34px")}<div style="margin-top:20px;font-family:P;font-weight:500;font-size:34px;line-height:1.55">'+'<br>'.join(f'<b>{g.split(" = ")[0]}</b> = {g.split(" = ")[1]}' for g in b['plain'])+f'</div><div style="margin-top:26px;font-family:P;font-weight:500;font-size:36px;line-height:1.4">{b["simple"]}</div><div style="margin-top:26px">{grad_chip("teal",b["answer"],40,"8px 30px")}</div><div style="margin-top:22px;font-size:44px">Too easy? 😄</div></div>'
+    fp=f'<div style="padding:22px 34px">{grad_chip("amber","Free pass",40,"2px 26px")}<div style="margin-top:10px;font-family:P;font-weight:500;font-size:26px;line-height:1.3">'+'<br>'.join(f'<b>{g.split(" = ")[0]}</b> = {g.split(" = ")[1]}' for g in b['plain'])+f'</div><div style="margin-top:14px;font-family:P;font-weight:500;font-size:26px;line-height:1.3">{b["simple"]}</div><div style="margin-top:14px;background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff;border-radius:28px;padding:10px 22px;font-family:O;font-weight:800;font-size:27px;line-height:1.25">{b["answer"]}</div></div>'
     o+=f'<div class="bfl">'+glass(1190,170,640,740,'<div style="padding:60px 40px;text-align:center"><div style="font-size:170px">🔒</div><div style="font-family:O;font-weight:800;font-size:54px;margin-top:20px">Free pass</div><div style="font-family:P;font-weight:500;font-size:36px;margin-top:20px;line-height:1.4">Stuck? Tap <b>We give up</b> when your team is ready.</div></div>',r=56)+'</div>'
-    o+=f'<div class="bfp" style="opacity:0;transition:opacity .6s,transform .6s;transform:translateY(40px)">{glass(1190,170,640,740,fp,r=56)}</div>'
+    o+=f'<div class="bfp" style="opacity:0;transition:opacity .6s,transform .6s;transform:translateY(40px)">{glass(1190,170,640,760,fp,r=56)}</div>'
     return o
 BUILD_EXT['boss']=boss_html
 
@@ -136,9 +146,9 @@ BUILD_EXT['boss']=boss_html
 def case_board_html(d,sid):
     """{'phase','title','teams':[(id,name,c1,c2)],'suspects':[(id,name,emoji)],'clues':[{id,team,r,pic,text|dials,say,ask,kind,fx}],'twist','test','answer','reveal'}"""
     o=header(d['phase'],d.get('title','Case board'),'amber')
-    o+='<div class="a cbcount"></div><div class="a cbsus"></div><div class="a cbgrid"></div><div class="a cbbar"></div><div class="a cbtw"></div>'
+    o+='<div class="a cbcount"></div><div class="a cbsus"></div><div class="a cbgrid"></div><div class="a cbbar"></div><div class="a cbtw"></div><div class="a cbq"></div>'
     o+='<div class="cbm"><div class="cbmb"></div></div>'
-    data={k:d[k] for k in ('teams','suspects','clues','twist','test','answer','reveal','debate','rule') if k in d}
+    data={k:d[k] for k in ('teams','suspects','clues','twist','test','answer','reveal','debate','rule','hunt','frames') if k in d}
     return o+f'<script type="application/json" id="d-{sid}">{json.dumps(data,ensure_ascii=False)}</script>'
 BUILD_EXT['case_board']=case_board_html
 
@@ -157,6 +167,8 @@ EXT_CSS.append("""
 .cbs{flex:1;height:140px;border-radius:40px;background:rgba(255,255,255,.7);border:4px solid #fff;box-shadow:0 10px 26px rgba(60,30,140,.14);text-align:center;font-family:O;font-weight:800;font-size:30px;padding-top:6px;transition:opacity .5s,background .5s}
 .cbs b{display:block;font-size:56px;line-height:1.15}.cbs .mk{font-size:28px;height:34px;letter-spacing:2px}.cbs.win{background:linear-gradient(135deg,#bff5df,#7fe0d8);transform:scale(1.04)}.cbs.dim{opacity:.35}
 .cbgrid{left:90px;top:305px;width:1740px;height:535px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.cbgrid.hunt{top:385px;height:465px;grid-template-rows:repeat(3,1fr);gap:14px 18px}.cbgrid.hunt .cbt.rd{animation:none;background:rgba(255,255,255,.85)}.cbgrid.hunt .cbt.rd .tx{font-family:O;font-weight:800;font-size:34px}
+.cbq{left:90px;top:300px;width:1740px;height:64px;border-radius:32px;background:rgba(255,255,255,.75);border:4px solid #fff;display:flex;align-items:center;gap:30px;padding:0 34px;box-sizing:border-box;font-family:O;font-weight:800;font-size:29px;color:#6a35e8;white-space:nowrap}.cbq i{font-style:normal;color:#1c1b2e;font-family:P;font-weight:500}.cbcount .pgb{display:inline-block;width:260px;height:22px;border-radius:11px;background:rgba(255,255,255,.55);vertical-align:middle;margin-right:16px;overflow:hidden}.cbcount .pgb b{display:block;height:100%;background:#fff;border-radius:11px;transition:width .6s}
 .cbcol{display:flex;flex-direction:column;gap:12px;min-height:0}
 .cbh{height:62px;border-radius:24px;color:#fff;font-family:O;font-weight:800;font-size:38px;text-align:center;line-height:62px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4)}
 .cbt{flex:1;min-height:0;border-radius:30px;background:rgba(255,255,255,.55);border:4px solid #fff;display:flex;align-items:center;gap:14px;padding:0 20px;font-family:P;font-weight:500;font-size:27px;line-height:1.18;overflow:hidden;text-align:left;color:#1c1b2e;position:relative}.cbt .tx{flex:1;min-width:0}.cbt.ov:after{content:'\2922';position:absolute;right:14px;bottom:4px;font-size:30px;color:#7b3cf0}
@@ -210,9 +222,10 @@ INIT.case_board=function(s){
  function fx(){var f={};D.suspects.forEach(function(x){f[x[0]]={f:0,a:0}});Object.keys(ok).forEach(function(id){var c=clue(id),e=c.fx||{};for(var k in e){if(f[k])f[k][e[k]==='for'?'f':'a']++}});return f}
  function txt(c){return c.dials?('<b>'+(c.topic||'')+'</b>'):(c.text||'').replace(/\n/g,'<br>')}
  function draw(){
-  var tot=D.clues.length,done=Object.keys(ok).filter(function(k){return k!=='TW'}).length;cnt.textContent=(tot-done)+' answers to go';
+  var tot=D.clues.length,done=Object.keys(ok).filter(function(k){return k!=='TW'}).length;if(D.hunt)cnt.innerHTML='<span class="pgb"><b style="width:'+Math.round(100*done/tot)+'%"></b></span>'+done+' / '+tot+' clues found';else cnt.textContent=(tot-done)+' answers to go';
   var f=fx();sus.innerHTML=D.suspects.map(function(x){return '<div class="cbs'+(won?(x[0]===D.answer?' win':' dim'):'')+'"><b>'+x[2]+'</b>'+x[1]+'<div class="mk"><span style="color:#10a98d">'+new Array(f[x[0]].f+1).join('✔')+'</span> <span style="color:#e0306a">'+new Array(f[x[0]].a+1).join('✖')+'</span></div></div>'}).join('');
-  grid.innerHTML=D.teams.map(function(t){var open=true,mine=D.clues.filter(function(c){return c.team===t[0]}).sort(function(a,b){return a.r-b.r});
+  if(D.hunt){grid.className='a cbgrid hunt';grid.innerHTML=D.clues.map(function(c){return ok[c.id]?'<div class="cbt ok" data-id="'+c.id+'" data-k="read"><span class="pc">'+c.pic+'</span><span class="tx">'+txt(c)+'</span></div>':'<div class="cbt rd" data-id="'+c.id+'" data-k="found"><span class="pc">'+c.pic+'</span><span class="tx">'+(c.topic||'')+'</span></div>'}).join('')}
+  else grid.innerHTML=D.teams.map(function(t){var open=true,mine=D.clues.filter(function(c){return c.team===t[0]}).sort(function(a,b){return a.r-b.r});
    return '<div class="cbcol"><div class="cbh" style="background:linear-gradient(135deg,'+t[2]+','+t[3]+')">'+t[1]+'</div>'+mine.map(function(c){var o=ok[c.id],rd=!o&&open;if(!o)open=false;
     if(o)return '<div class="cbt ok" data-id="'+c.id+'" data-k="read"><span class="pc">'+c.pic+'</span><span class="tx">'+txt(c)+'</span></div>';
     return '<div class="cbt '+(rd?'rd':'lk')+'" data-id="'+c.id+'" data-k="'+(rd?'ask':'')+'"><span class="pc">'+(rd?'✋':'🔒')+'</span><span>'+(rd?'tap when the team is ready':'')+'</span></div>'}).join('')+'</div>'}).join('');
@@ -222,16 +235,19 @@ INIT.case_board=function(s){
  function close(){m.classList.remove('on')}
  function dialsHtml(c){return c.dials?'<div class="ex">'+Object.keys(c.dials).map(function(k){return '<b>'+k+'</b> '+c.dials[k]}).join('<br>')+'</div>':''}
  grid.onclick=function(e){var t=e.target.closest('.cbt');if(!t||!t.dataset.k)return;var c=clue(t.dataset.id);P('tick');
-  if(t.dataset.k==='read'){sheet('<h3>'+c.pic+' '+(c.topic||c.id)+'</h3><div class="ex">'+(c.text||'').replace(/\n/g,'<br>')+'</div>'+dialsHtml(c)+'<button class="bt g" data-a="x">Close</button>');return}
+  if(t.dataset.k==='found'){ok[c.id]=1;draw();P('good');if(c.kind==='audio')say(c.text);return}
+  if(t.dataset.k==='read'){sheet('<h3>'+c.pic+' '+(c.topic||c.id)+'</h3><div class="ex">'+(c.text||'').replace(/\n/g,'<br>')+'</div>'+dialsHtml(c)+(D.hunt?'<button class="bt g" data-a="un" data-id="'+c.id+'">↩ Not found yet</button>':'')+'<button class="bt g" data-a="x">Close</button>');return}
   var k=c.task,h;
    if(k){var need=k.w!==false;h='<h3>'+c.pic+' <span style="font-size:40px;background:#efeaff;border-radius:999px;padding:6px 26px;vertical-align:middle">'+k.ic+' '+k.lab+'</span></h3><div class="ex" style="font-size:33px;line-height:1.4">'+k.card.replace(/\n/g,'<br>')+'</div><div style="font-size:28px;color:#6a6a7e">'+k.who+'</div><div style="font-size:28px;color:#6a6a7e;margin-top:8px">Check: <b>'+k.key+'</b> · listen for the meaning, not grammar. '+(D.rule||'')+'</div>'+(k.stretch?'<div style="margin:6px 0"><span class="tg" data-a="st" style="font-size:30px">⭐ Stretch (optional)</span><span class="stx" style="display:none;font-size:30px"><b>'+k.stretch+'</b></span></div>':'')+'<div style="margin:12px 0"><span class="tg" data-a="t1">Said aloud</span>'+(need?'<span class="tg" data-a="t2">Written down</span>':'')+'</div><button class="bt" data-a="ap" data-id="'+c.id+'" data-need="'+(need?2:1)+'" disabled>Approve · show clue</button><button class="bt g" data-a="x">Not yet</button>'}
    else h='<h3>'+c.pic+' '+c.id+'</h3>'+(c.ask?'<div>The team should ask: <b>"'+c.ask+'"</b></div>':'')+'<div class="ex">Listen for the meaning:<br><b>'+c.say+'</b></div><div style="font-size:30px;color:#6a6a7e">Approve on meaning, not grammar. '+(D.rule||'')+' Another team: "say it differently".</div><div style="margin:16px 0"><span class="tg" data-a="t1">Said aloud</span><span class="tg" data-a="t2">Written down</span></div><button class="bt" data-a="ap" data-id="'+c.id+'" data-need="2" disabled>Approve · show clue</button><button class="bt g" data-a="x">Not yet</button>';sheet(h)};
  mb.onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a;
   if(a==='x'){close();return}
+  if(a==='un'){delete ok[b.dataset.id];close();draw();return}
   if(a==='t1'||a==='t2'){b.classList.toggle('on');P('tick');var ap=$('[data-a="ap"]',mb),n=$$('.tg.on[data-a=t1],.tg.on[data-a=t2]',mb).length;ap.disabled=n<+ap.dataset.need;return}
    if(a==='st'){b.style.display='none';$('.stx',mb).style.display='inline';P('open');return}
   if(a==='ap'){var c=clue(b.dataset.id);ok[c.id]=1;close();draw();P('good');if(c.kind==='audio')say(c.text);return}
   if(a==='opt'){var T=D.test;if(+b.dataset.i===T.ans){b.style.background='#2bd9b6';b.style.color='#fff';$('.why',mb).textContent=T.why;P('good')}else{b.style.opacity=.4;wrong(b)}}};
+ if(D.frames){var q=$('.cbq',s);q.innerHTML='❓ Ask:&nbsp;'+D.frames.map(function(f){return '<i>'+f+'</i>'}).join('<span style="color:#c9b6ff">·</span>')}
  bar.innerHTML='<button class="cbb" data-b="tw">⚡ Late twist</button><button class="cbb" data-b="test">🧪 Confirming test</button><button class="cbb" data-b="rv">🎬 Reveal</button>'+(D.debate?'<button class="cbb" data-b="db">🗣️ Debate</button>':'');
  bar.onclick=function(e){var b=e.target.closest('[data-b]');if(!b)return;P('tick');var k=b.dataset.b;
   if(k==='tw'){tw=true;ok.TW=1;draw();P('open');say(D.twist.text.replace(/["⚡]/g,''))}
