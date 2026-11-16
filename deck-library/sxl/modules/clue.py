@@ -163,8 +163,8 @@ def rungs(d):
     o+='<div class="gl" style="left:1230px;top:185px;width:600px;height:706px;border-radius:72px"></div>'
     for i,s_ in enumerate(S):
         o+=(f'<div class="rgp" data-i="{i}" style="position:absolute;left:1230px;top:185px;width:600px;height:706px;opacity:{1 if i==st else 0};transition:opacity .3s;pointer-events:none">'
-            f'<div style="text-align:center;font-size:260px;line-height:1;margin-top:60px">{s_["e"]}</div>'
-            f'<div style="margin:34px 40px 0;text-align:center;font-family:O;font-weight:800;font-size:46px;line-height:1.2">{_ul(s_["sen"])}</div></div>')
+            f'<div style="text-align:center;font-size:200px;line-height:1;margin-top:40px">{s_["e"]}</div>'
+            +(f'<div class="rsy" data-say="{s_["say"]}" style="margin:26px 36px 0;text-align:center;font-family:P;font-weight:500;font-size:30px;color:#6a35e8">🗣️ {s_["say"]}</div>' if s_.get('say') else '')+f'<div style="margin:22px 40px 0;text-align:center;font-family:O;font-weight:800;font-size:46px;line-height:1.2">{_ul(s_["sen"])}</div></div>')
     return o
 
 @module('planb')
@@ -364,7 +364,7 @@ INIT.choice=function(s){
   else{b.classList.add('nope');wrong(b)}}})});
  show(0)};
 
-INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop')}})};
+INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop');var y=pn[+r.dataset.i].querySelector('.rsy');if(y&&window.speechSynthesis){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(y.dataset.say);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}}})};
 /* ---- room of clues ---- */
 INIT.room=function(s){var cap=$('.rcap',s);$('#nx').classList.add('on');$$('.rsp',s).forEach(function(b){b.onclick=function(){b.classList.add('on');cap.textContent=b.dataset.t;P('pop')}})};
 /* ---- dial ---- */
