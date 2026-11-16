@@ -11,7 +11,7 @@ _P1=''.join(stick(x,395,1.15,'hold')+_cards(x,395,1.15) for x in (90,200,310))+'
 _P2=stick(85,395,1.25,'throw')+'<circle cx="200" cy="175" r="21" fill="#ff9f1c" stroke="#1c1b2e" stroke-width="4"/><path d="M130 235 Q210 120 300 235" fill="none" stroke="#9a5cff" stroke-width="5" stroke-dasharray="3 12" stroke-linecap="round"/>'+stick(300,395,1.15,'up')+stick(365,395,1.0,'down')+bubble_svg(20,16,330,92,'Have you got\na clue about …?',fs=26,tx=105)
 _P3=stick(100,395,1.15,'hold')+'<text x="150" y="330" font-size="52">📝</text>'+stick(300,395,1.2,'up')+bubble_svg(70,16,320,110,'Yes, we have.\nHer pulse is 104.',fs=26,tx=300)
 _P4=('<rect x="40" y="40" width="320" height="230" rx="24" fill="#fff" stroke="#c9b6ff" stroke-width="5"/>'+''.join(f'<rect x="{62+c*100}" y="{64+r*100}" width="86" height="80" rx="14" fill="{"#2bd9b6" if (r,c)==(0,1) else "#efeaff"}"/>' for r in (0,1) for c in (0,1,2))+'<text x="205" y="125" font-size="46" text-anchor="middle" fill="#fff">✔</text>'+'<text x="250" y="258" font-size="64">👆</text>'+stick(70,395,1.15,'point')+'<text x="270" y="380" font-size="60">📝</text><text x="330" y="380" font-size="60">📝</text>')
-HUNT_COMIC=[dict(svg=_P1,cap='Keep your 3 clues secret.'),dict(svg=_P2,cap='One question per throw.'),dict(svg=_P3,cap='Answer in a full sentence.'),dict(svg=_P4,cap='Teacher taps. Everyone writes.')]
+HUNT_COMIC=[dict(svg=_P1,cap='3 of you hold a clue. 1 is the recorder.'),dict(svg=_P2,cap='One question per throw.'),dict(svg=_P3,cap='Answer in a full sentence.'),dict(svg=_P4,cap='Teacher taps. Everyone writes.')]
 Q=lambda c,t:(c,t)
 TEAMC=['#e0304a','#2a6ae0','#10a98d','#e89200']
 def lv(items3): return [{'items':i} for i in items3]
@@ -38,17 +38,17 @@ SYM=[[_q('🌡️','What does the nurse write?','She has a fever.','She has a ra
 U_PL='×10⁹/L'
 HL=dict(bronze=[
   _q('🌡️','The normal temperature is 37 °C. Her temperature is 39.2 °C. Her temperature is ___ than normal.','higher','lower'),
-  _q('🩸',f'Normal platelets: 150 to 450 {U_PL}. Her platelets: 95 {U_PL}. Her platelets are ___ than normal.','lower','higher'),
+  _q('🩸',f'Normal platelets: 150,000 to 450,000 per µL. Her platelets: 95,000 per µL. Her platelets are ___ than normal.','lower','higher'),
   _q('🫁','Normal breathing: 12 to 20 breaths per minute. Her breathing: 18 breaths per minute. Her breathing is ___.','normal','higher','lower'),
   _q('💓','Normal pulse: 60 to 100 beats per minute. His pulse: 48 beats per minute. His pulse is ___ than normal.','lower','higher')],
  silver=[
   _q('🌡️','Normal temperature: 37 °C. Her temperature: 39.2 °C.','Her temperature is much higher than normal.','Her temperature is slightly higher than normal.','Her temperature is lower than normal.'),
   _q('💓','Normal pulse: 60 to 100 beats per minute. Her pulse: 104 beats per minute.','Her pulse is slightly higher than normal.','Her pulse is much lower than normal.','Her pulse is normal.'),
-  _q('🩸',f'Normal white cells: 4.5 to 11 {U_PL}. Her white cells: 3.1 {U_PL}.','Her white cells are lower than normal.','Her white cells are much higher than normal.','Her white cells are normal.'),
-  _q('🌡️','Normal temperature: 37 °C. His temperature: 37.4 °C. He says he feels terrible.','His temperature is only slightly higher than normal. It is not a fever.','His temperature is much higher than normal.','His temperature is lower than normal.')],
+  _q('🩸',f'Normal white cells: 4,500 to 11,000 per µL. Her white cells: 3,100 per µL.','Her white cells are lower than normal.','Her white cells are much higher than normal.','Her white cells are normal.'),
+  _q('🌡️','Normal temperature: 37 °C. His temperature: 38.1 °C.','His temperature is slightly higher than normal. It is a mild fever.','His temperature is much higher than normal.','His temperature is lower than normal.')],
  gold=[
   _q('🥵','A patient says "I feel a little warm." The thermometer says 41 °C. Normal is 37 °C.','His temperature is dangerously higher than normal. It is not a little warm!','His temperature is slightly higher than normal.','His temperature is much lower than normal.','His temperature is normal.'),
-  _q('🩸',f'Platelets: 95 {U_PL}. Normal: 150 to 450 {U_PL}.','Her platelets are much lower than the normal range.','Her platelets are much more low than normal.','Her platelets are within the normal range.','Her platelets is lower than normal.'),
+  _q('🩸',f'Platelets: 95,000 per µL. Normal: 150,000 to 450,000 per µL.','Her platelets are much lower than the normal range.','Her platelets are much more low than normal.','Her platelets are within the normal range.','Her platelets is lower than normal.'),
   _q('🫁','Breathing: 18 breaths per minute. Normal: 12 to 20 breaths per minute.','Her breathing is within the normal range.','Her breathing is higher than the normal range.','Her breathing is lower than the normal range.','Her breathing is normal than.'),
   _q('💓','A sleeping marathon runner: 48 beats per minute. Normal for most adults: 60 to 100.','His pulse is lower than the normal range, but he is very fit.','His pulse is much higher than normal.','His pulse is normal.','His pulse are lower than normal.')])
 def _d(e,now,normal,s_,z): return dict(e=e,now=now,normal=normal,s=s_,z=z)
@@ -58,11 +58,11 @@ DIAL_DEMO=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute',
  _d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3)]
 DIAL_LV=[
  [_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),_d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2)],
- [_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),_d('🫁','Breathing: 21 breaths per minute','12 to 20 breaths per minute','His breathing is',4),_d('🩸',f'Platelets: 95 {U_PL}',f'150 to 450 {U_PL}','Her platelets are',1),_d('💓','Pulse: 130 beats per minute','60 to 100 beats per minute','Her pulse is',5)],
- [_d('🌡️','Temperature: 32 °C','about 37 °C','His temperature is',0),_d('💓','Pulse: 42 beats per minute','60 to 100 beats per minute','His pulse is',1),_d('🩸',f'Platelets: 20 {U_PL}',f'150 to 450 {U_PL}','Her platelets are',0),_d('🫁','Breathing: 40 breaths per minute','12 to 20 breaths per minute','Her breathing is',6)]]
+ [_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),_d('🫁','Breathing: 21 breaths per minute','12 to 20 breaths per minute','His breathing is',4),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1),_d('💓','Pulse: 130 beats per minute','60 to 100 beats per minute','Her pulse is',5)],
+ [_d('🌡️','Temperature: 32 °C','about 37 °C','His temperature is',0),_d('💓','Pulse: 42 beats per minute','60 to 100 beats per minute','His pulse is',1),_d('🩸',f'Platelets: 20,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',0),_d('🫁','Breathing: 40 breaths per minute','12 to 20 breaths per minute','Her breathing is',6)]]
 L3=[
  dict(m='cover',label='Cover',tag='NURSING ENGLISH',title='Lesson <span class="grad">3</span>',phases=['Engage','Study','Activate'],active=0,cards=[dict(pic='🩺',x=1010,y=150,w=330,h=430,r=-7),dict(pic='🌡️',x=1380,y=330,w=330,h=430,r=6)]),
- dict(m='vol_ladder',phase='ENGAGE',label='Eyes closed. Louder.',min=3,title='Eyes closed. Louder.',rungs=['fever','39 degrees','she has a rash','it might be dengue!',"IT CAN'T BE FLU!"],side='Everyone, eyes closed, at the same time. Whisper first. Each line is louder.'),
+ dict(m='vol_ladder',phase='ENGAGE',label='Eyes closed. Louder.',min=3,title='Eyes closed. Louder.',rungs=['Bello!','Banana!','Poopaye!','Tulaliloo ti amo!','KAMPAI!'],side='Everyone, eyes closed, at the same time. Whisper first. Each word is louder.'),
  dict(m='predict',phase='ENGAGE',label='Meet the patient',min=3,title='Meet the patient',cap=False,items=[dict(frames=[dict(e='🧍‍♀️',c='She walks in. She looks hot.'),dict(e='🌡️',c='The nurse takes her temperature.'),dict(e='😟',c='The nurse looks worried.')],q='❓ What is wrong with her?')]),
  dict(m='today',phase='STUDY',label='Today',min=1,emoji='stethoscope',title='Detective nurses',role='Today we are',rows=[[('c4','Ask'),('c3','the right question')],[('c1','Read'),('c3','the numbers')],[('c2','might'),('c4',"can't"),('c3','because')]]),
  dict(m='teach',phase='STUDY',label='Teach · Symptoms',min=2,role='Four symptoms',words=[('🤒','fever'),('🤕','headache'),('😷','cough'),('🔴','rash')]),
@@ -70,7 +70,7 @@ L3=[
  dict(m='choice',phase='STUDY',title='Symptoms',hint='Choose the right word or sentence.',label='Exercise · Symptoms',min=3,lvl=3,levels=lv(SYM)),
  dict(m='teach',phase='STUDY',label='Teach · Higher or lower',min=2,role='Compare with normal',pic='🌡️',lines=['The normal temperature is 37 °C.','Her temperature is 39.2 °C.','Her temperature is higher than normal.','She has a fever.']),
  dict(m='dial',phase='STUDY',label='Teach · The dial (slightly, much, dangerously)',min=3,title='How much higher? How much lower?',items=DIAL_DEMO,hint='Tap the zone. Say the sentence.'),
- dict(m='teach',phase='STUDY',label='Teach · How much?',min=2,role='How much higher?',pic='💓',lines=['Her pulse is 104. Normal is 60 to 100. It is slightly higher.','Her temperature is 41 °C. Normal is 37 °C. It is dangerously high.',f'Her platelets are 95 {U_PL}. Normal is 150 to 450. They are much lower.','Her breathing is 18. Normal is 12 to 20. It is about normal.']),
+ dict(m='teach',phase='STUDY',label='Teach · How much?',min=2,role='How much higher?',pic='💓',lines=['Her pulse is 104. Normal is 60 to 100. It is slightly higher.','Her temperature is 41 °C. Normal is 37 °C. It is dangerously high.',f'Her platelets are 95,000 per µL. Normal is 150 to 450. They are much lower.','Her breathing is 18. Normal is 12 to 20. It is about normal.']),
  exch(dict(K.L3_EX[1],levels=HL),min=4,lvl=3),
  dict(m='dial',phase='STUDY',label='Exercise · The dial',min=3,optional=True,title='The dial',lvl=3,levels=[dict(items=x) for x in DIAL_LV],hint='Tap the zone. Say the sentence.'),
  dict(m='teach',phase='STUDY',label='Teach · Might, can\'t, because',min=2,role='Clue → sentence',pic='🦟',lines=['Clue: mosquito bites.','It might be dengue.','Clue: her belly does not hurt.','It can\'t be appendicitis.']),
@@ -122,7 +122,7 @@ ROOM_SPOTS=[dict(e='🌡️',x=1130,y=300,t='A thermometer: 39.2 °C.'),dict(e='
  dict(e='🏞️',x=110,y=250,t='A pond outside the window.'),dict(e='🐱',x=1120,y=520,t='A sleepy cat.')]
 DIAL_MIX=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),
  _d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),
- _d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2),_d('🩸',f'Platelets: 95 {U_PL}',f'150 to 450 {U_PL}','Her platelets are',1)]
+ _d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1)]
 CUT3={'Teach · How much?','Exercise · The dial','Extra · Name the illness','Extra · What is wrong with this chart?','Listen and fix (handover)','Taboo for nurses (demo / class version)'}
 _new=[]
 for d in L3:
@@ -149,6 +149,10 @@ for d in L3:
           {'t':'S · Situation','c':'teal','l':['A young woman. Day 3 of fever.'],'fs':40},
           {'t':'B · Background','c':'sky','l':['She was bitten by mosquitoes a week ago.','She has a rash.'],'fs':40},
           {'t':'A · Assessment','c':'rose','l':['It is probably dengue.','It can\'t be flu because she has no cough.'],'fs':40}],note='Tell your partner. Then swap.')
+    elif lb=='Your sentences': d=dict(d,label='Your toolkit',title='Your hunt toolkit',groups=[
+        {'t':'❓ Ask','c':'teal','l':['Have you got a clue about …?','What does your clue say about …?','Does the patient have …?'],'fs':44},
+        {'t':'📢 Report','c':'sky','l':['Her temperature is much higher than normal.','She has a rash on her arms.','Her platelets are much lower than normal.'],'fs':40},
+        {'t':'⚖️ Argue','c':'rose','l':['It might be dengue because …',"It can't be flu because …",'It is unlikely to be measles because …'],'fs':40}],note='Ask with a question. Answer in a full sentence.')
     elif lb=='Taboo rules': d=dict(d,min=7,label='Taboo for nurses')
     _new.append(d)
 L3=_new

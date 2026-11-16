@@ -300,7 +300,7 @@ EXT_CSS.append("""
 EXT_JS.append(r"""
 SXL.say=false;
 document.addEventListener('keydown',function(e){if(/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))return;if('123'.indexOf(e.key)<0||e.key==='')return;var m=document.querySelector('.sl.on .mdl[data-l="'+e.key+'"]');if(m)m.click()});
-document.addEventListener('click',function(e){var b=e.target.closest('[data-seq]');if(b&&b.classList.contains('tch')){var st=+(b.dataset.st||0);if(st===0){b.dataset.st=1}else if(st===1){var pt=b.querySelector('.pt');if(pt)pt.style.display='block';b.dataset.st=2;P('tick');return}else if(st===2){var an=b.querySelector('.an');if(an)an.style.display='block';b.dataset.st=3;P('pop');return}}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-seq]');if(b&&b.classList.contains('tch')){var st=+(b.dataset.st||0);if(st===0){var pt=b.querySelector('.pt');if(pt)pt.style.display='block';b.dataset.st=1}else if(st===1){var an=b.querySelector('.an');if(an)an.style.display='block';b.dataset.st=2;P('pop');return}}
  var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;speechSynthesis.speak(u)}catch(x){}P('tick')}});
 /* temporary review skip: hide with ?noskip */
 if(!/noskip/.test(location.search)){var sk=$('#sk');sk.style.display='block';setInterval(function(){sk.style.visibility=(cur<slides.length-1)?'visible':'hidden'},300);sk.onclick=function(){var s=slides[cur];if(s)s.__done=1;P('tick');if(cur<slides.length-1)go(cur+1)}}
