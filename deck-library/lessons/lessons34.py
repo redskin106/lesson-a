@@ -115,6 +115,44 @@ CMP=cmp3(
  [C4('🥱','Monday: tired. Friday: very tired.',['She is more tired on Friday than on Monday.','She is tireder on Friday than on Monday.','She is the most tired on Monday than Friday.','She is more tired Friday than Monday.'],'She is more tired on Friday than on Monday.'),
   C4('💓','Pulse: Mon 90 · Wed 100 · Fri 110.',['Friday has the fastest pulse of the week.','Friday has the most fast pulse of the week.','Friday has a faster pulse of the week.','Monday has the fastest pulse of the week.'],'Friday has the fastest pulse of the week.'),
   C4('☕','She drinks 8 cups. Normal: about 4.',['She drinks twice as much coffee as normal.','She drinks twice more coffee than normal.','She drinks twice much as normal.','She drinks twice as many coffee than normal.'],'She drinks twice as much coffee as normal.')])
+# ================= L3 post-processing: 16 Nov review round =================
+TABOO3=[d for d in L3 if d['m']=='taboo'][0]
+ROOM_SPOTS=[dict(e='🌡️',x=1130,y=300,t='A thermometer: 39.2 °C.'),dict(e='🦟',x=640,y=40,t='There is a hole in the mosquito net.'),dict(e='🍱',x=1350,y=470,t='Half-eaten rice. She is not hungry.'),
+ dict(e='🧻',x=130,y=470,t='A box of tissues. It is empty.'),dict(e='💊',x=1430,y=240,t='Paracetamol. Two tablets yesterday.'),dict(e='📅',x=330,y=70,t='A calendar. Day 3 is circled.'),
+ dict(e='🏞️',x=110,y=250,t='A pond outside the window.'),dict(e='🐱',x=1120,y=520,t='A sleepy cat.')]
+DIAL_MIX=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),
+ _d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),
+ _d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2),_d('🩸',f'Platelets: 95 {U_PL}',f'150 to 450 {U_PL}','Her platelets are',1)]
+CUT3={'Teach · How much?','Exercise · The dial','Extra · Name the illness','Extra · What is wrong with this chart?','Listen and fix (handover)','Taboo for nurses (demo / class version)'}
+_new=[]
+for d in L3:
+    lb=d.get('label')
+    if lb in CUT3: continue
+    if lb=='Meet the patient': d=dict(m='room',phase='ENGAGE',label='The room of clues',min=3,title='The room of clues',spots=ROOM_SPOTS)
+    elif lb=='Eyes closed. Louder.': d=dict(d,min=2)
+    elif lb=='Teach · Symptom sentences':
+        d=dict(d,role='Listen to the patient',lines=[('She has a fever.','Ohhh… why is it so hot in here? Is the air-con broken?'),('He has a headache.','My head… boom, boom, boom. Like a drum!'),('He has a cough.','Cough, cough… sorry… I sound like a goat!'),('She has a rash on her arm.','Look at my arm! Red spots! Am I turning into a tomato?')])
+        d.pop('hint',None)
+    elif lb=='Teach · Higher or lower':
+        d=dict(d,min=1,lines=['The normal temperature is 37 °C.','Her temperature is 39.2 °C.','Her temperature is [[higher]] than normal.','She has a fever.'])
+    elif lb=='Teach · The dial (slightly, much, dangerously)':
+        d=dict(d,min=4,items=DIAL_MIX,label='Teach · The dial',title='How much higher? How much lower?'); d.pop('hint',None)
+    elif lb=='Teach · Might, can\'t, because':
+        d=dict(d,min=1,lines=[dict(t='Clue: mosquito bites.',c='amber'),dict(t='<span style="color:#0f9a8c">It</span> <span style="color:#2f9e4a">[[might]] be</span> <span style="color:#e8821a">dengue.</span>',c='teal'),dict(t='Clue: her belly does not hurt.',c='amber'),dict(t='<span style="color:#0f9a8c">It</span> <span style="color:#2f9e4a">[[can\'t]] be</span> <span style="color:#e8821a">appendicitis.</span>',c='teal')])
+    elif lb=='Teach · Symptoms': d=dict(d,min=1)
+    elif lb=='Teach · Ask the patient': d=dict(d,min=1)
+    elif lb=='Exercise · Might · can\'t · because': d=dict(d,lvl=2)
+    elif lb=='Exercise · Ask the patient (1)': d=dict(d,lvl=2,min=3)
+    elif lb=='Case board · Find the illness': d=dict(d,min=11)
+    elif lb=='Tell the doctor (handover)':
+        d=dict(m='frames3',phase='ACTIVATE',label='Tell the doctor (spoken)',min=3,title='Tell the doctor',groups=[
+          {'t':'S · Situation','c':'teal','l':['A young woman. Day 3 of fever.'],'fs':40},
+          {'t':'B · Background','c':'sky','l':['She was bitten by mosquitoes a week ago.','She has a rash.'],'fs':40},
+          {'t':'A · Assessment','c':'rose','l':['It is probably dengue.','It can\'t be flu because she has no cough.'],'fs':40}],note='Tell your partner. Then swap.')
+    elif lb=='Taboo rules': d=dict(d,min=7,label='Taboo for nurses')
+    _new.append(d)
+L3=_new
+
 L4=[
  dict(m='cover',label='Cover',tag='NURSING ENGLISH',title='Lesson <span class="grad">4</span>',phases=['Engage','Study','Activate'],active=0,cards=[dict(pic='📅',x=1010,y=150,w=330,h=430,r=-7),dict(pic='☕',x=1380,y=330,w=330,h=430,r=6)]),
  dict(m='vol_ladder',phase='ENGAGE',label='Eyes closed. How bad?',min=3,title='Eyes closed. How bad?',rungs=['a little','quite','very','really','the worst!'],side='Eyes closed, all together. The louder you are, the worse it is. Whisper = a little. Shout = the worst.'),
@@ -162,7 +200,6 @@ L4=[
  dict(m='recap',phase='RECAP',label='Recap',min=2,rows=[([('c1','She'),('c2','has felt'),('c3','tired'),('c4','for two weeks.')],'for'),([('c1','Her pulse'),('c2','is'),('c3','faster than normal.')],'than'),([('c1','She'),('c2','drinks'),('c3','the most coffee')],'the most'),([('c1','You'),('c2','should'),('c3','sleep more.')],'advice')],emoji='sleeping_face'),
  dict(m='closing',phase='EXIT',label='Thank you',min=1,stack=True,line1='Thank',line2='you!',sub='See you next time.',emoji='handshake'),
 ]
-TABOO3=[d for d in L3 if d['m']=='taboo'][0]
 TABOO4=[d for d in L4 if d['m']=='taboo'][0]
 if __name__=='__main__':
     out=HERE.parent.parent/'lessons-3-4'

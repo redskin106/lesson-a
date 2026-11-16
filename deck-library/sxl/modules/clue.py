@@ -84,7 +84,6 @@ def choice_html(d,sid):
         else: o+=picx(it.get('pic','❓'),90,180,630,600,56)
         o+=f'<div class="gl" style="left:770px;top:190px;width:1060px;height:210px;box-sizing:border-box;border-radius:48px;padding:0 40px;display:flex;align-items:center;font-family:O;font-weight:800;font-size:40px;line-height:1.2;position:absolute">{it["q"]}</div>'
         o+='<div class="a cho-wrap" style="left:770px;top:425px;width:1060px;display:flex;flex-direction:column;gap:14px">'+''.join(f'<button class="cho" data-ok="{1 if t==it["ans"] else 0}" style="font-size:38px;padding:16px 40px">{t}</button>' for t in it['opts'])+'</div></div>'
-    if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:810px;width:640px;font-size:34px;line-height:1.3">{d["hint"]}</div>'
     return o
 BUILD_EXT['choice']=choice_html
 # ---------------- task_card: one team task shown in lesson style, answers visible (review) ----------------
@@ -103,27 +102,51 @@ def task_card(d):
     return o
 
 # ---------------- teach: watch, listen, repeat (no tapping to answer, nothing to get wrong) ----------------
+def _ul(t):
+    import re
+    return re.sub(r'\[\[(.+?)\]\]',r'<span class="ulw">\1</span>',t)
+
 @module('teach')
 def teach(d):
-    """{'phase','role','pic':emoji|art,'lines':[sentence | (sentence, spoken)]} or {'words':[(emoji,word),...]}.  tts=True: tap a line to hear it (TTS stand-in for recorded audio). Each tap or arrow reveals the next."""
+    """{'phase','role','pic':emoji|art,'lines':[...]} or {'words':[(emoji,word),...]}.
+    line = 'text' | (answer, patient_line)  -> three taps: audio, patient text, answer | {'t':text,'c':'amber'|'teal'}.
+    [[word]] gets an animated underline when its line appears. tts=True: tap a line to hear it."""
     tts=d.get('tts',False)
     o=header(d.get('phase','STUDY'),d.get('role','Watch · listen · repeat'),'violet')
     if d.get('words'):
         C=d['words']; n=len(C); w=int((1740-30*(n-1))/n)
         for i,(e,t) in enumerate(C):
             x=90+i*(w+30); sa=f' data-say="{t}"' if tts else ''
-            o+=stp(f'<div class="gl tch"{sa} style="left:{x}px;top:200px;width:{w}px;height:600px;border-radius:56px"><div style="position:absolute;left:0;right:0;top:50px;text-align:center;font-size:{int(w*.5)}px;line-height:1">{e}</div><div style="position:absolute;left:0;right:0;bottom:50px;text-align:center;font-family:O;font-weight:800;font-size:68px">{t}</div></div>',i+1)
+            o+=stp(f'<div class="gl tch"{sa} style="left:{x}px;top:200px;width:{w}px;height:600px;border-radius:56px"><div style="position:absolute;left:0;right:0;top:50px;text-align:center;font-size:{int(w*.5)}px;line-height:1">{e}</div><div style="position:absolute;left:0;right:0;bottom:50px;text-align:center;font-family:O;font-weight:800;font-size:68px">{_ul(t)}</div></div>',i+1)
     else:
         L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,640,56)
-        sh=lambda x:x[0] if isinstance(x,(tuple,list)) else x
+        sh=lambda x:(x['t'] if isinstance(x,dict) else x[0] if isinstance(x,(tuple,list)) else x).replace('<span','').replace('</span>','')
         fs=42 if max(len(sh(x)) for x in L)<60 else 38
+        BG={'amber':'background:linear-gradient(135deg,#fff3c4,#ffe7a8)','teal':'background:linear-gradient(135deg,#d6fbea,#c4f3e6)'}
         for i,t in enumerate(L):
-            y=190+i*int(660/len(L)); h=int(660/len(L))-24
+            y=190+i*int(660/len(L)); h=int(660/len(L))-24; ex=''
             if isinstance(t,(tuple,list)):
-                body=f'<div style="flex:1"><div style="font-family:P;font-weight:500;font-size:30px;color:#6a35e8;margin-bottom:6px">🗣️ {t[1]}</div><div>{t[0]}</div></div>'; sa=f' data-say="{t[1]}"'
-            else: body=t; sa=f' data-say="{t}"' if tts else ''
-            o+=stp(f'<div class="gl tch"{sa} style="left:780px;top:{y}px;width:1050px;height:{h}px;border-radius:48px;display:flex;align-items:center;padding:0 44px;box-sizing:border-box;font-family:O;font-weight:800;font-size:{fs}px;line-height:1.15">{body}{"<span style=margin-left:auto;font-size:44px>🔊</span>" if (tts or isinstance(t,(tuple,list))) else ""}</div>',i+1)
-    o+=f'<div class="a mu" style="left:90px;top:858px;width:1740px;text-align:center;font-size:36px">{d.get("hint","Read it aloud with your partner. Then say it again without looking.")}</div>'
+                body=f'<div style="flex:1;display:flex;align-items:center;gap:26px"><span class="sp" style="font-size:64px">🔊</span><div><div class="pt" style="display:none;font-family:P;font-weight:500;font-size:30px;color:#6a35e8;margin-bottom:6px">🗣️ {t[1]}</div><div class="an" style="display:none">{_ul(t[0])}</div></div></div>'; sa=f' data-say="{t[1]}" data-seq="1"'
+            elif isinstance(t,dict): body='<div>'+_ul(t['t'])+'</div>'; sa=''; ex=BG.get(t.get('c'),'')
+            else: body='<div>'+_ul(t)+'</div>'; sa=f' data-say="{t}"' if tts else ''
+            o+=(lambda h,seq:h if seq else stp(h,i+1))(f'<div class="gl tch"{sa} style="left:780px;top:{y}px;width:1050px;height:{h}px;border-radius:48px;display:flex;align-items:center;padding:0 44px;box-sizing:border-box;font-family:O;font-weight:800;font-size:{fs}px;line-height:1.15;{ex}">{body}</div>',isinstance(t,(tuple,list)))
+    if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:858px;width:1740px;text-align:center;font-size:36px">{d["hint"]}</div>'
+    return o
+
+@module('room')
+def room(d):
+    """The room of clues: stickman patient in bed, tap objects to read what they say. {'phase','title','spots':[{'e','x','y','t'}]}"""
+    o=header(d['phase'],d.get('title','The room of clues'),d.get('grad','amber'))
+    sv=('<svg viewBox="0 0 1740 700" width="1740" style="position:absolute;left:0;top:0">'
+     '<rect x="0" y="470" width="1740" height="230" fill="#e8dcc8"/><rect x="330" y="400" width="760" height="150" rx="26" fill="#fff" stroke="#1c1b2e" stroke-width="7"/>'
+     '<rect x="330" y="470" width="760" height="85" rx="22" fill="#9ad4ff" stroke="#1c1b2e" stroke-width="7"/><rect x="330" y="400" width="130" height="75" rx="30" fill="#fff" stroke="#1c1b2e" stroke-width="7"/>'
+     '<circle cx="395" cy="392" r="42" fill="#fff" stroke="#1c1b2e" stroke-width="7"/><circle cx="380" cy="386" r="5" fill="#1c1b2e"/><circle cx="410" cy="386" r="5" fill="#1c1b2e"/><path d="M382 408 Q395 400 408 408" stroke="#1c1b2e" stroke-width="5" fill="none" stroke-linecap="round"/>'
+     '<text x="455" y="370" font-size="48">💦</text><rect x="330" y="555" width="20" height="90" fill="#1c1b2e"/><rect x="1070" y="555" width="20" height="90" fill="#1c1b2e"/>'
+     '<path d="M300 130 Q710 -30 1120 130" stroke="#9a5cff" stroke-width="5" fill="none" stroke-dasharray="4 12" stroke-linecap="round"/></svg>')
+    o+=f'<div class="gl room" style="left:90px;top:170px;width:1740px;height:700px;border-radius:56px;overflow:hidden;background:linear-gradient(#f6efe2,#f3e9d6)">{sv}'
+    for k,sp in enumerate(d['spots']):
+        o+=f'<button class="rsp" data-t="{sp["t"]}" style="left:{sp["x"]}px;top:{sp["y"]}px">{sp["e"]}</button>'
+    o+='</div><div class="a rcap" style="left:90px;top:885px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:46px;height:56px;color:#1c1b2e"></div>'
     return o
 
 @module('qr_card')
@@ -168,6 +191,24 @@ def comic(d):
         o+=stp(glass(x,200,w,590,body,r=48),i+1)
     return o
 
+def _dial_scene(z):
+    """stickman against the green normal line: up on a box / ladder / tower, or down in a dip / hole / well"""
+    L=205; off={4:25,5:60,6:100,3:0,2:-25,1:-55,0:-85}[z]; cx=395; g=''
+    pit=-off if off<0 else 0
+    if pit:
+        g+=f'<rect x="0" y="{L}" width="{cx-70}" height="140" fill="#d9c7a6"/><rect x="{cx+70}" y="{L}" width="{790-cx-70}" height="140" fill="#d9c7a6"/><rect x="{cx-70}" y="{L+pit}" width="140" height="140" fill="#d9c7a6"/><line x1="{cx-70}" y1="{L}" x2="{cx-70}" y2="{L+pit}" stroke="#1c1b2e" stroke-width="6"/><line x1="{cx+70}" y1="{L}" x2="{cx+70}" y2="{L+pit}" stroke="#1c1b2e" stroke-width="6"/>'
+    else: g+=f'<rect x="0" y="{L}" width="790" height="140" fill="#d9c7a6"/>'
+    if off>0:
+        g+=f'<rect x="{cx-55}" y="{L-off}" width="110" height="{off}" fill="#ffc13b" stroke="#1c1b2e" stroke-width="6"/>'
+        if off>=60:
+            g+=f'<line x1="{cx+75}" y1="{L}" x2="{cx+75}" y2="{L-off}" stroke="#1c1b2e" stroke-width="6"/><line x1="{cx+115}" y1="{L}" x2="{cx+115}" y2="{L-off}" stroke="#1c1b2e" stroke-width="6"/>'+''.join(f'<line x1="{cx+75}" y1="{L-t}" x2="{cx+115}" y2="{L-t}" stroke="#1c1b2e" stroke-width="5"/>' for t in range(20,off,28))
+    base=L-off if off>0 else L+(-pit if False else pit)
+    g+=stick(cx,base,.6,'up' if off>0 or pit else 'down')
+    if z==6: g+=f'<text x="{cx+30}" y="{base-95}" font-size="46">💦</text>'
+    if z==0: g+=f'<text x="{cx+40}" y="{base-70}" font-size="46">🆘</text>'
+    g+=f'<line x1="0" y1="{L}" x2="790" y2="{L}" stroke="#10a98d" stroke-width="7" stroke-dasharray="22 14"/>'
+    return g
+
 def _dial_html(d,sid):
     import math,json as _j
     cx,cy,R,r=450,470,430,230; a=180/7
@@ -184,9 +225,10 @@ def _dial_html(d,sid):
     o=header(d['phase'],d.get('title','How much?'),d.get('grad','violet'))
     o+=f'<div class="a" style="right:{130 if d.get("_lvg") else 90}px;top:60px;display:flex;gap:12px">'+''.join('<span class="chd" style="width:26px;height:26px;border-radius:50%"></span>' for _ in d['items'])+'</div>'
     o+=f'<div class="a" style="left:90px;top:230px;width:900px"><svg viewBox="0 0 900 540" width="900">{sv}</svg></div>'
-    o+='<div class="gl dcard" style="left:1040px;top:200px;width:790px;height:250px;border-radius:48px"></div>'
-    o+='<div class="gl dsen" style="left:1040px;top:480px;width:790px;height:250px;border-radius:48px"></div>'
-    o+=f'<div class="a mu" style="left:90px;top:810px;width:900px;font-size:34px">{d.get("hint","Tap the dial. Then say the sentence.")}</div>'
+    o+='<div class="gl dcard" style="left:1040px;top:190px;width:790px;height:170px;border-radius:48px"></div>'
+    o+='<div class="gl dsen" style="left:1040px;top:380px;width:790px;height:190px;border-radius:48px"></div>'
+    sc=''.join(f'<g class="sc" data-z="{z}" style="display:none">{_dial_scene(z)}</g>' for z in range(7))
+    o+=f'<div class="gl dscn" style="left:1040px;top:590px;width:790px;height:330px;border-radius:48px;overflow:hidden"><svg viewBox="0 0 790 330" width="790" height="330" style="display:block"><line class="qq" x1="0" y1="205" x2="790" y2="205" stroke="#10a98d" stroke-width="7" stroke-dasharray="22 14"/><text class="qq" x="395" y="140" font-size="90" text-anchor="middle">❔</text>{sc}</svg></div>'
     return o+f'<script type="application/json" id="d-{sid}">{_j.dumps({"items":d["items"]},ensure_ascii=False)}</script>'
 BUILD_EXT['dial']=_dial_html
 
@@ -235,7 +277,10 @@ EXT_CSS.append("""
 .cbgrid.hunt{top:335px;height:515px;grid-template-rows:repeat(3,1fr);gap:14px 18px}.cbgrid.hunt .cbt.rd{animation:none;background:rgba(255,255,255,.85)}.cbgrid.hunt .cbt.rd .tx{font-family:O;font-weight:800;font-size:34px}
 .cbq.tw{background:linear-gradient(135deg,#ffe3ea,#ffd0dc);color:#c01850}.cbq{left:90px;top:262px;width:1740px;height:58px;border-radius:32px;background:rgba(255,255,255,.75);border:4px solid #fff;display:flex;align-items:center;gap:30px;padding:0 34px;box-sizing:border-box;font-family:O;font-weight:800;font-size:28px;color:#6a35e8;white-space:nowrap}.cbq i{font-style:normal;color:#1c1b2e;font-family:P;font-weight:500}.cbcount .pgb{display:inline-block;width:260px;height:22px;border-radius:11px;background:rgba(255,255,255,.55);vertical-align:middle;margin-right:16px;overflow:hidden}.cbcount .pgb b{display:block;height:100%;background:#fff;border-radius:11px;transition:width .6s}
 .dz{cursor:pointer;stroke:#fff;stroke-width:6;transition:filter .2s,opacity .3s}.dz:hover{filter:brightness(1.08)}.dz.glow{filter:drop-shadow(0 0 16px #fff) brightness(1.1)}.dz.dim{opacity:.55}
-.dcard,.dsen{box-sizing:border-box;padding:26px 40px;font-family:O;font-weight:800;line-height:1.25;display:flex;flex-direction:column;justify-content:center}.dcard{font-size:46px}.dcard small{font-family:P;font-weight:500;font-size:34px;color:#4a4a62;margin-top:10px}.dsen{font-size:42px;color:#1c1b2e}.dsen u{text-decoration:none;display:inline-block;width:170px;border-bottom:6px solid #c9b6ff;vertical-align:baseline}.dsen.ok{background:linear-gradient(135deg,#d6fbea,#c4f3e6)}.dsen .say{font-family:P;font-weight:500;font-size:30px;color:#6a6a7e;margin-top:12px}
+.dcard,.dsen{box-sizing:border-box;padding:26px 40px;font-family:O;font-weight:800;line-height:1.25;display:flex;flex-direction:column;justify-content:center}.dcard{font-size:42px}.dcard small{font-family:P;font-weight:500;font-size:34px;color:#4a4a62;margin-top:10px}.dsen{font-size:42px;color:#1c1b2e}.dsen u{text-decoration:none;display:inline-block;width:170px;border-bottom:6px solid #c9b6ff;vertical-align:baseline}.dsen.ok{background:linear-gradient(135deg,#d6fbea,#c4f3e6)}.dsen .say{font-family:P;font-weight:500;font-size:30px;color:#6a6a7e;margin-top:12px}
+.mdls{display:none!important}
+.ulw{background:linear-gradient(90deg,#9a5cff,#ff5aa5) no-repeat 0 100%;background-size:0 9px;padding-bottom:6px}[data-s]:not(.sh) .ulw{animation:ulwd .8s .9s ease-out forwards}.sh .ulw{animation:none;background-size:0 9px}@keyframes ulwd{to{background-size:100% 9px}}
+.rsp{position:absolute;width:150px;height:150px;border-radius:50%;border:6px solid #fff;background:rgba(255,255,255,.85);box-shadow:0 12px 26px rgba(60,30,140,.2);font-size:84px;line-height:1;cursor:pointer;transition:transform .2s,background .3s}.rsp:hover{transform:scale(1.07)}.rsp.on{background:#d6fbea;border-color:#2bd9b6}
 .cbcol{display:flex;flex-direction:column;gap:12px;min-height:0}
 .cbh{height:62px;border-radius:24px;color:#fff;font-family:O;font-weight:800;font-size:38px;text-align:center;line-height:62px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4)}
 .cbt{flex:1;min-height:0;border-radius:30px;background:rgba(255,255,255,.55);border:4px solid #fff;display:flex;align-items:center;gap:14px;padding:0 20px;font-family:P;font-weight:500;font-size:27px;line-height:1.18;overflow:hidden;text-align:left;color:#1c1b2e;position:relative}.cbt .tx{flex:1;min-width:0}.cbt.ov:after{content:'\2922';position:absolute;right:14px;bottom:4px;font-size:30px;color:#7b3cf0}
@@ -254,7 +299,9 @@ EXT_CSS.append("""
 # ---------------- behaviour ----------------
 EXT_JS.append(r"""
 SXL.say=false;
-document.addEventListener('click',function(e){var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;speechSynthesis.speak(u)}catch(x){}P('tick')}});
+document.addEventListener('keydown',function(e){if(/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))return;if('123'.indexOf(e.key)<0||e.key==='')return;var m=document.querySelector('.sl.on .mdl[data-l="'+e.key+'"]');if(m)m.click()});
+document.addEventListener('click',function(e){var b=e.target.closest('[data-seq]');if(b&&b.classList.contains('tch')){var st=+(b.dataset.st||0);if(st===0){b.dataset.st=1}else if(st===1){var pt=b.querySelector('.pt');if(pt)pt.style.display='block';b.dataset.st=2;P('tick');return}else if(st===2){var an=b.querySelector('.an');if(an)an.style.display='block';b.dataset.st=3;P('pop');return}}
+ var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;speechSynthesis.speak(u)}catch(x){}P('tick')}});
 /* temporary review skip: hide with ?noskip */
 if(!/noskip/.test(location.search)){var sk=$('#sk');sk.style.display='block';setInterval(function(){sk.style.visibility=(cur<slides.length-1)?'visible':'hidden'},300);sk.onclick=function(){var s=slides[cur];if(s)s.__done=1;P('tick');if(cur<slides.length-1)go(cur+1)}}
 
@@ -274,20 +321,23 @@ INIT.choice=function(s){
   else{b.classList.add('nope');wrong(b)}}})});
  show(0)};
 
+/* ---- room of clues ---- */
+INIT.room=function(s){var cap=$('.rcap',s);$('#nx').classList.add('on');$$('.rsp',s).forEach(function(b){b.onclick=function(){b.classList.add('on');cap.textContent=b.dataset.t;P('pop')}})};
 /* ---- dial ---- */
 INIT.dial=function(s){
- var D=JSON.parse($('#d-'+s.dataset.id).textContent),I=D.items,k=0,done=0,card=$('.dcard',s),sen=$('.dsen',s),nd=$('.nd',s),dots=$$('.chd',s),zs=$$('.dz',s);
+ var D=JSON.parse($('#d-'+s.dataset.id).textContent),I=D.items,k=0,done=0,card=$('.dcard',s),sen=$('.dsen',s),nd=$('.nd',s),dots=$$('.chd',s),zs=$$('.dz',s),scs=$$('.sc',s),qq=$$('.qq',s);
+ function scn(z){scs.forEach(function(g){g.style.display=(+g.dataset.z===z)?'block':'none'});qq.forEach(function(q){q.style.display=z<0?'block':'none'})}
  var W=[['dangerously','lower'],['much','lower'],['slightly','lower'],['','normal'],['slightly','higher'],['much','higher'],['dangerously','higher']];
  function ang(z){return (z+.5)*180/7-90}
  function sent(it,z){var w=W[z];return z===3?it.s+' normal.':it.s+' <b>'+w[0]+' '+w[1]+'</b> than normal.'}
- function show(){var it=I[k];done=0;nd.style.transform='rotate(-90deg)';zs.forEach(function(z){z.classList.remove('glow','dim')});
+ function show(){var it=I[k];done=0;nd.style.transform='rotate(-90deg)';scn(-1);zs.forEach(function(z){z.classList.remove('glow','dim')});
   dots.forEach(function(d,i){d.classList.toggle('on',i===k);d.classList.toggle('dn',i<k)});
-  card.innerHTML=it.e+' '+it.now+'<small>Normal: '+it.normal+'</small>';sen.classList.remove('ok');
-  sen.innerHTML=it.s+' <u>&nbsp;</u> than normal.<div class="say">Tap the dial. Then say the sentence.</div>'}
- zs.forEach(function(z){z.onclick=function(){if(done)return;var it=I[k],n=+z.dataset.z;nd.style.transform='rotate('+ang(n)+'deg)';
-  if(n===it.z){done=1;z.classList.add('glow');zs.forEach(function(o){if(o!==z)o.classList.add('dim')});P('good');sen.classList.add('ok');sen.innerHTML=sent(it,n)+'<div class="say">Say it aloud.</div>';
+  card.innerHTML='<div>'+it.e+' '+it.now+'</div><small>Normal: '+it.normal+'</small>';sen.classList.remove('ok');
+  sen.innerHTML='<div>'+it.s+' <u>&nbsp;</u> than normal.</div>'}
+ zs.forEach(function(z){z.onclick=function(){if(done)return;var it=I[k],n=+z.dataset.z;nd.style.transform='rotate('+ang(n)+'deg)';scn(n);
+  if(n===it.z){done=1;z.classList.add('glow');zs.forEach(function(o){if(o!==z)o.classList.add('dim')});P('good');sen.classList.add('ok');sen.innerHTML='<div>'+sent(it,n)+'</div>';
    setTimeout(function(){if(k>=I.length-1){finish(s);return}k++;show()},3200)}
-  else{P('tick');setTimeout(function(){if(!done)nd.style.transform='rotate(-90deg)'},900);try{wrong(z)}catch(e){}}}});
+  else{P('tick');setTimeout(function(){if(!done){nd.style.transform='rotate(-90deg)';scn(-1)}},900);try{wrong(z)}catch(e){}}}});
  show()};
 /* ---- boss ---- */
 INIT.boss=function(s){
