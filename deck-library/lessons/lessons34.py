@@ -208,6 +208,28 @@ L4=[
  dict(m='closing',phase='EXIT',label='Thank you',min=1,stack=True,line1='Thank',line2='you!',sub='See you next time.',emoji='handshake'),
 ]
 
+# ---- L4 Activate: Fix the ward (night nurse handover with 12 mistakes, audio voice notes) ----
+_FIXD=[
+ ('red','🌡️','Temperature','Temperature: 73 °C','Temp 73 °C','Nurse','Her temperature is thirty-six point eight. Normal. Seventy-three? That was the coffee!',['Her temperature is normal.','Her temperature is very high.','Her temperature is very low.'],{'flu':'against'}),
+ ('blue','☕','Coffee','Drinks two cups a day','2 cups a day','Barista','Eight cups a day. Every day. I know her order!',['She drinks eight cups every day.','She drinks two cups every day.','She never drinks coffee.'],{'coffee':'for'}),
+ ('green','🛏️','Sleep','Sleeps nine hours','Sleeps 9 hours','Smartwatch','Sleep last night: three hours.',['She sleeps three hours. That is less than normal.','She sleeps nine hours. That is more than normal.','She sleeps seven hours. That is normal.'],{'coffee':'for','stress':'for'}),
+ ('yellow','💓','Pulse','Pulse 56: lower than normal','Pulse 56','Nurse','Her pulse is one hundred and ten.',['Her pulse is 110. It is higher than normal.','Her pulse is 56. It is lower than normal.','Her pulse is 80. It is normal.'],{'coffee':'for','stress':'for'}),
+ ('red','🤕','Headache','Headache: 9 out of 10','Headache 9/10','Patient','My headache is only a little. Three out of ten.',['Her headache is 3 out of 10. It is mild.','Her headache is 9 out of 10. It is severe.','Her headache is 5 out of 10. It is moderate.'],{}),
+ ('blue','🗓️','Start','It started yesterday','Started yesterday','Friend','She has felt like this since the exams started. About two weeks.',['It started two weeks ago.','It started yesterday.','It started two years ago.'],{'stress':'for','coffee':'for'}),
+ ('green','😷','Cough','Coughs every night','Coughs every night','Patient','I never cough. Not once.',['She never coughs.','She coughs every night.','She coughs twice a week.'],{'flu':'against'}),
+ ('yellow','🤢','Stomach','Vomiting and diarrhoea','Vomiting','Friend','We ate the same lunch. Nobody else is sick.',['Nobody else is sick.','Everybody is sick.','She has vomiting and diarrhoea.'],{'food':'against'}),
+ ('red','💊','Plan','Plan: two strong coffees','Plan: 2 strong coffees','Doctor','No more coffee suddenly. She should cut down slowly.',['She should cut down coffee slowly.','She should drink two strong coffees.','She should stop coffee today.'],{'coffee':'for'}),
+ ('blue','💔','Cause','Cause: broken heart','Broken heart','Patient','Nobody broke my heart! My phone just buzzes with exam messages.',["It can't be a broken heart. It is her phone.",'It is a broken heart.','It is flu.'],{'heart':'against'}),
+ ('green','🌞','Sunday','Worse on Sunday','Worse on Sunday','Nurse','On Sunday she drank no coffee. She slept nine hours and felt much better.',['She felt much better on Sunday.','She felt worse on Sunday.','She felt the same on Sunday.'],{'coffee':'for'}),
+ ('yellow','📚','Exams','One exam a week','1 exam a week','Teacher','Three exams in four days!',['She has three exams in four days.','She has one exam a week.','She has no exams.'],{'stress':'for'})]
+FIX=[dict(n=i+1,owner=o,pic=pc,topic=tp,wrong=w,short=sh,who=who,voice=v,fix=op[0],opts=op,fx=fx) for i,(o,pc,tp,w,sh,who,v,op,fx) in enumerate(_FIXD)]
+FIX_CLUES=[dict(id=f'M{f["n"]}',team=f['owner'],r=1,topic=f['topic'],pic=f['pic'],short=f['short'],text=f['fix'],fx=f['fx']) for f in FIX]
+_FP=stick(110,395,1.2,'down')+'<text x="190" y="340" font-size="64">☕</text><text x="215" y="260" font-size="50">🌡️</text><text x="190" y="170" font-size="40" font-family="Outfit,sans-serif" font-weight="800" fill="#e0304a">73 °C!</text><text x="40" y="110" font-size="60">💤</text>'
+_FP2=stick(120,395,1.2,'hold')+'<text x="190" y="360" font-size="80">📝</text><text x="195" y="300" font-size="60" fill="#e0304a">❌</text>'
+_FP3=stick(90,395,1.15,'up')+stick(310,395,1.15,'point')+bubble_svg(20,16,330,100,'Can I hear your\nvoice note?',fs=26,tx=120)
+_FP4=stick(130,395,1.2,'hold')+'<text x="195" y="330" font-size="86">🎧</text><text x="255" y="190" font-size="110" fill="#2bd9b6" font-family="Outfit,sans-serif" font-weight="800">✔</text>'
+FIX_COMIC=[dict(svg=_FP,cap='The night nurse made mistakes.'),dict(svg=_FP2,cap='Find the mistakes on your page.'),dict(svg=_FP3,cap='Ask another group.'),dict(svg=_FP4,cap='Listen. Choose the fix. Say it.')]
+
 # ================= L4 post-processing: 16 Nov review round =================
 def _o(pic,q,*opts,**kw): return dict(pic=pic,q=q,opts=list(opts),ans=opts[0],**kw)
 def _lvs(a,b,c): return [{'items':a},{'items':b},{'items':c}]
@@ -232,7 +254,7 @@ COMPARE=dict(m='choice',phase='STUDY',title='Compare',label='Exercise · Compare
  [_o('☕','Monday: 2 cups. Friday: 4 cups.','She drinks twice as much coffee on Friday as on Monday.','She drinks half as much coffee on Friday as on Monday.','She drinks the same coffee on Friday as on Monday.'),_o('😴','Mon 3 · Tue 4 · Wed 3 · Thu 2 · Fri 3 hours.','Thursday is the worst night, and Tuesday is the best.','Thursday is the best night, and Tuesday is the worst.','Every night is the same.'),_o('💓','Pulse: 108, 112, 110. Normal: 60 to 100.','Her pulse is higher than normal all day.','Her pulse is lower than normal all day.','Her pulse is normal all day.')]))
 PLANB4=dict(m='planb',phase='ACTIVATE',label='Plan B (teacher)',optional=True,min=1,title='Plan B · if you have time left',tiles=[
  dict(e='🎯',t='Taboo for nurses',min='7 min',use='Groups finish early. QR phone page: describer only, words only.'),dict(e='🩺',t='"Doctor, I\'m too busy."',min='6–8 min',use='Strong groups. Say one kind sentence to the patient.'),dict(e='🤥',t='Everybody lies',min='3 min',use='The argue phase is quiet. Patient says vs numbers say.'),
- dict(e='🧩',t='Boss question',min='3 min',use='Fast finishers: why "cut down slowly"?'),dict(e='🔤',t='Name the symptom',min='4 min',use='Spelling warm-up for mixed levels.'),dict(e='🗂️',t='Paper clues',min='10 min',use='Tech fails or the ball stalls: each group reads its 3 clue cards aloud in turn.')])
+ dict(e='🧩',t='Boss question',min='3 min',use='Fast finishers: why "cut down slowly"?'),dict(e='🔤',t='Name the symptom',min='4 min',use='Spelling warm-up for mixed levels.'),dict(e='🗂️',t='Paper fallback',min='10 min',use='Tech fails: read the 12 voice-note sentences aloud from paper; groups still choose the fix.')])
 _n4=[]
 for d in L4:
     lb=d.get('label')
@@ -250,9 +272,11 @@ for d in L4:
     elif lb=='Exercise · Compare (than · the most)': d=COMPARE
     elif lb in('Exercise · Say it with a dial (1)','Exercise · Say it with a dial (2)','Extra · Name the symptom','Extra · Read the label (how often, how much)'): d=dict(d,lvl=2)
     elif lb=='Your sentences': d=dict(d,label='Your toolkit',title='Your hunt toolkit',groups=[
-        {'t':'❓ Ask','c':'teal','l':['Have you got a clue about …?','What does your clue say about …?','How often does she …?'],'fs':44},
-        {'t':'📢 Report','c':'sky','l':['She drinks eight cups every day.','She has slept badly for two weeks.','Her pulse is higher than normal.'],'fs':40},
-        {'t':'⚖️ Argue','c':'rose','l':['It might be the coffee because …',"It can't be flu because she has no cough.",'It is unlikely to be food poisoning because …'],'fs':38}],note='Ask with a question. Answer in a full sentence.')
+        {'t':'❓ Ask','c':'teal','l':['Can I hear your voice note about …?','What does it say about …?','Is that a mistake?'],'fs':44},
+        {'t':'📢 Report','c':'sky','l':['The handover says … but the voice note says …','She drinks eight cups every day.','Her pulse is higher than normal.'],'fs':38},
+        {'t':'⚖️ Argue','c':'rose','l':['It might be the coffee because …',"It can't be a broken heart because …","It can't be flu because she has no cough."],'fs':38}],note='Ask with a question. Answer in a full sentence.')
+    elif lb=='How the hunt works': d=dict(d,label='How Fix the ward works',title='How Fix the ward works',panels=FIX_COMIC)
+    elif lb=='Case board · Find the reason': d=dict(d,reveal=d['reveal']+'<br>🌙 The night nurse wrote a chart just like her own: eight coffees, three hours of sleep!',title='Fix the ward',label='Case board · Fix the ward',clues=FIX_CLUES,unit='mistakes fixed',fix=True,min=11,frames=['Can I hear your voice note about …?','What does it say about …?','Is that a mistake?'])
     elif lb=='Boss question (just for fun)': _n4.append(PLANB4); d=dict(d)
     elif lb=='"Doctor, I\'m too busy."': d=dict(d,min=6)
     _n4.append(d)
