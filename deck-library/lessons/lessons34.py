@@ -18,8 +18,9 @@ def lv(items3): return [{'items':i} for i in items3]
 def exch(e,phase='STUDY',**kw):
     fix=lambda it:dict(it,pic='🔁' if e['title'].startswith('How often') else '📅') if len(it['pic'])>4 else it
     d=dict(m='choice',phase=phase,title=e['title'],hint=e['hint'],label='Exercise · '+e['title'],lvl=1,levels=[{'items':[fix(i) for i in e['levels'][k]]} for k in ('bronze','silver','gold')]); d.update(kw); return d
+L4SAY={'R1':'She says: two cups a day. The café card says: eight cups a day.','R2':'She sleeps three hours most nights. Normal is seven or more.','R3':'Her pulse is 108 to 112. Normal is 60 to 100.','B1':'She has no vomiting and no diarrhoea.','B2':'She studies until 2 am every night, for two weeks.','B3':'She has a headache most afternoons. It is 3 out of 10: mild.','G1':'Her hands shake for 30 minutes after every coffee.','G2':'She never coughs. No cough all week.','G3':'She cries a little when people talk about exams. She is quite worried.','Y1':'She never had this before the exams. It started two weeks ago.','Y2':'On Sunday she drank no coffee. She slept nine hours and felt much better.','Y3':'She ate lunch with three friends. Her friends are fine.'}
 def board(title,sus,clues,twist,test,ans,reveal,debate,rule=''):
-    return dict(m='case_board',phase='ACTIVATE',title=title,label='Case board · '+title,min=14,teams=[(a,b,c,c2) for (a,b,c),c2 in zip(K.TEAMS,TEAMC)],suspects=sus,clues=[dict(c,topic=c.get('topic') or K.TOPIC3.get(c['id']),short=(K.SHORT3 if clues is K.L3_CLUES else K.SHORT4).get(c['id'])) for i in (K.HUNT3 if clues is K.L3_CLUES else K.HUNT4) for c in clues if c['id']==i],hunt=True,frames=K.FRAMES,twist=twist,test=test,answer=ans,reveal=reveal,debate=debate,rule=rule)
+    return dict(m='case_board',phase='ACTIVATE',title=title,label='Case board · '+title,min=14,teams=[(a,b,c,c2) for (a,b,c),c2 in zip(K.TEAMS,TEAMC)],suspects=sus,clues=[dict(c,text=L4SAY.get(c['id'],c.get('text')),dials=None,topic=c.get('topic') or K.TOPIC3.get(c['id']),short=(K.SHORT3 if clues is K.L3_CLUES else K.SHORT4).get(c['id'])) for i in (K.HUNT3 if clues is K.L3_CLUES else K.HUNT4) for c in clues if c['id']==i],hunt=True,frames=K.FRAMES,twist=twist,test=test,answer=ans,reveal=reveal,debate=debate,rule=rule)
 
 # ============================ LESSON 3 ============================
 def _q(pic,q,ans,*wrong,**kw): return dict(pic=pic,q=q,opts=[ans,*wrong],ans=ans,**kw)
@@ -153,6 +154,8 @@ for d in L3:
         {'t':'❓ Ask','c':'teal','l':['Have you got a clue about …?','What does your clue say about …?','Does the patient have …?'],'fs':44},
         {'t':'📢 Report','c':'sky','l':['Her temperature is much higher than normal.','She has a rash on her arms.','Her platelets are much lower than normal.'],'fs':40},
         {'t':'⚖️ Argue','c':'rose','l':['It might be dengue because …',"It can't be flu because …",'It is unlikely to be measles because …'],'fs':40}],note='Ask with a question. Answer in a full sentence.')
+    elif lb=='Boss question (just for fun)':
+        _new.append(dict(m='planb',phase='ACTIVATE',label='Plan B (teacher)',optional=True,min=1,title='Plan B · if you have time left',tiles=[dict(e='🩺',t='Tell the doctor',min='3–6 min',use='Written or spoken Situation, Background, Assessment.'),dict(e='🧩',t='Boss question',min='3 min',use='Fast finishers.'),dict(e='🗣️',t='Ask the patient (2)',min='3 min',use='More question practice.'),dict(e='🎧',t='Listen and fix',min='4 min',use='Hear it once, tap the wrong word.'),dict(e='🔤',t='Name the illness',min='4 min',use='Spelling warm-up for mixed levels.'),dict(e='🗂️',t='Paper clues',min='10 min',use='Tech fails or the ball stalls: each group reads its 3 clue cards aloud in turn.')]))
     elif lb=='Taboo rules': d=dict(d,min=7,label='Taboo for nurses')
     _new.append(d)
 L3=_new
@@ -204,6 +207,56 @@ L4=[
  dict(m='recap',phase='RECAP',label='Recap',min=2,rows=[([('c1','She'),('c2','has felt'),('c3','tired'),('c4','for two weeks.')],'for'),([('c1','Her pulse'),('c2','is'),('c3','faster than normal.')],'than'),([('c1','She'),('c2','drinks'),('c3','the most coffee')],'the most'),([('c1','You'),('c2','should'),('c3','sleep more.')],'advice')],emoji='sleeping_face'),
  dict(m='closing',phase='EXIT',label='Thank you',min=1,stack=True,line1='Thank',line2='you!',sub='See you next time.',emoji='handshake'),
 ]
+
+# ================= L4 post-processing: 16 Nov review round =================
+def _o(pic,q,*opts,**kw): return dict(pic=pic,q=q,opts=list(opts),ans=opts[0],**kw)
+def _lvs(a,b,c): return [{'items':a},{'items':b},{'items':c}]
+_C=lambda sv:'<svg>'
+_Pn1=stick(110,395,1.2,'hold')+'<text x="190" y="370" font-size="84">📚</text><text x="215" y="130" font-size="76">📅</text><text x="200" y="200" font-size="38" font-family="Outfit,sans-serif" font-weight="800" fill="#e0304a">3 exams!</text>'
+_Pn2=stick(110,395,1.2,'hold')+'<text x="185" y="340" font-size="60">☕☕</text><text x="175" y="270" font-size="56">☕☕☕</text><text x="210" y="130" font-size="90">📱</text>'
+_Pn3='<text x="235" y="130" font-size="120">🌙</text><text x="40" y="110" font-size="64">⏰</text><text x="30" y="160" font-size="34" font-family="Outfit,sans-serif" font-weight="800">2:00 am</text><text x="260" y="380" font-size="66">🐱</text>'+stick(120,395,1.2,'down')+'<text x="68" y="236" font-size="38">👀</text>'
+_Pn4=stick(130,395,1.2,'down')+'<text x="195" y="330" font-size="80">😴</text><text x="250" y="170" font-size="190" font-family="Outfit,sans-serif" font-weight="800" fill="#9a5cff">?</text>'
+COMIC4=[dict(svg=_Pn1,cap='Books. Exams.'),dict(svg=_Pn2,cap='Coffee. Phone.'),dict(svg=_Pn3,cap='Night. Awake.'),dict(svg=_Pn4,cap='Asleep at the desk.')]
+BAD=[dict(word='no pain',e='🙂',gloss='0',sen='He has [[no]] pain.'),dict(word='a little',e='😕',gloss='1–3 · mild',sen='It hurts [[a little]].'),dict(word='quite',e='😣',gloss='4–6 · moderate',sen='It is [[quite]] painful.'),dict(word='very',e='😖',gloss='7–8',sen='It hurts [[very]] much.'),dict(word='the worst',e='😭',gloss='9–10 · severe',sen='It is [[the worst]] pain.')]
+HOWLONG=dict(m='choice',phase='STUDY',title='How long?',label='Exercise · How long?',lvl=2,min=2,levels=_lvs(
+ [_o('🗓️','Today is Friday. The pain began on Wednesday.','It started two days ago.','It started two days.'),_o('🗓️','The headache began on Monday.','It started on Monday.','It started in Monday.'),_o('🕑','The problem began 14 days ago.','It started two weeks ago.','It started two weeks.')],
+ [_o('🗓️','Today is Friday. She began to feel tired on Monday.','She is tired. It started on Monday.','She is tired. It started on Friday.','She is tired. It started Monday ago.'),_o('🤕','The headache began three days ago.','She has a headache. It started three days ago.','She has a headache. It started on three days.','She has a headache. It started since three days.'),_o('🌙','She cannot sleep. It began two weeks ago.','She cannot sleep. It started two weeks ago.','She cannot sleep. It started for two weeks.','She cannot sleep. It started two weeks.')],
+ K.L4_EX[2]['levels']['gold']))
+NORMAL=dict(m='choice',phase='STUDY',title='Compared with normal?',label='Exercise · Compared with normal?',lvl=2,min=3,levels=_lvs(
+ [_o('🛏️','She sleeps 3 hours. Normal is 7 hours.','She sleeps less than normal.','She sleeps more than normal.'),_o('💓','Her pulse is 110. Normal is 60 to 100.','Her pulse is higher than normal.','Her pulse is lower than normal.'),_o('🌡️','Her temperature is 36.8 °C. Normal is about 37 °C.','Her temperature is normal.','Her temperature is higher than normal.')],
+ [_o('☕','She drinks 8 cups. Normal is 4 or 5.','She drinks more coffee than normal.','She drinks less coffee than normal.','Her coffee is normal.'),_o('💓','Her pulse is 78. Normal is 60 to 100.','Her pulse is normal.','Her pulse is higher than normal.','Her pulse is lower than normal.'),_o('🛏️','She sleeps 5 hours. Normal is 7 to 9 hours.','She sleeps less than normal.','She sleeps more than normal.','Her sleep is normal.')],
+ [_o('💓','Pulse: 110. Normal: 60 to 100. The nurse is not worried.','Her pulse is a little higher than normal, but it is not dangerous.','Her pulse is much higher than normal. It is dangerous.','Her pulse is lower than normal.'),_o('🛏️','She sleeps 3 hours. Normal is 7 to 9 hours.','She sleeps much less than normal.','She sleeps a little less than normal.','She sleeps more than normal.'),_o('☕','She drinks 8 cups. Adults usually drink 4 or 5.','She drinks almost twice as much coffee as normal.','She drinks half as much coffee as normal.','She drinks the same coffee as normal.')]))
+COMPARE=dict(m='choice',phase='STUDY',title='Compare',label='Exercise · Compare (than · the most)',optional=True,lvl=2,min=3,levels=_lvs(
+ [_o('☕','Monday: 2 cups. Friday: 4 cups.','Friday has more coffee than Monday.','Monday has more coffee than Friday.'),_o('😴','Monday: 3 hours of sleep. Thursday: 2 hours.','Thursday has less sleep than Monday.','Thursday has more sleep than Monday.'),_o('💓','Her pulse is 110. Normal is 60 to 100.','Her pulse is higher than normal.','Her pulse is lower than normal.')],
+ [_o('☕','Mon 2 · Tue 3 · Wed 2 · Thu 3 · Fri 4 cups.','Friday has the most coffee.','Monday has the most coffee.','Wednesday has the most coffee.'),_o('😴','Mon 3 · Tue 4 · Wed 3 · Thu 2 · Fri 3 hours of sleep.','Thursday has the least sleep.','Tuesday has the least sleep.','Thursday has the most sleep.'),_o('💓','Pulse: Monday 90 · Tuesday 100 · Wednesday 110.','Wednesday has the highest pulse.','Monday has the highest pulse.','Wednesday has the lowest pulse.')],
+ [_o('☕','Monday: 2 cups. Friday: 4 cups.','She drinks twice as much coffee on Friday as on Monday.','She drinks half as much coffee on Friday as on Monday.','She drinks the same coffee on Friday as on Monday.'),_o('😴','Mon 3 · Tue 4 · Wed 3 · Thu 2 · Fri 3 hours.','Thursday is the worst night, and Tuesday is the best.','Thursday is the best night, and Tuesday is the worst.','Every night is the same.'),_o('💓','Pulse: 108, 112, 110. Normal: 60 to 100.','Her pulse is higher than normal all day.','Her pulse is lower than normal all day.','Her pulse is normal all day.')]))
+PLANB4=dict(m='planb',phase='ACTIVATE',label='Plan B (teacher)',optional=True,min=1,title='Plan B · if you have time left',tiles=[
+ dict(e='🎯',t='Taboo for nurses',min='7 min',use='Groups finish early. QR phone page: describer only, words only.'),dict(e='🩺',t='"Doctor, I\'m too busy."',min='6–8 min',use='Strong groups. Say one kind sentence to the patient.'),dict(e='🤥',t='Everybody lies',min='3 min',use='The argue phase is quiet. Patient says vs numbers say.'),
+ dict(e='🧩',t='Boss question',min='3 min',use='Fast finishers: why "cut down slowly"?'),dict(e='🔤',t='Name the symptom',min='4 min',use='Spelling warm-up for mixed levels.'),dict(e='🗂️',t='Paper clues',min='10 min',use='Tech fails or the ball stalls: each group reads its 3 clue cards aloud in turn.')])
+_n4=[]
+for d in L4:
+    lb=d.get('label')
+    if lb=='Eyes closed. How bad?': d=dict(d,min=2,rungs=['Bello!','Banana!','Poopaye!','Tulaliloo ti amo!','KAMPAI!'],side='Everyone, eyes closed, at the same time. Whisper first. Each word is louder.')
+    elif lb=='The impossible day': d=dict(m='comic',phase='ENGAGE',label='The impossible night',min=3,title='The impossible night',panels=COMIC4,y=230,h=470)
+    elif lb=='The dials': d=dict(m='teach',phase='STUDY',label='Teach · The dials',min=3,role='Say it with dials',pic='☕',lines=[dict(k='Start',t='She drinks coffee.'),dict(k='How often?',t='She drinks coffee [[every day]].',c='orange'),dict(k='How long?',t='It started [[two weeks ago]].',c='sky'),dict(k='How bad?',t='She is [[very]] tired.',c='rose')])
+    elif lb=='Her week': d=dict(m='week',phase='STUDY',label='Her week',min=3,title='Her week',days=[dict(d='Mon',cups=2,h=3,says='Two coffees. I am fine!'),dict(d='Tue',cups=3,h=4,says='Three cups. One more…'),dict(d='Wed',cups=2,h=3,says='Only two. So tired.'),dict(d='Thu',cups=3,h=2,says='My hands shake…'),dict(d='Fri',cups=4,h=3,says='Four cups! I cannot stop.')])
+    elif lb=='Teach · How bad?': d=dict(m='rungs',phase='STUDY',label='Teach · How bad?',min=2,title='How bad?',stops=BAD,start=2)
+    elif lb=='Exercise · How bad?': d=dict(d,lvl=2)
+    elif lb=='Teach · How long?': d=dict(d,min=1,lines=['She has a headache.','It started [[on]] Monday.','It started [[two days ago]].','It started [[two weeks ago]].'])
+    elif lb=='Exercise · How long?': d=HOWLONG
+    elif lb=='Teach · Compared with normal': d=dict(d,min=1,lines=['She sleeps 3 hours. Normal is 7 hours.','She sleeps [[less than]] normal.','Her pulse is 110. Normal is 60 to 100.','Her pulse is [[higher than]] normal.'])
+    elif lb=='Exercise · Compared with normal?': d=NORMAL
+    elif lb=='Exercise · How often?': d=dict(d,lvl=2)
+    elif lb=='Exercise · Compare (than · the most)': d=COMPARE
+    elif lb in('Exercise · Say it with a dial (1)','Exercise · Say it with a dial (2)','Extra · Name the symptom','Extra · Read the label (how often, how much)'): d=dict(d,lvl=2)
+    elif lb=='Your sentences': d=dict(d,label='Your toolkit',title='Your hunt toolkit',groups=[
+        {'t':'❓ Ask','c':'teal','l':['Have you got a clue about …?','What does your clue say about …?','How often does she …?'],'fs':44},
+        {'t':'📢 Report','c':'sky','l':['She drinks eight cups every day.','She has slept badly for two weeks.','Her pulse is higher than normal.'],'fs':40},
+        {'t':'⚖️ Argue','c':'rose','l':['It might be the coffee because …',"It can't be flu because she has no cough.",'It is unlikely to be food poisoning because …'],'fs':38}],note='Ask with a question. Answer in a full sentence.')
+    elif lb=='Boss question (just for fun)': _n4.append(PLANB4); d=dict(d)
+    elif lb=='"Doctor, I\'m too busy."': d=dict(d,min=6)
+    _n4.append(d)
+L4=_n4
 TABOO4=[d for d in L4 if d['m']=='taboo'][0]
 if __name__=='__main__':
     out=HERE.parent.parent/'lessons-3-4'

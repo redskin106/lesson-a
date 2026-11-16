@@ -417,6 +417,7 @@ INIT.choice=function(s){
   else{b.classList.add('nope');wrong(b)}}})});
  show(0)};
 
+INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop')}})};
 /* ---- room of clues ---- */
 INIT.room=function(s){var cap=$('.rcap',s);$('#nx').classList.add('on');$$('.rsp',s).forEach(function(b){b.onclick=function(){b.classList.add('on');cap.textContent=b.dataset.t;P('pop')}})};
 /* ---- dial ---- */
@@ -449,7 +450,7 @@ INIT.case_board=function(s){
  function say(t){try{if(!SXL.say)return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
  function clue(id){return id==='TW'?D.twist:D.clues.filter(function(c){return c.id===id})[0]}
  function fx(){var f={};D.suspects.forEach(function(x){f[x[0]]={f:0,a:0}});Object.keys(ok).forEach(function(id){var c=clue(id),e=c.fx||{};for(var k in e){if(f[k])f[k][e[k]==='for'?'f':'a']++}});return f}
- function txt(c){return c.dials?('<b>'+(c.topic||'')+'</b>'):((D.hunt&&c.short)||c.text||'').replace(/\n/g,'<br>')}
+ function txt(c){return (D.hunt&&c.short)?c.short:(c.dials?('<b>'+(c.topic||'')+'</b>'):(c.text||'').replace(/\n/g,'<br>'))}
  function draw(){
   var tot=D.clues.length,done=Object.keys(ok).filter(function(k){return k!=='TW'}).length;if(D.hunt)cnt.innerHTML='<span class="pgb"><b style="width:'+Math.round(100*done/tot)+'%"></b></span>'+done+' / '+tot+' clues found';else cnt.textContent=(tot-done)+' answers to go';
   var f=fx();sus.innerHTML=D.suspects.map(function(x){return '<div class="cbs'+(won?(x[0]===D.answer?' win':' dim'):'')+'"><b>'+x[2]+'</b><div>'+x[1]+'<div class="mk"><span style="color:#10a98d">'+new Array(f[x[0]].f+1).join('✔')+'</span> <span style="color:#e0306a">'+new Array(f[x[0]].a+1).join('✖')+'</span></div></div></div>'}).join('');
@@ -583,9 +584,13 @@ INIT.triage=function(s){var D=jd(s),B=D.buckets,I=pshuf(D.items),g=$('.pg',s),se
  I.forEach(function(it){var b=pmk('button','pcd',(D.show==='text'?'':'<i>'+(it.e||'')+'</i>')+'<span>'+it.t+'</span>',q);b.__it=it;b.onclick=function(){cards.forEach(function(c){c.classList.remove('sel')});b.classList.add('sel');sel=b;psay(it.t)};cards.push(b)})};
 /* label reader */
 INIT.label_reader=function(s){var D=jd(s),Q=D.qs,L=D.lab,st={k:0,n:Q.length};
+ function sayCb(t,cb){var done=0;function go(){if(!done){done=1;cb()}}try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.8;u.onend=go;speechSynthesis.speak(u);setTimeout(go,Math.max(3500,t.length*95))}catch(e){go()}}
  st.draw=function(){pdots(s,st.k);var g=$('.pg',s),dn=0,w=0,qq=Q[st.k];g.innerHTML='';var lab=pmk('div','gl plab','<h3>'+L.title+'</h3>',g),rows={};
+  var q=pmk('div','gl pqq','<div style="font-size:120px;text-align:center">🎧</div><div class="qt" style="display:none">'+qq.q+'</div><button class="pbt" style="font-size:38px">🔊 Listen again</button>',g);
+  lab.style.opacity=0;lab.style.pointerEvents='none';lab.style.transition='opacity .5s';
+  function reveal(){lab.style.opacity=1;lab.style.pointerEvents='auto';if(D.qtext!==false){var t=q.querySelector('.qt');if(t)t.style.display='block'}}
   L.lines.forEach(function(l){var b=pmk('button','pcd',(l.e?'<i>'+l.e+'</i>':'')+'<span>'+l.t+'</span>',lab);rows[l.id]=b;b.onclick=function(){if(dn)return;if(l.id===qq.a){dn=1;b.classList.add('ok');P('good');pstep(s,st,1700)}else{wrong(b);w++;if(w>=3)rows[qq.a].classList.add('glow')}}});
-  var q=pmk('div','gl pqq',(D.qtext===false?'<div style="font-size:120px;text-align:center">🎧</div>':qq.q)+'<br><button class="pbt" style="font-size:38px">🔊 Listen</button>',g);q.querySelector('button').onclick=function(){psay(qq.q)};psay(qq.q)};
+  q.querySelector('button').onclick=function(){sayCb(qq.q,reveal)};sayCb(qq.q,reveal)};
  st.draw()};
 /* taboo for nurses */
 INIT.taboo=function(s){var D=jd(s),Q=pshuf(D.items),lim=D.limit||3,done=0,N=D.items.length,shown=0,t=null,tm=D.secs||0,left=tm;pdots(s,0);

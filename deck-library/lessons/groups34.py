@@ -20,6 +20,13 @@ def page(lesson,letter,name,col,clues,frames):
 {cards}<div class="sec">Ask with the ball</div>{fr}<div class="sec2">Answer in a full sentence. 3 of you hold a clue. 1 of you writes.</div>
 <script>document.querySelectorAll('.cd').forEach(function(b){{b.onclick=function(){{b.classList.add('on');var s=b.dataset.say;if(s&&window.speechSynthesis){{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(s);u.lang='en-US';u.rate=.9;speechSynthesis.speak(u)}}}}}});</script></body></html>'''
 out=os.path.join(os.path.dirname(__file__),'..','..','lessons-3-4','groups'); os.makedirs(out,exist_ok=True)
+import importlib.util
+_sp=importlib.util.spec_from_file_location('l34',os.path.join(os.path.dirname(__file__),'lessons34.py'));_m=importlib.util.module_from_spec(_sp);_sp.loader.exec_module(_m)
+L4C=[dict(c,text=_m.L4SAY[c['id']]) for c in K.L4_CLUES if c['id'] in _m.L4SAY]
+L4G=[('R','Red','#ff5a6a'),('B','Blue','#2a8cf0'),('G','Green','#19b38a'),('Y','Yellow','#f2a900')]
+for letter,name,col in L4G:
+    by={c['id']:c for c in L4C}; mine=[by[i] for i in K.HUNT4 if i[0]==letter and i in by]
+    open(os.path.join(out,f'l4-{name.lower()}.html'),'w').write(page(4,letter,name,col,mine,[f[0] if isinstance(f,(tuple,list)) else f for f in K.FRAMES])); print(4,name,len(mine))
 for lesson,clues,hunt in ((3,K.L3_CLUES,K.HUNT3),):
     by={c['id']:c for c in clues}
     for letter,name,col in COL:

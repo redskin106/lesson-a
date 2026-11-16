@@ -76,7 +76,7 @@ def choice_html(d,sid):
     o+=f'<div class="a" style="right:{(130 if d.get("_lvg") else 90)}px;top:60px;display:flex;gap:12px">'+''.join(f'<span class="chd" style="width:26px;height:26px;border-radius:50%"></span>' for _ in I)+'</div>'
     import random
     for k,it in enumerate(I):
-        rest=[t for t in it['opts'] if t!=it['ans']]; random.Random(k*7+len(it['q'])).shuffle(rest); rest.insert((k*5+len(it['q']))%len(it['opts']),it['ans']); it=dict(it,opts=rest)
+        rest=[t for t in it['opts'] if t!=it['ans']]; random.Random(k*7+len(it['q'])).shuffle(rest); rest.insert((k*2+len(d.get('title','')))%len(it['opts']),it['ans']); it=dict(it,opts=rest)
         o+='<div class="chi" style="display:none">'
         if it.get('say'):
             sv=f'<svg viewBox="0 0 630 600" width="630" style="display:block">{bubble_svg(24,22,582,230,it["say"],fs=40,tx=230)}{stick(230,560,1.55,"hold")}<text x="400" y="470" font-size="130">{it.get("pic","")}</text></svg>'
@@ -122,15 +122,58 @@ def teach(d):
         L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,640,56)
         sh=lambda x:(x['t'] if isinstance(x,dict) else x[0] if isinstance(x,(tuple,list)) else x).replace('<span','').replace('</span>','')
         fs=42 if max(len(sh(x)) for x in L)<60 else 38
-        BG={'amber':'background:linear-gradient(135deg,#fff3c4,#ffe7a8)','teal':'background:linear-gradient(135deg,#d6fbea,#c4f3e6)'}
+        BG={'orange':'background:linear-gradient(135deg,#ffe6cc,#ffd2a6)','sky':'background:linear-gradient(135deg,#d9ecff,#c3e0ff)','rose':'background:linear-gradient(135deg,#ffe0ec,#ffcadd)','amber':'background:linear-gradient(135deg,#fff3c4,#ffe7a8)','teal':'background:linear-gradient(135deg,#d6fbea,#c4f3e6)'}
         for i,t in enumerate(L):
             y=190+i*int(660/len(L)); h=int(660/len(L))-24; ex=''
             if isinstance(t,(tuple,list)):
                 body=f'<div style="flex:1;display:flex;align-items:center;gap:26px"><span class="sp" style="font-size:64px">🔊</span><div><div class="pt" style="display:none;font-family:P;font-weight:500;font-size:30px;color:#6a35e8;margin-bottom:6px">🗣️ {t[1]}</div><div class="an" style="display:none">{_ul(t[0])}</div></div></div>'; sa=f' data-say="{t[1]}" data-seq="1"'
-            elif isinstance(t,dict): body='<div>'+_ul(t['t'])+'</div>'; sa=''; ex=BG.get(t.get('c'),'')
+            elif isinstance(t,dict): body=('<span style="flex:none;margin-right:26px;padding:6px 22px;border-radius:999px;background:#fff;font-size:30px;color:#6a35e8">'+t['k']+'</span>' if t.get('k') else '')+'<div>'+_ul(t['t'])+'</div>'; sa=''; ex=BG.get(t.get('c'),'')
             else: body='<div>'+_ul(t)+'</div>'; sa=f' data-say="{t}"' if tts else ''
             o+=(lambda h,seq:h if seq else stp(h,i+1))(f'<div class="gl tch"{sa} style="left:780px;top:{y}px;width:1050px;height:{h}px;border-radius:48px;display:flex;align-items:center;padding:0 44px;box-sizing:border-box;font-family:O;font-weight:800;font-size:{fs}px;line-height:1.15;{ex}">{body}</div>',isinstance(t,(tuple,list)))
     if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:858px;width:1740px;text-align:center;font-size:36px">{d["hint"]}</div>'
+    return o
+
+@module('week')
+def week(d):
+    """Her week, revealed day by day. {'phase','title','days':[{'d','cups','h','says'}]}"""
+    o=header(d['phase'],d.get('title','Her week'),d.get('grad','amber')); D=d['days']; n=len(D); w=int((1740-24*(n-1))/n)
+    for i,x in enumerate(D):
+        cups=''.join('☕' for _ in range(x['cups'])); bar=int(x['h']/9*(w-80))
+        body=(f'<div style="text-align:center;padding-top:22px"><span class="chip" style="font-size:34px;padding:6px 30px;border-radius:999px;background:linear-gradient(135deg,#9a5cff,#ff5aa5)">{x["d"]}</span></div>'
+          f'<div style="text-align:center;font-size:64px;line-height:1.2;height:170px;margin-top:14px;padding:0 10px">{cups}</div>'
+          f'<div style="text-align:center;font-size:44px;margin-top:6px">🌙 <b style="font-family:O">{x["h"]} h</b></div>'
+          f'<div style="margin:12px 40px 0;height:22px;border-radius:11px;background:rgba(255,255,255,.7)"><div style="width:{bar}px;height:100%;border-radius:11px;background:linear-gradient(90deg,#ff6b78,#ffb347)"></div></div>'
+          f'<div style="margin:22px 22px 0;padding:14px 18px;border-radius:26px;background:#fff;font-family:P;font-weight:500;font-size:30px;line-height:1.25;text-align:center">🗣️ {x["says"]}</div>')
+        o+=stp(glass(90+i*(w+24),200,w,640,body,r=44),i+1)
+    return o
+
+@module('rungs')
+def rungs(d):
+    """Vertical ladder, strongest on top. {'phase','title','stops':[{'word','e','gloss','sen','grad'}] weak->strong,'start'}"""
+    S=d['stops']; n=len(S); st=d.get('start',n-1); top0=185; rh=128; gp=14; x0=150; w=1040
+    T=['#6fd79a','#c7e36a','#ffd25a','#ff9a5a','#ff5a6a']
+    o=header(d['phase'],d.get('title','How bad?'),'violet')
+    ys=[top0+(n-1-i)*(rh+gp) for i in range(n)]
+    for i,s_ in enumerate(S):
+        y=ys[i]; c=T[min(i,len(T)-1)]
+        o+=(f'<div class="rgr" data-i="{i}" data-y="{y}" style="position:absolute;left:{x0}px;top:{y}px;width:{w}px;height:{rh}px;cursor:pointer;border-radius:{rh//2}px;background:linear-gradient(90deg,{c}88,{c}33);border:5px solid #fff;box-sizing:border-box;display:flex;align-items:center;padding:0 26px;gap:28px;box-shadow:0 10px 24px rgba(60,30,140,.16)">'
+            f'<span style="font-size:76px;line-height:1">{s_["e"]}</span><span class="chip" style="font-size:46px;padding:6px 32px;border-radius:999px;background:linear-gradient(135deg,{c},{c}cc);color:#1c1b2e;white-space:nowrap">{s_["word"]}</span>'
+            f'<span style="margin-left:auto;font-family:O;font-weight:800;font-size:36px;color:#6a35e8;background:rgba(255,255,255,.7);padding:6px 26px;border-radius:999px;white-space:nowrap">{s_["gloss"]}</span></div>')
+    o+=f'<div class="rgm" style="position:absolute;left:{x0-10}px;top:{ys[st]-10}px;width:{w+20}px;height:{rh+20}px;border-radius:{rh//2+10}px;border:7px solid #9a5cff;box-shadow:0 0 0 6px rgba(154,92,255,.25),0 14px 34px rgba(106,53,232,.35);pointer-events:none;transition:top .55s cubic-bezier(.3,1.4,.5,1)"></div>'
+    o+='<div class="gl" style="left:1230px;top:185px;width:600px;height:706px;border-radius:72px"></div>'
+    for i,s_ in enumerate(S):
+        o+=(f'<div class="rgp" data-i="{i}" style="position:absolute;left:1230px;top:185px;width:600px;height:706px;opacity:{1 if i==st else 0};transition:opacity .3s;pointer-events:none">'
+            f'<div style="text-align:center;font-size:260px;line-height:1;margin-top:60px">{s_["e"]}</div>'
+            f'<div style="margin:34px 40px 0;text-align:center;font-family:O;font-weight:800;font-size:46px;line-height:1.2">{_ul(s_["sen"])}</div></div>')
+    return o
+
+@module('planb')
+def planb(d):
+    """Teacher reference: backup activities. {'phase','title','tiles':[{'e','t','min','use'}]}"""
+    o=header(d['phase'],d.get('title','Plan B'),'amber'); T=d['tiles']; n=len(T); cols=3; w=int((1740-30*(cols-1))/cols); h=330
+    for i,t in enumerate(T):
+        x=90+(i%cols)*(w+30); y=185+(i//cols)*(h+26)
+        o+=glass(x,y,w,h,f'<div style="padding:22px 30px"><div style="font-size:64px;line-height:1">{t["e"]} <span style="font-family:O;font-weight:800;font-size:40px;vertical-align:middle">{t["t"]}</span></div><div style="margin-top:12px"><span class="chip" style="font-size:28px;padding:4px 20px;border-radius:999px;background:linear-gradient(135deg,#9a5cff,#ff5aa5)">{t["min"]}</span></div><div style="font-family:P;font-weight:500;font-size:30px;line-height:1.3;margin-top:14px;color:#4a4a62">{t["use"]}</div></div>',r=44)
     return o
 
 @module('room')
@@ -188,7 +231,7 @@ def comic(d):
     for i,pn in enumerate(P):
         x=90+i*(w+24)
         body=f'<svg viewBox="0 0 400 420" width="{w-30}" style="display:block;margin:12px auto 0">{pn["svg"]}</svg><div style="padding:0 22px;text-align:center;font-family:O;font-weight:800;font-size:34px;line-height:1.15"><span style="color:#9a5cff">{i+1}</span> {pn["cap"]}</div>'
-        o+=stp(glass(x,200,w,590,body,r=48),i+1)
+        o+=stp(glass(x,d.get('y',200),w,d.get('h',590),body,r=48),i+1)
     return o
 
 def _dial_scene(z):
@@ -321,6 +364,7 @@ INIT.choice=function(s){
   else{b.classList.add('nope');wrong(b)}}})});
  show(0)};
 
+INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop')}})};
 /* ---- room of clues ---- */
 INIT.room=function(s){var cap=$('.rcap',s);$('#nx').classList.add('on');$$('.rsp',s).forEach(function(b){b.onclick=function(){b.classList.add('on');cap.textContent=b.dataset.t;P('pop')}})};
 /* ---- dial ---- */
@@ -353,7 +397,7 @@ INIT.case_board=function(s){
  function say(t){try{if(!SXL.say)return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
  function clue(id){return id==='TW'?D.twist:D.clues.filter(function(c){return c.id===id})[0]}
  function fx(){var f={};D.suspects.forEach(function(x){f[x[0]]={f:0,a:0}});Object.keys(ok).forEach(function(id){var c=clue(id),e=c.fx||{};for(var k in e){if(f[k])f[k][e[k]==='for'?'f':'a']++}});return f}
- function txt(c){return c.dials?('<b>'+(c.topic||'')+'</b>'):((D.hunt&&c.short)||c.text||'').replace(/\n/g,'<br>')}
+ function txt(c){return (D.hunt&&c.short)?c.short:(c.dials?('<b>'+(c.topic||'')+'</b>'):(c.text||'').replace(/\n/g,'<br>'))}
  function draw(){
   var tot=D.clues.length,done=Object.keys(ok).filter(function(k){return k!=='TW'}).length;if(D.hunt)cnt.innerHTML='<span class="pgb"><b style="width:'+Math.round(100*done/tot)+'%"></b></span>'+done+' / '+tot+' clues found';else cnt.textContent=(tot-done)+' answers to go';
   var f=fx();sus.innerHTML=D.suspects.map(function(x){return '<div class="cbs'+(won?(x[0]===D.answer?' win':' dim'):'')+'"><b>'+x[2]+'</b><div>'+x[1]+'<div class="mk"><span style="color:#10a98d">'+new Array(f[x[0]].f+1).join('✔')+'</span> <span style="color:#e0306a">'+new Array(f[x[0]].a+1).join('✖')+'</span></div></div></div>'}).join('');
