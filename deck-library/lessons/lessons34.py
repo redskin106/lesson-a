@@ -5,6 +5,13 @@ sys.path.insert(0,str(HERE.parent)); sys.path.insert(0,str(HERE.parent.parent/'l
 import content as K
 from sxl.interactive import build_interactive
 import modules_gallery2 as G2, modules_gallery3 as G3
+from sxl.modules.clue import stick, bubble_svg
+def _cards(cx,base,sc): return f'<rect x="{cx-16*sc}" y="{base-118*sc}" width="{30*sc}" height="{38*sc}" rx="4" fill="#ffc13b" stroke="#1c1b2e" stroke-width="4" transform="rotate(-10 {cx} {base-100*sc})"/>'
+_P1=''.join(stick(x,395,1.15,'hold')+_cards(x,395,1.15) for x in (90,200,310))+'<text x="200" y="95" font-size="72" text-anchor="middle">🤫</text>'
+_P2=stick(85,395,1.25,'throw')+'<circle cx="200" cy="175" r="21" fill="#ff9f1c" stroke="#1c1b2e" stroke-width="4"/><path d="M130 235 Q210 120 300 235" fill="none" stroke="#9a5cff" stroke-width="5" stroke-dasharray="3 12" stroke-linecap="round"/>'+stick(300,395,1.15,'up')+stick(365,395,1.0,'down')+bubble_svg(20,16,330,92,'Have you got\na clue about …?',fs=26,tx=105)
+_P3=stick(100,395,1.15,'hold')+'<text x="150" y="330" font-size="52">📝</text>'+stick(300,395,1.2,'up')+bubble_svg(70,16,320,110,'Yes, we have.\nHer pulse is 104.',fs=26,tx=300)
+_P4=('<rect x="40" y="40" width="320" height="230" rx="24" fill="#fff" stroke="#c9b6ff" stroke-width="5"/>'+''.join(f'<rect x="{62+c*100}" y="{64+r*100}" width="86" height="80" rx="14" fill="{"#2bd9b6" if (r,c)==(0,1) else "#efeaff"}"/>' for r in (0,1) for c in (0,1,2))+'<text x="205" y="125" font-size="46" text-anchor="middle" fill="#fff">✔</text>'+'<text x="250" y="258" font-size="64">👆</text>'+stick(70,395,1.15,'point')+'<text x="270" y="380" font-size="60">📝</text><text x="330" y="380" font-size="60">📝</text>')
+HUNT_COMIC=[dict(svg=_P1,cap='Keep your 3 clues secret.'),dict(svg=_P2,cap='One question per throw.'),dict(svg=_P3,cap='Answer in a full sentence.'),dict(svg=_P4,cap='Teacher taps. Everyone writes.')]
 Q=lambda c,t:(c,t)
 TEAMC=['#e0304a','#2a6ae0','#10a98d','#e89200']
 def lv(items3): return [{'items':i} for i in items3]
@@ -12,22 +19,22 @@ def exch(e,phase='STUDY',**kw):
     fix=lambda it:dict(it,pic='🔁' if e['title'].startswith('How often') else '📅') if len(it['pic'])>4 else it
     d=dict(m='choice',phase=phase,title=e['title'],hint=e['hint'],label='Exercise · '+e['title'],lvl=1,levels=[{'items':[fix(i) for i in e['levels'][k]]} for k in ('bronze','silver','gold')]); d.update(kw); return d
 def board(title,sus,clues,twist,test,ans,reveal,debate,rule=''):
-    return dict(m='case_board',phase='ACTIVATE',title=title,label='Case board · '+title,min=14,teams=[(a,b,c,c2) for (a,b,c),c2 in zip(K.TEAMS,TEAMC)],suspects=sus,clues=[dict(c,topic=c.get('topic') or K.TOPIC3.get(c['id'])) for i in (K.HUNT3 if clues is K.L3_CLUES else K.HUNT4) for c in clues if c['id']==i],hunt=True,frames=K.FRAMES,twist=twist,test=test,answer=ans,reveal=reveal,debate=debate,rule=rule)
+    return dict(m='case_board',phase='ACTIVATE',title=title,label='Case board · '+title,min=14,teams=[(a,b,c,c2) for (a,b,c),c2 in zip(K.TEAMS,TEAMC)],suspects=sus,clues=[dict(c,topic=c.get('topic') or K.TOPIC3.get(c['id']),short=(K.SHORT3 if clues is K.L3_CLUES else K.SHORT4).get(c['id'])) for i in (K.HUNT3 if clues is K.L3_CLUES else K.HUNT4) for c in clues if c['id']==i],hunt=True,frames=K.FRAMES,twist=twist,test=test,answer=ans,reveal=reveal,debate=debate,rule=rule)
 
 # ============================ LESSON 3 ============================
-def _q(pic,q,ans,*wrong): return dict(pic=pic,q=q,opts=[ans,*wrong],ans=ans)
-SYM=[[_q('🤒','Her forehead is as hot as a hot-pot. The thermometer says 39.2.','She has a fever.','She has a rash.','She has a cough.'),
-  _q('😷','He coughs all night. Even the ward cat moves away.','He has a cough.','He has a rash.','He has a fever.'),
-  _q('🔴','Red spots on his arm, just like a strawberry!','He has a rash on his arm.','He has a cough on his arm.','He has a fever on his arm.'),
-  _q('🤕','"Doctor, I studied all night. Now my head is a drum."','He has a headache.','He has a rash.','He has a fever.')],
- [_q('🤒','Hot skin. A pounding head. She wants to lie down.','She has a fever and a headache.','She has a fever and a rash.','She has a cough and a rash.'),
-  _q('🦟','A mosquito bit her at the pond. Now her legs have red spots.','She has a rash on her legs.','She has a cough on her legs.','She has a headache on her legs.'),
-  _q('😷','He coughs. His skin is cool. His head is fine. He says "Do not worry!"','He has a cough, but he does not have a fever.','He has a fever, but he does not have a cough.','He has a cough and a fever.'),
-  _q('💪','Her head hurts. Her eyes hurt. Her muscles hurt. She says "Even my hair hurts."','Her head, her eyes and her muscles hurt.','Her head, her eyes and her muscles hurts.','Her head and her eyes hurt, but her muscles are fine.')],
- [_q('🤒','Fever and headache. She says: "It is only Monday."','She has a fever and a headache.','She have a fever and a headache.','She has fever and headache a.','She has a fever and a cough.'),
-  _q('🦟','A mosquito bit her a week ago. Now she is sick.','She was bitten by a mosquito a week ago.','A mosquito was bitten her a week ago.','She bit a mosquito a week ago.','She was bite by a mosquito.'),
-  _q('🔴','Rash on the arms. No rash on the face. The patient is worried about his selfie.','She has a rash on her arms but not on her face.','She has a rash on her arms but no on her face.','She have rash on arms, not face.','She has a rash on her face but not on her arms.'),
-  _q('🥵','He says: "I only feel a little warm." The thermometer says 41 °C.','He has a very high fever.','He has a low fever.','He have a very high fever.','He has fever very high.')]]
+def _q(pic,q,ans,*wrong,**kw): return dict(pic=pic,q=q,opts=[ans,*wrong],ans=ans,**kw)
+SYM=[[_q('🌡️','What does the nurse write?','She has a fever.','She has a rash.','She has a cough.',say='I am so hot! Can I sleep in the fridge?'),
+  _q('😷','What does the nurse write?','He has a cough.','He has a rash.','He has a fever.',say='Cough, cough! The whole ward is moving away from me.'),
+  _q('🔴','What does the nurse write?','He has a rash on his arm.','He has a cough on his arm.','He has a fever on his arm.',say='Look at my arm! I look like a strawberry!'),
+  _q('🤕','What does the nurse write?','He has a headache.','He has a rash.','He has a fever.',say='I studied all night. Now my head hurts so much!')],
+ [_q('🤒','What does the nurse write?','She has a fever and a headache.','She has a fever and a rash.','She has a cough and a rash.',say='Hot skin. Pounding head. I only want my bed.'),
+  _q('🦟','What does the nurse write?','She has a rash on her legs.','She has a cough on her legs.','She has a headache on her legs.',say='A mosquito bit me at the pond. Now my legs have red spots!'),
+  _q('😷','What does the nurse write?','He has a cough, but he does not have a fever.','He has a fever, but he does not have a cough.','He has a cough and a fever.',say='I cough, but no fever. Do not worry, nurse!'),
+  _q('💪','What does the nurse write?','Her head, her eyes and her muscles hurt.','Her head, her eyes and her muscles hurts.','Her head and her eyes hurt, but her muscles are fine.',say='My head, my eyes, my muscles… even my hair hurts!')],
+ [_q('🤒','What does the nurse write?','She has a fever and a headache.','She have a fever and a headache.','She has fever and headache a.','She has a fever and a cough.',say='Fever and a headache. It is only a cold, nurse!'),
+  _q('🦟','What does the nurse write?','She was bitten by a mosquito a week ago.','A mosquito was bitten her a week ago.','She bit a mosquito a week ago.','She was bite by a mosquito.',say='A mosquito bit me a week ago. Now I am sick.'),
+  _q('🔴','What does the nurse write?','She has a rash on her arms but not on her face.','She has a rash on her arms but no on her face.','She have rash on arms, not face.','She has a rash on her face but not on her arms.',say='Red spots on my arms, but not on my face. Phew!'),
+  _q('🥵','What does the nurse write?','He has a very high fever.','He has a low fever.','He have a very high fever.','He has fever very high.',say='I only feel a little warm. (Thermometer: 41 °C)')]]
 U_PL='×10⁹/L'
 HL=dict(bronze=[
   _q('🌡️','The normal temperature is 37 °C. Her temperature is 39.2 °C. Her temperature is ___ than normal.','higher','lower'),
@@ -40,61 +47,52 @@ HL=dict(bronze=[
   _q('🩸',f'Normal white cells: 4.5 to 11 {U_PL}. Her white cells: 3.1 {U_PL}.','Her white cells are lower than normal.','Her white cells are much higher than normal.','Her white cells are normal.'),
   _q('🌡️','Normal temperature: 37 °C. His temperature: 37.4 °C. He says he feels terrible.','His temperature is only slightly higher than normal. It is not a fever.','His temperature is much higher than normal.','His temperature is lower than normal.')],
  gold=[
-  _q('🥵','A patient says "I feel a little warm." The thermometer says 41 °C. Normal is 37 °C.','His temperature is far higher than normal. It is not a little warm!','His temperature is slightly higher than normal.','His temperature is much lower than normal.','His temperature is normal.'),
+  _q('🥵','A patient says "I feel a little warm." The thermometer says 41 °C. Normal is 37 °C.','His temperature is dangerously higher than normal. It is not a little warm!','His temperature is slightly higher than normal.','His temperature is much lower than normal.','His temperature is normal.'),
   _q('🩸',f'Platelets: 95 {U_PL}. Normal: 150 to 450 {U_PL}.','Her platelets are much lower than the normal range.','Her platelets are much more low than normal.','Her platelets are within the normal range.','Her platelets is lower than normal.'),
   _q('🫁','Breathing: 18 breaths per minute. Normal: 12 to 20 breaths per minute.','Her breathing is within the normal range.','Her breathing is higher than the normal range.','Her breathing is lower than the normal range.','Her breathing is normal than.'),
   _q('💓','A sleeping marathon runner: 48 beats per minute. Normal for most adults: 60 to 100.','His pulse is lower than the normal range, but he is very fit.','His pulse is much higher than normal.','His pulse is normal.','His pulse are lower than normal.')])
-HM=dict(bronze=[
-  _q('💓','Normal: 60 to 100. Her pulse: 104.','It is slightly higher.','It is far higher.'),
-  _q('🌡️','Normal: 37 °C. His temperature: 41 °C.','It is far higher.','It is slightly higher.'),
-  _q('🫁','Normal: 12 to 20. Her breathing: 21.','It is slightly higher.','It is far higher.'),
-  _q('🌡️','Normal: 37 °C. Her temperature: 38 °C.','It is slightly higher.','It is far higher.')],
- silver=[
-  _q('💓','Normal pulse: 60 to 100. Her pulse: 150.','Her pulse is far higher than normal.','Her pulse is slightly higher than normal.','Her pulse is the same as normal.'),
-  _q('🫁','Normal breathing: 12 to 20. His breathing: 21.','His breathing is slightly higher than normal.','His breathing is far higher than normal.','His breathing is lower than normal.'),
-  _q('🩸',f'Normal platelets: 150 to 450 {U_PL}. Hers: 140.','Her platelets are slightly lower than normal.','Her platelets are far lower than normal.','Her platelets are higher than normal.'),
-  _q('🌡️','Normal: 37 °C. Her temperature: 35.0 °C.','Her temperature is lower than normal.','Her temperature is higher than normal.','Her temperature is normal.')],
- gold=[
-  _q('💓','Her pulse is 104. Normal is 60 to 100. Which sentence is best?','Her pulse is only slightly higher than normal, so we watch her.','Her pulse is far higher than normal, so we call the doctor now.','Her pulse is slightly higher normal.','Her pulse are slightly higher than normal.'),
-  _q('🩸',f'Platelets 95 {U_PL}. Normal 150 to 450 {U_PL}. Which sentence is best?','Her platelets are much lower than normal, so we tell the doctor.','Her platelets are slightly higher than normal.','Her platelets much lower than normal.','Her platelets is much lower normal.'),
-  _q('🌡️','Temperature: 37.2 °C. Normal: about 37 °C. Which sentence is best?','Her temperature is about the same as normal.','Her temperature is far higher than normal.','Her temperature is much lower than normal.','Her temperature is about same normal.'),
-  _q('🫁','Breathing: 30 breaths per minute. Normal: 12 to 20. Which sentence is best?','His breathing is far faster than normal. Tell the doctor.','His breathing is slightly faster than normal.','His breathing is normal.','His breathing are far fast than normal.')])
+def _d(e,now,normal,s_,z): return dict(e=e,now=now,normal=normal,s=s_,z=z)
+DIAL_DEMO=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),
+ _d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),
+ _d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6),
+ _d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3)]
+DIAL_LV=[
+ [_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),_d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2)],
+ [_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),_d('🫁','Breathing: 21 breaths per minute','12 to 20 breaths per minute','His breathing is',4),_d('🩸',f'Platelets: 95 {U_PL}',f'150 to 450 {U_PL}','Her platelets are',1),_d('💓','Pulse: 130 beats per minute','60 to 100 beats per minute','Her pulse is',5)],
+ [_d('🌡️','Temperature: 32 °C','about 37 °C','His temperature is',0),_d('💓','Pulse: 42 beats per minute','60 to 100 beats per minute','His pulse is',1),_d('🩸',f'Platelets: 20 {U_PL}',f'150 to 450 {U_PL}','Her platelets are',0),_d('🫁','Breathing: 40 breaths per minute','12 to 20 breaths per minute','Her breathing is',6)]]
 L3=[
  dict(m='cover',label='Cover',tag='NURSING ENGLISH',title='Lesson <span class="grad">3</span>',phases=['Engage','Study','Activate'],active=0,cards=[dict(pic='🩺',x=1010,y=150,w=330,h=430,r=-7),dict(pic='🌡️',x=1380,y=330,w=330,h=430,r=6)]),
  dict(m='vol_ladder',phase='ENGAGE',label='Eyes closed. Louder.',min=3,title='Eyes closed. Louder.',rungs=['fever','39 degrees','she has a rash','it might be dengue!',"IT CAN'T BE FLU!"],side='Everyone, eyes closed, at the same time. Whisper first. Each line is louder.'),
  dict(m='predict',phase='ENGAGE',label='Meet the patient',min=3,title='Meet the patient',cap=False,items=[dict(frames=[dict(e='🧍‍♀️',c='She walks in. She looks hot.'),dict(e='🌡️',c='The nurse takes her temperature.'),dict(e='😟',c='The nurse looks worried.')],q='❓ What is wrong with her?')]),
  dict(m='today',phase='STUDY',label='Today',min=1,emoji='stethoscope',title='Detective nurses',role='Today we are',rows=[[('c4','Ask'),('c3','the right question')],[('c1','Read'),('c3','the numbers')],[('c2','might'),('c4',"can't"),('c3','because')]]),
  dict(m='teach',phase='STUDY',label='Teach · Symptoms',min=2,role='Four symptoms',words=[('🤒','fever'),('🤕','headache'),('😷','cough'),('🔴','rash')]),
- dict(m='teach',phase='STUDY',label='Teach · Symptom sentences',min=2,role='Say it in a sentence',pic='🤒',lines=['She has a fever.','He has a headache.','I have a cough.','She has a rash on her arm.']),
+ dict(m='teach',phase='STUDY',label='Teach · Symptom sentences',min=2,role='Listen to the patient',pic='🤒',tts=True,hint='Tap a line. Listen to the patient. Then say what the nurse writes.',lines=[('She has a fever.','Ohhh… why is it so hot in here? Is the air-con broken?'),('He has a headache.','My head… boom, boom, boom. Like a drum!'),('He has a cough.','Cough, cough… sorry… I sound like a goat!'),('She has a rash on her arm.','Look at my arm! Red spots! Am I turning into a tomato?')]),
  dict(m='choice',phase='STUDY',title='Symptoms',hint='Choose the right word or sentence.',label='Exercise · Symptoms',min=3,lvl=3,levels=lv(SYM)),
- dict(m='teach',phase='STUDY',label='Teach · Higher or lower',min=2,role='Compare with normal',pic='🌡️',lines=['The normal temperature is 37 °C (degrees Celsius).','Her temperature is 39.2 °C.','Her temperature is higher than normal.','She has a fever.']),
- dict(m='teach',phase='STUDY',label='Teach · Slightly, much, far',min=2,role='How much higher?',words=[('🤏','slightly'),('📈','much'),('🚀','far'),('🟰','about the same')]),
- dict(m='teach',phase='STUDY',label='Teach · How much?',min=2,role='How much higher?',pic='💓',lines=['Her pulse is 104. Normal is 60 to 100. It is slightly higher.','Her temperature is 41 °C. Normal is 37 °C. It is far higher.',f'Her platelets are 95 {U_PL}. Normal is 150 to 450. They are much lower.','Her breathing is 18. Normal is 12 to 20. It is about normal.']),
+ dict(m='teach',phase='STUDY',label='Teach · Higher or lower',min=2,role='Compare with normal',pic='🌡️',lines=['The normal temperature is 37 °C.','Her temperature is 39.2 °C.','Her temperature is higher than normal.','She has a fever.']),
+ dict(m='dial',phase='STUDY',label='Teach · The dial (slightly, much, dangerously)',min=3,title='How much higher? How much lower?',items=DIAL_DEMO,hint='Tap the zone. Say the sentence.'),
+ dict(m='teach',phase='STUDY',label='Teach · How much?',min=2,role='How much higher?',pic='💓',lines=['Her pulse is 104. Normal is 60 to 100. It is slightly higher.','Her temperature is 41 °C. Normal is 37 °C. It is dangerously high.',f'Her platelets are 95 {U_PL}. Normal is 150 to 450. They are much lower.','Her breathing is 18. Normal is 12 to 20. It is about normal.']),
  exch(dict(K.L3_EX[1],levels=HL),min=4,lvl=3),
- exch(dict(title='How much?',hint='Slightly, much or far?',levels=HM),min=3,optional=True,lvl=3),
+ dict(m='dial',phase='STUDY',label='Exercise · The dial',min=3,optional=True,title='The dial',lvl=3,levels=[dict(items=x) for x in DIAL_LV],hint='Tap the zone. Say the sentence.'),
  dict(m='teach',phase='STUDY',label='Teach · Might, can\'t, because',min=2,role='Clue → sentence',pic='🦟',lines=['Clue: mosquito bites.','It might be dengue.','Clue: her belly does not hurt.','It can\'t be appendicitis.']),
  exch(K.L3_EX[2],min=3),
- dict(m='teach',phase='STUDY',label='Teach · Ask the patient',min=2,role='Good questions',pic='🩺',lines=['How long have you had a fever?','Where does it hurt?','Do you have a cough?','Have you been bitten by mosquitoes?']),
+ dict(m='teach',phase='STUDY',label='Teach · Ask the patient',min=2,role='Good questions',pic='🩺',lines=['How long have you had a fever?','Where does it hurt?','Do you have a cough?','Did a mosquito bite you?']),
  dict(m='build',phase='STUDY',label='Exercise · Ask the patient (1)',title='Ask the patient',min=3,lvl=1,levels=[dict(pics=['🌡️'],parts=[Q('c4','How'),Q('c4','long'),Q('c2','have'),Q('c1','you'),Q('c2','had'),Q('c3','a fever?')],extra=e) for e in ([],[('c2','did'),('c2','are')],[('c2','did'),('c2','are'),('c4','since'),('c4','for')])]),
- dict(m='build',phase='STUDY',label='Exercise · Ask the patient (2)',title='Ask the patient',min=2,optional=True,lvl=1,levels=[dict(pics=['🦟'],parts=[Q('c4','Have'),Q('c1','you'),Q('c2','been'),Q('c2','bitten'),Q('c3','by mosquitoes?')],extra=e) for e in ([],[('c2','did'),('c2','are')],[('c2','did'),('c2','are'),('c2','bite'),('c4','ever')])]),
+ dict(m='build',phase='STUDY',label='Exercise · Ask the patient (2)',title='Ask the patient',min=2,optional=True,lvl=1,levels=[dict(pics=['🦟'],parts=[Q('c2','Did'),Q('c1','a mosquito'),Q('c4','bite'),Q('c3','you?')],extra=e) for e in ([],[('c2','Have'),('c2','were')],[('c2','Have'),('c2','were'),('c2','bitten'),('c4','bit')])]),
  dict(m='spell',phase='STUDY',label='Extra · Name the illness',optional=True,min=3,title='Name the illness',items=G2.ITEMS,lvl=1,levels=[dict(mode='tiles',showpic=True,decoys=0),dict(mode='tiles',showpic=False,decoys=4),dict(mode='type',showpic=False)]),
  dict(m='odd',phase='STUDY',label='Extra · What is wrong with this chart?',optional=True,min=2,items=G3.CHART,lvl=2,mode='chart'),
  dict(m='frames3',phase='ACTIVATE',label='Your sentences',min=2,title='Your sentences (they stay on the board)',groups=[
-   {'t':'Easy','c':'teal','l':['She has a fever.','Her pulse is 104.','It might be dengue.'],'fs':46},
-   {'t':'Better','c':'sky','l':['Her temperature is higher than normal.',"It can't be appendicitis because her belly does not hurt."],'fs':44},
-   {'t':'Stretch','c':'rose','l':['It is unlikely to be flu because she has no cough.','It is probably dengue, because she has a rash and she had mosquito bites.'],'fs':38}],note='Any sentence that carries the meaning is good.'),
- dict(m='frames3',phase='ACTIVATE',label='How the hunt works',min=2,title='How the hunt works',grad='violet',groups=[
-   {'t':'Your group','c':'violet','l':['You have 3 secret clues on your page.','Keep them secret!','Write every clue you hear on paper.'],'fs':42},
-   {'t':'Each throw','c':'teal','l':['Hold the ball? Ask ONE group.','<b>Have you got …?</b><br><b>What does your clue say about …?</b>','They answer in a full sentence. Then they throw.'],'fs':38},
-   {'t':'Then','c':'rose','l':['Teacher taps the board: the clue appears for everybody.','Everyone argues: which one can\'t it be?'],'fs':42}]),
+   {'t':'Easy','c':'teal','l':['She has a fever.','Her pulse is slightly higher than normal.','It might be dengue.'],'fs':44},
+   {'t':'Better','c':'sky','l':['Her temperature is much higher than normal.',"It can't be appendicitis because her belly does not hurt."],'fs':42},
+   {'t':'Stretch','c':'rose','l':['It is unlikely to be flu because she has no cough.','It is probably dengue, because she has a rash and she had mosquito bites.','Her platelets are much lower than normal.'],'fs':36}],note='Any sentence that carries the meaning is good.'),
+ dict(m='comic',phase='ACTIVATE',label='How the hunt works',min=2,title='How the hunt works',panels=HUNT_COMIC),
  board('Find the illness',K.L3_SUSPECTS,K.L3_CLUES,K.L3_TWIST,K.L3_TEST,K.L3_ANSWER,'<b>It is dengue.</b><br>She has had a fever for three days and a rash on her arms and chest.<br>Her platelets and white cells are lower than normal.<br>She was bitten by mosquitoes a week ago.<br>It can\'t be flu, because she has no cough.<br>It can\'t be appendicitis, because her belly does not hurt.',
    dict(title="Wait… which can't it be?",lines=['Stand at the illness you believe.','Say why in one sentence.','Better reason? Move.']),rule='Say it in a full sentence.'),
  dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L3_BOSS,sec=90),
- dict(m='listen_fix',phase='ACTIVATE',label='Listen and fix (handover)',min=3,title='Listen and fix',items=[
+ dict(m='listen_fix',phase='ACTIVATE',label='Listen and fix (handover)',min=3,optional=True,title='Listen and fix',items=[
    dict(text='Her temperature is lower than normal',say='Her temperature is higher than normal',opts=['lowest','more']),
    dict(text='She has a cough',say='She has no cough',opts=['not','any']),
    dict(text='The rash is on her face',say='The rash is on her chest',opts=['arm','leg'])],lvl=1,levels=[dict(mode='opts'),dict(mode='opts'),dict(mode='type')]),
- dict(m='frames3',phase='ACTIVATE',label='Tell the doctor (handover)',min=8,title='Tell the doctor',h=780,groups=[
+ dict(m='frames3',phase='ACTIVATE',label='Tell the doctor (handover)',min=8,optional=True,title='Tell the doctor',h=780,groups=[
    {'t':'Easy · fill the gaps','c':'teal','l':['A young woman. Day 3 of fever.','Her temperature is ___ than normal.','She has ___ and ___. No ___.','It is probably ___ because ___.'],'fs':34},
    {'t':'Better · S B A','c':'sky','l':['<b>S</b>  Patient: ___. Day ___ of ___.','<b>B</b>  She had ___ last week.','<b>A</b>  It might be ___. It can\'t be ___ because ___.'],'fs':34},
    {'t':'Stretch · your patient','c':'rose','l':['Invent your own patient.','Pick 4 facts. Say <b>S B A</b>.','<b>R</b>  "Please check ___."','Use might · can\'t · because.'],'fs':34}],note='Write it on paper. Then tell your partner.'),
@@ -152,10 +150,7 @@ L4=[
    {'t':'The patient says…','c':'rose','l':['"I only drink two cups."','"I sleep fine."'],'fs':48},
    {'t':'The numbers say…','c':'sky','l':['The café card: 8 cups.','The watch: 3 hours of sleep.'],'fs':48},
    {'t':'You decide','c':'teal','l':['"She says ___, but ___."','Which clue do you believe?'],'fs':48}]),
- dict(m='frames3',phase='ACTIVATE',label='How the hunt works',min=2,title='How the hunt works',grad='violet',groups=[
-   {'t':'Your group','c':'violet','l':['You have 3 secret clues on your page.','Keep them secret!','Write every clue you hear on paper.'],'fs':42},
-   {'t':'Each throw','c':'teal','l':['Hold the ball? Ask ONE group.','<b>Have you got …?</b><br><b>What does your clue say about …?</b>','They answer in a full sentence. Then they throw.'],'fs':38},
-   {'t':'Then','c':'rose','l':['Teacher taps the board: the clue appears for everybody.','Everyone argues: which one can\'t it be?'],'fs':42}]),
+ dict(m='comic',phase='ACTIVATE',label='How the hunt works',min=2,title='How the hunt works',panels=HUNT_COMIC),
  board('Find the reason',K.L4_SUSPECTS,K.L4_CLUES,K.L4_TWIST,K.L4_TEST,K.L4_ANSWER,'<b>It is too much coffee.</b><br>She says she drinks two cups, but the café card says eight.<br>She sleeps only 3 hours, and her pulse is faster than normal.<br>She has no fever and no cough, so it can\'t be flu.<br>She has no stomach problems, so it can\'t be food poisoning.<br>On Sunday she drank no coffee, and she felt much better.',
    dict(title='Wait… is it just stress?',lines=['Stand at the reason you believe.','Say why with a dial.','Better reason? Move.']),rule='At least one dial in every sentence.'),
  dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L4_BOSS,sec=90),

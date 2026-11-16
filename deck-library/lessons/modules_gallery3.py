@@ -7,8 +7,8 @@ C=lambda t,e:dict(t=t,e=e)
 ODD=[dict(cards=[C('fever','🌡️'),C('headache','🤕'),C('rash','🔴'),C('shoe','👟')],odd=3,why='A shoe is not a symptom.'),
      dict(cards=[C('nurse','🧑‍⚕️'),C('doctor','🩺'),C('pharmacist','💊'),C('bus','🚌')],odd=3,why='A bus is not a person who works in a hospital.'),
      dict(cards=[C('syringe','💉'),C('bandage','🩹'),C('thermometer','🌡️'),C('pizza','🍕')],odd=3,why='Pizza is not a medical tool.')]
-CHART=[dict(cards=[dict(t='Temperature',v='37.1 °C'),dict(t='Pulse',v='78 /min'),dict(t='Breathing',v='78 /min'),dict(t='Pain',v='3 / 10')],odd=2,why='Breathing 78 is far too high. Normal is 12 to 20.'),
-       dict(cards=[dict(t='Pulse',v='72 /min'),dict(t='Temperature',v='98.6 °C'),dict(t='Breathing',v='16 /min'),dict(t='Pain',v='2 / 10')],odd=1,why='98.6 is a Fahrenheit number. In °C, normal is about 37.')]
+CHART=[dict(cards=[dict(t='Temperature',v='37.1 °C'),dict(t='Pulse',v='78 beats per minute'),dict(t='Breathing',v='78 breaths per minute'),dict(t='Pain',v='3 out of 10')],odd=2,why='78 breaths per minute is dangerously high. Normal is 12 to 20.'),
+       dict(cards=[dict(t='Pulse',v='72 beats per minute'),dict(t='Temperature',v='98.6 °C'),dict(t='Breathing',v='16 breaths per minute'),dict(t='Pain',v='2 out of 10')],odd=1,why='98.6 is a Fahrenheit number. In °C, normal is about 37 °C.')]
 LF=[dict(text='The patient has a low fever',say='The patient has a high fever',opts=['short','new']),
     dict(text='Take two tablets before meals',say='Take two tablets after meals',opts=['during','with']),
     dict(text='The rash is on his right arm',say='The rash is on his left arm',opts=['back','head'])]

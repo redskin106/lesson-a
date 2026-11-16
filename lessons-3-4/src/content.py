@@ -12,7 +12,7 @@ L3_CLUES=[
  dict(id='A1',team='red',r=1,kind='audio',pic='🎧',ask='How long have you had a fever?',text='Three days.',say='She has had a fever for three days.',fx={}),
  dict(id='A2',team='red',r=2,kind='audio',pic='🎧',ask='Where does it hurt?',text='My head and behind my eyes. My muscles hurt too.',say='Her head, her eyes and her muscles hurt, so it might be flu or dengue. It can\'t be appendicitis.',fx={'dengue':'for','flu':'for','appendix':'against'}),
  dict(id='A3',team='red',r=3,kind='audio',pic='🎧',ask='Do you have a cough?',text='No. No cough.',say='She has no cough, so it is unlikely to be flu or measles.',fx={'flu':'against','measles':'against'}),
- dict(id='A4',team='red',r=4,kind='audio',pic='🎧',ask='Have you been bitten by mosquitoes?',text='Yes, a lot. In the garden by the pond, about a week ago.',say='She was bitten by mosquitoes a week ago, so it might be dengue.',fx={'dengue':'for'}),
+ dict(id='A4',team='red',r=4,kind='audio',pic='🎧',ask='Did a mosquito bite you?',text='Yes, a lot. In the garden by the pond, about a week ago.',say='She was bitten by mosquitoes a week ago, so it might be dengue.',fx={'dengue':'for'}),
  dict(id='B1',team='blue',r=1,kind='number',pic='🌡️',text='Temperature: 39.2 °C   (normal: about 37 °C)',say='Her temperature is 39.2. It is higher than normal, so she has a fever.',fx={'appendix':'against'}),
  dict(id='B2',team='blue',r=2,kind='number',pic='💓',text='Pulse: 104 beats per minute   (normal: 60 – 100)',say='Her pulse is 104. It is a little higher than normal.',fx={}),
  dict(id='B3',team='blue',r=3,kind='number',pic='🩸',text='Platelets 95 ×10⁹/L (normal 150–450)\nWhite cells 3.1 ×10⁹/L (normal 4.5–11)',say='Her platelets and white cells are lower than normal. That fits dengue.',fx={'dengue':'for'},level='silver'),
@@ -167,3 +167,7 @@ TOPIC3=dict(A2='Where it hurts',A3='Cough?',A4='Mosquitoes?',B1='Temperature',B2
 FRAMES=['Have you got …?','What does your clue say about …?','Does the patient have …?']
 # group = clues it holds (3 each)
 def group_clues(clues,hunt,team): return [c for c in clues if c['team']==team and c['id'] in hunt]
+
+# short text shown on the hunt board tile (full wording opens on tap)
+SHORT3=dict(C1='Rash: arms and chest, not face',A3='No cough.',D2='Friend: same food, nobody sick',B1='Temperature 39.2 °C (normal 37 °C)',A4='Mosquito bites a week ago',C3='Belly: soft, no pain',D3='Neighbour: 2 people had a fever',B3='Platelets and white cells: low',A2='Head, eyes and muscles hurt',C2='Eyes: not red, not watery',B2='Pulse 104 (normal 60 to 100)',D1='Measles vaccine: 2 doses')
+SHORT4=dict(G2='No cough.',R1='Coffee: says 2 cups, card says 8',Y3='Lunch: her friends are fine',B1='Stomach: no vomiting',Y2='Sunday, no coffee: much better',G1='Hands shake after coffee',R3='Pulse 108 to 112 (normal 60 to 100)',B3='Headache: 3 out of 10',Y1='Never before the exams',G3='Worried about exams',R2='Sleeps 3 hours',B2='Studies until 2 am')
