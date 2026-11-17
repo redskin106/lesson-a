@@ -26,64 +26,70 @@ P10_02 | Narrator | [calm, clear] Her platelets are ninety-five thousand. Normal
 P10_03 | Narrator | [calm, clear] Her pulse is one hundred and thirty. Normal is sixty to one hundred.
 P10_04 | Narrator | [calm, clear] She breathes forty times a minute. Normal is twelve to twenty.
 P10_05 | Narrator | [calm, clear] Her temperature is thirty-two degrees. Normal is about thirty-seven.
-P11_01 | Narrator | [calm, clear] Her temperature is thirty-nine point two degrees.
-P11_02 | Narrator | [calm, clear] Her pulse is one hundred and four beats a minute.
-P11_03 | Narrator | [calm, clear] She breathes eighteen times a minute.
-P11_04 | Narrator | [calm, clear] Platelets: ninety-five thousand per microlitre.
-P11_05 | Narrator | [calm, clear] Normal is about thirty-seven. Hers is thirty-eight point one.
-P11_06 | Narrator | [calm, clear] Her pulse is forty-eight. Normal is sixty to one hundred.
-P11_07 | Narrator | [calm, clear] White cells: three thousand one hundred per microlitre. Normal is four and a half to eleven thousand.
-P11_08 | Narrator | [calm, clear] She says she feels a little warm. The thermometer says forty-one degrees!
-P11_09 | Narrator | [calm, clear] Breathing: twenty-one breaths a minute. Normal is twelve to twenty.
-P13_01 | Patient | [tired, friendly] Three days.
-P13_02 | Patient | [tired, friendly] Behind my eyes. And my muscles.
-P13_03 | Patient | [tired, friendly] Yes, a lot. By the pond, a week ago.
-P13_04 | Patient | [tired, friendly] No cough. Not once this week.
-P13_05 | Narrator | [calm, clear] It started on Monday. So three days.
-P13_06 | Patient | [tired, friendly] We all ate the same lunch. Nobody else is sick.
-P13_07 | Patient | [tired, friendly] Paracetamol, yesterday. The fever went down, and then it came back.
-P13_08 | Patient | [tired, friendly] Yes. Two people on my street had a fever last week.
-P13_09 | Patient | [tired, friendly] Two doses, in school. I have the card.
-P15_01 | Narrator | [calm, clear] It can't be appendicitis.
-P15_02 | Narrator | [calm, clear] It might be dengue.
-P15_03 | Narrator | [calm, clear] It is dengue.
-P15_04 | Narrator | [calm, clear] It is unlikely to be measles.
-P15_05 | Narrator | [calm, clear] It is probably dengue.
-P15_06 | Narrator | [calm, clear] It might be flu, or it might be dengue.
-P15_07 | Narrator | [calm, clear] It is unlikely to be flu, because she has no cough.
-P15_08 | Narrator | [calm, clear] It is probably dengue, because she has a rash and a mosquito bite.
-P15_09 | Narrator | [calm, clear] It can't be appendicitis, because her belly does not hurt.
-P18_01 | Patient | [tired, friendly] No cough. No runny nose.
-P18_02 | Narrator | [calm, clear] Her belly is soft. It does not hurt.
-P18_03 | Patient | [tired, friendly] We ate the same food. Nobody else is sick.
-P18_04 | Narrator | [calm, clear] She has a fever, but she has no cough.
-P18_05 | Narrator | [calm, clear] Her eyes are not red. They are not watery.
-P18_06 | Narrator | [calm, clear] She had two measles vaccines.
-P18_07 | Patient | [tired, friendly] No cough, so it can not be flu.
-P18_08 | Narrator | [calm, clear] Her belly does not hurt when I press it.
-P18_09 | Patient | [tired, friendly] Fever, rash and mosquito bites. No cough.
-P19_01 | Narrator | [calm, clear] She has a rash, but no fever.
-P19_02 | Narrator | [calm, clear] He has a cough, but he has no fever.
-P19_03 | Patient | [tired, friendly] Although she has a fever, she has no cough.
-P19_04 | Narrator | [calm, clear] She was bitten by mosquitoes, so it might be dengue.
-P19_05 | Narrator | [calm, clear] Her friends ate the same food, so it is unlikely to be food poisoning.
-P19_06 | Patient | [tired, friendly] Although she has a high fever, her pulse is only slightly higher than normal.
-P19_07 | Narrator | [calm, clear] She has a rash, but not on her face, so measles is unlikely.
-P19_08 | Narrator | [calm, clear] Her platelets are low, so it might be dengue, but we need a blood test.
-P22_01 | Patient | [tired, friendly] I have a fever and red spots on my arms. What is wrong with me?
-P22_02 | Patient | [tired, friendly] No cough. No runny nose. But my head and my eyes hurt.
-P22_03 | Patient | [tired, friendly] A mosquito bit me a week ago, by the pond.
-P22_04 | Patient | [tired, friendly] Is it really dengue? How do you know?
-P22_05 | Patient | [tired, friendly] Okay. Please do the test. Quickly, please.
-P23_01 | Patient | [tired, friendly] I only feel a little warm.
-P23_02 | Patient | [tired, friendly] A mosquito? No, never.
-P23_03 | Patient | [tired, friendly] I have a terrible cough.
-P23_04 | Patient | [tired, friendly] My heart is fine. Totally normal.
-P23_05 | Patient | [tired, friendly] I have had a fever for two days.
+P11_01 | Patient | [tired, friendly] Thirty-nine point two! Is that bad, nurse?
+P11_02 | Patient | [tired, friendly] My pulse? One hundred and four. My heart is going crazy!
+P11_03 | Patient | [tired, friendly] I breathe eighteen times a minute. I counted. I was bored.
+P11_04 | Narrator | [calm, clear] The lab says my platelets are ninety-five thousand. Is that a lot?
+P11_05 | Patient | [tired, friendly] Thirty-eight point one. Normal is thirty-seven… so a bit high?
+P11_06 | Patient | [tired, friendly] My pulse is forty-eight. Normal is sixty to one hundred. Am I a robot?
+P11_07 | Patient | [tired, friendly] My white cells are three thousand one hundred. Normal is four and a half to eleven thousand. They are tiny!
+P11_08 | Patient | [tired, friendly] I feel a little warm. What? Forty-one degrees?!
+P11_09 | Patient | [tired, friendly] Twenty-one breaths a minute. Normal is twelve to twenty. Almost normal, no?
+P13_01 | Patient | [tired, friendly] Three days. Three very long days.
+P13_02 | Patient | [tired, friendly] Behind my eyes. And my muscles. Everything hurts!
+P13_03 | Patient | [tired, friendly] Yes! Loads of bites, by the pond, a week ago.
+P13_04 | Patient | [tired, friendly] No cough. Not even a little one.
+P13_05 | Narrator | [calm, clear] It started on Monday. So… three days.
+P13_06 | Patient | [tired, friendly] We all ate the same lunch. Nobody else is sick, thank goodness.
+P13_07 | Patient | [tired, friendly] Paracetamol, yesterday. The fever went down… and then it came back.
+P13_08 | Patient | [tired, friendly] Yes! Two people on my street had a fever last week.
+P13_09 | Patient | [tired, friendly] Two doses, at school. I even kept the card!
+P14_01 | Narrator | [calm, clear] It can't be appendicitis. I am sure.
+P14_02 | Narrator | [calm, clear] It is unlikely to be flu. Maybe one chance in ten.
+P14_03 | Narrator | [calm, clear] It might be dengue. Maybe.
+P14_04 | Narrator | [calm, clear] It is probably dengue. I am nearly sure.
+P14_05 | Narrator | [calm, clear] It is dengue. The test says so.
+P15_01 | Patient | [tired, friendly] Appendicitis? No way. Her belly is fine.
+P15_02 | Patient | [tired, friendly] Dengue? Hmm… it might be dengue. I'm not sure yet.
+P15_03 | Narrator | [calm, clear] It is dengue. The test says so!
+P15_04 | Patient | [tired, friendly] Measles? I doubt it. It is unlikely.
+P15_05 | Patient | [tired, friendly] Dengue? I'm nearly sure. It is probably dengue.
+P15_06 | Narrator | [calm, clear] It might be flu, it might be dengue. I can't decide!
+P15_07 | Patient | [tired, friendly] Flu? Unlikely. She has no cough, you see.
+P15_08 | Patient | [tired, friendly] Dengue, probably! Rash, mosquito bites… it all fits.
+P15_09 | Patient | [tired, friendly] Appendicitis? It can't be. I pressed her belly and she just laughed.
+P18_01 | Patient | [tired, friendly] No cough, no runny nose. Nothing!
+P18_02 | Narrator | [calm, clear] Her belly is soft. She even asked for lunch!
+P18_03 | Patient | [tired, friendly] We ate the same food. Nobody else is sick. Not even the cat!
+P18_04 | Narrator | [calm, clear] She has a fever, but no cough. Strange.
+P18_05 | Narrator | [calm, clear] Her eyes are fine. Not red, not watery.
+P18_06 | Patient | [tired, friendly] Two measles vaccines. She even has the card!
+P18_07 | Patient | [tired, friendly] No cough… so it can not be flu, right?
+P18_08 | Patient | [tired, friendly] I pressed her belly. She just smiled.
+P18_09 | Patient | [tired, friendly] Fever, rash, mosquito bites. No cough. Hmm, hmm, hmm…
+P19_01 | Patient | [tired, friendly] I have a fever, but no cough. Weird, right?
+P19_02 | Patient | [tired, friendly] A rash, but no fever. Strange!
+P19_03 | Narrator | [calm, clear] He coughs all day, but he has no fever.
+P19_04 | Patient | [tired, friendly] Although I feel awful, I still want to go to class!
+P19_05 | Patient | [tired, friendly] Mosquito bites, so it might be dengue.
+P19_06 | Patient | [tired, friendly] My friends ate the same food, so it is probably not food poisoning.
+P19_07 | Patient | [tired, friendly] Although my fever is high, my pulse is only a little fast.
+P19_08 | Patient | [tired, friendly] I have a rash, but not on my face, so measles is unlikely.
+P19_09 | Patient | [tired, friendly] My platelets are low, so maybe dengue. But we need a blood test first.
+P22_01 | Patient | [tired, friendly] I have a fever and red spots on my arms. Am I turning into a tomato?
+P22_02 | Patient | [tired, friendly] No cough. Not even a little one. My cat coughs more than me!
+P22_03 | Patient | [tired, friendly] A mosquito bit me a week ago, by the pond. A big one. Like a helicopter!
+P22_04 | Patient | [tired, friendly] Dengue?! How do you know? Are you a doctor?
+P22_05 | Patient | [tired, friendly] Okay, do the test. But please be quick. My cat is waiting!
+P23_01 | Patient | [tired, friendly] I only feel a little warm. Really!
+P23_02 | Patient | [tired, friendly] A mosquito? Me? Never! I love nature.
+P23_03 | Patient | [tired, friendly] I have a terrible cough. Cough, cough!
+P23_04 | Patient | [tired, friendly] My heart is fine. Totally normal. Stop looking at the monitor!
+P23_05 | Patient | [tired, friendly] I have had a fever for two days. Okay, maybe two and a half.
 P23_06 | Patient | [tired, friendly] Same lunch as my friends. Nobody else is sick.
-P23_07 | Patient | [tired, friendly] My blood is perfect.
-P23_08 | Narrator | [calm, clear] The rash is on my face.
-P23_09 | Patient | [tired, friendly] I took paracetamol and the fever never came back.
+P23_07 | Patient | [tired, friendly] My blood is perfect. I eat vegetables!
+P23_08 | Narrator | [calm, clear] The rash is on my face. Everywhere!
+P23_09 | Patient | [tired, friendly] I took paracetamol and the fever never came back. Never!
 P27_01 | Narrator | [calm, clear] She has a rash on her arms and chest, but not on her face. It might be dengue. It is unlikely to be measles.
 P27_02 | Narrator | [calm, clear] She has no cough, so it is unlikely to be flu or measles.
 P27_03 | Narrator | [calm, clear] Her friends ate the same food and they are not sick, so food poisoning is less likely.
@@ -97,8 +103,3 @@ P27_10 | Narrator | [calm, clear] Her eyes are not red or watery, so it is unlik
 P27_11 | Narrator | [calm, clear] Her pulse is 104. It is a little higher than normal.
 P27_12 | Narrator | [calm, clear] She had two measles vaccines, so measles is unlikely.
 P27_13 | Narrator | [calm, clear] Her sister had flu, so flu is possible. But she has no cough and she has a rash.
-P14_01 | Narrator | [calm, clear] It can't be appendicitis. I am sure.
-P14_02 | Narrator | [calm, clear] It is unlikely to be flu. Maybe one chance in ten.
-P14_03 | Narrator | [calm, clear] It might be dengue. Maybe.
-P14_04 | Narrator | [calm, clear] It is probably dengue. I am nearly sure.
-P14_05 | Narrator | [calm, clear] It is dengue. The test says so.

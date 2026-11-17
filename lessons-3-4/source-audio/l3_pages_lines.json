@@ -111,272 +111,302 @@
  },
  {
   "id": "P11_01",
-  "text": "Her temperature is thirty-nine point two degrees.",
+  "text": "Thirty-nine point two! Is that bad, nurse?",
   "file": "P11_01.mp3"
  },
  {
   "id": "P11_02",
-  "text": "Her pulse is one hundred and four beats a minute.",
+  "text": "My pulse? One hundred and four. My heart is going crazy!",
   "file": "P11_02.mp3"
  },
  {
   "id": "P11_03",
-  "text": "She breathes eighteen times a minute.",
+  "text": "I breathe eighteen times a minute. I counted. I was bored.",
   "file": "P11_03.mp3"
  },
  {
   "id": "P11_04",
-  "text": "Platelets: ninety-five thousand per microlitre.",
+  "text": "The lab says my platelets are ninety-five thousand. Is that a lot?",
   "file": "P11_04.mp3"
  },
  {
   "id": "P11_05",
-  "text": "Normal is about thirty-seven. Hers is thirty-eight point one.",
+  "text": "Thirty-eight point one. Normal is thirty-seven… so a bit high?",
   "file": "P11_05.mp3"
  },
  {
   "id": "P11_06",
-  "text": "Her pulse is forty-eight. Normal is sixty to one hundred.",
+  "text": "My pulse is forty-eight. Normal is sixty to one hundred. Am I a robot?",
   "file": "P11_06.mp3"
  },
  {
   "id": "P11_07",
-  "text": "White cells: three thousand one hundred per microlitre. Normal is four and a half to eleven thousand.",
+  "text": "My white cells are three thousand one hundred. Normal is four and a half to eleven thousand. They are tiny!",
   "file": "P11_07.mp3"
  },
  {
   "id": "P11_08",
-  "text": "She says she feels a little warm. The thermometer says forty-one degrees!",
+  "text": "I feel a little warm. What? Forty-one degrees?!",
   "file": "P11_08.mp3"
  },
  {
   "id": "P11_09",
-  "text": "Breathing: twenty-one breaths a minute. Normal is twelve to twenty.",
+  "text": "Twenty-one breaths a minute. Normal is twelve to twenty. Almost normal, no?",
   "file": "P11_09.mp3"
  },
  {
   "id": "P13_01",
-  "text": "Three days.",
+  "text": "Three days. Three very long days.",
   "file": "P13_01.mp3"
  },
  {
   "id": "P13_02",
-  "text": "Behind my eyes. And my muscles.",
+  "text": "Behind my eyes. And my muscles. Everything hurts!",
   "file": "P13_02.mp3"
  },
  {
   "id": "P13_03",
-  "text": "Yes, a lot. By the pond, a week ago.",
+  "text": "Yes! Loads of bites, by the pond, a week ago.",
   "file": "P13_03.mp3"
  },
  {
   "id": "P13_04",
-  "text": "No cough. Not once this week.",
+  "text": "No cough. Not even a little one.",
   "file": "P13_04.mp3"
  },
  {
   "id": "P13_05",
-  "text": "It started on Monday. So three days.",
+  "text": "It started on Monday. So… three days.",
   "file": "P13_05.mp3"
  },
  {
   "id": "P13_06",
-  "text": "We all ate the same lunch. Nobody else is sick.",
+  "text": "We all ate the same lunch. Nobody else is sick, thank goodness.",
   "file": "P13_06.mp3"
  },
  {
   "id": "P13_07",
-  "text": "Paracetamol, yesterday. The fever went down, and then it came back.",
+  "text": "Paracetamol, yesterday. The fever went down… and then it came back.",
   "file": "P13_07.mp3"
  },
  {
   "id": "P13_08",
-  "text": "Yes. Two people on my street had a fever last week.",
+  "text": "Yes! Two people on my street had a fever last week.",
   "file": "P13_08.mp3"
  },
  {
   "id": "P13_09",
-  "text": "Two doses, in school. I have the card.",
+  "text": "Two doses, at school. I even kept the card!",
   "file": "P13_09.mp3"
  },
  {
+  "id": "P14_01",
+  "text": "It can't be appendicitis. I am sure.",
+  "file": "P14_01.mp3"
+ },
+ {
+  "id": "P14_02",
+  "text": "It is unlikely to be flu. Maybe one chance in ten.",
+  "file": "P14_02.mp3"
+ },
+ {
+  "id": "P14_03",
+  "text": "It might be dengue. Maybe.",
+  "file": "P14_03.mp3"
+ },
+ {
+  "id": "P14_04",
+  "text": "It is probably dengue. I am nearly sure.",
+  "file": "P14_04.mp3"
+ },
+ {
+  "id": "P14_05",
+  "text": "It is dengue. The test says so.",
+  "file": "P14_05.mp3"
+ },
+ {
   "id": "P15_01",
-  "text": "It can't be appendicitis.",
+  "text": "Appendicitis? No way. Her belly is fine.",
   "file": "P15_01.mp3"
  },
  {
   "id": "P15_02",
-  "text": "It might be dengue.",
+  "text": "Dengue? Hmm… it might be dengue. I'm not sure yet.",
   "file": "P15_02.mp3"
  },
  {
   "id": "P15_03",
-  "text": "It is dengue.",
+  "text": "It is dengue. The test says so!",
   "file": "P15_03.mp3"
  },
  {
   "id": "P15_04",
-  "text": "It is unlikely to be measles.",
+  "text": "Measles? I doubt it. It is unlikely.",
   "file": "P15_04.mp3"
  },
  {
   "id": "P15_05",
-  "text": "It is probably dengue.",
+  "text": "Dengue? I'm nearly sure. It is probably dengue.",
   "file": "P15_05.mp3"
  },
  {
   "id": "P15_06",
-  "text": "It might be flu, or it might be dengue.",
+  "text": "It might be flu, it might be dengue. I can't decide!",
   "file": "P15_06.mp3"
  },
  {
   "id": "P15_07",
-  "text": "It is unlikely to be flu, because she has no cough.",
+  "text": "Flu? Unlikely. She has no cough, you see.",
   "file": "P15_07.mp3"
  },
  {
   "id": "P15_08",
-  "text": "It is probably dengue, because she has a rash and a mosquito bite.",
+  "text": "Dengue, probably! Rash, mosquito bites… it all fits.",
   "file": "P15_08.mp3"
  },
  {
   "id": "P15_09",
-  "text": "It can't be appendicitis, because her belly does not hurt.",
+  "text": "Appendicitis? It can't be. I pressed her belly and she just laughed.",
   "file": "P15_09.mp3"
  },
  {
   "id": "P18_01",
-  "text": "No cough. No runny nose.",
+  "text": "No cough, no runny nose. Nothing!",
   "file": "P18_01.mp3"
  },
  {
   "id": "P18_02",
-  "text": "Her belly is soft. It does not hurt.",
+  "text": "Her belly is soft. She even asked for lunch!",
   "file": "P18_02.mp3"
  },
  {
   "id": "P18_03",
-  "text": "We ate the same food. Nobody else is sick.",
+  "text": "We ate the same food. Nobody else is sick. Not even the cat!",
   "file": "P18_03.mp3"
  },
  {
   "id": "P18_04",
-  "text": "She has a fever, but she has no cough.",
+  "text": "She has a fever, but no cough. Strange.",
   "file": "P18_04.mp3"
  },
  {
   "id": "P18_05",
-  "text": "Her eyes are not red. They are not watery.",
+  "text": "Her eyes are fine. Not red, not watery.",
   "file": "P18_05.mp3"
  },
  {
   "id": "P18_06",
-  "text": "She had two measles vaccines.",
+  "text": "Two measles vaccines. She even has the card!",
   "file": "P18_06.mp3"
  },
  {
   "id": "P18_07",
-  "text": "No cough, so it can not be flu.",
+  "text": "No cough… so it can not be flu, right?",
   "file": "P18_07.mp3"
  },
  {
   "id": "P18_08",
-  "text": "Her belly does not hurt when I press it.",
+  "text": "I pressed her belly. She just smiled.",
   "file": "P18_08.mp3"
  },
  {
   "id": "P18_09",
-  "text": "Fever, rash and mosquito bites. No cough.",
+  "text": "Fever, rash, mosquito bites. No cough. Hmm, hmm, hmm…",
   "file": "P18_09.mp3"
  },
  {
   "id": "P19_01",
-  "text": "She has a rash, but no fever.",
+  "text": "I have a fever, but no cough. Weird, right?",
   "file": "P19_01.mp3"
  },
  {
   "id": "P19_02",
-  "text": "He has a cough, but he has no fever.",
+  "text": "A rash, but no fever. Strange!",
   "file": "P19_02.mp3"
  },
  {
   "id": "P19_03",
-  "text": "Although she has a fever, she has no cough.",
+  "text": "He coughs all day, but he has no fever.",
   "file": "P19_03.mp3"
  },
  {
   "id": "P19_04",
-  "text": "She was bitten by mosquitoes, so it might be dengue.",
+  "text": "Although I feel awful, I still want to go to class!",
   "file": "P19_04.mp3"
  },
  {
   "id": "P19_05",
-  "text": "Her friends ate the same food, so it is unlikely to be food poisoning.",
+  "text": "Mosquito bites, so it might be dengue.",
   "file": "P19_05.mp3"
  },
  {
   "id": "P19_06",
-  "text": "Although she has a high fever, her pulse is only slightly higher than normal.",
+  "text": "My friends ate the same food, so it is probably not food poisoning.",
   "file": "P19_06.mp3"
  },
  {
   "id": "P19_07",
-  "text": "She has a rash, but not on her face, so measles is unlikely.",
+  "text": "Although my fever is high, my pulse is only a little fast.",
   "file": "P19_07.mp3"
  },
  {
   "id": "P19_08",
-  "text": "Her platelets are low, so it might be dengue, but we need a blood test.",
+  "text": "I have a rash, but not on my face, so measles is unlikely.",
   "file": "P19_08.mp3"
  },
  {
+  "id": "P19_09",
+  "text": "My platelets are low, so maybe dengue. But we need a blood test first.",
+  "file": "P19_09.mp3"
+ },
+ {
   "id": "P22_01",
-  "text": "I have a fever and red spots on my arms. What is wrong with me?",
+  "text": "I have a fever and red spots on my arms. Am I turning into a tomato?",
   "file": "P22_01.mp3"
  },
  {
   "id": "P22_02",
-  "text": "No cough. No runny nose. But my head and my eyes hurt.",
+  "text": "No cough. Not even a little one. My cat coughs more than me!",
   "file": "P22_02.mp3"
  },
  {
   "id": "P22_03",
-  "text": "A mosquito bit me a week ago, by the pond.",
+  "text": "A mosquito bit me a week ago, by the pond. A big one. Like a helicopter!",
   "file": "P22_03.mp3"
  },
  {
   "id": "P22_04",
-  "text": "Is it really dengue? How do you know?",
+  "text": "Dengue?! How do you know? Are you a doctor?",
   "file": "P22_04.mp3"
  },
  {
   "id": "P22_05",
-  "text": "Okay. Please do the test. Quickly, please.",
+  "text": "Okay, do the test. But please be quick. My cat is waiting!",
   "file": "P22_05.mp3"
  },
  {
   "id": "P23_01",
-  "text": "I only feel a little warm.",
+  "text": "I only feel a little warm. Really!",
   "file": "P23_01.mp3"
  },
  {
   "id": "P23_02",
-  "text": "A mosquito? No, never.",
+  "text": "A mosquito? Me? Never! I love nature.",
   "file": "P23_02.mp3"
  },
  {
   "id": "P23_03",
-  "text": "I have a terrible cough.",
+  "text": "I have a terrible cough. Cough, cough!",
   "file": "P23_03.mp3"
  },
  {
   "id": "P23_04",
-  "text": "My heart is fine. Totally normal.",
+  "text": "My heart is fine. Totally normal. Stop looking at the monitor!",
   "file": "P23_04.mp3"
  },
  {
   "id": "P23_05",
-  "text": "I have had a fever for two days.",
+  "text": "I have had a fever for two days. Okay, maybe two and a half.",
   "file": "P23_05.mp3"
  },
  {
@@ -386,17 +416,17 @@
  },
  {
   "id": "P23_07",
-  "text": "My blood is perfect.",
+  "text": "My blood is perfect. I eat vegetables!",
   "file": "P23_07.mp3"
  },
  {
   "id": "P23_08",
-  "text": "The rash is on my face.",
+  "text": "The rash is on my face. Everywhere!",
   "file": "P23_08.mp3"
  },
  {
   "id": "P23_09",
-  "text": "I took paracetamol and the fever never came back.",
+  "text": "I took paracetamol and the fever never came back. Never!",
   "file": "P23_09.mp3"
  },
  {
@@ -463,30 +493,5 @@
   "id": "P27_13",
   "text": "Her sister had flu, so flu is possible. But she has no cough and she has a rash.",
   "file": "P27_13.mp3"
- },
- {
-  "id": "P14_01",
-  "text": "It can't be appendicitis. I am sure.",
-  "file": "P14_01.mp3"
- },
- {
-  "id": "P14_02",
-  "text": "It is unlikely to be flu. Maybe one chance in ten.",
-  "file": "P14_02.mp3"
- },
- {
-  "id": "P14_03",
-  "text": "It might be dengue. Maybe.",
-  "file": "P14_03.mp3"
- },
- {
-  "id": "P14_04",
-  "text": "It is probably dengue. I am nearly sure.",
-  "file": "P14_04.mp3"
- },
- {
-  "id": "P14_05",
-  "text": "It is dengue. The test says so.",
-  "file": "P14_05.mp3"
  }
 ]
