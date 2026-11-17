@@ -38,7 +38,7 @@ def chat_markup(d, sid):
         left = s in ('N', 'D'); a = EM(av.get(s, AV[s]))
         if isinstance(c, dict) and 'say' in c:
             import html as _h
-            inner = (f'<div class="vm" data-say="{_h.escape(c["say"], quote=True)}" style="cursor:pointer;display:flex;align-items:center;gap:20px;max-width:1150px"><span style="font-size:60px;line-height:1">🔊</span>'
+            inner = (f'<div class="vm" data-say="{_h.escape(c["say"], quote=True)}" style="cursor:pointer;display:flex;align-items:center;gap:20px;max-width:1150px"><span style="font-size:60px;line-height:1"><i class="sico"></i></span>'
                      f'<span class="wv" style="font-family:O;font-weight:800;font-size:44px;letter-spacing:4px;color:#9a5cff">▁▃▅▇▅▃▁▃▅▇▅▃▁▃▅</span>'
                      f'<span class="tx" style="font-family:O;font-weight:800;font-size:40px;line-height:1.15;color:#1c1b2e">{_h.escape(c["say"])}</span></div>'); gaps = []
         elif isinstance(c, dict):
@@ -88,7 +88,7 @@ def sort_markup(d, sid):
         y = int(top + i * step); pre = r.get('pre', ('c1', 'You')) if r.get('pre', 1) else None; end = r.get('end')
         a = r.get('ans', [plain[i][1]]); a = [a] if isinstance(a, str) else a
         ph = pic(180, y, h, h, r['pic'], r=int(h * .23)); j = ph.index(' ', ph.index('<')); ph = ph[:j] + f' data-rp="{i}" class="rp"' + ph[j:] if 'class="' not in ph[:ph.index('>')] else ph.replace('class="', f'data-rp="{i}" class="rp ', 1)
-        out += num(90, y + h // 2 - 32, i + 1) + ph + f'<img class="spk" data-i="{i}" src="{EM("sparkles")}" style="left:{180 + h - 80}px;top:{y - 20}px;width:120px">'
+        out += num(90, y + h // 2 - 32, i + 1) + ph + f'<img class="sico" data-i="{i}" src="{EM("sparkles")}" style="left:{180 + h - 80}px;top:{y - 20}px;width:120px">'
         x0 = 180 + h + 40
         def slot(k, cls, col, w):
             return (f'<span class="slot" data-i="{i}" data-t="{a[k]}"><span class="op">{gap(col, w, "…", h=gh)}</span>'

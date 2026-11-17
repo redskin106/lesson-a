@@ -28,9 +28,9 @@ def vol_ladder(d):
         fs=50+int(i*46/max(1,n-1)); x=100+i*(62 if n>4 else 80); y=int(Y0)
         nl=t.count('<br>')+1; Y0+=nl*fs*(1.3 if nl>1 else 1.15)+22+(34 if n>4 else 44)
         clip=_clip((d.get('clips') or [None]*n)[i]) if d.get('clips') else None
-        btn=(f'<button class="vsp{"" if clip else " mute"}" data-a="{clip or ""}" style="width:{fs+40}px;height:{fs+40}px;font-size:{int(fs*.8)}px">🔊</button>' if d.get('clips') else '')
+        btn=(f'<button class="vsp{"" if clip else " mute"}" data-a="{clip or ""}" style="width:{fs+40}px;height:{fs+40}px"><i class="sico"></i></button>' if d.get('clips') else '')
         o+=stp(f'<div class="a" style="left:{x}px;top:{y}px;display:flex;align-items:center;gap:26px">{grad_chip("violet" if i<n-1 else "rose",t,fs,"8px 40px")}{btn}</div>',i+1,pills=True)
-    o+=stp(glass(1180,190,650,640,f'<div style="font-size:150px;text-align:center;margin-top:50px">{d.get("emoji","🙈")}</div><div style="font-family:P;font-weight:500;font-size:42px;line-height:1.45;padding:10px 46px;text-align:center">{d["side"]}</div>',r=56),n+1)
+    o+=stp(glass(1180,190,650,640,f'<div style="font-size:150px;text-align:center;margin-top:20px">{('<img src="'+ART+d['emoji']+'" style="width:300px;height:300px;object-fit:contain;border-radius:36px;background:#fff">') if _isart(d.get('emoji')) else d.get("emoji","🙈")}</div><div style="font-family:P;font-weight:500;font-size:42px;line-height:1.45;padding:10px 46px;text-align:center">{d["side"]}</div>',r=56),n+1)
     return o
 
 @module('dials3')
@@ -55,12 +55,12 @@ def frames3(d):
         BH=232; GP=20
         for i,g in enumerate(G):
             y=172+i*(BH+GP); ic,_,lab=g['t'].partition(' ')
-            rows=''.join('<div style="flex:1;min-height:0;border-radius:999px;background:rgba(255,255,255,.62);border:3px solid #fff;display:flex;align-items:center;gap:12px;padding:0 30px;box-shadow:0 6px 16px rgba(60,30,140,.10)">'+''.join(f'<span style="padding:4px 24px 6px;border-radius:999px;background:{CH[k][0]};color:{CH[k][1]};font-family:O;font-weight:800;font-size:35px;white-space:nowrap;box-shadow:0 5px 10px rgba(60,30,140,.18)">{w_}</span>' for w_,k in row)+'</div>' for row in d['chips'][i])
+            rows=''.join(('<div' if j==0 else '<div data-s="%d"'%(3*i+j+1))+' style="flex:1;min-height:0;border-radius:999px;background:rgba(255,255,255,.62);border:3px solid #fff;display:flex;align-items:center;gap:12px;padding:0 30px;box-shadow:0 6px 16px rgba(60,30,140,.10)">'+''.join(f'<span style="padding:4px 24px 6px;border-radius:999px;background:{CH[k][0]};color:{CH[k][1]};font-family:O;font-weight:800;font-size:35px;white-space:nowrap;box-shadow:0 5px 10px rgba(60,30,140,.18)">{w_}</span>' for w_,k in row)+'</div>' for j,row in enumerate(d['chips'][i]))
             body=(f'<div style="height:100%;box-sizing:border-box;display:flex;align-items:center;gap:30px;padding:18px 28px">'
                   f'<div style="flex:none;width:230px;text-align:center"><div style="display:inline-block;width:104px;height:104px;border-radius:50%;background:#fff;font-size:66px;line-height:104px;box-shadow:0 8px 20px rgba(60,30,140,.18)">{ic}</div><div style="margin-top:8px">{grad_chip(g.get("c","violet"),lab,38,"4px 26px")}</div></div>'
                   f'<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:10px">{rows}</div></div>')
-            o+=stp(glass(90,y,1740,BH,body,r=56),i+1)
-        if d.get('note'): o+=stp(f'<div class="a mu" style="left:90px;top:{172+3*(BH+GP)-6}px;width:1740px;text-align:center;font-size:30px">{d["note"]}</div>',4)
+            o+=stp(glass(90,y,1740,BH,body,r=56),3*i+1)
+        if d.get('note'): o+=stp(f'<div class="a mu" style="left:90px;top:{172+3*(BH+GP)-6}px;width:1740px;text-align:center;font-size:30px">{d["note"]}</div>',10)
         return o
     if d.get('bubbles'):
         AC={'teal':'#10a98d','sky':'#4f86f0','rose':'#e0306a','amber':'#e8a21a','violet':'#7a45f0'}; nr=max(len(g['l']) for g in G); bh=int((h-330-(nr-1)*18)/nr)
@@ -121,9 +121,9 @@ def choice_html(d,sid):
         o+='<div class="chi" style="display:none">'
         if it.get('say') and it.get('grid') and (it.get('aud') or d.get('aud')):
             cells=''.join(f'<div style="text-align:center"><div style="font-family:O;font-weight:800;font-size:28px;color:#6a35e8">{a_}</div><div style="font-size:{it.get("gfs",48)}px;line-height:1.2;margin-top:8px">{b_}</div></div>' for a_,b_ in it['grid'])
-            o+=glass(90,180,630,750,f'<div style="height:100%;display:flex;flex-direction:column;justify-content:center;gap:70px;padding:0 14px"><div class="caud" data-say="{it["say"]}" style="margin:0 24px;padding:48px 20px;border-radius:48px;background:#fff;border:5px solid #d9c8ff;text-align:center;font-family:O;font-weight:800;font-size:54px;cursor:pointer">🔊 Tap to listen</div><div style="display:flex;justify-content:space-around;align-items:flex-start">{cells}</div></div>',r=56)
+            o+=glass(90,180,630,750,f'<div style="height:100%;display:flex;flex-direction:column;justify-content:center;gap:70px;padding:0 14px"><div class="caud" data-say="{it["say"]}" style="margin:0 24px;padding:48px 20px;border-radius:48px;background:#fff;border:5px solid #d9c8ff;text-align:center;font-family:O;font-weight:800;font-size:54px;cursor:pointer"><i class="sico"></i> Tap to listen</div><div style="display:flex;justify-content:space-around;align-items:flex-start">{cells}</div></div>',r=56)
         elif it.get('say') and (it.get('aud') or d.get('aud')):
-            sv=(f'<svg viewBox="0 0 630 750" width="630" style="display:block"><rect x="24" y="26" width="582" height="704" rx="44" fill="#fff"/><image href="{ART}{it["pic"]}" x="40" y="170" width="550" height="560" preserveAspectRatio="xMidYMid meet"/>{bubble_svg(52,44,170,120,"🔊",fs=72,tx=120)}</svg>' if _isart(it.get("pic")) else f'<svg viewBox="0 0 630 750" width="630" style="display:block">{bubble_svg(110,250,170,120,"🔊",fs=72,tx=200)}{stick(230,715,1.85,"hold")}<text x="395" y="600" font-size="150">{it.get("pic","")}</text></svg>')
+            sv=(f'<svg viewBox="0 0 630 750" width="630" style="display:block"><rect x="24" y="26" width="582" height="704" rx="44" fill="#fff"/><image href="{ART}{it["pic"]}" x="40" y="170" width="550" height="560" preserveAspectRatio="xMidYMid meet"/>{bubble_svg(52,44,170,120,"",fs=72,tx=120)}{spkg(52+170/2,44+120/2,84)}</svg>' if _isart(it.get("pic")) else f'<svg viewBox="0 0 630 750" width="630" style="display:block">{bubble_svg(110,250,170,120,"",fs=72,tx=200)}{spkg(110+170/2,250+120/2,84)}{stick(230,715,1.85,"hold")}<text x="395" y="600" font-size="150">{it.get("pic","")}</text></svg>')
             o+=glass(90,180,630,750,sv,r=56)+f'<div class="caud" data-say="{it["say"]}" style="position:absolute;left:{(130 if _isart(it.get('pic')) else 190)}px;top:{(214 if _isart(it.get('pic')) else 420)}px;width:230px;height:170px;z-index:4;cursor:pointer;border-radius:40px"></div>'
         elif it.get('say'):
             sv=(f'<svg viewBox="0 0 630 750" width="630" style="display:block"><rect x="24" y="26" width="582" height="704" rx="44" fill="#fff"/><image href="{ART}{it["pic"]}" x="40" y="170" width="550" height="560" preserveAspectRatio="xMidYMid meet"/>{bubble_svg(40,40,550,200,it["say"],fs=42,tx=215)}</svg>' if _isart(it.get("pic")) else f'<svg viewBox="0 0 630 750" width="630" style="display:block">{bubble_svg(24,26,582,290,it["say"],fs=42,tx=230)}{stick(230,715,1.85,"hold")}<text x="395" y="600" font-size="150">{it.get("pic","")}</text></svg>')
@@ -172,7 +172,8 @@ def teach(d):
         for i,(e,t) in enumerate(C):
             x=90+i*(w+30); sa=f' data-say="{t}"' if tts else ''
             ea=(f'<div style="position:absolute;left:18px;right:18px;top:18px;bottom:150px;border-radius:42px;overflow:hidden">{_artimg(e,42)}</div>' if _isart(e) else f'<div style="position:absolute;left:0;right:0;top:90px;text-align:center;font-size:{int(w*.5)}px;line-height:1">{e}</div>')
-            o+=stp(f'<div class="gl tch"{sa} style="left:{x}px;top:190px;width:{w}px;height:740px;border-radius:56px">{ea}<div style="position:absolute;left:0;right:0;bottom:50px;text-align:center;font-family:O;font-weight:800;font-size:68px">{_ul(t)}</div></div>',i+1)
+            o+=stp(f'<div class="gl tch"{sa} style="left:{x}px;top:190px;width:{w}px;height:740px;border-radius:56px">{ea}</div>',2*i+1)
+            o+=stp(f'<div class="a" style="left:{x}px;top:{190+740-140}px;width:{w}px;text-align:center;font-family:O;font-weight:800;font-size:68px;line-height:1.1">{_ul(t)}</div>',2*i+2)
     else:
         L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,740,56).replace('class="gl"','class="gl tpic"',1)
         sh=lambda x:(x['t'] if isinstance(x,dict) else x[0] if isinstance(x,(tuple,list)) else x).replace('<span','').replace('</span>','')
@@ -181,7 +182,7 @@ def teach(d):
         for i,t in enumerate(L):
             y=190+i*int(740/len(L)); h=int(740/len(L))-26; ex=''
             if isinstance(t,(tuple,list)):
-                body=f'<div style="flex:1;display:flex;align-items:center;gap:26px"><span class="sp" style="font-size:64px">🔊</span><div><div class="pt" style="display:none;font-family:P;font-weight:500;font-size:30px;color:#6a35e8;margin-bottom:6px">{t[1]}</div><div class="an" style="display:none">{_ul(t[0])}</div></div></div>'; sa=f' data-say="{t[1]}" data-seq="1"'
+                body=f'<div style="flex:1;display:flex;align-items:center;gap:26px"><span class="sp" style="font-size:64px"><i class="sico"></i></span><div><div class="pt" style="display:none;font-family:P;font-weight:500;font-size:30px;color:#6a35e8;margin-bottom:6px">{t[1]}</div><div class="an" style="display:none">{_ul(t[0])}</div></div></div>'; sa=f' data-say="{t[1]}" data-seq="1"'
             elif isinstance(t,dict): body=('<span style="flex:none;margin-right:26px;padding:6px 22px;border-radius:999px;background:#fff;font-size:30px;color:#6a35e8">'+t['k']+'</span>' if t.get('k') else '')+'<div>'+_ul(t['t'])+'</div>'; sa=''; ex=BG.get(t.get('c'),'')
             else: body='<div>'+_ul(t)+'</div>'; sa=f' data-say="{t}"' if tts else ''
             if d.get('pics'): sa+=f' data-pic="{ART+d["pics"][i] if _isart(d["pics"][i]) else d["pics"][i]}"'
@@ -283,6 +284,10 @@ def stick(cx,base,sc=1.0,pose='down',col='#1c1b2e'):
     g+=f'<line x1="{cx}" y1="{hip}" x2="{cx-26*sc}" y2="{base}"/><line x1="{cx}" y1="{hip}" x2="{cx+26*sc}" y2="{base}"/></g>'
     g+=f'<circle cx="{cx-8*sc}" cy="{hy-3*sc}" r="{2.6*sc}" fill="{col}"/><circle cx="{cx+8*sc}" cy="{hy-3*sc}" r="{2.6*sc}" fill="{col}"/><path d="M{cx-8*sc} {hy+9*sc} Q{cx} {hy+15*sc} {cx+8*sc} {hy+9*sc}" stroke="{col}" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
     return g
+
+def spkg(cx,cy,sz):
+    k=sz/24
+    return f'<g transform="translate({cx-12*k+0.7*k},{cy-12*k}) scale({k})"><path d="M3 9v6h4l5 4V5L7 9z" fill="#6a35e8"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.2 5.6a9 9 0 0 1 0 12.8" fill="none" stroke="#6a35e8" stroke-width="2.2" stroke-linecap="round"/></g>'
 
 def bubble_svg(x,y,w,h,text,fs=21,tail='down',tx=None):
     import textwrap
@@ -392,7 +397,7 @@ BUILD_EXT['case_board']=case_board_html
 # ---------------- CSS ----------------
 EXT_CSS.append("""
 .ptr.hid{justify-content:center}.ptr.hid .ptx{display:none}.ptr.hid:after{content:'?';font-size:54px}.ptr.hid{pointer-events:none}
-.vsp{border:5px solid #fff;border-radius:50%;background:linear-gradient(135deg,#ffd27a,#ff9fb8);box-shadow:0 10px 24px rgba(60,30,140,.25);cursor:pointer;line-height:1;padding:0;flex-shrink:0}.vsp.mute{opacity:.55}.vsp:active{transform:scale(.94)}
+.sico{display:inline-block;width:1em;height:1em;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M3 9v6h4l5 4V5L7 9z' fill='%236a35e8'/><path d='M15.5 8.5a5 5 0 0 1 0 7M18.2 5.6a9 9 0 0 1 0 12.8' fill='none' stroke='%236a35e8' stroke-width='2.2' stroke-linecap='round'/></svg>") center/contain no-repeat;vertical-align:-.14em;flex:none}.vsp{display:flex;align-items:center;justify-content:center}.vsp .sico{width:58%;height:58%}.vsp{border:5px solid #fff;border-radius:50%;background:linear-gradient(135deg,#ffd27a,#ff9fb8);box-shadow:0 10px 24px rgba(60,30,140,.25);cursor:pointer;line-height:1;padding:0;flex-shrink:0}.vsp.mute{opacity:.55}.vsp:active{transform:scale(.94)}
 .mdls{position:absolute;left:50%;top:44px;transform:translateX(-50%);display:flex;gap:18px;z-index:6}
 .mdl{width:74px;height:74px;border-radius:50%;border:5px solid rgba(255,255,255,.9);box-shadow:0 10px 24px rgba(60,30,140,.28),inset 0 4px 0 rgba(255,255,255,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;opacity:.5;transition:transform .25s,opacity .25s}
 .mdl i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.95);display:block}
@@ -424,7 +429,7 @@ g.dz{stroke:none}g.dz.dim{opacity:1;filter:grayscale(.85) brightness(1.1)}.dz{cu
 .cbtw{left:1190px;top:858px;width:640px;font-family:O;font-weight:800;font-size:27px;line-height:1.1;color:#c0306a;display:none;background:#fff;border-radius:40px;padding:8px 26px}
 .cbm{position:absolute;inset:0;background:rgba(40,20,100,.42);display:none;align-items:center;justify-content:center;z-index:8}.cbm.on{display:flex}
 .cbmb{width:1200px;max-height:850px;overflow:auto;background:#fff;border-radius:56px;padding:44px 56px;box-shadow:0 40px 100px rgba(40,20,100,.45);font-family:P;font-weight:500;font-size:36px;line-height:1.4;color:#1c1b2e}
-.cbmb h3{font-family:O;font-weight:800;font-size:56px;margin:0 0 14px}.cbmb .ex{background:#efeaff;border-radius:30px;padding:20px 30px;margin:18px 0;font-size:38px}
+.cbmb .ulw{animation:ulwd .7s .7s ease-out forwards}.cbmb h3{font-family:O;font-weight:800;font-size:56px;margin:0 0 14px}.cbmb .ex{background:#efeaff;border-radius:30px;padding:20px 30px;margin:18px 0;font-size:38px}
 .cbmb .tg{display:inline-block;margin:8px 12px 8px 0;padding:10px 30px;border-radius:999px;border:5px solid #d9d3f5;font-family:O;font-weight:800;font-size:38px;cursor:pointer;background:#fff}.cbmb .tg.on{background:#2bd9b6;color:#fff;border-color:#fff}
 .cbmb .stx{margin-left:6px}.cbmb .bt{border:0;font-family:O;font-weight:800;font-size:38px;padding:14px 44px;border-radius:999px;margin:10px 14px 0 0;cursor:pointer;color:#fff;background:linear-gradient(135deg,#7b3cf0,#ff4fa3)}.cbmb .bt.g{background:#d9d3f5;color:#333}.cbmb .bt[disabled]{opacity:.35}
 """)
@@ -478,18 +483,18 @@ INIT.room=function(s){var cap=$('.rcap',s);$('#nx').classList.add('on');$$('.rsp
 /* ---- dial ---- */
 INIT.dial=function(s){
  var D=JSON.parse($('#d-'+s.dataset.id).textContent),I=D.items,k=0,done=0,wt=-1,fin={},card=$('.dcard',s),sen=$('.dsen',s),nd=$('.nd',s),dots=$$('.chd',s),zs=$$('.dz',s),scs=$$('.sc',s),qq=$$('.qq',s),dart=$('.dart',s);
- function scn(z){scs.forEach(function(g){g.style.display=(+g.dataset.z===z)?'block':'none'});qq.forEach(function(q){q.style.display=z<0?'block':'none'});if(dart)dart.style.display=(z<0&&dart.firstChild)?'block':'none'}
+ function scn(z){scs.forEach(function(g){g.style.display=(+g.dataset.z===z)?'block':'none'});qq.forEach(function(q){q.style.display=z<0?'block':'none'});if(dart)dart.style.display=dart.firstChild?'block':'none'}
  var W=[['dangerously','lower'],['much','lower'],['slightly','lower'],['','normal'],['slightly','higher'],['much','higher'],['dangerously','higher']];
  function ang(z){return (z+.5)*180/7-90}
  function ic(e){return /\.jpg$|^file:|^data:image/.test(e)?'<img src="'+e+'" style="height:84px;width:84px;border-radius:50%;object-fit:cover;vertical-align:middle;background:#fff;margin-right:8px">':e}
- function sent(it,z){var w=W[z];return z===3?it.s+' normal.':it.s+' <b>'+w[0]+' '+w[1]+'</b> than '+(it.ref||'normal')+'.'}
+ function sent(it,z){var w=W[z];return z===3?it.s+' normal.':it.s+' <b>'+w[0]+' '+w[1]+'</b>'+(it.nt?'':' than '+(it.ref||'normal'))+'.'}
  function go1(){if(wt<0)return false;wt=-1;P('tick');if(k>=I.length-1){finish(s);return true}k++;show();if(!s.__done)$('#nx').classList.remove('on');return true}
  s.__adv=go1;s.addEventListener('click',function(e){if(e.target.closest('.dz,.chd'))return;go1()});
  function show(){var it=I[k];done=0;wt=-1;nd.style.transform='rotate(-90deg)';if(dart)dart.innerHTML=it.art?'<img src="'+it.art+'" style="width:100%;height:100%;object-fit:contain;border-radius:48px;display:block">':'';scn(-1);zs.forEach(function(z){z.classList.remove('glow','dim')});
   dots.forEach(function(d,i){d.classList.toggle('on',i===k);d.classList.toggle('dn',!!fin[i])});
-  if(D.aud&&it.say)card.innerHTML='<div class="tch dtl" data-say="'+it.say+'" style="cursor:pointer;text-align:center;font-size:52px">🔊 Tap to listen</div>';else card.innerHTML='<div>'+(it.art?'':it.e+' ')+it.now+'</div><small>'+(it.nl||'Normal')+': '+it.normal+'</small>';sen.classList.remove('ok');
+  if(D.aud&&it.say)card.innerHTML='<div class="tch dtl" data-say="'+it.say+'" style="cursor:pointer;text-align:center;font-size:52px"><i class="sico"></i> Tap to listen</div>';else card.innerHTML='<div>'+(it.art?'':it.e+' ')+it.now+'</div><small>'+(it.nl||'Normal')+': '+it.normal+'</small>';sen.classList.remove('ok');
   if(it.guide&&it.demo)card.insertAdjacentHTML('beforeend','<div class="gd">'+it.guide+'</div>');
-  sen.innerHTML='<div>'+it.s+' <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u> than '+(it.ref||'normal')+'.</div>';var pp=$('.ptp',s);if(pp)pp.style.visibility=it.demo?'hidden':'visible';
+  sen.innerHTML='<div>'+it.s+' <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>'+(it.nt?'':' than '+(it.ref||'normal'))+'.</div>';var pp=$('.ptp',s);if(pp)pp.style.visibility=it.demo?'hidden':'visible';
   if(it.demo){done=1;var kk=k;setTimeout(function(){if(k!==kk)return;fin[kk]=1;dots[kk].classList.add('dn');nd.style.transform='rotate('+ang(it.z)+'deg)';scn(it.z);var z=zs[it.z];z.classList.add('glow');zs.forEach(function(o){if(o!==z)o.classList.add('dim')});sen.classList.add('ok');sen.innerHTML='<div>'+sent(it,it.z)+'</div>';P('good');try{if(SXL.say||1){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(sen.textContent);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}}catch(e){}},1500);setTimeout(function(){if(k!==kk)return;wt=kk;$('#nx').classList.add('on')},2600)}}
  zs.forEach(function(z){z.onclick=function(){if(done)return;var it=I[k],n=+z.dataset.z;nd.style.transform='rotate('+ang(n)+'deg)';scn(n);
   if(n===it.z){done=1;fin[k]=1;dots[k].classList.add('dn');z.classList.add('glow');zs.forEach(function(o){if(o!==z)o.classList.add('dim')});P('good');sen.classList.add('ok');sen.innerHTML='<div>'+sent(it,n)+'</div>';if(D.aud&&it.say)card.innerHTML='<div>'+(it.art?'':it.e+' ')+it.now+'</div><small>'+(it.nl||'Normal')+': '+it.normal+'</small>';
@@ -545,6 +550,6 @@ INIT.case_board=function(s){
   if(k==='tw'){tw=true;ok.TW=1;draw();P('open');say(D.twist.text.replace(/["⚡]/g,''))}
   if(k==='test'){var T=D.test;sheet('<h3>🧪 '+T.q+'</h3>'+T.opts.map(function(o,i){return '<button class="bt g" style="display:block;width:100%;text-align:left" data-a="opt" data-i="'+i+'">'+o+'</button>'}).join('')+'<div class="ex why">Let the teams argue first.</div><button class="bt g" data-a="x">Close</button>')}
   if(k==='db'){var f=fx(),top=D.suspects.slice().sort(function(a,b){return (f[b[0]].f-f[b[0]].a)-(f[a[0]].f-f[a[0]].a)}).slice(0,3);sheet('<h3>🗣️ '+D.debate.title+'</h3><div class="ex">'+top.map(function(x){return '<span class="tg">'+x[2]+' '+x[1]+'</span>'}).join('')+'</div>'+D.debate.lines.map(function(l){return '<div style="margin:8px 0">'+l+'</div>'}).join('')+'<button class="bt g" data-a="x">Close</button>')}
-  if(k==='rv'){won=true;draw();var a=D.suspects.filter(function(x){return x[0]===D.answer})[0];P('arrive');sheet('<h3 style="font-size:84px">'+a[2]+' '+a[1]+'</h3><div class="ex">'+D.reveal+'</div><button class="bt g" data-a="x">Close</button>');finish(s)}};
+  if(k==='rv'){won=true;draw();var a=D.suspects.filter(function(x){return x[0]===D.answer})[0];P('arrive');sheet('<h3 style="font-size:84px">'+a[2]+' '+a[1]+'</h3><div class="ex">'+D.reveal+'</div><button class="bt g" data-a="x">Close</button>');$$('.ulw',mb).forEach(function(u,i){u.style.animationDelay=(0.7+i*0.75)+'s'});finish(s)}};
  $('#nx').classList.add('on');draw()};
 """)

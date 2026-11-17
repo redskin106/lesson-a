@@ -594,9 +594,48 @@ for d in L4:
           [[('It',_S),('might be',_V),('too much coffee',_O),('because …',_B)],[('It',_S),("can't be",_V),('a broken heart',_O),('because …',_B)],[('It',_S),("can't be",_V),('flu',_O),('because',_B),('she',_S),('has',_V),('no cough.',_O)]]]
     if d.get('label')=='Exercise · Higher or lower?':
         _DA={('💓','Pulse: 110 beats per minute'):'l4_c4_racing_heart.jpg',('💓','Pulse: 150 beats per minute'):'l4_c4_racing_heart.jpg',('💓','Pulse: 38 beats per minute'):'l4_h4_pulse_slow.jpg',('🛏️','Sleep: 3 hours a night'):'l4_b3_night.jpg',('🛏️','Sleep: 6 hours a night'):'l4_b3_night.jpg',('🌡️','Temperature: 37 °C'):'l4_h1_thermometer.jpg',('🌡️','Temperature: 41 °C'):'l4_h3_fever_high.jpg',('☕','Coffee: 5 cups a day'):'l4_b2_coffee.jpg'}
+        import os as _os
+        for _k,_f in {('💓','Pulse: 110 beats per minute'):'l4_i1_pulse_slightly_high.jpg',('💓','Pulse: 38 beats per minute'):'l4_i2_pulse_dangerously_low.jpg',('🛏️','Sleep: 6 hours a night'):'l4_i3_sleep_6h_rested.jpg'}.items():
+            if _os.path.exists('/home/claude/work/lesson/art/'+_f): _DA[_k]=_f
+        for it in d['items']:
+            if it['s'].startswith('Her temperature'): it['nt']=1
         for it in d['items']:
             a=_DA.get((it['e'],it['now']))
             if a: it['art']=ART+a
+# ---- Nick 17 Nov 21:29 batch (L4) ----
+import re as _re
+def _she(o):
+    if isinstance(o,str):
+        for a,b in (('He','She'),('he','she'),('His','Her'),('his','her'),('him','her')): o=_re.sub(r'\b'+a+r'\b',b,o)
+        return o
+    if isinstance(o,list): return [_she(x) for x in o]
+    if isinstance(o,tuple): return tuple(_she(x) for x in o)
+    if isinstance(o,dict): return {k:(v if k in ('art','pic','pics','m','phase') else _she(v)) for k,v in o.items()}
+    return o
+_NEWREV=("<b>[[It is too much coffee.]]</b><br>She says she drinks two cups, but the café card says [[eight]].<br>She sleeps only [[3 hours]], and her pulse is [[faster than normal]].<br>"
+ "She has [[no fever and no cough]], so it can't be flu.<br>She has [[no stomach problems]], so it can't be food poisoning.<br>On Sunday she drank [[no coffee]], and she felt [[much better]].<br>"
+ "🌙 The night nurse wrote a chart just like her own: eight coffees, three hours of sleep!")
+_LF4=dict(m='listen_fix',phase='ACTIVATE',label='Listen and fix (night chart)',min=4,title='Listen and fix the chart',items=[
+   dict(text='She drinks two cups of coffee every day',say='She drinks eight cups of coffee every day',opts=['five','ten']),
+   dict(text='Her pulse is lower than normal',say='Her pulse is higher than normal',opts=['slower','much']),
+   dict(text='She sleeps nine hours a night',say='She sleeps three hours a night',opts=['six','seven']),
+   dict(text='Her headache is mild',say='Her headache is severe',opts=['moderate','unbearable'])],lvl=1,levels=[dict(mode='opts'),dict(mode='opts'),dict(mode='type')])
+_L=[]
+for d in L4:
+    lb=d.get('label')
+    if lb=='Taboo for nurses': _L.append(_LF4)
+    if lb=='Exercise · How bad?': d=dict(d,pt='')
+    if lb=='Your toolkit': d=dict(d,note=None)
+    if lb=='Case board · Fix the ward':
+        import re as _r2
+        d=dict(d,reveal=_re.sub(r'\[\[(.+?)\]\]',r'<span class="ulw">\1</span>',_NEWREV))
+    import os as _o3
+    _ex=lambda f:_o3.path.exists('/home/claude/work/lesson/art/'+f)
+    if d.get('m')=='vol_ladder' and _ex('l4_j1_eyes_closed.jpg'): d=dict(d,emoji='l4_j1_eyes_closed.jpg')
+    if lb=='Taboo for nurses' and _ex('l4_k1_taboo_words_only.jpg'): d=dict(d,introArt=ART+'l4_k1_taboo_words_only.jpg')
+    _L.append(d)
+L4=[_she(d) for d in _L]
+L4.append(dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L4_BOSS,sec=90))
 if __name__=='__main__':
     out=HERE.parent.parent/'lessons-3-4'
     print(build_interactive(L3,str(out/'lesson3_v2.html'),title='SkillsXLab · Lesson 3 · Which illness?'))
