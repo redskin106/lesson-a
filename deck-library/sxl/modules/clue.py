@@ -263,6 +263,19 @@ def room(d):
     o+='</div><div class="a rcap" style="left:90px;top:885px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:46px;height:56px;color:#1c1b2e"></div>'
     return o
 
+@module('qr_groups')
+def qr_groups(d):
+    """{'phase','title','qrs':[data-uri x4],'cols':[colour x4]} four big group codes in a row"""
+    o=header(d['phase'],d['title'],d.get('grad','rose'))
+    W=420; gap=(1740-4*W)//3
+    for i,(q,c) in enumerate(zip(d['qrs'],d['cols'])):
+        x=90+i*(W+gap)
+        inner=(f'<div style="display:flex;flex-direction:column;align-items:center;gap:26px;padding-top:34px">'
+               f'<div style="width:150px;height:150px;border-radius:50%;background:{c};color:#fff;font-family:O;font-weight:800;font-size:112px;line-height:150px;text-align:center">{i+1}</div>'
+               f'<img src="{q}" style="width:300px;height:300px;border-radius:22px;image-rendering:pixelated;background:#fff;padding:8px"></div>')
+        o+=stp(glass(x,200,W,600,inner,r=56),i+1)
+    return o
+
 @module('qr_card')
 def qr_card(d):
     """{'phase','title','rules':[lines],'qr':data-uri,'url','caption'} rules on the left, QR on the right"""

@@ -633,6 +633,10 @@ for d in L4:
     if d.get('m')=='vol_ladder' and _ex('l4_j1_eyes_closed.jpg'): d=dict(d,emoji='l4_j1_eyes_closed.jpg')
     if lb=='Taboo for nurses' and _ex('l4_k1_taboo_words_only.jpg'): d=dict(d,introArt=ART+'l4_k1_taboo_words_only.jpg')
     _L.append(d)
+    if lb=='How Fix the ward works':
+        import base64 as _b64
+        _qd=lambda n:'data:image/png;base64,'+_b64.b64encode(open(f'/home/claude/lesson-a/lessons-3-4/source-art/print/qr_{n}.png','rb').read()).decode()
+        _L.append(dict(m='qr_groups',phase='ACTIVATE',label='Group QR codes',title='Scan your group',min=1,qrs=[_qd(n) for n in '1234'],cols=['#ff5a6a','#2a8cf0','#19b38a','#f2a900']))
 L4=[_she(d) for d in _L]
 L4.append(dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L4_BOSS,sec=90))
 def _inject_audio(html_path,adir):
