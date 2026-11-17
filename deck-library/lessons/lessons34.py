@@ -651,10 +651,10 @@ _PT3='💬 Tell your partner. Then tap.'
 SYM3=[[_a2('🌡️','I am so hot! Can I sleep in the fridge?','She has a fever.','She has a rash.','She has a cough.'),
   _a2('😷','Cough, cough! The whole ward is moving away from me.','He has a cough.','He has a rash.','He has a fever.'),
   _a2('🔴','Look at my arm! I look like a strawberry!','He has a rash on his arm.','He has a cough on his arm.','He has a fever on his arm.')],
- [_a2('🥶','I am freezing… but my forehead is burning.','She has chills and a fever.','She has a rash and a fever.','She has a cough and chills.'),
-  _a2('🧴',"My arm… I can't stop scratching!",'His arm is itchy.','His arm is stiff.','His arm is cold.'),
+ [_a2('🥶','I am freezing! But my forehead is burning.','She has chills and a fever.','She has a rash and a fever.','She has a cough and chills.'),
+  _a2('🧴',"I can't stop scratching!",'His arm is itchy.','His arm is stiff.','His arm is cold.'),
   _a2('🤕','My head, my eyes, my muscles… even my hair hurts!','Her head, her eyes and her muscles hurt.','Her head hurts, but her muscles are fine.','Her eyes hurt, but her head is fine.')],
- [_a2('🍚','I have not eaten for two days. I do not want food.','She has no appetite.','She has a big appetite.','She is itchy.'),
+ [_a2('🍚','I do not want food. Not even my favourite noodles.','She has no appetite.','She has a big appetite.','She is itchy.'),
   _a2('🔴','Red spots on my arms. They itch, but my face is fine.','She has an itchy rash on her arms, but not on her face.','She has an itchy rash on her face, but not on her arms.','She has a rash on her arms and her face.'),
   _a2('🦟','A mosquito bit me a week ago. Now I am sick.','She was bitten by a mosquito a week ago.','She bit a mosquito a week ago.','A mosquito was sick a week ago.')]]
 MORE3_W=dict(m='teach',phase='STUDY',label='Teach · More symptoms',min=1,role='Four more',words=[('🥶','chills'),('🧴','itchy'),('🫨','stiff'),('🍚','no appetite')])

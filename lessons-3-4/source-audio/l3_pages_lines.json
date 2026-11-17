@@ -78,43 +78,22 @@
  },
  {
   "id": "P09_04",
-  "text": "I am freezing… but my forehead is burning.",
+  "text": "My head, my eyes, my muscles… even my hair hurts!",
   "file": "P09_04.mp3",
   "priority": 1,
   "slide": "Exercise · Symptoms"
  },
  {
   "id": "P09_05",
-  "text": "My arm… I can't stop scratching!",
+  "text": "Red spots on my arms. They itch, but my face is fine.",
   "file": "P09_05.mp3",
   "priority": 1,
   "slide": "Exercise · Symptoms"
  },
  {
   "id": "P09_06",
-  "text": "My head, my eyes, my muscles… even my hair hurts!",
-  "file": "P09_06.mp3",
-  "priority": 1,
-  "slide": "Exercise · Symptoms"
- },
- {
-  "id": "P09_07",
-  "text": "I have not eaten for two days. I do not want food.",
-  "file": "P09_07.mp3",
-  "priority": 1,
-  "slide": "Exercise · Symptoms"
- },
- {
-  "id": "P09_08",
-  "text": "Red spots on my arms. They itch, but my face is fine.",
-  "file": "P09_08.mp3",
-  "priority": 1,
-  "slide": "Exercise · Symptoms"
- },
- {
-  "id": "P09_09",
   "text": "A mosquito bit me a week ago. Now I am sick.",
-  "file": "P09_09.mp3",
+  "file": "P09_06.mp3",
   "priority": 1,
   "slide": "Exercise · Symptoms"
  },
