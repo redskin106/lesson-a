@@ -389,6 +389,31 @@ SYM4=[[_a('🥱',"I can't keep my eyes open!",'She is exhausted.','She is dizzy.
 PAIRS=dict(PAIRS,pairs=[('She has no cough and no fever.',"It can't be flu."),('Her friends ate the same lunch. They are fine.',"It can't be food poisoning."),('Her hands shake when she skips breakfast.','It might be low blood sugar.'),('She is breathless and sweaty before every exam.','It might be stress.'),('She drinks eight cups of coffee a day.','It might be the coffee.')])
 _FP3=stick(90,395,1.15,'up')+stick(310,395,1.15,'point')+bubble_svg(10,8,380,128,'Does anyone have\na voice note about\nthe temperature?',fs=25,tx=110)
 FIX_COMIC=[dict(svg=_FP,cap='The night nurse made mistakes.'),dict(svg=_FP2,cap='Find the mistakes on your page.'),dict(svg=_FP3,cap='One group asks the class. Everyone listens.'),dict(svg=_FP4,cap='"Yes, we do." Listen. Choose the fix. Say it.')]
+
+# ---- 17 Nov round 5: cups wording in Compare, truth exercise not all coffee, Plan B cleanup ----
+def _tq(pic,say,src,ans,*w): return dict(pic=pic,say=say,q=src+' Is she telling the truth?',ans=ans,opts=[ans,*w])
+WEEKQ=dict(m='choice',phase='STUDY',title='Is she telling the truth?',label='Her week · Is she telling the truth?',aud=True,lvl=2,min=3,levels=_lv3(
+ [_tq('☕','I drink two coffees a day. Only two!','The café card says: 2 cups.','Yes. She tells the truth.','No. She drinks more.'),
+  _tq('🛏️','I sleep fine. Seven hours, easy.','The watch says: 3 hours.','No. She sleeps less.','Yes. She tells the truth.'),
+  _tq('🌡️','I have no fever.','The thermometer says: 36.8 °C.','Yes. She tells the truth.','No. She has a fever.')],
+ [_tq('💓','My heart is fine. Totally normal.','The monitor says: 110 beats per minute.','Not really. Her pulse is higher than normal.','Yes. Her pulse is normal.','No. Her pulse is lower than normal.'),
+  _tq('🛏️','I sleep about six hours.','The watch says: 6 hours.','Yes. She tells the truth.','No. She sleeps less.','No. She sleeps more.'),
+  _tq('☕','Only two cups on Friday!','The café card says: 8 cups.','No. She drinks much more.','Yes. She tells the truth.','No. She drinks less.')],
+ [_tq('📚','I am not worried about the exams at all.','Her friend says: she cannot sleep before every exam.','No. She is worried.','Yes. She is calm.','Yes. She is happy.'),
+  _tq('🤕','My headache is mild. Two out of ten.','The nurse says: she cannot work.','No. It is not mild. It is severe.','Yes. It is mild.','Yes. It is moderate.'),
+  _tq('💓','My pulse is always the same.','The monitor says: Monday 90, Tuesday 100, Wednesday 110.','No. It gets faster every day.','Yes. It is the same every day.','No. It gets slower every day.')]))
+_cups=lambda lab,v: [(d_,'☕×%d'%k) for d_,k in zip(lab,v)]
+COMPARE2=dict(COMPARE2,levels=_lv3(
+ [dict(pic='☕',grid=_cups(['Mon','Fri'],[2,4]),gfs=40,q='Look at the cups. Which sentence is true?',ans='She has more cups on Friday than on Monday.',opts=['She has more cups on Friday than on Monday.','She has more cups on Monday than on Friday.','She has the same number of cups on both days.']),
+  dict(pic='🛏️',grid=_cg(['Mon','Thu'],[3,2],'🌙'),gfs=40,q='Look at the nights. Which sentence is true?',ans='She sleeps less on Thursday than on Monday.',opts=['She sleeps less on Thursday than on Monday.','She sleeps more on Thursday than on Monday.','She sleeps the same on Thursday and Monday.']),
+  dict(pic='💓',grid=[('Normal','60–100'),('Her pulse','110')],gfs=34,q='Which sentence is true?',ans='Her pulse is higher than normal.',opts=['Her pulse is higher than normal.','Her pulse is lower than normal.','Her pulse is the same as normal.'])],
+ [dict(pic='☕',grid=_cups(['Mon','Tue','Wed','Thu','Fri'],[2,3,2,3,4]),gfs=30,q='Look at her week. Which sentence is true?',ans='She has the most cups on Friday.',opts=['She has the most cups on Friday.','She has the most cups on Monday.','She has the fewest cups on Friday.']),
+  dict(pic='🛏️',grid=_cg(['Mon','Tue','Wed','Thu','Fri'],[3,4,3,2,3],'🌙'),gfs=30,q='Look at her week. Which sentence is true?',ans='She sleeps the least on Thursday.',opts=['She sleeps the least on Thursday.','She sleeps the most on Thursday.','She sleeps the least on Tuesday.']),
+  dict(pic='💓',grid=[('Mon','90'),('Tue','100'),('Wed','110')],gfs=34,q='Her pulse during the week. Which sentence is true?',ans='Her pulse gets faster every day.',opts=['Her pulse gets faster every day.','Her pulse gets slower every day.','Her pulse stays the same.'])],
+ [dict(pic='☕',grid=_cups(['Mon','Fri'],[2,4]),gfs=40,q='Which sentence is true?',ans='She has twice as many cups on Friday as on Monday.',opts=['She has twice as many cups on Friday as on Monday.','She has half as many cups on Friday as on Monday.','She has the same number of cups on both days.']),
+  dict(pic='🛏️',grid=_cg(['Mon','Tue','Wed','Thu','Fri'],[3,4,3,2,3],'🌙'),gfs=30,q='Which sentence is true?',ans='Tuesday is her best night, and Thursday is her worst.',opts=['Tuesday is her best night, and Thursday is her worst.','Thursday is her best night, and Tuesday is her worst.','Every night is the same.']),
+  dict(pic='💓',grid=[('Mon','108'),('Tue','112'),('Wed','110')],gfs=34,q='Normal: 60 to 100. Which sentence is true?',ans='Her pulse is higher than normal every day.',opts=['Her pulse is higher than normal every day.','Her pulse is lower than normal every day.','Her pulse is normal every day.'])]))
+PLANB4=dict(PLANB4,tiles=[t for t in PLANB4['tiles'] if t['t'] not in ('Everybody lies','Name the symptom')])
 NEW_STUDY=[TODAY4,
  dict(m='teach',phase='STUDY',label='Teach · Symptoms',min=1,role='Four feelings',words=[('🥱','exhausted'),('😵‍💫','dizzy'),('🤲','shaky'),('💓','racing heart')]),
  dict(m='teach',phase='STUDY',label='Teach · Symptom sentences',min=2,role='Listen to the patient',pic='🥱',pics=['🥱','😵‍💫','🤲','💓'],tts=True,lines=[('She is exhausted.',"Ohhh… I can't keep my eyes open. I could sleep standing up!"),('He feels dizzy.','The room is spinning like a washing machine!'),('Her hands are shaky.',"Look at my hands! They won't stop shaking!"),('Her heart is racing.','My heart is racing, nurse. Boom-boom-boom!')]),
