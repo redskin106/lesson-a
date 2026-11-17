@@ -193,5 +193,20 @@
   "id": "P23_06",
   "text": "Same lunch as my friends. Nobody else is sick.",
   "file": "P23_06.mp3"
+ },
+ {
+  "id": "P22_01",
+  "text": "I have a fever and red spots on my arms. What is wrong with me?",
+  "file": "P22_01.mp3"
+ },
+ {
+  "id": "P22_05",
+  "text": "Okay, do the test. But please be quick. My cat is waiting!",
+  "file": "P22_05.mp3"
+ },
+ {
+  "id": "P09_07",
+  "text": "No breakfast, no lunch, no dinner. I am just not hungry!",
+  "file": "P09_07.mp3"
  }
 ]
