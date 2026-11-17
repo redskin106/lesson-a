@@ -375,11 +375,15 @@ def _choice_static(d): return choice_html(d,'x')
 def boss_html(d,sid):
     """{'phase','title','text','q','plain':[glosses],'simple','answer','sec'}"""
     b=d; o=header(d.get('phase','ACTIVATE'),'Optional boss','rose')
-    o+=glass(90,170,1060,470,f'<div style="padding:40px 50px;font-family:P;font-weight:500;font-size:{37 if len(b["text"])<330 else 31 if len(b["text"])<345 else 28}px;line-height:1.45">{b["text"]}</div>',r=56)
+    o+=glass(90,170,1060,470,f'<div style="height:100%;box-sizing:border-box;display:flex;align-items:center;padding:30px 50px;font-family:P;font-weight:500;font-size:{37 if len(b["text"])<330 else 31 if len(b["text"])<345 else 28}px;line-height:1.45"><div>{b["text"]}</div></div>',r=56)
     o+=f'<div class="a" style="left:90px;top:665px;width:1060px;font-family:O;font-weight:800;font-size:54px;line-height:1.1">{b["q"]}</div>'
     o+=f'<div class="a" style="left:90px;top:790px;display:flex;gap:28px;align-items:center"><div class="bstime" style="font-family:O;font-weight:800;font-size:110px;min-width:190px" data-sec="{b.get("sec",90)}"><span class="grad">{b.get("sec",90)}</span></div><button class="bsb bstart">{grad_chip("violet","▶ start",48,"10px 44px")}</button><button class="bsb bgive">{grad_chip("rose","😵‍💫",64,"2px 40px")}</button></div>'
-    fp=f'<div style="padding:22px 34px">{grad_chip("amber","Free pass",40,"2px 26px")}<div style="margin-top:10px;font-family:P;font-weight:500;font-size:26px;line-height:1.3">'+'<br>'.join(f'<b>{g.split(" = ")[0]}</b> = {g.split(" = ")[1]}' for g in b['plain'])+f'</div><div style="margin-top:14px;font-family:P;font-weight:500;font-size:26px;line-height:1.3">{b["simple"]}</div><div style="margin-top:14px;background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff;border-radius:28px;padding:10px 22px;font-family:O;font-weight:800;font-size:27px;line-height:1.25">{b["answer"]}</div></div>'
-    o+=f'<div class="bfl">'+glass(1190,170,640,740,'<div style="padding:60px 40px;text-align:center"><div style="font-size:170px">🔒</div><div style="font-family:O;font-weight:800;font-size:54px;margin-top:20px">Free pass</div><div style="font-family:P;font-weight:500;font-size:36px;margin-top:20px;line-height:1.4">Stuck? Tap 😵‍💫 when your team is ready.</div></div>',r=56)+'</div>'
+    fp=(f'<div style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-evenly;padding:28px 38px">'
+        f'<div>{grad_chip("amber","Free pass",44,"2px 28px")}</div>'
+        f'<div style="font-family:P;font-weight:500;font-size:26px;line-height:1.4">'+'<br>'.join(f'<b>{g.split(" = ")[0]}</b> = {g.split(" = ")[1]}' for g in b['plain'])+'</div>'
+        f'<div style="font-family:P;font-weight:500;font-size:26px;line-height:1.35">{b["simple"]}</div>'
+        f'<div style="background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff;border-radius:30px;padding:14px 24px;font-family:O;font-weight:800;font-size:27px;line-height:1.25">{b["answer"]}</div></div>')
+    o+=f'<div class="bfl">'+glass(1190,170,640,740,'<div style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding:0 40px;text-align:center"><div style="font-size:170px;line-height:1.1">🔒</div><div style="font-family:O;font-weight:800;font-size:54px;margin-top:20px">Free pass</div><div style="font-family:P;font-weight:500;font-size:36px;margin-top:20px;line-height:1.4">Stuck? Tap 😵‍💫 when your team is ready.</div></div>',r=56)+'</div>'
     o+=f'<div class="bfp" style="opacity:0;transition:opacity .6s,transform .6s;transform:translateY(40px)">{glass(1190,170,640,760,fp,r=56)}</div>'
     return o
 BUILD_EXT['boss']=boss_html
