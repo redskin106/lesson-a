@@ -750,6 +750,7 @@ TOOL3_CHIPS=[
 _H1=stick(100,395,1.2,'hold')+'<text x="165" y="330" font-size="86">🎧</text><text x="250" y="150" font-size="60" font-family="Outfit,sans-serif" font-weight="800" fill="#9a5cff">×3</text>'
 _H3=stick(130,395,1.2,'hold')+'<text x="195" y="330" font-size="86">🎧</text><text x="215" y="190" font-size="40" font-family="Outfit,sans-serif" font-weight="800" fill="#10a98d">Her pulse is 104.</text>'
 HUNT3_COMIC=[dict(svg=_H1,cap='Each group has 3 voice notes.'),dict(svg=_FP3,cap='One group asks the class.'),dict(svg=_H3,cap='Listen. Say it in a sentence.'),dict(svg=_P4,cap='Teacher taps. The board fills.')]
+HUNT3_COMIC[0]['img']='l4_d4_fix.jpg'; HUNT3_COMIC[1]['img']='l4_d3_ask.jpg'; HUNT3_COMIC[2]['img']='l4_d2_find.jpg'
 # --- the 12 voice notes (numbered groups 1-4) ---
 _FIX3D=[('A2','🤕','Head, eyes, muscles','Patient','My head hurts… and behind my eyes. My muscles hurt too. Everything aches.','Her head, her eyes and her muscles hurt.'),
  ('A3','😷','Cough','Patient','No. No cough. Not once this week.','She has no cough.'),
@@ -836,7 +837,7 @@ for d in L3:
     if lb=='Your toolkit': d=dict(d,note=None,bubbles=False,chips=TOOL3_CHIPS,title='Your hunt toolkit')
     if lb=='How the hunt works': d=dict(d,label='How the voice-note hunt works',title='How the voice-note hunt works',panels=HUNT3_COMIC)
     if lb in ('Taboo for nurses','Plan B (teacher)','Tell the doctor (spoken)'): continue
-    if lb=='Recap': d=dict(d,rows=[([('c1','She'),('c2','has'),('c3','chills and a rash.')],'symptoms'),([('c1','Her temperature'),('c2','is'),('c3','much higher than normal.')],'than'),([('c1','It'),('c2','is probably'),('c3','dengue.')],'probably'),([('c1','It'),('c2',"can't be"),('c3','flu because she has no cough.')],'because…'),([('c2','Have'),('c1','you'),('c3','had a fever?')],'ask')])
+    if lb=='Recap': d=dict(d,rows=[([('c1','She'),('c2','has'),('c3','chills and a rash.')],'symptoms'),([('c1','Her pulse'),('c2','is'),('c3','higher than normal.')],'than'),([('c1','It'),('c2','is probably'),('c3','dengue.')],'probably'),([('c1','It'),('c2',"can't be"),('c3','flu because she has no cough.')],'why'),([('c2','Have'),('c1','you'),('c3','had a fever?')],'ask')])
     if lb=='Case board · Find the illness':
         d=dict(d,frames=['Does anyone have a voice note about …?','Yes, we do. Come and listen.','Is that a clue for flu?'],unit='clues found',clues=[dict(c,pic=_BY3[c['id']]['pic'],kind=None,topic=_BY3[c['id']]['topic'],text=_BY3[c['id']]['fact']) for c in d['clues']])
     _L3.append(d)
