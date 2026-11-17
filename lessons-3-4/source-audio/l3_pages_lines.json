@@ -1,0 +1,492 @@
+[
+ {
+  "id": "P06_01",
+  "text": "Ohhh… why is it so hot in here? Is the air-con broken?",
+  "file": "P06_01.mp3"
+ },
+ {
+  "id": "P06_02",
+  "text": "My head… boom, boom, boom. Like a drum!",
+  "file": "P06_02.mp3"
+ },
+ {
+  "id": "P06_03",
+  "text": "Cough, cough… sorry… I sound like a goat!",
+  "file": "P06_03.mp3"
+ },
+ {
+  "id": "P06_04",
+  "text": "Look at my arm! Red spots! Am I turning into a tomato?",
+  "file": "P06_04.mp3"
+ },
+ {
+  "id": "P08_01",
+  "text": "I am freezing! But my forehead is burning.",
+  "file": "P08_01.mp3"
+ },
+ {
+  "id": "P08_02",
+  "text": "I can't stop scratching!",
+  "file": "P08_02.mp3"
+ },
+ {
+  "id": "P08_03",
+  "text": "I cannot turn my head. It is so stiff!",
+  "file": "P08_03.mp3"
+ },
+ {
+  "id": "P08_04",
+  "text": "I do not want food. Not even my favourite noodles.",
+  "file": "P08_04.mp3"
+ },
+ {
+  "id": "P09_01",
+  "text": "I am so hot! Can I sleep in the fridge?",
+  "file": "P09_01.mp3"
+ },
+ {
+  "id": "P09_02",
+  "text": "Cough, cough! The whole ward is moving away from me.",
+  "file": "P09_02.mp3"
+ },
+ {
+  "id": "P09_03",
+  "text": "Look at my arm! I look like a strawberry!",
+  "file": "P09_03.mp3"
+ },
+ {
+  "id": "P09_04",
+  "text": "I am freezing… but my forehead is burning.",
+  "file": "P09_04.mp3"
+ },
+ {
+  "id": "P09_05",
+  "text": "My arm… I can't stop scratching!",
+  "file": "P09_05.mp3"
+ },
+ {
+  "id": "P09_06",
+  "text": "My head, my eyes, my muscles… even my hair hurts!",
+  "file": "P09_06.mp3"
+ },
+ {
+  "id": "P09_07",
+  "text": "I have not eaten for two days. I do not want food.",
+  "file": "P09_07.mp3"
+ },
+ {
+  "id": "P09_08",
+  "text": "Red spots on my arms. They itch, but my face is fine.",
+  "file": "P09_08.mp3"
+ },
+ {
+  "id": "P09_09",
+  "text": "A mosquito bit me a week ago. Now I am sick.",
+  "file": "P09_09.mp3"
+ },
+ {
+  "id": "P10_01",
+  "text": "Her temperature is forty-one degrees. Normal is about thirty-seven.",
+  "file": "P10_01.mp3"
+ },
+ {
+  "id": "P10_02",
+  "text": "Her platelets are ninety-five thousand. Normal is one hundred and fifty to four hundred and fifty thousand.",
+  "file": "P10_02.mp3"
+ },
+ {
+  "id": "P10_03",
+  "text": "Her pulse is one hundred and thirty. Normal is sixty to one hundred.",
+  "file": "P10_03.mp3"
+ },
+ {
+  "id": "P10_04",
+  "text": "She breathes forty times a minute. Normal is twelve to twenty.",
+  "file": "P10_04.mp3"
+ },
+ {
+  "id": "P10_05",
+  "text": "Her temperature is thirty-two degrees. Normal is about thirty-seven.",
+  "file": "P10_05.mp3"
+ },
+ {
+  "id": "P11_01",
+  "text": "Her temperature is thirty-nine point two degrees.",
+  "file": "P11_01.mp3"
+ },
+ {
+  "id": "P11_02",
+  "text": "Her pulse is one hundred and four beats a minute.",
+  "file": "P11_02.mp3"
+ },
+ {
+  "id": "P11_03",
+  "text": "She breathes eighteen times a minute.",
+  "file": "P11_03.mp3"
+ },
+ {
+  "id": "P11_04",
+  "text": "Platelets: ninety-five thousand per microlitre.",
+  "file": "P11_04.mp3"
+ },
+ {
+  "id": "P11_05",
+  "text": "Normal is about thirty-seven. Hers is thirty-eight point one.",
+  "file": "P11_05.mp3"
+ },
+ {
+  "id": "P11_06",
+  "text": "Her pulse is forty-eight. Normal is sixty to one hundred.",
+  "file": "P11_06.mp3"
+ },
+ {
+  "id": "P11_07",
+  "text": "White cells: three thousand one hundred per microlitre. Normal is four and a half to eleven thousand.",
+  "file": "P11_07.mp3"
+ },
+ {
+  "id": "P11_08",
+  "text": "She says she feels a little warm. The thermometer says forty-one degrees!",
+  "file": "P11_08.mp3"
+ },
+ {
+  "id": "P11_09",
+  "text": "Breathing: twenty-one breaths a minute. Normal is twelve to twenty.",
+  "file": "P11_09.mp3"
+ },
+ {
+  "id": "P13_01",
+  "text": "Three days.",
+  "file": "P13_01.mp3"
+ },
+ {
+  "id": "P13_02",
+  "text": "Behind my eyes. And my muscles.",
+  "file": "P13_02.mp3"
+ },
+ {
+  "id": "P13_03",
+  "text": "Yes, a lot. By the pond, a week ago.",
+  "file": "P13_03.mp3"
+ },
+ {
+  "id": "P13_04",
+  "text": "No cough. Not once this week.",
+  "file": "P13_04.mp3"
+ },
+ {
+  "id": "P13_05",
+  "text": "It started on Monday. So three days.",
+  "file": "P13_05.mp3"
+ },
+ {
+  "id": "P13_06",
+  "text": "We all ate the same lunch. Nobody else is sick.",
+  "file": "P13_06.mp3"
+ },
+ {
+  "id": "P13_07",
+  "text": "Paracetamol, yesterday. The fever went down, and then it came back.",
+  "file": "P13_07.mp3"
+ },
+ {
+  "id": "P13_08",
+  "text": "Yes. Two people on my street had a fever last week.",
+  "file": "P13_08.mp3"
+ },
+ {
+  "id": "P13_09",
+  "text": "Two doses, in school. I have the card.",
+  "file": "P13_09.mp3"
+ },
+ {
+  "id": "P15_01",
+  "text": "It can't be appendicitis.",
+  "file": "P15_01.mp3"
+ },
+ {
+  "id": "P15_02",
+  "text": "It might be dengue.",
+  "file": "P15_02.mp3"
+ },
+ {
+  "id": "P15_03",
+  "text": "It is dengue.",
+  "file": "P15_03.mp3"
+ },
+ {
+  "id": "P15_04",
+  "text": "It is unlikely to be measles.",
+  "file": "P15_04.mp3"
+ },
+ {
+  "id": "P15_05",
+  "text": "It is probably dengue.",
+  "file": "P15_05.mp3"
+ },
+ {
+  "id": "P15_06",
+  "text": "It might be flu, or it might be dengue.",
+  "file": "P15_06.mp3"
+ },
+ {
+  "id": "P15_07",
+  "text": "It is unlikely to be flu, because she has no cough.",
+  "file": "P15_07.mp3"
+ },
+ {
+  "id": "P15_08",
+  "text": "It is probably dengue, because she has a rash and a mosquito bite.",
+  "file": "P15_08.mp3"
+ },
+ {
+  "id": "P15_09",
+  "text": "It can't be appendicitis, because her belly does not hurt.",
+  "file": "P15_09.mp3"
+ },
+ {
+  "id": "P18_01",
+  "text": "No cough. No runny nose.",
+  "file": "P18_01.mp3"
+ },
+ {
+  "id": "P18_02",
+  "text": "Her belly is soft. It does not hurt.",
+  "file": "P18_02.mp3"
+ },
+ {
+  "id": "P18_03",
+  "text": "We ate the same food. Nobody else is sick.",
+  "file": "P18_03.mp3"
+ },
+ {
+  "id": "P18_04",
+  "text": "She has a fever, but she has no cough.",
+  "file": "P18_04.mp3"
+ },
+ {
+  "id": "P18_05",
+  "text": "Her eyes are not red. They are not watery.",
+  "file": "P18_05.mp3"
+ },
+ {
+  "id": "P18_06",
+  "text": "She had two measles vaccines.",
+  "file": "P18_06.mp3"
+ },
+ {
+  "id": "P18_07",
+  "text": "No cough, so it can not be flu.",
+  "file": "P18_07.mp3"
+ },
+ {
+  "id": "P18_08",
+  "text": "Her belly does not hurt when I press it.",
+  "file": "P18_08.mp3"
+ },
+ {
+  "id": "P18_09",
+  "text": "Fever, rash and mosquito bites. No cough.",
+  "file": "P18_09.mp3"
+ },
+ {
+  "id": "P19_01",
+  "text": "She has a rash, but no fever.",
+  "file": "P19_01.mp3"
+ },
+ {
+  "id": "P19_02",
+  "text": "He has a cough, but he has no fever.",
+  "file": "P19_02.mp3"
+ },
+ {
+  "id": "P19_03",
+  "text": "Although she has a fever, she has no cough.",
+  "file": "P19_03.mp3"
+ },
+ {
+  "id": "P19_04",
+  "text": "She was bitten by mosquitoes, so it might be dengue.",
+  "file": "P19_04.mp3"
+ },
+ {
+  "id": "P19_05",
+  "text": "Her friends ate the same food, so it is unlikely to be food poisoning.",
+  "file": "P19_05.mp3"
+ },
+ {
+  "id": "P19_06",
+  "text": "Although she has a high fever, her pulse is only slightly higher than normal.",
+  "file": "P19_06.mp3"
+ },
+ {
+  "id": "P19_07",
+  "text": "She has a rash, but not on her face, so measles is unlikely.",
+  "file": "P19_07.mp3"
+ },
+ {
+  "id": "P19_08",
+  "text": "Her platelets are low, so it might be dengue, but we need a blood test.",
+  "file": "P19_08.mp3"
+ },
+ {
+  "id": "P22_01",
+  "text": "I have a fever and red spots on my arms. What is wrong with me?",
+  "file": "P22_01.mp3"
+ },
+ {
+  "id": "P22_02",
+  "text": "No cough. No runny nose. But my head and my eyes hurt.",
+  "file": "P22_02.mp3"
+ },
+ {
+  "id": "P22_03",
+  "text": "A mosquito bit me a week ago, by the pond.",
+  "file": "P22_03.mp3"
+ },
+ {
+  "id": "P22_04",
+  "text": "Is it really dengue? How do you know?",
+  "file": "P22_04.mp3"
+ },
+ {
+  "id": "P22_05",
+  "text": "Okay. Please do the test. Quickly, please.",
+  "file": "P22_05.mp3"
+ },
+ {
+  "id": "P23_01",
+  "text": "I only feel a little warm.",
+  "file": "P23_01.mp3"
+ },
+ {
+  "id": "P23_02",
+  "text": "A mosquito? No, never.",
+  "file": "P23_02.mp3"
+ },
+ {
+  "id": "P23_03",
+  "text": "I have a terrible cough.",
+  "file": "P23_03.mp3"
+ },
+ {
+  "id": "P23_04",
+  "text": "My heart is fine. Totally normal.",
+  "file": "P23_04.mp3"
+ },
+ {
+  "id": "P23_05",
+  "text": "I have had a fever for two days.",
+  "file": "P23_05.mp3"
+ },
+ {
+  "id": "P23_06",
+  "text": "Same lunch as my friends. Nobody else is sick.",
+  "file": "P23_06.mp3"
+ },
+ {
+  "id": "P23_07",
+  "text": "My blood is perfect.",
+  "file": "P23_07.mp3"
+ },
+ {
+  "id": "P23_08",
+  "text": "The rash is on my face.",
+  "file": "P23_08.mp3"
+ },
+ {
+  "id": "P23_09",
+  "text": "I took paracetamol and the fever never came back.",
+  "file": "P23_09.mp3"
+ },
+ {
+  "id": "P27_01",
+  "text": "She has a rash on her arms and chest, but not on her face. It might be dengue. It is unlikely to be measles.",
+  "file": "P27_01.mp3"
+ },
+ {
+  "id": "P27_02",
+  "text": "She has no cough, so it is unlikely to be flu or measles.",
+  "file": "P27_02.mp3"
+ },
+ {
+  "id": "P27_03",
+  "text": "Her friends ate the same food and they are not sick, so food poisoning is less likely.",
+  "file": "P27_03.mp3"
+ },
+ {
+  "id": "P27_04",
+  "text": "Her temperature is 39.2. It is higher than normal, so she has a fever.",
+  "file": "P27_04.mp3"
+ },
+ {
+  "id": "P27_05",
+  "text": "She was bitten by mosquitoes a week ago, so it might be dengue.",
+  "file": "P27_05.mp3"
+ },
+ {
+  "id": "P27_06",
+  "text": "Her belly does not hurt when I press it, so it can't be appendicitis.",
+  "file": "P27_06.mp3"
+ },
+ {
+  "id": "P27_07",
+  "text": "Two people on her street were sick, so it might be an infection from mosquitoes.",
+  "file": "P27_07.mp3"
+ },
+ {
+  "id": "P27_08",
+  "text": "Her platelets and white cells are lower than normal. That fits dengue.",
+  "file": "P27_08.mp3"
+ },
+ {
+  "id": "P27_09",
+  "text": "Her head, her eyes and her muscles hurt, so it might be flu or dengue. It can't be appendicitis.",
+  "file": "P27_09.mp3"
+ },
+ {
+  "id": "P27_10",
+  "text": "Her eyes are not red or watery, so it is unlikely to be measles.",
+  "file": "P27_10.mp3"
+ },
+ {
+  "id": "P27_11",
+  "text": "Her pulse is 104. It is a little higher than normal.",
+  "file": "P27_11.mp3"
+ },
+ {
+  "id": "P27_12",
+  "text": "She had two measles vaccines, so measles is unlikely.",
+  "file": "P27_12.mp3"
+ },
+ {
+  "id": "P27_13",
+  "text": "Her sister had flu, so flu is possible. But she has no cough and she has a rash.",
+  "file": "P27_13.mp3"
+ },
+ {
+  "id": "P14_01",
+  "text": "It can't be appendicitis. I am sure.",
+  "file": "P14_01.mp3"
+ },
+ {
+  "id": "P14_02",
+  "text": "It is unlikely to be flu. Maybe one chance in ten.",
+  "file": "P14_02.mp3"
+ },
+ {
+  "id": "P14_03",
+  "text": "It might be dengue. Maybe.",
+  "file": "P14_03.mp3"
+ },
+ {
+  "id": "P14_04",
+  "text": "It is probably dengue. I am nearly sure.",
+  "file": "P14_04.mp3"
+ },
+ {
+  "id": "P14_05",
+  "text": "It is dengue. The test says so.",
+  "file": "P14_05.mp3"
+ }
+]
