@@ -309,50 +309,43 @@
  },
  {
   "id": "P15_03",
-  "text": "It is dengue. The test says so!",
+  "text": "Measles? I doubt it. It is unlikely.",
   "file": "P15_03.mp3",
   "priority": 2,
   "slide": "Exercise · How sure?"
  },
  {
   "id": "P15_04",
-  "text": "Measles? I doubt it. It is unlikely.",
+  "text": "Dengue? I'm nearly sure. It is probably dengue.",
   "file": "P15_04.mp3",
   "priority": 2,
   "slide": "Exercise · How sure?"
  },
  {
   "id": "P15_05",
-  "text": "Dengue? I'm nearly sure. It is probably dengue.",
+  "text": "It might be flu, it might be dengue. I can't decide!",
   "file": "P15_05.mp3",
   "priority": 2,
   "slide": "Exercise · How sure?"
  },
  {
   "id": "P15_06",
-  "text": "It might be flu, it might be dengue. I can't decide!",
+  "text": "Flu? Unlikely. She has no cough, you see.",
   "file": "P15_06.mp3",
   "priority": 2,
   "slide": "Exercise · How sure?"
  },
  {
   "id": "P15_07",
-  "text": "Flu? Unlikely. She has no cough, you see.",
+  "text": "Dengue, probably! Rash, mosquito bites… it all fits.",
   "file": "P15_07.mp3",
   "priority": 2,
   "slide": "Exercise · How sure?"
  },
  {
   "id": "P15_08",
-  "text": "Dengue, probably! Rash, mosquito bites… it all fits.",
-  "file": "P15_08.mp3",
-  "priority": 2,
-  "slide": "Exercise · How sure?"
- },
- {
-  "id": "P15_09",
   "text": "Appendicitis? It can't be. I pressed her belly and she just laughed.",
-  "file": "P15_09.mp3",
+  "file": "P15_08.mp3",
   "priority": 2,
   "slide": "Exercise · How sure?"
  },
@@ -484,7 +477,7 @@
  },
  {
   "id": "P22_01",
-  "text": "I have a fever and red spots on my arms. Am I turning into a tomato?",
+  "text": "I have a fever and red spots on my arms. What is wrong with me?",
   "file": "P22_01.mp3",
   "priority": 1,
   "slide": "Exercise · Patient chat (voice messages)"

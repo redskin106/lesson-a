@@ -2,7 +2,7 @@
 
 Model: Eleven v4. Same two voices as the Lesson 4 pack (Patient, Narrator: see lesson4-elevenlabs-pages-pack-v4). Save each clip as its ID (P09_01.mp3), put them in lessons-3-4/source-audio/l3_pages/ with manifest.json (ids, text, file) and the build wires them by exact text. Settings: speed about 0.9 (0.85 for the Narrator), stability toward the stable end. Numbers are spelled out. Until the clips exist the deck uses the browser voice.
 
-**Priority:** P1 = story and fun lines (generate these first), P2 = exercise listening lines, P3 = optional slides (leave on the browser voice if credits are short). P1: 29 clips, 1526 characters · P2: 45 clips, 2355 characters · P3: 22 clips, 1268 characters
+**Priority:** P1 = story and fun lines (generate these first), P2 = exercise listening lines, P3 = optional slides (leave on the browser voice if credits are short). P1: 29 clips, 1521 characters · P2: 44 clips, 2324 characters · P3: 22 clips, 1268 characters
 
 ID | Priority | Voice | Text to paste (tag first)
 ---|---|---|---
@@ -50,13 +50,12 @@ P14_04 | P2 | Narrator | [calm, clear] It is probably dengue. I am nearly sure.
 P14_05 | P2 | Narrator | [calm, clear] It is dengue. The test says so.
 P15_01 | P2 | Patient | [tired, friendly] Appendicitis? No way. Her belly is fine.
 P15_02 | P2 | Patient | [tired, friendly] Dengue? Hmm… it might be dengue. I'm not sure yet.
-P15_03 | P2 | Narrator | [calm, clear] It is dengue. The test says so!
-P15_04 | P2 | Patient | [tired, friendly] Measles? I doubt it. It is unlikely.
-P15_05 | P2 | Patient | [tired, friendly] Dengue? I'm nearly sure. It is probably dengue.
-P15_06 | P2 | Narrator | [calm, clear] It might be flu, it might be dengue. I can't decide!
-P15_07 | P2 | Patient | [tired, friendly] Flu? Unlikely. She has no cough, you see.
-P15_08 | P2 | Patient | [tired, friendly] Dengue, probably! Rash, mosquito bites… it all fits.
-P15_09 | P2 | Patient | [tired, friendly] Appendicitis? It can't be. I pressed her belly and she just laughed.
+P15_03 | P2 | Patient | [tired, friendly] Measles? I doubt it. It is unlikely.
+P15_04 | P2 | Patient | [tired, friendly] Dengue? I'm nearly sure. It is probably dengue.
+P15_05 | P2 | Narrator | [calm, clear] It might be flu, it might be dengue. I can't decide!
+P15_06 | P2 | Patient | [tired, friendly] Flu? Unlikely. She has no cough, you see.
+P15_07 | P2 | Patient | [tired, friendly] Dengue, probably! Rash, mosquito bites… it all fits.
+P15_08 | P2 | Patient | [tired, friendly] Appendicitis? It can't be. I pressed her belly and she just laughed.
 P18_01 | P2 | Patient | [tired, friendly] No cough, no runny nose. Nothing!
 P18_02 | P2 | Narrator | [calm, clear] Her belly is soft. She even asked for lunch!
 P18_03 | P2 | Patient | [tired, friendly] We ate the same food. Nobody else is sick. Not even the cat!
@@ -75,7 +74,7 @@ P19_06 | P3 | Patient | [tired, friendly] My friends ate the same food, so it is
 P19_07 | P3 | Patient | [tired, friendly] Although my fever is high, my pulse is only a little fast.
 P19_08 | P3 | Patient | [tired, friendly] I have a rash, but not on my face, so measles is unlikely.
 P19_09 | P3 | Patient | [tired, friendly] My platelets are low, so maybe dengue. But we need a blood test first.
-P22_01 | P1 | Patient | [tired, friendly] I have a fever and red spots on my arms. Am I turning into a tomato?
+P22_01 | P1 | Patient | [tired, friendly] I have a fever and red spots on my arms. What is wrong with me?
 P22_02 | P1 | Patient | [tired, friendly] No cough. Not even a little one. My cat coughs more than me!
 P22_03 | P1 | Patient | [tired, friendly] A mosquito bit me a week ago, by the pond. A big one!
 P22_04 | P1 | Patient | [tired, friendly] Dengue?! How do you know? Are you a doctor?
