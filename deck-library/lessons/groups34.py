@@ -22,32 +22,34 @@ def page(lesson,letter,name,col,clues,frames):
 out=os.path.join(os.path.dirname(__file__),'..','..','lessons-3-4','groups'); os.makedirs(out,exist_ok=True)
 import importlib.util,json
 _sp=importlib.util.spec_from_file_location('l34',os.path.join(os.path.dirname(__file__),'lessons34.py'));_m=importlib.util.module_from_spec(_sp);_sp.loader.exec_module(_m)
-ORDER=[('red','1','#ff5a6a','1️⃣'),('blue','2','#2a8cf0','2️⃣'),('green','3','#19b38a','3️⃣'),('yellow','4','#f2a900','4️⃣')]
+ORDER=[('red','1','#ff5a6a'),('blue','2','#2a8cf0'),('green','3','#19b38a'),('yellow','4','#f2a900')]
+import base64,glob
+ADIR=os.path.join(os.path.dirname(__file__),'..','..','lessons-3-4','source-audio','l4_fix')
+def _clip(n):
+    p=os.path.join(ADIR,'FIX_%02d.mp3'%n)
+    return 'data:audio/mpeg;base64,'+base64.b64encode(open(p,'rb').read()).decode() if os.path.exists(p) else ''
+SPK='<svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z" fill="#fff"/><path d="M15.5 8.5a5 5 0 010 7M18 6a8.5 8.5 0 010 12" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'
+JS="""var cur=null;function stop(){if(cur){cur.pause();cur=null}if(window.speechSynthesis)speechSynthesis.cancel();document.querySelectorAll('.nt.on').forEach(function(x){x.classList.remove('on')})}
+document.querySelectorAll('.nt').forEach(function(b){b.onclick=function(){var was=b.classList.contains('on');stop();if(was)return;b.classList.add('on');var c=b.dataset.clip;if(c){cur=new Audio(c);cur.onended=function(){b.classList.remove('on')};cur.play()}else if(window.speechSynthesis){var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.85;u.onend=function(){b.classList.remove('on')};speechSynthesis.speak(u)}}});"""
+def notes(items):
+    return ''.join(f'<button class="nt" aria-label="voice note" data-clip="{_clip(f["n"])}" data-say="{html.escape(f["voice"])}"><span class="pic">{f["pic"]}</span><span class="pl">{SPK}</span></button>' for f in items)
+CSS="""*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;font-family:Outfit,system-ui,sans-serif;background:linear-gradient(#f5ecff,#dff1ff);color:#1c1b2e;padding:20px;min-height:100vh}
+.top{display:flex;align-items:center;gap:14px;margin-bottom:18px}.num{width:84px;height:84px;border-radius:50%;background:var(--c);color:#fff;font-weight:800;font-size:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.22)}
+.nt{display:flex;align-items:center;justify-content:space-between;width:100%;height:150px;margin:0 0 16px;padding:0 26px;border-radius:36px;border:6px solid var(--c);background:#fff;box-shadow:0 10px 24px rgba(60,30,140,.14);font:inherit;cursor:pointer}
+.nt .pic{font-size:84px;line-height:1}.nt .pl{width:92px;height:92px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;flex:none}
+.nt.on{background:#fff7e0}.nt.on .pl{animation:pu 1s infinite}@keyframes pu{50%{transform:scale(1.14)}}.g{margin:6px 0 10px;font-weight:800;font-size:26px}"""
 def page4(idx):
-    key,name,col,dot=ORDER[idx]; nxt=ORDER[(idx+1)%4]; prv=ORDER[(idx-1)%4]
-    mine=[f for f in _m.FIX if f['owner']==key]; hold=[f for f in _m.FIX if f['owner']==prv[0]]
-    cards=''
-    for ri,f in enumerate(mine):
-        opts=json.dumps(f['opts'],ensure_ascii=False)
-        cards+=f'<div class="mk" data-ans="{html.escape(f["fix"])}" data-o=\'{html.escape(opts,quote=True)}\'><div class="w"><span class="e">{f["pic"]}</span><s>{html.escape(f["wrong"])}</s></div><div class="ask"><b>Round {ri+1}.</b> Ask the class: "Does anyone have a voice note about the {f["topic"].lower()}?"</div><button class="hb">✔ We listened</button><div class="op" style="display:none"></div><div class="ok" style="display:none">✅ Fixed! Say it to the class.</div></div>'
-    vn=''.join(f'<div class="vn"><button class="pl" data-say="{html.escape(f["voice"])}">🎧</button><div><b>{f["pic"]} Voice note: {f["topic"].lower()}</b><div class="who">{f["who"]}</div></div></div>' for f in hold)
-    return f'''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fix the ward · Group {name}</title><style>
-*{{box-sizing:border-box}}body{{margin:0;font-family:Outfit,system-ui,sans-serif;background:linear-gradient(#f5ecff,#dff1ff);color:#1c1b2e;padding:18px}}
-.top{{display:flex;align-items:center;gap:12px;margin-bottom:12px}}.dot{{width:50px;height:50px;border-radius:50%;background:{col}}}h1{{font-size:25px;margin:0}}.sub{{font-size:15px;color:#5a5a74}}
-.sec{{font-weight:800;font-size:20px;margin:18px 0 8px}}.mk,.vn{{background:#fff;border:5px solid {col};border-radius:26px;padding:14px 16px;margin-bottom:12px;box-shadow:0 8px 20px rgba(60,30,140,.12)}}
-.w{{font-size:24px;font-weight:800}}.w .e{{font-size:36px;margin-right:10px}}.w s{{color:#c01850}}.ask{{font-size:16px;color:#5a5a74;margin:8px 0}}
-.hb,.opt{{display:block;width:100%;margin:8px 0 0;padding:12px 16px;border-radius:20px;border:3px solid #d8c9ff;background:#f7f2ff;font:700 18px Outfit,system-ui;text-align:left}}.hb{{text-align:center;background:{col};color:#fff;border:0}}
-.opt.bad{{background:#ffe0e6;border-color:#ff8aa0;animation:sh .3s}}.opt.good{{background:#d6fbea;border-color:#2bd9b6}}.ok{{font-weight:800;font-size:20px;margin-top:10px;color:#0f9a8c}}
-.vn{{display:flex;gap:14px;align-items:center}}.pl{{flex:none;width:76px;height:76px;border-radius:50%;border:0;background:{col};font-size:38px}}.who{{font-size:15px;color:#6a6a7e;margin-top:2px}}.hint{{font-size:15px;color:#5a5a74}}
-@keyframes sh{{25%{{transform:translateX(-6px)}}75%{{transform:translateX(6px)}}}}</style></head><body>
-<div class="top"><div class="dot"></div><div><h1>Group {name}</h1><div class="sub">Fix the ward · Lesson 4</div></div></div>
-<div class="sec">Your mistakes</div>{cards}<div class="hint">One group asks at a time. Wait for your turn. Listen. Then choose the fix.</div>
-<div class="sec">Your voice notes · if someone asks, say: "Yes, we do. Come and listen."</div>{vn}
-<script>function shuf(a){{for(var i=a.length-1;i>0;i--){{var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}}return a}}
-document.querySelectorAll('.pl').forEach(function(b){{b.onclick=function(){{if(window.speechSynthesis){{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}}}}}});
-document.querySelectorAll('.mk').forEach(function(m){{var op=m.querySelector('.op');m.querySelector('.hb').onclick=function(){{this.style.display='none';op.style.display='block';shuf(JSON.parse(m.dataset.o)).forEach(function(t){{var b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=function(){{if(t===m.dataset.ans){{b.classList.add('good');op.querySelectorAll('.opt').forEach(function(x){{x.disabled=true}});m.querySelector('.ok').style.display='block'}}else{{b.classList.add('bad');setTimeout(function(){{b.classList.remove('bad')}},400)}}}};op.appendChild(b)}})}}}});</script></body></html>'''
+    key,name,col=ORDER[idx]
+    mine=[f for f in _m.FIX if f['owner']==key]
+    return f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fix the ward · Group {name}</title><style>:root{{--c:{col}}}{CSS}</style></head><body><div class="top"><div class="num">{name}</div></div>{notes(mine)}<script>{JS}</script></body></html>'
+def teacher():
+    sec=''.join(f'<div class="g" style="color:{ORDER[i][2]}">Group {ORDER[i][1]}</div><div style="--c:{ORDER[i][2]}">{notes([f for f in _m.FIX if f["owner"]==ORDER[i][0]])}</div>' for i in range(4))
+    return f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fix the ward · teacher</title><style>{CSS}</style></head><body><div class="top"><h1 style="margin:0;font-size:26px">All 12 voice notes (teacher laptop)</h1></div>{sec}<script>{JS}</script></body></html>'
+import glob as _g
+for _f in _g.glob(os.path.join(out,'l4-*.html')): os.remove(_f)
+open(os.path.join(out,'l4-teacher.html'),'w').write(teacher())
 for idx in range(4):
-    open(os.path.join(out,f'l4-{ORDER[idx][0]}.html'),'w').write(page4(idx)); print(4,ORDER[idx][1])
+    open(os.path.join(out,f'l4-{ORDER[idx][1]}.html'),'w').write(page4(idx)); print(4,ORDER[idx][1])
 for lesson,clues,hunt in ((3,K.L3_CLUES,K.HUNT3),):
     by={c['id']:c for c in clues}
     for letter,name,col in COL:

@@ -228,7 +228,7 @@ _FP=stick(110,395,1.2,'down')+'<text x="190" y="340" font-size="64">☕</text><t
 _FP2=stick(120,395,1.2,'hold')+'<text x="190" y="360" font-size="80">📝</text><text x="195" y="300" font-size="60" fill="#e0304a">❌</text>'
 _FP3=stick(90,395,1.15,'up')+stick(310,395,1.15,'point')+bubble_svg(20,16,330,100,'Can I hear your\nvoice note?',fs=26,tx=120)
 _FP4=stick(130,395,1.2,'hold')+'<text x="195" y="330" font-size="86">🎧</text><text x="255" y="190" font-size="110" fill="#2bd9b6" font-family="Outfit,sans-serif" font-weight="800">✔</text>'
-FIX_COMIC=[dict(svg=_FP,cap='The night nurse made mistakes.'),dict(svg=_FP2,cap='Find the mistakes on your page.'),dict(svg=_FP3,cap='Ask another group.'),dict(svg=_FP4,cap='Listen. Choose the fix. Say it.')]
+FIX_COMIC=[dict(svg=_FP,cap='The night nurse made mistakes.'),dict(svg=_FP2,cap='Find the mistakes on the board.'),dict(svg=_FP3,cap='Ask the class.'),dict(svg=_FP4,cap='Listen. Write the fix. Say it.')]
 
 # ================= L4 post-processing: 16 Nov review round =================
 def _o(pic,q,*opts,**kw): return dict(pic=pic,q=q,opts=list(opts),ans=opts[0],**kw)
@@ -392,7 +392,7 @@ SYM4=[[_a('🥱',"I can't keep my eyes open!",'She is exhausted.','She is dizzy.
  [_a('🥱','I am so tired… but in bed, I just stare at the ceiling.','She is exhausted, but she cannot sleep.','She is exhausted, and she sleeps well.','She is not tired.'),_a('😓','I am sweating, and my face is white. Is the air-con on?','She is sweaty and pale.','She is sweaty and red.','She is cold and pale.'),_a('☕','Two cups. Maybe three. Okay… eight.','She drinks much more coffee than she first says.','She drinks only two cups.','She does not drink coffee.')]]
 PAIRS=dict(PAIRS,pairs=[('She has no cough and no fever.',"It can't be flu."),('Her friends ate the same lunch. They are fine.',"It can't be food poisoning."),('Her hands shake when she skips breakfast.','It might be low blood sugar.'),('She is breathless and sweaty before every exam.','It might be stress.'),('She drinks eight cups of coffee a day.','It might be the coffee.')])
 _FP3=stick(90,395,1.15,'up')+stick(310,395,1.15,'point')+bubble_svg(10,8,380,128,'Does anyone have\na voice note about\nthe temperature?',fs=25,tx=110)
-FIX_COMIC=[dict(svg=_FP,cap='The night nurse made mistakes.'),dict(svg=_FP2,cap='Find the mistakes on your page.'),dict(svg=_FP3,cap='One group asks the class. Everyone listens.'),dict(svg=_FP4,cap='"Yes, we do." Listen. Choose the fix. Say it.')]
+FIX_COMIC=[dict(svg=_FP,cap='The night nurse made mistakes.'),dict(svg=_FP2,cap='Find the mistakes on the board.'),dict(svg=_FP3,cap='One group asks the class. Everyone listens.'),dict(svg=_FP4,cap='"Yes, we do." Listen. Choose the fix. Say it.')]
 
 # ---- 17 Nov round 5: cups wording in Compare, truth exercise not all coffee, Plan B cleanup ----
 def _tq(pic,say,src,ans,*w): return dict(pic=pic,say=say,q=src+' Is she telling the truth?',ans=ans,opts=[ans,*w])
