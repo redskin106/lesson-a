@@ -35,32 +35,32 @@ SYM=[[_q('🌡️','What does the nurse write?','She has a fever.','She has a ra
  [_q('🤒','What does the nurse write?','She has a fever and a headache.','She have a fever and a headache.','She has fever and headache a.','She has a fever and a cough.',say='Fever and a headache. It is only a cold, nurse!'),
   _q('🦟','What does the nurse write?','She was bitten by a mosquito a week ago.','A mosquito was bitten her a week ago.','She bit a mosquito a week ago.','She was bite by a mosquito.',say='A mosquito bit me a week ago. Now I am sick.'),
   _q('🔴','What does the nurse write?','She has a rash on her arms but not on her face.','She has a rash on her arms but no on her face.','She have rash on arms, not face.','She has a rash on her face but not on her arms.',say='Red spots on my arms, but not on my face. Phew!'),
-  _q('🥵','What does the nurse write?','He has a very high fever.','He has a low fever.','He have a very high fever.','He has fever very high.',say='I only feel a little warm. (Thermometer: 41 °C)')]]
+  _q('🥵','What does the nurse write?','She has a very high fever.','She has a low fever.','She have a very high fever.','She has fever very high.',say='I only feel a little warm. (Thermometer: 41 °C)')]]
 U_PL='×10⁹/L'
 HL=dict(bronze=[
   _q('🌡️','The normal temperature is 37 °C. Her temperature is 39.2 °C. Her temperature is ___ than normal.','higher','lower'),
   _q('🩸',f'Normal platelets: 150,000 to 450,000 per µL. Her platelets: 95,000 per µL. Her platelets are ___ than normal.','lower','higher'),
   _q('🫁','Normal breathing: 12 to 20 breaths per minute. Her breathing: 18 breaths per minute. Her breathing is ___.','normal','higher','lower'),
-  _q('💓','Normal pulse: 60 to 100 beats per minute. His pulse: 48 beats per minute. His pulse is ___ than normal.','lower','higher')],
+  _q('💓','Normal pulse: 60 to 100 beats per minute. Her pulse: 48 beats per minute. Her pulse is ___ than normal.','lower','higher')],
  silver=[
   _q('🌡️','Normal temperature: 37 °C. Her temperature: 39.2 °C.','Her temperature is much higher than normal.','Her temperature is slightly higher than normal.','Her temperature is lower than normal.'),
   _q('💓','Normal pulse: 60 to 100 beats per minute. Her pulse: 104 beats per minute.','Her pulse is slightly higher than normal.','Her pulse is much lower than normal.','Her pulse is normal.'),
   _q('🩸',f'Normal white cells: 4,500 to 11,000 per µL. Her white cells: 3,100 per µL.','Her white cells are lower than normal.','Her white cells are much higher than normal.','Her white cells are normal.'),
-  _q('🌡️','Normal temperature: 37 °C. His temperature: 38.1 °C.','His temperature is slightly higher than normal. It is a mild fever.','His temperature is much higher than normal.','His temperature is lower than normal.')],
+  _q('🌡️','Normal temperature: 37 °C. Her temperature: 38.1 °C.','Her temperature is slightly higher than normal. It is a mild fever.','Her temperature is much higher than normal.','Her temperature is lower than normal.')],
  gold=[
-  _q('🥵','A patient says "I feel a little warm." The thermometer says 41 °C. Normal is 37 °C.','His temperature is dangerously higher than normal. It is not a little warm!','His temperature is slightly higher than normal.','His temperature is much lower than normal.','His temperature is normal.'),
+  _q('🥵','A patient says "I feel a little warm." The thermometer says 41 °C. Normal is 37 °C.','Her temperature is dangerously higher than normal. It is not a little warm!','Her temperature is slightly higher than normal.','Her temperature is much lower than normal.','Her temperature is normal.'),
   _q('🩸',f'Platelets: 95,000 per µL. Normal: 150,000 to 450,000 per µL.','Her platelets are much lower than the normal range.','Her platelets are much more low than normal.','Her platelets are within the normal range.','Her platelets is lower than normal.'),
   _q('🫁','Breathing: 18 breaths per minute. Normal: 12 to 20 breaths per minute.','Her breathing is within the normal range.','Her breathing is higher than the normal range.','Her breathing is lower than the normal range.','Her breathing is normal than.'),
-  _q('💓','A sleeping marathon runner: 48 beats per minute. Normal for most adults: 60 to 100.','His pulse is lower than the normal range, but he is very fit.','His pulse is much higher than normal.','His pulse is normal.','His pulse are lower than normal.')])
+  _q('💓','A sleeping marathon runner: 48 beats per minute. Normal for most adults: 60 to 100.','Her pulse is lower than the normal range, but she is very fit.','Her pulse is much higher than normal.','Her pulse is normal.','Her pulse are lower than normal.')])
 def _d(e,now,normal,s_,z): return dict(e=e,now=now,normal=normal,s=s_,z=z)
 DIAL_DEMO=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),
  _d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),
  _d('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6),
  _d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3)]
 DIAL_LV=[
- [_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),_d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2)],
- [_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),_d('🫁','Breathing: 21 breaths per minute','12 to 20 breaths per minute','His breathing is',4),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1),_d('💓','Pulse: 130 beats per minute','60 to 100 beats per minute','Her pulse is',5)],
- [_d('🌡️','Temperature: 32 °C','about 37 °C','His temperature is',0),_d('💓','Pulse: 42 beats per minute','60 to 100 beats per minute','His pulse is',1),_d('🩸',f'Platelets: 20,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',0),_d('🫁','Breathing: 40 breaths per minute','12 to 20 breaths per minute','Her breathing is',6)]]
+ [_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),_d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','Her pulse is',2)],
+ [_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),_d('🫁','Breathing: 21 breaths per minute','12 to 20 breaths per minute','Her breathing is',4),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1),_d('💓','Pulse: 130 beats per minute','60 to 100 beats per minute','Her pulse is',5)],
+ [_d('🌡️','Temperature: 32 °C','about 37 °C','Her temperature is',0),_d('💓','Pulse: 42 beats per minute','60 to 100 beats per minute','Her pulse is',1),_d('🩸',f'Platelets: 20,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',0),_d('🫁','Breathing: 40 breaths per minute','12 to 20 breaths per minute','Her breathing is',6)]]
 L3=[
  dict(m='cover',phase='ENGAGE',label='Cover',title='Lesson <span class="grad">3</span>',phases=['Engage','Study','Activate'],active=0,cards=[dict(pic='🩺',x=1010,y=150,w=330,h=430,r=-7),dict(pic='🌡️',x=1380,y=330,w=330,h=430,r=6)]),
  dict(m='vol_ladder',phase='ENGAGE',label='Eyes closed. Louder.',min=3,title=None,clips=['bello.mp3','banana.mp3','papaya.mp3','kampai.mp3'],rungs=['Bello!','Banana!','Tu e bella<br>como la papaya!','KAMPAI!'],side='Everyone, eyes closed, at the same time. Whisper first. Each word is louder.'),
@@ -123,7 +123,7 @@ ROOM_SPOTS=[dict(e='🌡️',x=1130,y=300,t='A thermometer: 39.2 °C.'),dict(e='
  dict(e='🏞️',x=110,y=250,t='A pond outside the window.'),dict(e='🐱',x=1120,y=520,t='A sleepy cat.')]
 DIAL_MIX=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),
  _d('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),
- _d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1)]
+ _d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','Her pulse is',2),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1)]
 CUT3={'Teach · How much?','Exercise · The dial','Extra · Name the illness','Extra · What is wrong with this chart?','Listen and fix (handover)','Taboo for nurses (demo / class version)'}
 _new=[]
 for d in L3:
@@ -280,11 +280,11 @@ LONGEX=dict(m='choice',phase='STUDY',title='How long?',label='Exercise · How lo
  [_q4('☀️','What does the nurse write?','It started today.','It started two weeks ago.','It started last week.',say='I woke up like this this morning.'),_q4('🕑','What does the nurse write?','It started two weeks ago.','It started two days ago.','It started today.',say='I have been like this for two weeks.'),_q4('📚','What does the nurse write?','It started when the exams started.','It started when the exams finished.','It started yesterday.',say='It started when the exams started.')],
  [_q4('📅','What does the nurse write?','She has a headache. It started two days ago.','She has a headache. It started on two days.','She has a headache. It started since two days.',say='My head hurts. It started two days ago.'),_q4('🗓️','What does the nurse write?','He is tired. It started on Monday.','He is tired. It started Monday ago.','He is tired. It started in Monday.',say='I am so tired. It started on Monday.'),_q4('🕑','What does the nurse write?','She cannot sleep. It started two weeks ago.','She cannot sleep. It started for two weeks.','She cannot sleep. It started two weeks.',say='I cannot sleep. Two weeks ago it began.')],
  K.L4_EX[2]['levels']['gold']))
-DIAL4=[_d('💓','Pulse: 110 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('☕','Coffee: 8 cups a day','up to 4 cups a day','Her coffee is',5),_d('🛏️','Sleep: 3 hours a night','7 to 9 hours a night','Her sleep is',1),_d('🌡️','Temperature: 36.8 °C','about 37 °C','Her temperature is',3),_d('💓','Pulse: 45 beats per minute','60 to 100 beats per minute','His pulse is',1),_d('☕','Coffee: 12 cups a day','up to 4 cups a day','Her coffee is',6)]
+DIAL4=[_d('💓','Pulse: 110 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('☕','Coffee: 8 cups a day','up to 4 cups a day','Her coffee is',5),_d('🛏️','Sleep: 3 hours a night','7 to 9 hours a night','Her sleep is',1),_d('🌡️','Temperature: 36.8 °C','about 37 °C','Her temperature is',3),_d('💓','Pulse: 45 beats per minute','60 to 100 beats per minute','Her pulse is',1),_d('☕','Coffee: 12 cups a day','up to 4 cups a day','Her coffee is',6)]
 HL4=dict(m='choice',phase='STUDY',title='Higher or lower?',label='Exercise · Higher or lower?',lvl=3,min=3,levels=_lv3(
- [_o('🛏️','Normal sleep: 7 to 9 hours. Her sleep: 3 hours. Her sleep is ___ than normal.','lower','higher'),_o('☕','Normal coffee: up to 4 cups. Her coffee: 8 cups. Her coffee is ___ than normal.','higher','lower'),_o('💓','Normal pulse: 60 to 100. His pulse: 45. His pulse is ___ than normal.','lower','higher')],
+ [_o('🛏️','Normal sleep: 7 to 9 hours. Her sleep: 3 hours. Her sleep is ___ than normal.','lower','higher'),_o('☕','Normal coffee: up to 4 cups. Her coffee: 8 cups. Her coffee is ___ than normal.','higher','lower'),_o('💓','Normal pulse: 60 to 100. Her pulse: 45. Her pulse is ___ than normal.','lower','higher')],
  [_o('💓','Normal pulse: 60 to 100 beats per minute. Her pulse: 110.','Her pulse is slightly higher than normal.','Her pulse is much higher than normal.','Her pulse is lower than normal.'),_o('🛏️','Normal sleep: 7 to 9 hours. Her sleep: 3 hours.','Her sleep is much lower than normal.','Her sleep is slightly lower than normal.','Her sleep is higher than normal.'),_o('🌡️','Normal temperature: about 37 °C. Her temperature: 36.8 °C.','Her temperature is normal.','Her temperature is higher than normal.','Her temperature is lower than normal.')],
- [_o('☕','Coffee: 12 cups a day. Normal: up to 4 cups.','Her coffee is dangerously higher than normal.','Her coffee is slightly higher than normal.','Her coffee is much lower than normal.'),_o('🛏️','A patient says "I sleep fine." The watch says 3 hours. Normal: 7 to 9.','Her sleep is much lower than normal. She does not sleep fine!','Her sleep is normal.','Her sleep is slightly higher than normal.'),_o('💓','A sleeping marathon runner: 48 beats per minute. Normal: 60 to 100.','His pulse is lower than the normal range, but he is very fit.','His pulse is much higher than normal.','His pulse is normal.')]))
+ [_o('☕','Coffee: 12 cups a day. Normal: up to 4 cups.','Her coffee is dangerously higher than normal.','Her coffee is slightly higher than normal.','Her coffee is much lower than normal.'),_o('🛏️','A patient says "I sleep fine." The watch says 3 hours. Normal: 7 to 9.','Her sleep is much lower than normal. She does not sleep fine!','Her sleep is normal.','Her sleep is slightly higher than normal.'),_o('💓','A sleeping marathon runner: 48 beats per minute. Normal: 60 to 100.','Her pulse is lower than the normal range, but she is very fit.','Her pulse is much higher than normal.','Her pulse is normal.')]))
 _MI=lambda t:'<span style="color:#0f9a8c">It</span> <span style="color:#2f9e4a">'+t+'</span>'
 MIGHT_T=dict(m='teach',phase='STUDY',label="Teach · Might, can't, because",min=1,role='Clue → sentence',pic='☕',lines=[dict(t='Clue: her hands shake after every coffee.',c='amber'),dict(t=_MI('[[might]] be')+' <span style="color:#e8821a">the coffee.</span>',c='teal'),dict(t='Clue: she has no cough.',c='amber'),dict(t=_MI("[[can't]] be")+' <span style="color:#e8821a">flu.</span>',c='teal')])
 MIGHT_E=dict(m='choice',phase='STUDY',title='Might or can\'t?',label="Exercise · Might · can't · because",lvl=2,min=2,levels=_lv3(
@@ -334,7 +334,7 @@ def _da(e,now,normal,st,z,say): return dict(_d(e,now,normal,st,z),say=say)
 DIALA=[_da('💓','Pulse: 150 beats per minute','60 to 100 beats per minute','Her pulse is',5,'Her pulse is one hundred and fifty. Normal is sixty to one hundred.'),
  _da('🛏️','Sleep: 6 hours a night','7 to 9 hours a night','Her sleep time is',2,'She sleeps six hours a night. Normal is seven to nine hours.'),
  _da('☕','Coffee: 5 cups a day','up to 4 cups a day','Her coffee intake is',4,'She drinks five cups of coffee a day. A healthy limit is up to four cups.'),
- _da('🌡️','Temperature: 37 °C','about 37 °C','His temperature is',3,'His temperature is thirty-seven degrees. Normal is about thirty-seven.'),
+ _da('🌡️','Temperature: 37 °C','about 37 °C','Her temperature is',3,'Her temperature is thirty-seven degrees. Normal is about thirty-seven.'),
  _da('💓','Pulse: 38 beats per minute','60 to 100 beats per minute','Her pulse is',0,'Her pulse is thirty-eight beats a minute. Normal is sixty to one hundred.'),
  _da('☕','Coffee: 12 cups a day','up to 4 cups a day','Her coffee intake is',6,'She drinks twelve cups of coffee a day. A healthy limit is up to four cups.')]
 DIALX=dict(m='dial',phase='STUDY',label='Exercise · Higher or lower?',min=3,title='Listen: higher or lower?',aud=True,items=DIALA)
@@ -366,7 +366,7 @@ DIAL4=[_d('💓','Pulse: 110 beats per minute','60 to 100 beats per minute','Her
 DIALA=[_da('💓','Pulse: 150 beats per minute','60 to 100 beats per minute','Her pulse is',5,'Her pulse is one hundred and fifty. Normal is sixty to one hundred.'),
  _R(_da('🛏️','Sleep: 6 hours a night','7 to 9 hours a night','Her sleep time is',2,'She sleeps six hours a night. The recommended amount is seven to nine hours.')),
  _R(_da('☕','Coffee: 5 cups a day','up to 4 cups a day','Her coffee intake is',4,'She drinks five cups of coffee a day. The recommended limit is four cups.')),
- _da('🌡️','Temperature: 37 °C','about 37 °C','His temperature is',3,'His temperature is thirty-seven degrees. Normal is about thirty-seven.'),
+ _da('🌡️','Temperature: 37 °C','about 37 °C','Her temperature is',3,'Her temperature is thirty-seven degrees. Normal is about thirty-seven.'),
  _da('💓','Pulse: 38 beats per minute','60 to 100 beats per minute','Her pulse is',0,'Her pulse is thirty-eight beats a minute. Normal is sixty to one hundred.'),
  _R(_da('☕','Coffee: 12 cups a day','up to 4 cups a day','Her coffee intake is',6,'She drinks twelve cups of coffee a day. The recommended limit is four cups.'))]
 DIALX=dict(DIALX,items=DIALA)
@@ -557,7 +557,7 @@ COMIC4[3]['img']='l4_b4_asleep.jpg'
 for _p in COMIC4: _p['cap']=''
 for d in L4:
     if d.get('label')=='Your toolkit': d['bubbles']=True
-    if d.get('label')=="Teach · Might, can't, because": d['pics']=['l4_c3_shaky.jpg','l4_g1_cups_eight.jpg','l4_h1_thermometer.jpg','l4_h1_thermometer.jpg']; d['pic']='l4_c3_shaky.jpg'
+    if d.get('label')=="Teach · Might, can't, because": d['pics']=['l4_c3_shaky.jpg','l4_g2_might_causes.jpg','l4_h1_thermometer.jpg','l4_h1_thermometer.jpg']; d['pic']='l4_c3_shaky.jpg'
     if d.get('label')=='Exercise · Symptoms':
         d=d
 # 17 Nov 15:30: pain faces -> art, cups, thermometer
@@ -580,7 +580,7 @@ for d in L4:
     lb=d.get('label')
     if lb in ('Teach · How bad?','Exercise · How bad?'): d=_fm(d,_FMAP)
     if lb=='Exercise · Symptoms': d=_cupfix(d)
-    if lb in ('Everybody lies',"Teach · Might, can't, because"): d=_fm(d,{'🌡️':'l4_h1_thermometer.jpg'})
+    if lb in ('Everybody lies',"Teach · Might, can't, because"): d=_fm(d,{'🌡️':'l4_h1_thermometer.jpg','🤕':'l4_h2_headache_mild.jpg'})
     _nl.append(d)
 L4=_nl
 # 17 Nov 15:45: toolkit as colour-coded chips (like the grammar rows), p13 dial art
@@ -593,7 +593,7 @@ for d in L4:
           [[('The handover',_S),('says',_V),('…',_O),('but',_B),('the voice note',_S),('says',_V),('…',_O)],[('She',_S),('drinks',_V),('eight cups',_O),('every day.',_T)],[('Her pulse',_S),('is',_V),('higher than normal.',_O)]],
           [[('It',_S),('might be',_V),('too much coffee',_O),('because …',_B)],[('It',_S),("can't be",_V),('a broken heart',_O),('because …',_B)],[('It',_S),("can't be",_V),('flu',_O),('because',_B),('she',_S),('has',_V),('no cough.',_O)]]]
     if d.get('label')=='Exercise · Higher or lower?':
-        _DA={('💓','Pulse: 110 beats per minute'):'l4_c4_racing_heart.jpg',('💓','Pulse: 150 beats per minute'):'l4_c4_racing_heart.jpg',('💓','Pulse: 38 beats per minute'):'l4_c2_dizzy.jpg',('🛏️','Sleep: 3 hours a night'):'l4_b3_night.jpg',('🛏️','Sleep: 6 hours a night'):'l4_b3_night.jpg',('🌡️','Temperature: 37 °C'):'l4_h1_thermometer.jpg',('🌡️','Temperature: 41 °C'):'l4_c7_sweaty.jpg',('☕','Coffee: 5 cups a day'):'l4_b2_coffee.jpg'}
+        _DA={('💓','Pulse: 110 beats per minute'):'l4_c4_racing_heart.jpg',('💓','Pulse: 150 beats per minute'):'l4_c4_racing_heart.jpg',('💓','Pulse: 38 beats per minute'):'l4_h4_pulse_slow.jpg',('🛏️','Sleep: 3 hours a night'):'l4_b3_night.jpg',('🛏️','Sleep: 6 hours a night'):'l4_b3_night.jpg',('🌡️','Temperature: 37 °C'):'l4_h1_thermometer.jpg',('🌡️','Temperature: 41 °C'):'l4_h3_fever_high.jpg',('☕','Coffee: 5 cups a day'):'l4_b2_coffee.jpg'}
         for it in d['items']:
             a=_DA.get((it['e'],it['now']))
             if a: it['art']=ART+a
