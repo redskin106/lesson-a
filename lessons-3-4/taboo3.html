@@ -662,7 +662,7 @@ INIT.label_reader=function(s){var D=jd(s),Q=D.qs,L=D.lab,st={k:0,n:Q.length};
   q.querySelector('button').onclick=function(){sayCb(qq.q,reveal)}};
  st.draw()};
 /* taboo for nurses */
-INIT.taboo=function(s){var D=jd(s),Q=pshuf(D.items),lim=D.limit||3,N=Q.length,fin={},cu=0,shown=0,t=null,tm=D.secs||0,left=tm,ds=$$('.chd',s);
+INIT.taboo=function(s){var D=jd(s),Q=D.shuffle?pshuf(D.items):D.items.slice(),lim=D.limit||3,N=Q.length,fin={},cu=0,shown=0,t=null,tm=D.secs||0,left=tm,ds=$$('.chd',s);
  function dots(){ds.forEach(function(d,i){d.classList.toggle('on',i===cu);d.classList.toggle('dn',!!fin[i])})}
  function nxt(){for(var q=1;q<=N;q++){var k=(cu+q)%N;if(!fin[k])return k}return -1}
  var g=$('.pg',s),card=pmk('div','gl ptb',null,g),btn=pmk('div','',null,g);btn.style.cssText='position:absolute;left:1040px;top:20px;width:660px;text-align:center';
