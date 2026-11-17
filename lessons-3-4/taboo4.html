@@ -128,7 +128,7 @@ g.dz{stroke:none}g.dz.dim{opacity:1;filter:grayscale(.85) brightness(1.1)}.dz{cu
 .cbmb .ulw{animation:ulwd .7s .7s ease-out forwards}.cbmb h3{font-family:O;font-weight:800;font-size:56px;margin:0 0 14px}.cbmb .ex{background:#efeaff;border-radius:30px;padding:20px 30px;margin:18px 0;font-size:38px}
 .cbmb .tg{display:inline-block;margin:8px 12px 8px 0;padding:10px 30px;border-radius:999px;border:5px solid #d9d3f5;font-family:O;font-weight:800;font-size:38px;cursor:pointer;background:#fff}.cbmb .tg.on{background:#2bd9b6;color:#fff;border-color:#fff}
 .cbmb .stx{margin-left:6px}.cbmb .bt{border:0;font-family:O;font-weight:800;font-size:38px;padding:14px 44px;border-radius:999px;margin:10px 14px 0 0;cursor:pointer;color:#fff;background:linear-gradient(135deg,#7b3cf0,#ff4fa3)}.cbmb .bt.g{background:#d9d3f5;color:#333}.cbmb .bt[disabled]{opacity:.35}
-
+.aab{display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;width:370px;height:196px;padding:0 30px;border-radius:44px;border:7px solid;background:#fff;cursor:pointer;box-shadow:0 10px 24px rgba(60,30,140,.14)}.aap{font-size:104px;line-height:1}.aas{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:56px}.aab.on{background:#fff7e0}.aab.on .aas{animation:pu .8s infinite}.zoomv img[src^='data:image/png']{width:900px;height:900px;image-rendering:pixelated;padding:30px;box-sizing:border-box}
 .wt{box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;width:118px;height:132px;border-radius:34px;border:0;color:#fff;font-family:O;font-weight:800;font-size:74px;text-transform:uppercase;cursor:pointer;background:linear-gradient(135deg,#9a5cff,#6a35e8);box-shadow:0 12px 24px rgba(80,60,160,.3),inset 0 4px 0 rgba(255,255,255,.45);transition:transform .2s,opacity .3s}
 .wt:active{transform:scale(.94)}.wt.used{opacity:.18;pointer-events:none}.wt.glow{animation:wgl 1s infinite}.wt.k{width:70px;height:80px;font-size:44px;border-radius:24px;background:linear-gradient(135deg,#ffd21f,#ffb21f)}.wt.k.hit{background:linear-gradient(135deg,#2bd9b6,#10a98d)}.wt.k.miss{opacity:.22;pointer-events:none}
 @keyframes wgl{50%{box-shadow:0 0 0 14px rgba(255,210,31,.55)}}
@@ -547,6 +547,13 @@ INIT.case_board=function(s){
   if(k==='db'){var f=fx(),top=D.suspects.slice().sort(function(a,b){return (f[b[0]].f-f[b[0]].a)-(f[a[0]].f-f[a[0]].a)}).slice(0,3);sheet('<h3>🗣️ '+D.debate.title+'</h3><div class="ex">'+top.map(function(x){return '<span class="tg">'+x[2]+' '+x[1]+'</span>'}).join('')+'</div>'+D.debate.lines.map(function(l){return '<div style="margin:8px 0">'+l+'</div>'}).join('')+'<button class="bt g" data-a="x">Close</button>')}
   if(k==='rv'){won=true;draw();var a=D.suspects.filter(function(x){return x[0]===D.answer})[0];P('arrive');sheet('<h3 style="font-size:84px">'+a[2]+' '+a[1]+'</h3><div class="ex">'+D.reveal+'</div><button class="bt g" data-a="x">Close</button>');$$('.ulw',mb).forEach(function(u,i){u.style.animationDelay=(0.7+i*0.75)+'s'});finish(s)}};
  $('#nx').classList.add('on');draw()};
+
+
+INIT.audio_all=function(s){
+ var cur=null;function stop(){if(cur){cur.pause();cur=null}if(window.speechSynthesis)speechSynthesis.cancel();$$('.aab.on',s).forEach(function(x){x.classList.remove('on')})}
+ $$('.aab',s).forEach(function(b){b.onclick=function(){var was=b.classList.contains('on');stop();if(was)return;b.classList.add('on');
+  var c=b.dataset.clip;if(c){cur=new Audio(c);cur.onended=function(){b.classList.remove('on')};cur.play()}else if(window.speechSynthesis){var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.85;u.onend=function(){b.classList.remove('on')};speechSynthesis.speak(u)}}});
+ $('#nx').classList.add('on')};
 
 /* ---- word-tile engine: spell / scramble / unveil ---- */
 function lev(a,b){var m=[],i,j;for(i=0;i<=a.length;i++){m[i]=[i]}for(j=0;j<=b.length;j++)m[0][j]=j;for(i=1;i<=a.length;i++)for(j=1;j<=b.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return m[a.length][b.length]}

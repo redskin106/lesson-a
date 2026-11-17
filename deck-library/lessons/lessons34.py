@@ -638,6 +638,13 @@ for d in L4:
         _qd=lambda n:'data:image/png;base64,'+_b64.b64encode(open(f'/home/claude/lesson-a/lessons-3-4/source-art/print/qr_{n}.png','rb').read()).decode()
         _L.append(dict(m='qr_groups',phase='ACTIVATE',label='Group QR codes',title='Scan your group',min=1,qrs=[_qd(n) for n in '1234'],cols=['#ff5a6a','#2a8cf0','#19b38a','#f2a900']))
 L4=[_she(d) for d in _L]
+import base64 as _b64a
+def _fixclip(n):
+    f='/home/claude/lesson-a/lessons-3-4/source-audio/l4_fix/FIX_%02d.mp3'%n
+    return 'data:audio/mpeg;base64,'+_b64a.b64encode(open(f,'rb').read()).decode() if _o3.path.exists(f) else ''
+_gi=lambda o:[dict(pic=f['pic'],clip=_fixclip(f['n']),say=f['voice'].replace('"','&quot;')) for f in FIX if f['owner']==o]
+_ci=next(i for i,d in enumerate(L4) if d.get('label')=='Thank you')
+L4.insert(_ci+1,dict(m='audio_all',phase='ACTIVATE',label='Teacher backup · all group voice notes',optional=True,min=1,title='All voice notes',groups=[_gi(o) for o in ('red','blue','green','yellow')],cols=['#ff5a6a','#2a8cf0','#19b38a','#f2a900']))
 L4.append(dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L4_BOSS,sec=90))
 def _inject_audio(html_path,adir):
     """Recorded clips (ElevenLabs) keyed by exact spoken text. speechSynthesis.speak is wrapped: a matching line plays the clip,

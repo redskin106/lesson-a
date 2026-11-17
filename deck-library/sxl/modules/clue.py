@@ -272,9 +272,23 @@ def qr_groups(d):
         x=90+i*(W+gap)
         inner=(f'<div style="display:flex;flex-direction:column;align-items:center;gap:26px;padding-top:34px">'
                f'<div style="width:150px;height:150px;border-radius:50%;background:{c};color:#fff;font-family:O;font-weight:800;font-size:112px;line-height:150px;text-align:center">{i+1}</div>'
-               f'<img src="{q}" style="width:300px;height:300px;border-radius:22px;image-rendering:pixelated;background:#fff;padding:8px"></div>')
+               f'<img data-z="1" src="{q}" style="cursor:zoom-in;width:300px;height:300px;border-radius:22px;image-rendering:pixelated;background:#fff;padding:8px"></div>')
         o+=stp(glass(x,200,W,600,inner,r=56),i+1)
     return o
+
+def audio_all(d,sid=None):
+    """{'phase','title','groups':[[{'pic','clip','say'} x3] x4],'cols':[...]} all group voice notes on one page (teacher backup)"""
+    o=header(d['phase'],d['title'],d.get('grad','rose'))
+    W=420; gap=(1740-4*W)//3
+    for i,(g,c) in enumerate(zip(d['groups'],d['cols'])):
+        x=90+i*(W+gap)
+        btns=''.join(f'<button class="aab" data-clip="{n["clip"]}" data-say="{n["say"]}" style="border-color:{c}"><span class="aap">{n["pic"]}</span><span class="aas" style="background:{c}"><i class="sico" style="filter:invert(1) brightness(2)"></i></span></button>' for n in g)
+        inner=(f'<div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding-top:24px">'
+               f'<div style="width:110px;height:110px;border-radius:50%;background:{c};color:#fff;font-family:O;font-weight:800;font-size:82px;line-height:110px;text-align:center">{i+1}</div>{btns}</div>')
+        o+=glass(x,190,W,800,inner,r=56)
+    return o
+
+BUILD_EXT['audio_all']=audio_all
 
 @module('qr_card')
 def qr_card(d):
@@ -569,4 +583,13 @@ INIT.case_board=function(s){
   if(k==='db'){var f=fx(),top=D.suspects.slice().sort(function(a,b){return (f[b[0]].f-f[b[0]].a)-(f[a[0]].f-f[a[0]].a)}).slice(0,3);sheet('<h3>🗣️ '+D.debate.title+'</h3><div class="ex">'+top.map(function(x){return '<span class="tg">'+x[2]+' '+x[1]+'</span>'}).join('')+'</div>'+D.debate.lines.map(function(l){return '<div style="margin:8px 0">'+l+'</div>'}).join('')+'<button class="bt g" data-a="x">Close</button>')}
   if(k==='rv'){won=true;draw();var a=D.suspects.filter(function(x){return x[0]===D.answer})[0];P('arrive');sheet('<h3 style="font-size:84px">'+a[2]+' '+a[1]+'</h3><div class="ex">'+D.reveal+'</div><button class="bt g" data-a="x">Close</button>');$$('.ulw',mb).forEach(function(u,i){u.style.animationDelay=(0.7+i*0.75)+'s'});finish(s)}};
  $('#nx').classList.add('on');draw()};
+
+
+INIT.audio_all=function(s){
+ var cur=null;function stop(){if(cur){cur.pause();cur=null}if(window.speechSynthesis)speechSynthesis.cancel();$$('.aab.on',s).forEach(function(x){x.classList.remove('on')})}
+ $$('.aab',s).forEach(function(b){b.onclick=function(){var was=b.classList.contains('on');stop();if(was)return;b.classList.add('on');
+  var c=b.dataset.clip;if(c){cur=new Audio(c);cur.onended=function(){b.classList.remove('on')};cur.play()}else if(window.speechSynthesis){var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.85;u.onend=function(){b.classList.remove('on')};speechSynthesis.speak(u)}}});
+ $('#nx').classList.add('on')};
 """)
+
+EXT_CSS.append(".aab{display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;width:370px;height:196px;padding:0 30px;border-radius:44px;border:7px solid;background:#fff;cursor:pointer;box-shadow:0 10px 24px rgba(60,30,140,.14)}.aap{font-size:104px;line-height:1}.aas{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:56px}.aab.on{background:#fff7e0}.aab.on .aas{animation:pu .8s infinite}.zoomv img[src^='data:image/png']{width:900px;height:900px;image-rendering:pixelated;padding:30px;box-sizing:border-box}")
