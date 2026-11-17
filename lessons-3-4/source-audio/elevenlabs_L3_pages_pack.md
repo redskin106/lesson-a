@@ -2,7 +2,7 @@
 
 Model: Eleven v4. Same two voices as the Lesson 4 pack (Patient, Narrator: see lesson4-elevenlabs-pages-pack-v4). Save each clip as its ID (P09_01.mp3), put them in lessons-3-4/source-audio/l3_pages/ with manifest.json (ids, text, file) and the build wires them by exact text. Settings: speed about 0.9 (0.85 for the Narrator), stability toward the stable end. Numbers are spelled out. Until the clips exist the deck uses the browser voice.
 
-**Priority:** P1 = story and fun lines (generate these first), P2 = exercise listening lines, P3 = optional slides (leave on the browser voice if credits are short). P1: 29 clips, 1521 characters · P2: 44 clips, 2324 characters · P3: 22 clips, 1268 characters
+**Priority:** P1 = story and fun lines (generate these first), P2 = exercise listening lines, P3 = optional slides (leave on the browser voice if credits are short). P1: 32 clips, 1691 characters · P2: 44 clips, 2324 characters · P3: 22 clips, 1268 characters
 
 ID | Priority | Voice | Text to paste (tag first)
 ---|---|---|---
@@ -17,9 +17,12 @@ P08_04 | P3 | Patient | [tired, friendly] I do not want food. Not even my favour
 P09_01 | P1 | Patient | [tired, friendly] I am so hot! Can I sleep in the fridge?
 P09_02 | P1 | Patient | [tired, friendly] Cough, cough! The whole ward is moving away from me.
 P09_03 | P1 | Patient | [tired, friendly] Look at my arm! I look like a strawberry!
-P09_04 | P1 | Patient | [tired, friendly] My head, my eyes, my muscles… even my hair hurts!
-P09_05 | P1 | Patient | [tired, friendly] Red spots on my arms. They itch, but my face is fine.
-P09_06 | P1 | Patient | [tired, friendly] A mosquito bit me a week ago. Now I am sick.
+P09_04 | P1 | Patient | [tired, friendly] Brrr… I am shaking under three blankets! But my head is hot.
+P09_05 | P1 | Patient | [tired, friendly] Ugh, my arm is so itchy! I could scratch it all night.
+P09_06 | P1 | Patient | [tired, friendly] My head, my eyes, my muscles… even my hair hurts!
+P09_07 | P1 | Patient | [tired, friendly] No breakfast, no lunch, no dinner. I am just not hungry!
+P09_08 | P1 | Patient | [tired, friendly] Red spots on my arms. They itch, but my face is fine.
+P09_09 | P1 | Patient | [tired, friendly] A mosquito bit me a week ago. Now I am sick.
 P10_01 | P1 | Narrator | [calm, clear] Her temperature is forty-one degrees. Normal is about thirty-seven.
 P10_02 | P1 | Narrator | [calm, clear] Her platelets are ninety-five thousand. Normal is one hundred and fifty to four hundred and fifty thousand.
 P10_03 | P1 | Narrator | [calm, clear] Her pulse is one hundred and thirty. Normal is sixty to one hundred.

@@ -78,22 +78,43 @@
  },
  {
   "id": "P09_04",
-  "text": "My head, my eyes, my muscles… even my hair hurts!",
+  "text": "Brrr… I am shaking under three blankets! But my head is hot.",
   "file": "P09_04.mp3",
   "priority": 1,
   "slide": "Exercise · Symptoms"
  },
  {
   "id": "P09_05",
-  "text": "Red spots on my arms. They itch, but my face is fine.",
+  "text": "Ugh, my arm is so itchy! I could scratch it all night.",
   "file": "P09_05.mp3",
   "priority": 1,
   "slide": "Exercise · Symptoms"
  },
  {
   "id": "P09_06",
-  "text": "A mosquito bit me a week ago. Now I am sick.",
+  "text": "My head, my eyes, my muscles… even my hair hurts!",
   "file": "P09_06.mp3",
+  "priority": 1,
+  "slide": "Exercise · Symptoms"
+ },
+ {
+  "id": "P09_07",
+  "text": "No breakfast, no lunch, no dinner. I am just not hungry!",
+  "file": "P09_07.mp3",
+  "priority": 1,
+  "slide": "Exercise · Symptoms"
+ },
+ {
+  "id": "P09_08",
+  "text": "Red spots on my arms. They itch, but my face is fine.",
+  "file": "P09_08.mp3",
+  "priority": 1,
+  "slide": "Exercise · Symptoms"
+ },
+ {
+  "id": "P09_09",
+  "text": "A mosquito bit me a week ago. Now I am sick.",
+  "file": "P09_09.mp3",
   "priority": 1,
   "slide": "Exercise · Symptoms"
  },

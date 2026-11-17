@@ -132,7 +132,7 @@ for d in L3:
     if lb=='Meet the patient': d=dict(m='room',phase='ENGAGE',label='The room of clues',min=3,title='The room of clues',spots=ROOM_SPOTS)
     elif lb=='Eyes closed. Louder.': d=dict(d,min=2)
     elif lb=='Teach · Symptom sentences':
-        d=dict(d,role='Listen to the patient',lines=[('She has a fever.','Ohhh… why is it so hot in here? Is the air-con broken?'),('He has a headache.','My head… boom, boom, boom. Like a drum!'),('He has a cough.','Cough, cough… sorry… I sound like a goat!'),('She has a rash on her arm.','Look at my arm! Red spots! Am I turning into a tomato?')])
+        d=dict(d,pics=['🤒','🤕','😷','🔴'],role='Listen to the patient',lines=[('She has a fever.','Ohhh… why is it so hot in here? Is the air-con broken?'),('He has a headache.','My head… boom, boom, boom. Like a drum!'),('He has a cough.','Cough, cough… sorry… I sound like a goat!'),('She has a rash on her arm.','Look at my arm! Red spots! Am I turning into a tomato?')])
         d.pop('hint',None)
     elif lb=='Teach · Higher or lower':
         d=dict(d,min=1,lines=['The normal temperature is 37 °C.','Her temperature is 39.2 °C.','Her temperature is [[higher]] than normal.','She has a fever.'])
@@ -651,10 +651,10 @@ _PT3='💬 Tell your partner. Then tap.'
 SYM3=[[_a2('🌡️','I am so hot! Can I sleep in the fridge?','She has a fever.','She has a rash.','She has a cough.'),
   _a2('😷','Cough, cough! The whole ward is moving away from me.','He has a cough.','He has a rash.','He has a fever.'),
   _a2('🔴','Look at my arm! I look like a strawberry!','He has a rash on his arm.','He has a cough on his arm.','He has a fever on his arm.')],
- [_a2('🥶','I am freezing! But my forehead is burning.','She has chills and a fever.','She has a rash and a fever.','She has a cough and chills.'),
-  _a2('🧴',"I can't stop scratching!",'His arm is itchy.','His arm is stiff.','His arm is cold.'),
+ [_a2('🥶','Brrr… I am shaking under three blankets! But my head is hot.','She has chills and a fever.','She has a rash and a fever.','She has a cough and chills.'),
+  _a2('🧴',"Ugh, my arm is so itchy! I could scratch it all night.",'His arm is itchy.','His arm is stiff.','His arm is cold.'),
   _a2('🤕','My head, my eyes, my muscles… even my hair hurts!','Her head, her eyes and her muscles hurt.','Her head hurts, but her muscles are fine.','Her eyes hurt, but her head is fine.')],
- [_a2('🍚','I do not want food. Not even my favourite noodles.','She has no appetite.','She has a big appetite.','She is itchy.'),
+ [_a2('🍚','No breakfast, no lunch, no dinner. I am just not hungry!','She has no appetite.','She has a big appetite.','She is itchy.'),
   _a2('🔴','Red spots on my arms. They itch, but my face is fine.','She has an itchy rash on her arms, but not on her face.','She has an itchy rash on her face, but not on her arms.','She has a rash on her arms and her face.'),
   _a2('🦟','A mosquito bit me a week ago. Now I am sick.','She was bitten by a mosquito a week ago.','She bit a mosquito a week ago.','A mosquito was sick a week ago.')]]
 MORE3_W=dict(m='teach',phase='STUDY',label='Teach · More symptoms',min=1,role='Four more',words=[('🥶','chills'),('🧴','itchy'),('🫨','stiff'),('🍚','no appetite')])
