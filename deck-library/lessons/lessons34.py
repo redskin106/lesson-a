@@ -635,9 +635,24 @@ for d in L4:
     _L.append(d)
 L4=[_she(d) for d in _L]
 L4.append(dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L4_BOSS,sec=90))
+def _inject_audio(html_path,adir):
+    """Recorded clips (ElevenLabs) keyed by exact spoken text. speechSynthesis.speak is wrapped: a matching line plays the clip,
+    anything else falls back to the browser voice. Nothing in the slide data changes."""
+    import json as _j,base64 as _b
+    man=_j.load(open(adir/'manifest.json',encoding='utf-8'))
+    M={' '.join(m['text'].split()):'data:audio/mpeg;base64,'+_b.b64encode(open(adir/m['file'],'rb').read()).decode() for m in man}
+    js=("<script>(function(){var M="+_j.dumps(M,ensure_ascii=False)+";var ss=window.speechSynthesis;if(!ss)return;var os=ss.speak.bind(ss),oc=ss.cancel.bind(ss),cur=null;"
+        "function nz(t){return (t||'').replace(/\\s+/g,' ').trim()}"
+        "ss.speak=function(u){var src=M[nz(u.text)];if(!src)return os(u);try{if(cur){cur.pause();cur=null}var a=new Audio(src);cur=a;a.onended=function(){if(cur===a)cur=null;if(u.onend)u.onend({})};a.onerror=function(){os(u)};var p=a.play();if(p&&p.catch)p.catch(function(){os(u)})}catch(e){os(u)}};"
+        "ss.cancel=function(){if(cur){cur.pause();cur=null}oc()};})();</script>")
+    h=open(html_path,encoding='utf-8').read(); i=h.rindex('</body>')
+    open(html_path,'w',encoding='utf-8').write(h[:i]+js+h[i:])
+    print('audio clips embedded:',len(M))
+
 if __name__=='__main__':
     out=HERE.parent.parent/'lessons-3-4'
     print(build_interactive(L3,str(out/'lesson3_v2.html'),title='SkillsXLab · Lesson 3 · Which illness?'))
     print(build_interactive(L4,str(out/'lesson4_v2.html'),title='SkillsXLab · Lesson 4 · The Impossible Week'))
+    _inject_audio(out/'lesson4_v2.html',out/'source-audio'/'l4_pages')
     for n,t in ((3,TABOO3),(4,TABOO4)):
         print(build_interactive([dict(t,label='Taboo for nurses',optional=False)],str(out/f'taboo{n}.html'),title=f'SkillsXLab · Taboo for nurses · Lesson {n}'))
