@@ -55,10 +55,10 @@ HL=dict(bronze=[
 def _d(e,now,normal,s_,z): return dict(e=e,now=now,normal=normal,s=s_,z=z)
 DIAL_DEMO=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),
  _d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),
- _d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6),
+ _d('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6),
  _d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3)]
 DIAL_LV=[
- [_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),_d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2)],
+ [_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),_d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2)],
  [_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),_d('🫁','Breathing: 21 breaths per minute','12 to 20 breaths per minute','His breathing is',4),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1),_d('💓','Pulse: 130 beats per minute','60 to 100 beats per minute','Her pulse is',5)],
  [_d('🌡️','Temperature: 32 °C','about 37 °C','His temperature is',0),_d('💓','Pulse: 42 beats per minute','60 to 100 beats per minute','His pulse is',1),_d('🩸',f'Platelets: 20,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',0),_d('🫁','Breathing: 40 breaths per minute','12 to 20 breaths per minute','Her breathing is',6)]]
 L3=[
@@ -122,7 +122,7 @@ ROOM_SPOTS=[dict(e='🌡️',x=1130,y=300,t='A thermometer: 39.2 °C.'),dict(e='
  dict(e='🧻',x=130,y=470,t='A box of tissues. It is empty.'),dict(e='💊',x=1430,y=240,t='Paracetamol. Two tablets yesterday.'),dict(e='📅',x=330,y=70,t='A calendar. Day 3 is circled.'),
  dict(e='🏞️',x=110,y=250,t='A pond outside the window.'),dict(e='🐱',x=1120,y=520,t='A sleepy cat.')]
 DIAL_MIX=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),
- _d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),
+ _d('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6),_d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),
  _d('💓','Pulse: 56 beats per minute','60 to 100 beats per minute','His pulse is',2),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1)]
 CUT3={'Teach · How much?','Exercise · The dial','Extra · Name the illness','Extra · What is wrong with this chart?','Listen and fix (handover)','Taboo for nurses (demo / class version)'}
 _new=[]
@@ -335,7 +335,7 @@ DIALA=[_da('💓','Pulse: 150 beats per minute','60 to 100 beats per minute','He
  _da('🛏️','Sleep: 6 hours a night','7 to 9 hours a night','Her sleep time is',2,'She sleeps six hours a night. Normal is seven to nine hours.'),
  _da('☕','Coffee: 5 cups a day','up to 4 cups a day','Her coffee intake is',4,'She drinks five cups of coffee a day. A healthy limit is up to four cups.'),
  _da('🌡️','Temperature: 37 °C','about 37 °C','His temperature is',3,'His temperature is thirty-seven degrees. Normal is about thirty-seven.'),
- _da('💓','Pulse: 38 beats per minute','60 to 100 beats per minute','His pulse is',0,'His pulse is thirty-eight beats a minute. Normal is sixty to one hundred.'),
+ _da('💓','Pulse: 38 beats per minute','60 to 100 beats per minute','Her pulse is',0,'Her pulse is thirty-eight beats a minute. Normal is sixty to one hundred.'),
  _da('☕','Coffee: 12 cups a day','up to 4 cups a day','Her coffee intake is',6,'She drinks twelve cups of coffee a day. A healthy limit is up to four cups.')]
 DIALX=dict(m='dial',phase='STUDY',label='Exercise · Higher or lower?',min=3,title='Listen: higher or lower?',aud=True,items=DIALA)
 MIGHT_T=dict(MIGHT_T,lines=[dict(t='Clue: her hands shake after every coffee. They also shake when she skips lunch.',c='amber'),dict(t=_MI('[[might]] be')+' <span style="color:#e8821a">the coffee. It might be low blood sugar.</span>',c='teal'),dict(t='Clue: she has no cough. She has no fever.',c='amber'),dict(t=_MI("[[can't]] be")+' <span style="color:#e8821a">flu.</span>',c='teal')])
@@ -367,7 +367,7 @@ DIALA=[_da('💓','Pulse: 150 beats per minute','60 to 100 beats per minute','He
  _R(_da('🛏️','Sleep: 6 hours a night','7 to 9 hours a night','Her sleep time is',2,'She sleeps six hours a night. The recommended amount is seven to nine hours.')),
  _R(_da('☕','Coffee: 5 cups a day','up to 4 cups a day','Her coffee intake is',4,'She drinks five cups of coffee a day. The recommended limit is four cups.')),
  _da('🌡️','Temperature: 37 °C','about 37 °C','His temperature is',3,'His temperature is thirty-seven degrees. Normal is about thirty-seven.'),
- _da('💓','Pulse: 38 beats per minute','60 to 100 beats per minute','His pulse is',0,'His pulse is thirty-eight beats a minute. Normal is sixty to one hundred.'),
+ _da('💓','Pulse: 38 beats per minute','60 to 100 beats per minute','Her pulse is',0,'Her pulse is thirty-eight beats a minute. Normal is sixty to one hundred.'),
  _R(_da('☕','Coffee: 12 cups a day','up to 4 cups a day','Her coffee intake is',6,'She drinks twelve cups of coffee a day. The recommended limit is four cups.'))]
 DIALX=dict(DIALX,items=DIALA)
 _MS=lambda t,x: _MI(t)+' <span style="color:#e8821a">'+x+'</span>'
@@ -383,7 +383,7 @@ LONGEX['levels'][1]['items']=[
 _nos=lambda d_:{k:v for k,v in d_.items() if k!='say'}
 _s3=dict(DIAL4[1],say='She sleeps three hours a night. The recommended amount is seven to nine hours.')
 # Nick 17 Nov: mix written and spoken clues (spoken: sleep, sleep, coffee; numbers are written)
-_T41=_d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6)
+_T41=_d('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6)
 DIAL1=[DIAL4[0],_s3,_nos(DIALA[3]),DIALA[0],_nos(DIALA[1]),DIALA[4],_nos(DIALA[2]),_T41]
 
 # ---- 17 Nov round 4: 3 items per level, woven vocab, truth bridge, Fix the ward as class questions ----
