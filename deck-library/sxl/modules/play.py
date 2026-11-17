@@ -95,15 +95,18 @@ INIT.label_reader=function(s){var D=jd(s),Q=D.qs,L=D.lab,st={k:0,n:Q.length};
   q.querySelector('button').onclick=function(){sayCb(qq.q,reveal)}};
  st.draw()};
 /* taboo for nurses */
-INIT.taboo=function(s){var D=jd(s),Q=pshuf(D.items),lim=D.limit||3,done=0,N=D.items.length,shown=0,t=null,tm=D.secs||0,left=tm;pdots(s,0);
+INIT.taboo=function(s){var D=jd(s),Q=pshuf(D.items),lim=D.limit||3,N=Q.length,fin={},cu=0,shown=0,t=null,tm=D.secs||0,left=tm,ds=$$('.chd',s);
+ function dots(){ds.forEach(function(d,i){d.classList.toggle('on',i===cu);d.classList.toggle('dn',!!fin[i])})}
+ function nxt(){for(var q=1;q<=N;q++){var k=(cu+q)%N;if(!fin[k])return k}return -1}
  var g=$('.pg',s),card=pmk('div','gl ptb',null,g),btn=pmk('div','',null,g);btn.style.cssText='position:absolute;left:1040px;top:20px;width:660px;text-align:center';
  var info=pmk('div','',null,g);info.style.cssText='position:absolute;left:1040px;top:560px;width:660px;font-size:40px;text-align:center;color:#6a35e8';
- function draw(){var it=Q[0];card.innerHTML=shown?'<div style="font-size:120px">'+(it.e||'')+'</div><div>'+it.w+'</div><ul>'+it.no.slice(0,lim).map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul>':'<div style="font-size:90px">🙈</div><div style="font-size:44px;font-weight:700">Describer only: tap Show.<br>Others: guess! Say it in English.<br><span style="color:#e0306a">Words only · no miming 🚫</span></div>';
+ function draw(){var it=Q[cu];dots();card.innerHTML=shown?'<div style="font-size:120px">'+(it.e||'')+'</div><div>'+it.w+'</div><ul>'+it.no.slice(0,lim).map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul>':'<div style="font-size:90px">🙈</div><div style="font-size:44px;font-weight:700">Describer only: tap Show.<br>Others: guess! Say it in English.<br><span style="color:#e0306a">Words only · no miming 🚫</span></div>';
   btn.innerHTML='';var a=pmk('button','pbt o',shown?'🙈 Hide':'👀 Show',btn);a.onclick=function(){shown=!shown;P('tick');draw()};
-  var b=pmk('button','pbt g','✔ Got it',btn);b.onclick=function(){P('good');Q.shift();done++;pdots(s,done);shown=0;if(!Q.length){finish(s);return}draw();clk()};
-  var c=pmk('button','pbt','↷ Pass',btn);c.onclick=function(){Q.push(Q.shift());shown=0;P('tick');draw();clk()};
-  info.innerHTML='Words left: '+Q.length+'<br>Do not say the ✖ words, or the word itself!'}
- function clk(){clearInterval(t);if(!tm)return;left=tm;t=setInterval(function(){left--;if(left<=0){clearInterval(t);info.innerHTML='⏰ Time! Pass the tablet.'}else info.innerHTML='⏳ '+left+' s<br>Words left: '+Q.length},1000)}
+  var b=pmk('button','pbt g','✔ Got it',btn);b.onclick=function(){P('good');fin[cu]=1;shown=0;var n=nxt();if(n<0){dots();finish(s);return}cu=n;draw();clk()};
+  var c=pmk('button','pbt','↷ Pass',btn);c.onclick=function(){var n=nxt();if(n<0)return;cu=n;shown=0;P('tick');draw();clk()};
+  info.innerHTML=''}
+ function clk(){clearInterval(t);if(!tm)return;left=tm;t=setInterval(function(){left--;if(left<=0){clearInterval(t);info.innerHTML='⏰ Time! Pass the tablet.'}else info.innerHTML='⏳ '+left+' s'},1000)}
+ s.__jump=function(i){fin[i]=0;cu=i;shown=0;draw();clk()};
  draw();clk()};
 /* guess who, patient edition */
 INIT.guess_who=function(s){var D=jd(s),R=D.rounds||2,r=0,A=D.attrs,all=D.patients;

@@ -98,6 +98,6 @@ function wordgame(s){
      if(hit.length){b.classList.add('hit');P('pop');hit.forEach(function(e){e.textContent=c;e.classList.add('f');got++;var cc=order[oi++];if(cc)cc.classList.add('gone')});wrongs=0;if(got===need.length)win()}
      else{b.classList.add('miss');P('boop');wrongs++;if(wrongs>=3&&D.hint===false){hint.style.opacity=1;hint.textContent='It is '+(D.items[n].cat||'a word')+'.'}}}})}
  }
- start(0)}
+ s.__jump=function(i){k=i;start(i)};start(0)}
 INIT.spell=wordgame;INIT.scramble=wordgame;INIT.unveil=wordgame;
 """)

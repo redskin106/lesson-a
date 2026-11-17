@@ -15,6 +15,7 @@ def gapchip(c,t):
     return f'<span style="display:inline-flex;align-items:center;justify-content:center;height:84px;min-width:{40+len(t)*30}px;border-radius:44px;border:5px dashed {col};color:transparent;font-family:O;font-weight:800;font-size:46px;padding:0 20px">{t}</span>'
 def line(y,side,content,av,filled=False,op=1,pic_=None):
     left=side in ('N','D'); a=EM(av.get(side,AV[side]))
+    if isinstance(content,dict): content=content.get('say','')
     inner=(f'<div style="font-family:O;font-weight:800;font-size:52px;color:#1c1b2e">{content}</div>' if isinstance(content,str)
            else '<div style="display:flex;gap:12px;align-items:center">'+''.join(gapchip(c,t) if (g and not filled) else ch(c,t,46,'8px 26px') for c,t,g in content)+'</div>')
     pimg=(f'<img src="{ART}{pic_}" style="height:112px;width:112px;border-radius:26px;margin-left:30px;background:#fff;object-fit:contain">' if pic_ else '')
@@ -22,7 +23,7 @@ def line(y,side,content,av,filled=False,op=1,pic_=None):
     avh=f'<div class="gl" style="position:static;width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff"><img src="{a}" style="width:78px"></div>'
     side_css='left:90px;' if left else 'right:90px;'
     return f'<div class="a" style="{side_css}top:{y}px;opacity:{op};display:flex;align-items:center;gap:22px;{"" if left else "flex-direction:row-reverse"}">{avh}{bub}</div>'
-def has_gap(c): return not isinstance(c,str) and any(g for _,_,g in c)
+def has_gap(c): return not isinstance(c,(str,dict)) and any(g for _,_,g in c)
 def parts(l): return l[0],l[1],(l[2] if len(l)>2 else None)
 def expand(d):
     L=d['lines']; gaps=[i for i,l in enumerate(L) if has_gap(l[1])]

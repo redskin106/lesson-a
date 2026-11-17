@@ -5,7 +5,7 @@ sys.path.insert(0,str(HERE.parent)); sys.path.insert(0,str(HERE.parent.parent/'l
 import content as K
 from sxl.interactive import build_interactive
 import modules_gallery2 as G2, modules_gallery3 as G3
-from sxl.modules.clue import stick, bubble_svg
+from sxl.modules.clue import stick, bubble_svg, ART
 def _cards(cx,base,sc): return f'<rect x="{cx-16*sc}" y="{base-118*sc}" width="{30*sc}" height="{38*sc}" rx="4" fill="#ffc13b" stroke="#1c1b2e" stroke-width="4" transform="rotate(-10 {cx} {base-100*sc})"/>'
 _P1=''.join(stick(x,395,1.15,'hold')+_cards(x,395,1.15) for x in (90,200,310))+'<text x="200" y="95" font-size="72" text-anchor="middle">🤫</text>'
 _P2=stick(85,395,1.25,'throw')+'<circle cx="200" cy="175" r="21" fill="#ff9f1c" stroke="#1c1b2e" stroke-width="4"/><path d="M130 235 Q210 120 300 235" fill="none" stroke="#9a5cff" stroke-width="5" stroke-dasharray="3 12" stroke-linecap="round"/>'+stick(300,395,1.15,'up')+stick(365,395,1.0,'down')+bubble_svg(20,16,330,92,'Have you got\na clue about …?',fs=26,tx=105)
@@ -62,8 +62,8 @@ DIAL_LV=[
  [_d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),_d('🫁','Breathing: 21 breaths per minute','12 to 20 breaths per minute','His breathing is',4),_d('🩸',f'Platelets: 95,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',1),_d('💓','Pulse: 130 beats per minute','60 to 100 beats per minute','Her pulse is',5)],
  [_d('🌡️','Temperature: 32 °C','about 37 °C','His temperature is',0),_d('💓','Pulse: 42 beats per minute','60 to 100 beats per minute','His pulse is',1),_d('🩸',f'Platelets: 20,000 per µL',f'150,000 to 450,000 per µL','Her platelets are',0),_d('🫁','Breathing: 40 breaths per minute','12 to 20 breaths per minute','Her breathing is',6)]]
 L3=[
- dict(m='cover',label='Cover',tag='NURSING ENGLISH',title='Lesson <span class="grad">3</span>',phases=['Engage','Study','Activate'],active=0,cards=[dict(pic='🩺',x=1010,y=150,w=330,h=430,r=-7),dict(pic='🌡️',x=1380,y=330,w=330,h=430,r=6)]),
- dict(m='vol_ladder',phase='ENGAGE',label='Eyes closed. Louder.',min=3,title='Eyes closed. Louder.',rungs=['Bello!','Banana!','Poopaye!','Tulaliloo ti amo!','KAMPAI!'],side='Everyone, eyes closed, at the same time. Whisper first. Each word is louder.'),
+ dict(m='cover',phase='ENGAGE',label='Cover',title='Lesson <span class="grad">3</span>',phases=['Engage','Study','Activate'],active=0,cards=[dict(pic='🩺',x=1010,y=150,w=330,h=430,r=-7),dict(pic='🌡️',x=1380,y=330,w=330,h=430,r=6)]),
+ dict(m='vol_ladder',phase='ENGAGE',label='Eyes closed. Louder.',min=3,title=None,clips=['bello.mp3','banana.mp3','papaya.mp3','kampai.mp3'],rungs=['Bello!','Banana!','Tu e bella<br>como la papaya!','KAMPAI!'],side='Everyone, eyes closed, at the same time. Whisper first. Each word is louder.'),
  dict(m='predict',phase='ENGAGE',label='Meet the patient',min=3,title='Meet the patient',cap=False,items=[dict(frames=[dict(e='🧍‍♀️',c='She walks in. She looks hot.'),dict(e='🌡️',c='The nurse takes her temperature.'),dict(e='😟',c='The nurse looks worried.')],q='❓ What is wrong with her?')]),
  dict(m='today',phase='STUDY',label='Today',min=1,emoji='stethoscope',title='Detective nurses',role='Today we are',rows=[[('c4','Ask'),('c3','the right question')],[('c1','Read'),('c3','the numbers')],[('c2','might'),('c4',"can't"),('c3','because')]]),
  dict(m='teach',phase='STUDY',label='Teach · Symptoms',min=2,role='Four symptoms',words=[('🤒','fever'),('🤕','headache'),('😷','cough'),('🔴','rash')]),
@@ -161,7 +161,7 @@ for d in L3:
 L3=_new
 
 L4=[
- dict(m='cover',label='Cover',tag='NURSING ENGLISH',title='Lesson <span class="grad">4</span>',phases=['Engage','Study','Activate'],active=0,cards=[dict(pic='📅',x=1010,y=150,w=330,h=430,r=-7),dict(pic='☕',x=1380,y=330,w=330,h=430,r=6)]),
+ dict(m='cover',phase='ENGAGE',label='Cover',title='Lesson <span class="grad">4</span>',phases=['Engage','Study','Activate'],active=0,cards=[dict(pic='📅',x=1010,y=150,w=330,h=430,r=-7),dict(pic='☕',x=1380,y=330,w=330,h=430,r=6)]),
  dict(m='vol_ladder',phase='ENGAGE',label='Eyes closed. How bad?',min=3,title='Eyes closed. How bad?',rungs=['a little','quite','very','really','the worst!'],side='Eyes closed, all together. The louder you are, the worse it is. Whisper = a little. Shout = the worst.'),
  dict(m='predict',phase='ENGAGE',label='The impossible day',min=3,title='The impossible day',cap=False,items=[dict(frames=[dict(e='📚',c='Books. Exams.'),dict(e='☕',c='Cup after cup of coffee.'),dict(e='🌙',c='Night. Still awake.'),dict(e='😴',c='Asleep at the desk.')],q='❓ Why is she so tired?')]),
  dict(m='dials3',phase='STUDY',label='The dials',min=3,title='Three dials (and one checker)',dials=K.DIALS,note='Use at least one dial in every sentence.'),
@@ -371,7 +371,7 @@ DIALA=[_da('💓','Pulse: 150 beats per minute','60 to 100 beats per minute','He
  _R(_da('☕','Coffee: 12 cups a day','up to 4 cups a day','Her coffee intake is',6,'She drinks twelve cups of coffee a day. The recommended limit is four cups.'))]
 DIALX=dict(DIALX,items=DIALA)
 _MS=lambda t,x: _MI(t)+' <span style="color:#e8821a">'+x+'</span>'
-MIGHT_T=dict(MIGHT_T,lines=[dict(t='Clue: her hands shake after every coffee. They also shake when she skips lunch.',c='amber'),dict(t=_MS('[[might]] be','the coffee.')+'<br>'+_MS('[[might]] be','low blood sugar.'),c='teal'),dict(t='Clue: she has no cough. She has no fever.',c='amber'),dict(t=_MS("[[can't]] be",'flu.'),c='teal')])
+MIGHT_T=dict(MIGHT_T,lines=[dict(k='🤔 Guessing',t='Her hands shake after every coffee. They also shake when she skips lunch.',c='amber'),dict(k='→ might',t=_MS('[[might]] be','the coffee.')+'<br>'+_MS('[[might]] be','low blood sugar.'),c='teal'),dict(k='🚫 Almost sure it is NOT',t='She has no cough. She has no fever.',c='amber'),dict(k="→ can't",t=_MS("[[can't]] be",'flu.'),c='teal')])
 PAIRS=dict(PAIRS,pairs=[('She has no cough and no fever.',"It can't be flu."),('Her friends ate the same lunch. They are fine.',"It can't be food poisoning."),('Her hands shake when she skips breakfast.','It might be low blood sugar.'),('She has been worried about her exams for two weeks.','It might be stress.'),('She drinks eight cups of coffee a day.','It might be the coffee.')])
 _cal=lambda *c: dict(grid=c,gfs=40)
 LONGEX['levels'][1]['items']=[
@@ -380,7 +380,11 @@ LONGEX['levels'][1]['items']=[
  dict(pic='🕑',grid=[('Week 1','🌙✖️'),('Week 2','🌙✖️'),('Today','📍')],gfs=44,say='Every night for two weeks, I cannot sleep.',q='What does the nurse write?',ans='She has not slept well for two weeks.',opts=['She has not slept well for two weeks.','She has not slept well for two days.','She has not slept well for four days.'])]
 
 # one dial exercise: 2 shown, then listening (Nick 17 Nov)
-DIAL1=[DIAL4[0],DIAL4[1],DIALA[2],DIALA[1],DIALA[3],DIALA[0],DIALA[5]]
+_nos=lambda d_:{k:v for k,v in d_.items() if k!='say'}
+_s3=dict(DIAL4[1],say='She sleeps three hours a night. The recommended amount is seven to nine hours.')
+# Nick 17 Nov: mix written and spoken clues (spoken: sleep, sleep, coffee; numbers are written)
+_T41=_d('🌡️','Temperature: 41 °C','about 37 °C','His temperature is',6)
+DIAL1=[DIAL4[0],_s3,_nos(DIALA[3]),DIALA[0],_nos(DIALA[1]),DIALA[4],_nos(DIALA[2]),_T41]
 
 # ---- 17 Nov round 4: 3 items per level, woven vocab, truth bridge, Fix the ward as class questions ----
 SYM4=[[_a('🥱',"I can't keep my eyes open!",'She is exhausted.','She is dizzy.','She is shaky.'),_a('💓','Boom-boom-boom! My heart is racing!','Her heart is racing.','Her heart is slow.','Her heart is sore.'),_a('🤢',"I feel sick. I think I'm going to vomit.",'She feels nauseous.','She feels dizzy.','She feels exhausted.')],
@@ -413,7 +417,7 @@ COMPARE2=dict(COMPARE2,levels=_lv3(
  [dict(pic='☕',grid=_cups(['Mon','Fri'],[2,4]),gfs=40,q='Which sentence is true?',ans='She has twice as many cups on Friday as on Monday.',opts=['She has twice as many cups on Friday as on Monday.','She has half as many cups on Friday as on Monday.','She has the same number of cups on both days.']),
   dict(pic='🛏️',grid=_cg(['Mon','Tue','Wed','Thu','Fri'],[3,4,3,2,3],'🌙'),gfs=30,q='Which sentence is true?',ans='Tuesday is her best night, and Thursday is her worst.',opts=['Tuesday is her best night, and Thursday is her worst.','Thursday is her best night, and Tuesday is her worst.','Every night is the same.']),
   dict(pic='💓',grid=[('Mon','108'),('Tue','112'),('Wed','110')],gfs=34,q='Normal: 60 to 100. Which sentence is true?',ans='Her pulse is higher than normal every day.',opts=['Her pulse is higher than normal every day.','Her pulse is lower than normal every day.','Her pulse is normal every day.'])]))
-PLANB4=dict(PLANB4,tiles=[t for t in PLANB4['tiles'] if t['t'] not in ('Everybody lies','Name the symptom')])
+PLANB4=dict(PLANB4,tiles=[t for t in PLANB4['tiles'] if t['t'] not in ('Everybody lies','Name the symptom','Boss question')])
 NEW_STUDY=[TODAY4,
  dict(m='teach',phase='STUDY',label='Teach · Symptoms',min=1,role='Four feelings',words=[('🥱','exhausted'),('😵‍💫','dizzy'),('🤲','shaky'),('💓','racing heart')]),
  dict(m='teach',phase='STUDY',label='Teach · Symptom sentences',min=2,role='Listen to the patient',pic='🥱',pics=['🥱','😵‍💫','🤲','💓'],tts=True,lines=[('She is exhausted.',"Ohhh… I can't keep my eyes open. I could sleep standing up!"),('He feels dizzy.','The room is spinning like a washing machine!'),('Her hands are shaky.',"Look at my hands! They won't stop shaking!"),('Her heart is racing.','My heart is racing, nurse. Boom-boom-boom!')]),
@@ -429,7 +433,7 @@ NEW_STUDY=[TODAY4,
 _n4=[]
 for d in L4:
     lb=d.get('label')
-    if lb=='Eyes closed. How bad?': d=dict(d,min=2,rungs=['Bello!','Banana!','Poopaye!','Tulaliloo ti amo!','KAMPAI!'],side='Everyone, eyes closed, at the same time. Whisper first. Each word is louder.')
+    if lb=='Eyes closed. How bad?': d=dict(d,min=2,title=None,clips=['kampai.mp3','bello.mp3','papaya.mp3','banana.mp3'],rungs=['KAMPAI!','Bello!','Tu e bella<br>como la papaya!','Banana!'],side='Everyone, eyes closed, at the same time. Whisper first. Each word is louder.')
     elif lb=='The impossible day': d=dict(m='comic',phase='ENGAGE',label='The impossible night',min=3,title='The impossible night',panels=COMIC4)
     elif lb=='The dials': d=dict(m='teach',phase='STUDY',label='Teach · The dials',min=3,role='Say it with dials',pic='☕',lines=[dict(k='Start',t='She drinks coffee.'),dict(k='How often?',t='She drinks coffee [[every day]].',c='orange'),dict(k='How long?',t='It started [[two weeks ago]].',c='sky'),dict(k='How bad?',t='She is [[very]] tired.',c='rose')])
     elif lb=='Her week': d=dict(m='week',phase='STUDY',label='Her week',min=3,title='Her week',days=[dict(d='Mon',cups=2,h=3,says='Two coffees. I am fine!'),dict(d='Tue',cups=3,h=4,says='Three cups. One more…'),dict(d='Wed',cups=2,h=3,says='Only two. So tired.'),dict(d='Thu',cups=3,h=2,says='My hands shake…'),dict(d='Fri',cups=4,h=3,says='Four cups! I cannot stop.')])
@@ -445,20 +449,154 @@ for d in L4:
     elif lb=='Your sentences': d=dict(d,label='Your toolkit',title='Your hunt toolkit',groups=[
         {'t':'❓ Ask','c':'teal','l':['Can I hear your voice note about …?','What does it say about …?','Is that a mistake?'],'fs':44},
         {'t':'📢 Report','c':'sky','l':['The handover says … but the voice note says …','She drinks eight cups every day.','Her pulse is higher than normal.'],'fs':38},
-        {'t':'⚖️ Argue','c':'rose','l':['It might be the coffee because …',"It can't be a broken heart because …","It can't be flu because she has no cough."],'fs':38}],note='Ask with a question. Answer in a full sentence.')
+        {'t':'⚖️ Argue','c':'rose','l':['It might be too much coffee because …',"It can't be a broken heart because …","It can't be flu because she has no cough."],'fs':38}],note='Ask with a question. Answer in a full sentence.')
     elif lb=='How the hunt works': d=dict(d,label='How Fix the ward works',title='How Fix the ward works',panels=FIX_COMIC)
     elif lb=='Case board · Find the reason': d=dict(d,reveal=d['reveal']+'<br>🌙 The night nurse wrote a chart just like her own: eight coffees, three hours of sleep!',title='Fix the ward',label='Case board · Fix the ward',clues=FIX_CLUES,unit='mistakes fixed',fix=True,min=11,teams=[(a,'Group %d'%(i+1),c,c2) for i,(a,b,c,c2) in enumerate(d['teams'])],frames=['Does anyone have a voice note about …?','Yes, we do. Come and listen.','Is that a mistake?'])
-    elif lb=='Boss question (just for fun)': _n4.append(PLANB4); d=dict(d)
+    elif lb=='Boss question (just for fun)': continue
+    elif lb=='"Doctor, I\'m too busy."': continue
     elif lb=='"Doctor, I\'m too busy."': d=dict(d,min=6)
     _n4.append(d)
 _by={d.get('label'):d for d in _n4}
 _EXTRA=['Teach · The dials','Exercise · How often?','Exercise · Compare (than · the most)','Exercise · Say it with a dial (1)','Exercise · Say it with a dial (2)']
 _by['Her week']=WEEKQ; _by['Exercise · How often?']=HOWOFTEN; _by['Exercise · Compare (than · the most)']=COMPARE2
 _i=[d.get('label') for d in _n4].index('Your toolkit')
-L4=_n4[:3]+NEW_STUDY+[dict(_by[l],optional=True) for l in _EXTRA if l in _by]+_n4[_i:]
+L4=_n4[:3]+NEW_STUDY+_n4[_i:]
 L4=[(dict(WEEKQ,phase='ACTIVATE',label='Everybody lies',title='Everybody lies?',min=3) if d.get('label')=='Everybody lies' else d) for d in L4]
+# Nick 17 Nov pm: Everybody lies before the toolkit; recap matches the core Study; Taboo stays in the main run
+_ix={d.get('label'):i for i,d in enumerate(L4)}
+_a,_b=_ix['Your toolkit'],_ix['Everybody lies']
+if _a<_b: L4[_a],L4[_b]=L4[_b],L4[_a]
+_RC=[([('c1','She'),('c2','has felt'),('c3','tired'),('c4','for two weeks.')],'for'),([('c1','Her pulse'),('c2','is'),('c3','much higher than normal.')],'than'),([('c1','It'),('c2','might be'),('c3','too much coffee.')],'might'),([('c1','It'),('c2',"can't be"),('c3','flu.')],'because…'),([('c1','He'),('c2','is'),('c3','breathless, sweaty and pale.')],'symptoms')]
+_T=[]
+for d in L4:
+    if d.get('label')=='Recap': d=dict(d,rows=_RC)
+    elif d.get('m')=='taboo': d=dict(d,label='Taboo for nurses',optional=False,min=5)
+    _T.append(d)
+L4=_T
+# dial: picture-arc version is the main exercise; the zone-word arc stays as an optional backup right after it (Nick 17 Nov)
+_L=[]
+for d in L4:
+    if d.get('m')=='dial' and d.get('label')=='Exercise · Higher or lower?':
+        _L.append(dict(d,min=4))
+    else: _L.append(d)
+L4=_L
+# ---- 17 Nov midday 2 (Nick): because on the teach slide, new words reused, audio chat bridge, Today/Recap match, partner prompts ----
+_PT='💬 Tell your partner. Then tap.'
+_MIGHT_T2=dict(MIGHT_T,lines=[dict(k='🤔 Guessing',t='Her hands are shaky after coffee. Also when she skips lunch.',c='amber'),dict(k='→ might',t=_MS('[[might]] be','too much coffee.')+'<br>'+_MS('[[might]] be','low blood sugar.'),c='teal'),dict(k='🚫 Almost sure it is NOT',t='She has no cough. She has no fever.',c='amber'),dict(k="→ can't + because",t=_MS("[[can't]] be",'flu [[because]] she has no fever.'),c='teal')])
+_PAIRS2=dict(PAIRS,hint='⚽ Tap a clue. Pass the ball to a student.',ball=True,lvl=1,pairs=[('She has no cough and no fever.',"It can't be flu."),('Her friends ate the same lunch. They are fine.',"It can't be food poisoning."),('Her hands are shaky when she skips breakfast.','It might be low blood sugar.'),('She is breathless and sweaty before every exam.','It might be stress.'),('She drinks eight cups of coffee a day.','It might be too much coffee.')],levels=[{},{'hide':True},{'hide':True,'pairs':[('She has no cough and no fever.',"It can't be flu because she has no fever."),('Her friends ate the same lunch. They are fine.',"It can't be food poisoning because they are fine."),('Her hands are shaky when she skips breakfast.','It might be low blood sugar because she skips breakfast.'),('She is breathless and sweaty before every exam.','It might be stress because it happens before exams.'),('She drinks eight cups of coffee a day.','It might be too much coffee because she drinks eight cups.')]}])
+_Q=lambda c,t,g=False:(c,t,g)
+CHAT4=dict(m='chat',phase='STUDY',label='Exercise · Patient chat (voice messages)',min=4,title='Voice messages',window=4,pt='🎧 Listen. Then answer as the nurse.',lines=[
+ ('P',dict(say='My hands are shaky and my heart is racing. What is wrong with me?')),
+ ('N',[_Q('c2','Do you drink'),_Q('c3','a lot of coffee?',True)],[('c3','a lot of coffee?'),('c3','a lot of water?'),('c3','a lot of tea?')]),
+ ('P',dict(say='Eight cups a day! Coffee is my best friend.')),
+ ('N',[_Q('c1','It'),_Q('c2','might',True),_Q('c2','be'),_Q('c3','too much coffee.')],[('c2','might'),('c2',"can't")]),
+ ('P',dict(say='I feel nauseous and sweaty. What is wrong with me?')),
+ ('N',[_Q('c2','Do you have'),_Q('c3','a fever?',True)],[('c3','a fever?'),('c3','a rash?'),('c3','a cat?')]),
+ ('P',dict(say='No fever. No cough. Only my cat looks worried.')),
+ ('N',[_Q('c1','It'),_Q('c2',"can't",True),_Q('c2','be'),_Q('c3','flu'),_Q('c4','because',True),_Q('c1','you have no fever.')],[('c2','might'),('c2',"can't"),('c4','because'),('c4','but')]),
+ ('P',dict(say='I am exhausted and dizzy. What is wrong with me?')),
+ ('N',[_Q('c2','Do you have'),_Q('c3','exams?',True)],[('c3','exams?'),('c3','a cat?'),('c3','a fever?')]),
+ ('P',dict(say='Yes! They started two weeks ago. And my cat watches me all night.')),
+ ('N',[_Q('c1','It'),_Q('c2','might',True),_Q('c2','be'),_Q('c3','stress'),_Q('c4','because',True),_Q('c1','you have exams.')],[('c2','might'),('c2',"can't"),('c4','because'),('c4','but')]),
+ ('P',dict(say='Okay, okay. You are right. But I need one more coffee.')),
+])
+_ZG={'pulse_hi':'slightly 101–120 · much 121–150 · dangerously over 150','pulse_lo':'slightly 50–59 · much 40–49 · dangerously under 40','sleep':'slightly 5–6 h · much 3–4 h · dangerously under 3 h','temp_n':'normal: 36 to 37.5 °C','temp_hi':'slightly 38–39 · much 39–40 · dangerously over 40','coffee':'slightly 5–6 · much 7–9 · dangerously 10 or more'}
+_DG=[('pulse_hi',True),('sleep',0),('temp_n',0),('pulse_hi',0),('sleep',0),('pulse_lo',0),('coffee',0),('temp_hi',0)]
+for _it,(_g,_dm) in zip(DIAL1,_DG): _it['guide']=_ZG[_g]; _it['demo']=bool(_dm)
+_T3=[]
+for d in L4:
+    lb=d.get('label'); m=d['m']
+    if m=='today': d=dict(d,rows=[[('c4','Say'),('c3','how bad')],[('c1','Say'),('c3','how long')],[('c4','Say'),('c3','higher / lower than normal')],[('c2','might'),('c4',"can't"),('c3','because')]])
+    elif lb=="Teach · Might, can't, because": d=_MIGHT_T2
+    elif lb=="Exercise · Might · can't": d=_PAIRS2; _T3.append(d); _T3.append(CHAT4); continue
+    elif lb=='Recap': d=dict(d,rows=[([('c1','He'),('c2','is'),('c3','breathless, sweaty and pale.')],'symptoms'),([('c1','His pain'),('c2','is'),('c3','severe.')],'how bad'),([('c1','It'),('c2','started'),('c4','two weeks ago.')],'ago'),([('c1','Her pulse'),('c2','is'),('c3','much higher than normal.')],'than'),([('c1','It'),('c2','might be'),('c3','too much coffee.')],'might'),([('c1','It'),('c2',"can't be"),('c3','flu because she has no fever.')],'because')])
+    if m in ('choice','dial','chat') and lb and (lb.startswith('Exercise') or lb.startswith('Everybody')) and not d.get('pt') and lb!='Exercise · Symptoms': d=dict(d,pt=_PT)
+    _T3.append(d)
+L4=_T3
+def _rr(o,m):
+    if isinstance(o,str):
+        for a,b in m.items(): o=o.replace(a,b)
+        return o
+    if isinstance(o,list): return [_rr(x,m) for x in o]
+    if isinstance(o,dict): return {k:_rr(v,m) for k,v in o.items()}
+    if isinstance(o,tuple): return tuple(_rr(x,m) for x in o)
+    return o
+L4=[d if d['m'] in ('dial','chat','pairs','recap','today') else _rr(d,{'say':None}) if False else d for d in L4]
+_SAYM={"I woke up like this this morning.":"I feel dizzy. I woke up like this this morning.","I have been like this for two weeks.":"I am exhausted. I have been like this for two weeks."}
+def _say_only(o):
+    if isinstance(o,dict): return {k:(_rr(v,_SAYM) if k=='say' else _say_only(v)) for k,v in o.items()}
+    if isinstance(o,list): return [_say_only(x) for x in o]
+    return o
+L4=[_say_only(d) if d.get('label') in ('Teach · How long?','Exercise · How long?') else d for d in L4]
 TABOO4=[d for d in L4 if d['m']=='taboo'][0]
-TABOO4['items']=TABOO4['items']+[dict(w='exhausted',e='🥱',no=['tired','sleep','energy','night']),dict(w='dizzy',e='😵‍💫',no=['spin','head','fall','room']),dict(w='nauseous',e='🤢',no=['sick','vomit','stomach','feel']),dict(w='breathless',e='😮‍💨',no=['breath','air','run','stairs'])]
+TABOO4['items']=[dict(w='shaky',e='🤲',no=['shake','hands','cold','fall']),dict(w='coffee',e='☕',no=['cup','drink','morning','caffeine']),dict(w='dizzy',e='😵‍💫',no=['spin','head','fall','room']),dict(w='pulse',e='💓',no=['heart','beat','wrist','minute']),dict(w='nauseous',e='🤢',no=['sick','vomit','stomach','feel']),dict(w='headache',e='🤕',no=['head','pain','hurt','tablet']),dict(w='breathless',e='😮‍💨',no=['breath','air','run','stairs']),dict(w='exam',e='📝',no=['test','study','paper','university'])]
+
+# ---- 17 Nov pm: Gemini art placed (slots without art yet keep their emoji / drawing) ----
+ARTMAP={'🥱':'l4_c1_exhausted.jpg','🤲':'l4_c3_shaky.jpg','💓':'l4_c4_racing_heart.jpg','🤢':'l4_c5_nauseous.jpg','🫥':'l4_c8_pale.jpg','😵‍💫':'l4_c2_dizzy.jpg','😮‍💨':'l4_c6_breathless.jpg','😓':'l4_c7_sweaty.jpg'}
+_ARTLB=('Teach · Symptoms','Teach · Symptom sentences','Teach · More symptoms','Teach · More patient sentences','Exercise · Symptoms')
+def _artswap(o):
+    if isinstance(o,str): return ARTMAP.get(o,o)
+    if isinstance(o,list): return [_artswap(x) for x in o]
+    if isinstance(o,tuple): return tuple(_artswap(x) for x in o)
+    if isinstance(o,dict): return {k:_artswap(v) for k,v in o.items()}
+    return o
+L4=[_artswap(d) if d.get('label') in _ARTLB else d for d in L4]
+for d in L4:
+    if d['m']=='cover': d['cards']=[dict(d['cards'][0],pic='l4_a1_cover_exams.jpg'),dict(d['cards'][1],pic='l4_a2_cover_coffee.jpg')]
+COMIC4[0]['img']='l4_b1_books.jpg'; COMIC4[1]['img']='l4_b2_coffee.jpg'; COMIC4[2]['img']='l4_b3_night.jpg'
+FIX_COMIC[0]['img']='l4_d1_night_nurse.jpg'; FIX_COMIC[1]['img']='l4_d2_find.jpg'; FIX_COMIC[2]['img']='l4_d3_ask.jpg'; FIX_COMIC[3]['img']='l4_d4_fix.jpg'
+# 17 Nov 15:00: Everybody lies listen cards get art where it exists (thermometer/headache still emoji)
+_LIEMAP={'☕':'l4_b2_coffee.jpg','🛏️':'l4_b3_night.jpg','💓':'l4_c4_racing_heart.jpg','📚':'l4_b1_books.jpg'}
+def _liefix(o):
+    if isinstance(o,dict): return {k:(_LIEMAP.get(v,v) if k=='pic' else _liefix(v)) for k,v in o.items()}
+    if isinstance(o,list): return [_liefix(x) for x in o]
+    return o
+L4=[_liefix(d) if d.get('label')=='Everybody lies' else d for d in L4]
+# 17 Nov 15:15 (Nick): B4 art, toolkit bubbles, teach pics
+COMIC4[3]['img']='l4_b4_asleep.jpg'
+for _p in COMIC4: _p['cap']=''
+for d in L4:
+    if d.get('label')=='Your toolkit': d['bubbles']=True
+    if d.get('label')=="Teach · Might, can't, because": d['pics']=['l4_c3_shaky.jpg','l4_g1_cups_eight.jpg','l4_h1_thermometer.jpg','l4_h1_thermometer.jpg']; d['pic']='l4_c3_shaky.jpg'
+    if d.get('label')=='Exercise · Symptoms':
+        d=d
+# 17 Nov 15:30: pain faces -> art, cups, thermometer
+_FMAP={'🙂':'l4_f5_pain_gone.jpg','😕':'l4_f1_pain_mild.jpg','😣':'l4_f2_pain_moderate.jpg','😖':'l4_f3_pain_severe.jpg','😭':'l4_f4_pain_unbearable.jpg'}
+def _fm(o,M):
+    if isinstance(o,str): return M.get(o,o)
+    if isinstance(o,list): return [_fm(x,M) for x in o]
+    if isinstance(o,tuple): return tuple(_fm(x,M) for x in o)
+    if isinstance(o,dict): return {k:_fm(v,M) for k,v in o.items()}
+    return o
+def _cupfix(o):
+    if isinstance(o,dict):
+        if o.get('pic')=='☕' and o.get('say'): 
+            return dict({k:_cupfix(v) for k,v in o.items()},pic='l4_g1_cups_eight.jpg' if o['say'].startswith('Two cups') else 'l4_c3_shaky.jpg')
+        return {k:_cupfix(v) for k,v in o.items()}
+    if isinstance(o,list): return [_cupfix(x) for x in o]
+    return o
+_nl=[]
+for d in L4:
+    lb=d.get('label')
+    if lb in ('Teach · How bad?','Exercise · How bad?'): d=_fm(d,_FMAP)
+    if lb=='Exercise · Symptoms': d=_cupfix(d)
+    if lb in ('Everybody lies',"Teach · Might, can't, because"): d=_fm(d,{'🌡️':'l4_h1_thermometer.jpg'})
+    _nl.append(d)
+L4=_nl
+# 17 Nov 15:45: toolkit as colour-coded chips (like the grammar rows), p13 dial art
+_S,_V,_O,_B,_T='s','v','o','b','t'
+for d in L4:
+    if d.get('label')=='Your toolkit':
+        d['bubbles']=False
+        d['chips']=[
+          [[('Can',_V),('I',_S),('hear',_V),('your voice note',_O),('about …?',_O)],[('What',_B),('does',_V),('it',_S),('say',_V),('about …?',_O)],[('Is',_V),('that',_S),('a mistake?',_O)]],
+          [[('The handover',_S),('says',_V),('…',_O),('but',_B),('the voice note',_S),('says',_V),('…',_O)],[('She',_S),('drinks',_V),('eight cups',_O),('every day.',_T)],[('Her pulse',_S),('is',_V),('higher than normal.',_O)]],
+          [[('It',_S),('might be',_V),('too much coffee',_O),('because …',_B)],[('It',_S),("can't be",_V),('a broken heart',_O),('because …',_B)],[('It',_S),("can't be",_V),('flu',_O),('because',_B),('she',_S),('has',_V),('no cough.',_O)]]]
+    if d.get('label')=='Exercise · Higher or lower?':
+        _DA={('💓','Pulse: 110 beats per minute'):'l4_c4_racing_heart.jpg',('💓','Pulse: 150 beats per minute'):'l4_c4_racing_heart.jpg',('💓','Pulse: 38 beats per minute'):'l4_c2_dizzy.jpg',('🛏️','Sleep: 3 hours a night'):'l4_b3_night.jpg',('🛏️','Sleep: 6 hours a night'):'l4_b3_night.jpg',('🌡️','Temperature: 37 °C'):'l4_h1_thermometer.jpg',('🌡️','Temperature: 41 °C'):'l4_c7_sweaty.jpg',('☕','Coffee: 5 cups a day'):'l4_b2_coffee.jpg'}
+        for it in d['items']:
+            a=_DA.get((it['e'],it['now']))
+            if a: it['art']=ART+a
 if __name__=='__main__':
     out=HERE.parent.parent/'lessons-3-4'
     print(build_interactive(L3,str(out/'lesson3_v2.html'),title='SkillsXLab · Lesson 3 · Which illness?'))
