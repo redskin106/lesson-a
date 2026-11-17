@@ -22,14 +22,14 @@ def page(lesson,letter,name,col,clues,frames):
 out=os.path.join(os.path.dirname(__file__),'..','..','lessons-3-4','groups'); os.makedirs(out,exist_ok=True)
 import importlib.util,json
 _sp=importlib.util.spec_from_file_location('l34',os.path.join(os.path.dirname(__file__),'lessons34.py'));_m=importlib.util.module_from_spec(_sp);_sp.loader.exec_module(_m)
-ORDER=[('red','Red','#ff5a6a','🔴'),('blue','Blue','#2a8cf0','🔵'),('green','Green','#19b38a','🟢'),('yellow','Yellow','#f2a900','🟡')]
+ORDER=[('red','1','#ff5a6a','1️⃣'),('blue','2','#2a8cf0','2️⃣'),('green','3','#19b38a','3️⃣'),('yellow','4','#f2a900','4️⃣')]
 def page4(idx):
     key,name,col,dot=ORDER[idx]; nxt=ORDER[(idx+1)%4]; prv=ORDER[(idx-1)%4]
     mine=[f for f in _m.FIX if f['owner']==key]; hold=[f for f in _m.FIX if f['owner']==prv[0]]
     cards=''
-    for f in mine:
+    for ri,f in enumerate(mine):
         opts=json.dumps(f['opts'],ensure_ascii=False)
-        cards+=f'<div class="mk" data-ans="{html.escape(f["fix"])}" data-o=\'{html.escape(opts,quote=True)}\'><div class="w"><span class="e">{f["pic"]}</span><s>{html.escape(f["wrong"])}</s></div><div class="ask">{nxt[3]} Ask {nxt[1]}: "Can I hear your voice note about the {f["topic"].lower()}?"</div><button class="hb">✔ We listened</button><div class="op" style="display:none"></div><div class="ok" style="display:none">✅ Fixed! Say it to the class.</div></div>'
+        cards+=f'<div class="mk" data-ans="{html.escape(f["fix"])}" data-o=\'{html.escape(opts,quote=True)}\'><div class="w"><span class="e">{f["pic"]}</span><s>{html.escape(f["wrong"])}</s></div><div class="ask"><b>Round {ri+1}.</b> Ask the class: "Does anyone have a voice note about the {f["topic"].lower()}?"</div><button class="hb">✔ We listened</button><div class="op" style="display:none"></div><div class="ok" style="display:none">✅ Fixed! Say it to the class.</div></div>'
     vn=''.join(f'<div class="vn"><button class="pl" data-say="{html.escape(f["voice"])}">🎧</button><div><b>{f["pic"]} Voice note: {f["topic"].lower()}</b><div class="who">{f["who"]}</div></div></div>' for f in hold)
     return f'''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fix the ward · Group {name}</title><style>
 *{{box-sizing:border-box}}body{{margin:0;font-family:Outfit,system-ui,sans-serif;background:linear-gradient(#f5ecff,#dff1ff);color:#1c1b2e;padding:18px}}
@@ -41,8 +41,8 @@ def page4(idx):
 .vn{{display:flex;gap:14px;align-items:center}}.pl{{flex:none;width:76px;height:76px;border-radius:50%;border:0;background:{col};font-size:38px}}.who{{font-size:15px;color:#6a6a7e;margin-top:2px}}.hint{{font-size:15px;color:#5a5a74}}
 @keyframes sh{{25%{{transform:translateX(-6px)}}75%{{transform:translateX(6px)}}}}</style></head><body>
 <div class="top"><div class="dot"></div><div><h1>Group {name}</h1><div class="sub">Fix the ward · Lesson 4</div></div></div>
-<div class="sec">Your mistakes</div>{cards}<div class="hint">Ask the other group. Listen. Then choose the fix.</div>
-<div class="sec">Your voice notes ({prv[3]} {prv[1]} will ask you)</div>{vn}
+<div class="sec">Your mistakes</div>{cards}<div class="hint">One group asks at a time. Wait for your turn. Listen. Then choose the fix.</div>
+<div class="sec">Your voice notes · if someone asks, say: "Yes, we do. Come and listen."</div>{vn}
 <script>function shuf(a){{for(var i=a.length-1;i>0;i--){{var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}}return a}}
 document.querySelectorAll('.pl').forEach(function(b){{b.onclick=function(){{if(window.speechSynthesis){{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}}}}}});
 document.querySelectorAll('.mk').forEach(function(m){{var op=m.querySelector('.op');m.querySelector('.hb').onclick=function(){{this.style.display='none';op.style.display='block';shuf(JSON.parse(m.dataset.o)).forEach(function(t){{var b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=function(){{if(t===m.dataset.ans){{b.classList.add('good');op.querySelectorAll('.opt').forEach(function(x){{x.disabled=true}});m.querySelector('.ok').style.display='block'}}else{{b.classList.add('bad');setTimeout(function(){{b.classList.remove('bad')}},400)}}}};op.appendChild(b)}})}}}});</script></body></html>'''

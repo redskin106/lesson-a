@@ -378,17 +378,28 @@ LONGEX['levels'][1]['items']=[
  dict(pic='📅',grid=[('Mon','·'),('Tue','·'),('Wed','🤒'),('Thu','·'),('Fri','📍<div style="font-size:22px">today</div>')],gfs=44,say='It began on Wednesday.',q='What does the nurse write?',ans='It started two days ago.',opts=['It started two days ago.','It started two weeks ago.','It started two months ago.']),
  dict(pic='🗓️',grid=[('Mon','😴'),('Tue','·'),('Wed','·'),('Thu','📍<div style="font-size:22px">today</div>')],gfs=44,say='I have felt tired since Monday.',q='What does the nurse write?',ans='She has felt tired for three days.',opts=['She has felt tired for three days.','She has felt tired for three weeks.','She has felt tired for one day.']),
  dict(pic='🕑',grid=[('Week 1','🌙✖️'),('Week 2','🌙✖️'),('Today','📍')],gfs=44,say='Every night for two weeks, I cannot sleep.',q='What does the nurse write?',ans='She has not slept well for two weeks.',opts=['She has not slept well for two weeks.','She has not slept well for two days.','She has not slept well for four days.'])]
+
+# one dial exercise: 2 shown, then listening (Nick 17 Nov)
+DIAL1=[DIAL4[0],DIAL4[1],DIALA[2],DIALA[1],DIALA[3],DIALA[0],DIALA[5]]
+
+# ---- 17 Nov round 4: 3 items per level, woven vocab, truth bridge, Fix the ward as class questions ----
+SYM4=[[_a('🥱',"I can't keep my eyes open!",'She is exhausted.','She is dizzy.','She is shaky.'),_a('💓','Boom-boom-boom! My heart is racing!','Her heart is racing.','Her heart is slow.','Her heart is sore.'),_a('🤢',"I feel sick. I think I'm going to vomit.",'She feels nauseous.','She feels dizzy.','She feels exhausted.')],
+ [_a('😵‍💫','When I stand up, the room spins.','She feels dizzy when she stands up.','She feels dizzy when she sits down.','She feels dizzy when she sleeps.'),_a('☕','After each coffee, my hands shake!','Her hands shake after she drinks coffee.','Her hands shake before she drinks coffee.','Her hands never shake.'),_a('😮‍💨',"I climbed one floor… and I can't catch my breath.",'He is breathless.','He is dizzy.','He is hungry.')],
+ [_a('🥱','I am so tired… but in bed, I just stare at the ceiling.','She is exhausted, but she cannot sleep.','She is exhausted, and she sleeps well.','She is not tired.'),_a('😓','I am sweating, and my face is white. Is the air-con on?','She is sweaty and pale.','She is sweaty and red.','She is cold and pale.'),_a('☕','Two cups. Maybe three. Okay… eight.','She drinks much more coffee than she first says.','She drinks only two cups.','She does not drink coffee.')]]
+PAIRS=dict(PAIRS,pairs=[('She has no cough and no fever.',"It can't be flu."),('Her friends ate the same lunch. They are fine.',"It can't be food poisoning."),('Her hands shake when she skips breakfast.','It might be low blood sugar.'),('She is breathless and sweaty before every exam.','It might be stress.'),('She drinks eight cups of coffee a day.','It might be the coffee.')])
+_FP3=stick(90,395,1.15,'up')+stick(310,395,1.15,'point')+bubble_svg(10,8,380,128,'Does anyone have\na voice note about\nthe temperature?',fs=25,tx=110)
+FIX_COMIC=[dict(svg=_FP,cap='The night nurse made mistakes.'),dict(svg=_FP2,cap='Find the mistakes on your page.'),dict(svg=_FP3,cap='One group asks the class. Everyone listens.'),dict(svg=_FP4,cap='"Yes, we do." Listen. Choose the fix. Say it.')]
 NEW_STUDY=[TODAY4,
  dict(m='teach',phase='STUDY',label='Teach · Symptoms',min=1,role='Four feelings',words=[('🥱','exhausted'),('😵‍💫','dizzy'),('🤲','shaky'),('💓','racing heart')]),
  dict(m='teach',phase='STUDY',label='Teach · Symptom sentences',min=2,role='Listen to the patient',pic='🥱',pics=['🥱','😵‍💫','🤲','💓'],tts=True,lines=[('She is exhausted.',"Ohhh… I can't keep my eyes open. I could sleep standing up!"),('He feels dizzy.','The room is spinning like a washing machine!'),('Her hands are shaky.',"Look at my hands! They won't stop shaking!"),('Her heart is racing.','My heart is racing, nurse. Boom-boom-boom!')]),
- MORE_W,MORE_S,
+ MORE_W,
  dict(m='choice',phase='STUDY',title='Symptoms',label='Exercise · Symptoms',aud=True,min=3,lvl=3,levels=lv(SYM4)),
  dict(m='rungs',phase='STUDY',label='Teach · How bad?',min=1,title='How bad?',stops=BAD,start=2),
  dict(m='choice',phase='STUDY',title='How bad?',label='Exercise · How bad?',aud=True,min=2,lvl=2,levels=lv(HB4)),
  dict(m='rungs',phase='STUDY',label='Teach · How long?',min=1,title='How long?',stops=LONG,start=3),
  LONGEX,
- dict(m='dial',phase='STUDY',label='Teach · The dial',min=3,title='How much higher? How much lower?',items=DIAL4),
- DIALX,MIGHT_T,PAIRS,ASK_T,ASK_B1,ASK_B2]
+ dict(m='dial',phase='STUDY',label='Exercise · Higher or lower?',min=4,title='How much higher? How much lower?',aud=True,items=DIAL1),
+ MIGHT_T,PAIRS]
 
 _n4=[]
 for d in L4:
@@ -411,15 +422,16 @@ for d in L4:
         {'t':'📢 Report','c':'sky','l':['The handover says … but the voice note says …','She drinks eight cups every day.','Her pulse is higher than normal.'],'fs':38},
         {'t':'⚖️ Argue','c':'rose','l':['It might be the coffee because …',"It can't be a broken heart because …","It can't be flu because she has no cough."],'fs':38}],note='Ask with a question. Answer in a full sentence.')
     elif lb=='How the hunt works': d=dict(d,label='How Fix the ward works',title='How Fix the ward works',panels=FIX_COMIC)
-    elif lb=='Case board · Find the reason': d=dict(d,reveal=d['reveal']+'<br>🌙 The night nurse wrote a chart just like her own: eight coffees, three hours of sleep!',title='Fix the ward',label='Case board · Fix the ward',clues=FIX_CLUES,unit='mistakes fixed',fix=True,min=11,frames=['Can I hear your voice note about …?','What does it say about …?','Is that a mistake?'])
+    elif lb=='Case board · Find the reason': d=dict(d,reveal=d['reveal']+'<br>🌙 The night nurse wrote a chart just like her own: eight coffees, three hours of sleep!',title='Fix the ward',label='Case board · Fix the ward',clues=FIX_CLUES,unit='mistakes fixed',fix=True,min=11,teams=[(a,'Group %d'%(i+1),c,c2) for i,(a,b,c,c2) in enumerate(d['teams'])],frames=['Does anyone have a voice note about …?','Yes, we do. Come and listen.','Is that a mistake?'])
     elif lb=='Boss question (just for fun)': _n4.append(PLANB4); d=dict(d)
     elif lb=='"Doctor, I\'m too busy."': d=dict(d,min=6)
     _n4.append(d)
 _by={d.get('label'):d for d in _n4}
-_EXTRA=['Teach · The dials','Her week','Exercise · How often?','Exercise · Compare (than · the most)','Exercise · Say it with a dial (1)','Exercise · Say it with a dial (2)']
+_EXTRA=['Teach · The dials','Exercise · How often?','Exercise · Compare (than · the most)','Exercise · Say it with a dial (1)','Exercise · Say it with a dial (2)']
 _by['Her week']=WEEKQ; _by['Exercise · How often?']=HOWOFTEN; _by['Exercise · Compare (than · the most)']=COMPARE2
 _i=[d.get('label') for d in _n4].index('Your toolkit')
 L4=_n4[:3]+NEW_STUDY+[dict(_by[l],optional=True) for l in _EXTRA if l in _by]+_n4[_i:]
+L4=[(dict(WEEKQ,phase='ACTIVATE',label='Everybody lies',title='Everybody lies?',min=3) if d.get('label')=='Everybody lies' else d) for d in L4]
 TABOO4=[d for d in L4 if d['m']=='taboo'][0]
 TABOO4['items']=TABOO4['items']+[dict(w='exhausted',e='🥱',no=['tired','sleep','energy','night']),dict(w='dizzy',e='😵‍💫',no=['spin','head','fall','room']),dict(w='nauseous',e='🤢',no=['sick','vomit','stomach','feel']),dict(w='breathless',e='😮‍💨',no=['breath','air','run','stairs'])]
 if __name__=='__main__':
