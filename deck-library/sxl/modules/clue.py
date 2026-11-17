@@ -35,7 +35,7 @@ def dials3(d):
 @module('frames3')
 def frames3(d):
     """Sentence frames. {'phase','title','groups':[{'t','c','l':[lines],'fs'}],'note','write':bool}"""
-    G=d['groups']; n=len(G); w=int((1740-30*(n-1))/n); o=header(d['phase'],d.get('title','Say it'),d.get('grad','teal')); h=d.get('h',560 if d.get('write') else 640)
+    G=d['groups']; n=len(G); w=int((1740-30*(n-1))/n); o=header(d['phase'],d.get('title','Say it'),d.get('grad','teal')); h=d.get('h',560 if d.get('write') else 745)
     for i,g in enumerate(G):
         x=90+i*(w+30); fs=g.get('fs',40)
         body=f'<div style="padding:30px 34px;height:{h}px;box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start">{grad_chip(g.get("c","violet"),g["t"],44,"6px 30px")}<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:20px;align-self:stretch">'+''.join(f'<div style="margin:18px 0 0;font-family:P;font-weight:500;font-size:{fs}px;line-height:1.3">{l}</div>' for l in g['l'])+'</div></div>'
@@ -78,9 +78,12 @@ def choice_html(d,sid):
     for k,it in enumerate(I):
         rest=[t for t in it['opts'] if t!=it['ans']]; random.Random(k*7+len(it['q'])).shuffle(rest); rest.insert((k*2+len(d.get('title','')))%len(it['opts']),it['ans']); it=dict(it,opts=rest)
         o+='<div class="chi" style="display:none">'
-        if it.get('say') and (it.get('aud') or d.get('aud')):
+        if it.get('say') and it.get('grid') and (it.get('aud') or d.get('aud')):
+            cells=''.join(f'<div style="text-align:center"><div style="font-family:O;font-weight:800;font-size:28px;color:#6a35e8">{a_}</div><div style="font-size:{it.get("gfs",48)}px;line-height:1.2;margin-top:8px">{b_}</div></div>' for a_,b_ in it['grid'])
+            o+=glass(90,180,630,750,f'<div style="height:100%;display:flex;flex-direction:column;justify-content:center;gap:70px;padding:0 14px"><div class="caud" data-say="{it["say"]}" style="margin:0 24px;padding:48px 20px;border-radius:48px;background:#fff;border:5px solid #d9c8ff;text-align:center;font-family:O;font-weight:800;font-size:54px;cursor:pointer">🔊 Tap to listen</div><div style="display:flex;justify-content:space-around;align-items:flex-start">{cells}</div></div>',r=56)
+        elif it.get('say') and (it.get('aud') or d.get('aud')):
             sv=f'<svg viewBox="0 0 630 750" width="630" style="display:block">{bubble_svg(24,26,582,290,"🔊  Tap to listen",fs=54,tx=230)}{stick(230,715,1.85,"hold")}<text x="395" y="600" font-size="150">{it.get("pic","")}</text></svg>'
-            o+=glass(90,180,630,750,sv,r=56)+f'<div class="tch caud" data-say="{it["say"]}" style="position:absolute;left:90px;top:180px;width:630px;height:340px;z-index:4;cursor:pointer;border-radius:56px"></div>'
+            o+=glass(90,180,630,750,sv,r=56)+f'<div class="caud" data-say="{it["say"]}" style="position:absolute;left:90px;top:180px;width:630px;height:340px;z-index:4;cursor:pointer;border-radius:56px"></div>'
         elif it.get('say'):
             sv=f'<svg viewBox="0 0 630 750" width="630" style="display:block">{bubble_svg(24,26,582,290,it["say"],fs=42,tx=230)}{stick(230,715,1.85,"hold")}<text x="395" y="600" font-size="150">{it.get("pic","")}</text></svg>'
             o+=glass(90,180,630,750,sv,r=56)
@@ -157,7 +160,7 @@ def week(d):
 @module('rungs')
 def rungs(d):
     """Vertical ladder, strongest on top. {'phase','title','stops':[{'word','e','gloss','sen','grad'}] weak->strong,'start'}"""
-    S=d['stops']; n=len(S); st=d.get('start',n-1); top0=185; rh=128; gp=14; x0=150; w=1040
+    S=d['stops']; n=len(S); st=d.get('start',n-1); top0=180; gp=14; rh=int((756-(n-1)*gp)/n); x0=150; w=1040
     T=['#6fd79a','#c7e36a','#ffd25a','#ff9a5a','#ff5a6a']
     o=header(d['phase'],d.get('title','How bad?'),'violet')
     ys=[top0+(n-1-i)*(rh+gp) for i in range(n)]
@@ -167,10 +170,10 @@ def rungs(d):
             f'<span style="font-size:76px;line-height:1">{s_["e"]}</span><span class="chip" style="font-size:46px;padding:6px 32px;border-radius:999px;background:linear-gradient(135deg,{c},{c}cc);color:#1c1b2e;white-space:nowrap">{s_["word"]}</span>'
             f'<span style="margin-left:auto;font-family:O;font-weight:800;font-size:36px;color:#6a35e8;background:rgba(255,255,255,.7);padding:6px 26px;border-radius:999px;white-space:nowrap">{s_["gloss"]}</span></div>')
     o+=f'<div class="rgm" style="position:absolute;left:{x0-10}px;top:{ys[st]-10}px;width:{w+20}px;height:{rh+20}px;border-radius:{rh//2+10}px;border:7px solid #9a5cff;box-shadow:0 0 0 6px rgba(154,92,255,.25),0 14px 34px rgba(106,53,232,.35);pointer-events:none;transition:top .55s cubic-bezier(.3,1.4,.5,1)"></div>'
-    o+='<div class="gl" style="left:1230px;top:185px;width:600px;height:706px;border-radius:72px"></div>'
+    o+='<div class="gl" style="left:1230px;top:180px;width:600px;height:756px;border-radius:72px"></div>'
     for i,s_ in enumerate(S):
-        o+=(f'<div class="rgp" data-i="{i}" style="position:absolute;left:1230px;top:185px;width:600px;height:706px;opacity:{1 if i==st else 0};transition:opacity .3s;pointer-events:none">'
-            f'<div style="text-align:center;font-size:200px;line-height:1;margin-top:40px">{s_["e"]}</div>'
+        o+=(f'<div class="rgp" data-i="{i}" style="position:absolute;left:1230px;top:180px;width:600px;height:756px;opacity:{1 if i==st else 0};transition:opacity .3s;pointer-events:none">'
+            f'<div style="text-align:center;font-size:230px;line-height:1;margin-top:70px">{s_["e"]}</div>'
             +(f'<div class="rsy" data-say="{s_["say"]}" style="margin:26px 36px 0;text-align:center;font-family:P;font-weight:500;font-size:30px;color:#6a35e8">🗣️ {s_["say"]}</div>' if s_.get('say') else '')+f'<div style="margin:22px 40px 0;text-align:center;font-family:O;font-weight:800;font-size:46px;line-height:1.2">{_ul(s_["sen"])}</div></div>')
     return o
 
@@ -250,8 +253,8 @@ def comic(d):
     o=header(d['phase'],d['title'],d.get('grad','violet')); P=d['panels']; n=len(P); w=int((1740-24*(n-1))/n)
     for i,pn in enumerate(P):
         x=90+i*(w+24)
-        body=f'<svg viewBox="0 0 400 420" width="{w-30}" style="display:block;margin:12px auto 0">{pn["svg"]}</svg><div style="padding:0 22px;text-align:center;font-family:O;font-weight:800;font-size:34px;line-height:1.15"><span style="color:#9a5cff">{i+1}</span> {pn["cap"]}</div>'
-        o+=stp(glass(x,d.get('y',200),w,d.get('h',590),body,r=48),i+1)
+        body=f'<div style="height:100%;display:flex;flex-direction:column;justify-content:center;gap:24px"><svg viewBox="0 0 400 420" width="{w-30}" style="display:block;margin:0 auto">{pn["svg"]}</svg><div style="padding:0 22px;text-align:center;font-family:O;font-weight:800;font-size:38px;line-height:1.15"><span style="color:#9a5cff">{i+1}</span> {pn["cap"]}</div></div>'
+        o+=stp(glass(x,d.get('y',190),w,d.get('h',745),body,r=48),i+1)
     return o
 
 def _dial_scene(z):
@@ -287,11 +290,11 @@ def _dial_html(d,sid):
     sv+=f'<g class="nd" style="transform-origin:{cx}px {cy}px;transform:rotate(-90deg);transition:transform .9s cubic-bezier(.3,1.35,.5,1)"><polygon points="{cx-11},{cy} {cx+11},{cy} {cx},{cy-395}" fill="#1c1b2e"/></g><circle cx="{cx}" cy="{cy}" r="30" fill="#1c1b2e"/><circle cx="{cx}" cy="{cy}" r="11" fill="#fff"/>'
     o=header(d['phase'],d.get('title','How much?'),d.get('grad','violet'))
     o+=f'<div class="a" style="right:{130 if d.get("_lvg") else 90}px;top:60px;display:flex;gap:12px">'+''.join('<span class="chd" style="width:26px;height:26px;border-radius:50%"></span>' for _ in d['items'])+'</div>'
-    o+=f'<div class="a" style="left:90px;top:200px;width:780px"><svg viewBox="0 0 900 540" width="780">{sv}</svg></div>'
-    o+='<div class="gl dcard" style="left:90px;top:700px;width:780px;height:190px;border-radius:48px"></div>'
-    o+='<div class="gl dsen" style="left:910px;top:190px;width:920px;height:170px;border-radius:48px"></div>'
+    o+=f'<div class="a" style="left:90px;top:185px;width:840px"><svg viewBox="0 0 900 540" width="840">{sv}</svg></div>'
+    o+='<div class="gl dcard" style="left:90px;top:725px;width:840px;height:210px;border-radius:48px"></div>'
+    o+='<div class="gl dsen" style="left:970px;top:190px;width:860px;height:190px;border-radius:48px"></div>'
     sc=''.join(f'<g class="sc" data-z="{z}" style="display:none">{_dial_scene(z)}</g>' for z in range(7))
-    o+=f'<div class="gl dscn" style="left:910px;top:380px;width:920px;height:510px;border-radius:48px;overflow:hidden"><svg viewBox="0 0 790 330" width="920" height="510" style="display:block"><line class="qq" x1="0" y1="205" x2="790" y2="205" stroke="#10a98d" stroke-width="7" stroke-dasharray="22 14"/><text class="qq" x="395" y="140" font-size="90" text-anchor="middle">❔</text>{sc}</svg></div>'
+    o+=f'<div class="gl dscn" style="left:970px;top:405px;width:860px;height:530px;border-radius:48px;overflow:hidden"><svg viewBox="0 0 790 330" width="860" height="530" style="display:block"><line class="qq" x1="0" y1="205" x2="790" y2="205" stroke="#10a98d" stroke-width="7" stroke-dasharray="22 14"/><text class="qq" x="395" y="140" font-size="90" text-anchor="middle">❔</text>{sc}</svg></div>'
     return o+f'<script type="application/json" id="d-{sid}">{_j.dumps({"items":d["items"],"aud":bool(d.get("aud"))},ensure_ascii=False)}</script>'
 BUILD_EXT['dial']=_dial_html
 
@@ -376,7 +379,7 @@ addEventListener('keydown',function(e){if(e.target&&/^(TEXTAREA|INPUT)$/.test(e.
 INIT.choice=function(s){
  var items=$$('.chi',s),dots=$$('.chd',s),k=0;
  function show(n){items.forEach(function(e,i){e.style.display=i===n?'block':'none'});dots.forEach(function(d,i){d.classList.toggle('on',i===n);d.classList.toggle('dn',i<n)});
-  var box=$('.cho-wrap',items[n]),arr=$$('.cho',items[n]);for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=arr[i];arr[i]=arr[j];arr[j]=t}arr.forEach(function(b){box.appendChild(b)});}
+  var box=$('.cho-wrap',items[n]),arr=$$('.cho',items[n]);for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=arr[i];arr[i]=arr[j];arr[j]=t}arr.forEach(function(b){box.appendChild(b)});var au=$('.caud',items[n]);if(au){box.style.transition='opacity .5s';box.style.opacity=0;box.style.pointerEvents='none';au.style.cursor='pointer';au.onclick=function(){var rv=function(){box.style.opacity=1;box.style.pointerEvents='auto'};P('tick');try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(au.dataset.say),dn=0,go=function(){if(!dn){dn=1;rv()}};u.lang='en-GB';u.rate=.85;u.onend=go;speechSynthesis.speak(u);setTimeout(go,Math.max(3500,au.dataset.say.length*110))}catch(e){rv()}}}}
  items.forEach(function(it,n){$$('.cho',it).forEach(function(b){b.onclick=function(){if(it.__ok)return;
   if(b.dataset.ok==='1'){it.__ok=1;b.classList.add('ok');$$('.cho',it).forEach(function(x){if(x!==b)x.classList.add('off')});P('pop');setTimeout(function(){P('tick')},90);
    try{var u=new SpeechSynthesisUtterance(b.textContent);u.lang='en-GB';u.rate=.85;speechSynthesis.cancel();if(SXL.say)speechSynthesis.speak(u)}catch(e){}
@@ -387,7 +390,7 @@ INIT.choice=function(s){
 INIT.pairs=function(s){var L=$$('.ptl',s),R=$$('.ptr',s),sel=null,left=L.length;$('#nx').classList.remove('on');
  L.forEach(function(l){l.onclick=function(){if(l.__ok)return;L.forEach(function(x){x.style.outline=''});sel=(sel===l)?null:l;if(sel){l.style.outline='7px solid #9a5cff';P('tick')}}});
  R.forEach(function(r){r.onclick=function(){if(r.__ok)return;if(!sel){P('tick');return}
-  if(sel.dataset.i===r.dataset.i){sel.__ok=r.__ok=1;sel.style.outline='';sel.style.opacity=r.style.opacity=.6;sel.innerHTML='✔ '+sel.innerHTML;r.innerHTML='✔ '+r.innerHTML;sel=null;P('pop');if(--left==0){P('good');s.__done=1;$('#nx').classList.add('on')}}
+  if(sel.dataset.i===r.dataset.i){sel.__ok=r.__ok=1;sel.style.outline='';var PC=['linear-gradient(135deg,#ffd6e8,#ffb8d6)','linear-gradient(135deg,#cfe6ff,#a9d1ff)','linear-gradient(135deg,#d8f5c4,#b9e89c)','linear-gradient(135deg,#ffdcb8,#ffc58a)','linear-gradient(135deg,#e3d4ff,#c9b0ff)'],cc=PC[(5-left)%5];sel.style.background=r.style.background=cc;sel.style.color=r.style.color='#1c1b2e';sel.innerHTML='✔ '+sel.innerHTML;r.innerHTML='✔ '+r.innerHTML;sel=null;P('pop');if(--left==0){P('good');s.__done=1;$('#nx').classList.add('on')}}
   else{try{wrong(sel)}catch(e){}sel.style.outline='';sel=null}}})};
 INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop')}})};
 /* ---- room of clues ---- */
@@ -398,13 +401,13 @@ INIT.dial=function(s){
  function scn(z){scs.forEach(function(g){g.style.display=(+g.dataset.z===z)?'block':'none'});qq.forEach(function(q){q.style.display=z<0?'block':'none'})}
  var W=[['dangerously','lower'],['much','lower'],['slightly','lower'],['','normal'],['slightly','higher'],['much','higher'],['dangerously','higher']];
  function ang(z){return (z+.5)*180/7-90}
- function sent(it,z){var w=W[z];return z===3?it.s+' normal.':it.s+' <b>'+w[0]+' '+w[1]+'</b> than normal.'}
+ function sent(it,z){var w=W[z];return z===3?it.s+' normal.':it.s+' <b>'+w[0]+' '+w[1]+'</b> than '+(it.ref||'normal')+'.'}
  function show(){var it=I[k];done=0;nd.style.transform='rotate(-90deg)';scn(-1);zs.forEach(function(z){z.classList.remove('glow','dim')});
   dots.forEach(function(d,i){d.classList.toggle('on',i===k);d.classList.toggle('dn',i<k)});
-  if(D.aud&&it.say)card.innerHTML='<div class="tch" data-say="'+it.say+'" style="cursor:pointer;text-align:center;font-size:52px">🔊 Tap to listen</div>';else card.innerHTML='<div>'+it.e+' '+it.now+'</div><small>Normal: '+it.normal+'</small>';sen.classList.remove('ok');
-  sen.innerHTML='<div>'+it.s+' <u>&nbsp;</u> than normal.</div>'}
+  if(D.aud&&it.say)card.innerHTML='<div class="tch" data-say="'+it.say+'" style="cursor:pointer;text-align:center;font-size:52px">🔊 Tap to listen</div>';else card.innerHTML='<div>'+it.e+' '+it.now+'</div><small>'+(it.nl||'Normal')+': '+it.normal+'</small>';sen.classList.remove('ok');
+  sen.innerHTML='<div>'+it.s+' <u>&nbsp;</u> than '+(it.ref||'normal')+'.</div>'}
  zs.forEach(function(z){z.onclick=function(){if(done)return;var it=I[k],n=+z.dataset.z;nd.style.transform='rotate('+ang(n)+'deg)';scn(n);
-  if(n===it.z){done=1;z.classList.add('glow');zs.forEach(function(o){if(o!==z)o.classList.add('dim')});P('good');sen.classList.add('ok');sen.innerHTML='<div>'+sent(it,n)+'</div>';if(D.aud&&it.say)card.innerHTML='<div>'+it.e+' '+it.now+'</div><small>Normal: '+it.normal+'</small>';
+  if(n===it.z){done=1;z.classList.add('glow');zs.forEach(function(o){if(o!==z)o.classList.add('dim')});P('good');sen.classList.add('ok');sen.innerHTML='<div>'+sent(it,n)+'</div>';if(D.aud&&it.say)card.innerHTML='<div>'+it.e+' '+it.now+'</div><small>'+(it.nl||'Normal')+': '+it.normal+'</small>';
    setTimeout(function(){if(k>=I.length-1){finish(s);return}k++;show()},3200)}
   else{P('tick');setTimeout(function(){if(!done){nd.style.transform='rotate(-90deg)';scn(-1)}},900);try{wrong(z)}catch(e){}}}});
  show()};

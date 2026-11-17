@@ -289,7 +289,7 @@ def recap(d):
     o=header(d['phase'])+f'<div class="a h" style="left:90px;top:130px;font-size:68px">{d.get("title","Today we can say…")}</div>'
     nr=len(d['rows'])
     for k,(cs,g) in enumerate(d['rows']):
-        o+=stp(f'<div class="gl" style="left:90px;top:{240+k*150}px;width:{960 if d.get('side') else 1270}px;height:128px;border-radius:64px;display:flex;align-items:center;gap:14px;padding:0 36px">{chiprow(cs,48,"8px 24px","14px")}<span style="margin-left:auto">{spill(g,None,34,"6px 26px")}</span></div>',k+1,pills=True)
+        o+=stp(f'<div class="gl" style="left:90px;top:{235+k*int(710/nr)}px;width:{960 if d.get('side') else 1270}px;height:{int(710/nr)-24}px;border-radius:64px;display:flex;align-items:center;gap:14px;padding:0 36px">{chiprow(cs,48,"8px 24px","14px")}<span style="margin-left:auto">{spill(g,None,34,"6px 26px")}</span></div>',k+1,pills=True)
     if d.get('side'):
         o+=stp('<div class="gl" style="left:1080px;top:240px;width:750px;height:728px;border-radius:72px"></div>',nr+1)
         for k,q in enumerate(d['side']): o+=stp(f'<div class="a" style="left:1100px;top:{300+k*150}px;width:710px;display:flex;gap:10px;justify-content:center">'+''.join(ch(a,b,44,'8px 22px') for a,b in q)+'</div>',nr+1+k,pills=True)
