@@ -257,9 +257,11 @@ def room(d):
      '<circle cx="395" cy="392" r="42" fill="#fff" stroke="#1c1b2e" stroke-width="7"/><circle cx="380" cy="386" r="5" fill="#1c1b2e"/><circle cx="410" cy="386" r="5" fill="#1c1b2e"/><path d="M382 408 Q395 400 408 408" stroke="#1c1b2e" stroke-width="5" fill="none" stroke-linecap="round"/>'
      '<text x="455" y="370" font-size="48">💦</text><rect x="330" y="555" width="20" height="90" fill="#1c1b2e"/><rect x="1070" y="555" width="20" height="90" fill="#1c1b2e"/>'
      '<path d="M300 130 Q710 -30 1120 130" stroke="#9a5cff" stroke-width="5" fill="none" stroke-dasharray="4 12" stroke-linecap="round"/></svg>')
-    o+=f'<div class="gl room" style="left:90px;top:170px;width:1740px;height:700px;border-radius:56px;overflow:hidden;background:linear-gradient(#f6efe2,#f3e9d6)">{sv}'
+    if d.get('img'):
+        sv=f'<img src="{ART}{d["img"]}" style="position:absolute;left:243px;top:0;width:1254px;height:700px;object-fit:contain">'
+    o+=f'<div class="gl room" style="left:90px;top:170px;width:1740px;height:700px;border-radius:56px;overflow:hidden;background:{"#fff" if d.get("img") else "linear-gradient(#f6efe2,#f3e9d6)"}">{sv}'
     for k,sp in enumerate(d['spots']):
-        o+=f'<button class="rsp" data-t="{sp["t"]}" style="left:{sp["x"]}px;top:{sp["y"]}px">{sp["e"]}</button>'
+        o+=f'<button class="rsp{" rg" if d.get("img") else ""}" data-t="{sp["t"]}" style="left:{sp["x"]}px;top:{sp["y"]}px">{"" if d.get("img") else sp["e"]}</button>'
     o+='</div><div class="a rcap" style="left:90px;top:885px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:46px;height:56px;color:#1c1b2e"></div>'
     return o
 
@@ -449,7 +451,7 @@ g.dz{stroke:none}g.dz.dim{opacity:1;filter:grayscale(.85) brightness(1.1)}.dz{cu
 .dcard,.dsen{box-sizing:border-box;padding:26px 40px;font-family:O;font-weight:800;line-height:1.25;display:flex;flex-direction:column;justify-content:center}.dcard{font-size:42px}.dcard small{font-family:P;font-weight:500;font-size:34px;color:#4a4a62;margin-top:10px}.dsen{font-size:42px;color:#1c1b2e}.dsen u{text-decoration:none;display:inline-block;width:260px;border-bottom:6px solid #c9b6ff;vertical-align:baseline}.dsen.ok{background:linear-gradient(135deg,#d6fbea,#c4f3e6)}.dsen .say{font-family:P;font-weight:500;font-size:30px;color:#6a6a7e;margin-top:12px}
 .mdls{display:none!important}
 .ulw{background:linear-gradient(90deg,#9a5cff,#ff5aa5) no-repeat 0 100%;background-size:0 9px;padding-bottom:6px}[data-s]:not(.sh) .ulw{animation:ulwd .8s .9s ease-out forwards}.sh .ulw{animation:none;background-size:0 9px}@keyframes ulwd{to{background-size:100% 9px}}
-.rsp{position:absolute;width:150px;height:150px;border-radius:50%;border:6px solid #fff;background:rgba(255,255,255,.85);box-shadow:0 12px 26px rgba(60,30,140,.2);font-size:84px;line-height:1;cursor:pointer;transition:transform .2s,background .3s}.rsp:hover{transform:scale(1.07)}.rsp.on{background:#d6fbea;border-color:#2bd9b6}
+.rsp.rg{width:112px;height:112px;background:rgba(255,138,31,.10);border:6px solid #ff8a1f;box-shadow:0 0 0 0 rgba(255,138,31,.5);animation:rgp 2.2s infinite}.rsp.rg.on{background:rgba(43,217,182,.18);border-color:#2bd9b6;animation:none}@keyframes rgp{70%{box-shadow:0 0 0 22px rgba(255,138,31,0)}100%{box-shadow:0 0 0 0 rgba(255,138,31,0)}}.rsp{position:absolute;width:150px;height:150px;border-radius:50%;border:6px solid #fff;background:rgba(255,255,255,.85);box-shadow:0 12px 26px rgba(60,30,140,.2);font-size:84px;line-height:1;cursor:pointer;transition:transform .2s,background .3s}.rsp:hover{transform:scale(1.07)}.rsp.on{background:#d6fbea;border-color:#2bd9b6}
 .cbcol{display:flex;flex-direction:column;gap:12px;min-height:0}
 .cbh{height:62px;border-radius:24px;color:#fff;font-family:O;font-weight:800;font-size:38px;text-align:center;line-height:62px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4)}
 .cbt{flex:1;min-height:0;border-radius:30px;background:rgba(255,255,255,.55);border:4px solid #fff;display:flex;align-items:center;gap:14px;padding:0 20px;font-family:P;font-weight:500;font-size:27px;line-height:1.18;overflow:hidden;text-align:left;color:#1c1b2e;position:relative}.cbt .tx{flex:1;min-width:0}.cbt.ov:after{content:'\2922';position:absolute;right:14px;bottom:4px;font-size:30px;color:#7b3cf0}

@@ -867,6 +867,21 @@ L3.insert(_bi,dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)
 _OPT3={'Exercise · Listen and tick the numbers':3,'Exercise · How sure?':2}
 _MIN3={'Teach · How sure?':1,'Teach · Ask the patient':1,'The room of clues':2}
 L3=[dict(d,optional=True,min=_OPT3[d['label']]) if d.get('label') in _OPT3 else dict(d,min=_MIN3[d['label']]) if d.get('label') in _MIN3 else d for d in L3]
+# ---- 18 Nov: L3 art placed (Gemini batch 1), slots without art keep their emoji ----
+ARTMAP3={'🤒':'l3_b1_fever.jpg','🌡️':'l3_b1_fever.jpg','🤕':'l3_b2_headache.jpg','😷':'l3_b3_cough.jpg','🔴':'l3_b4_rash.jpg','🥶':'l3_b5_chills.jpg','🧴':'l3_b6_itchy.jpg','🫨':'l3_b7_stiff.jpg','🍚':'l3_b8_no_appetite.jpg','🦟':'l3_c1_mosquito_bite.jpg','🩸':'l3_c2_blood_test.jpg','🫁':'l3_c3_chest_xray.jpg','💩':'l3_c4_stool_test.jpg'}
+_ART3=('Teach · Symptoms','Teach · Symptom sentences','Teach · More symptoms','Teach · More patient sentences','Exercise · Symptoms','Teach · Ask the patient','Teach · Which test?')
+_s=700/1116.0
+def _rs(dx,dy,t): return dict(e='',x=int(243+dx*_s-56),y=int(dy*_s-56),t=t)
+ROOM3=[_rs(255,590,'A thermometer: 39.2 °C.'),_rs(395,690,'Paracetamol. Two tablets yesterday.'),_rs(1255,230,'A calendar. Days are crossed out.'),_rs(1740,430,'Her lunch. She did not eat much.'),_rs(1310,545,'A sleepy cat.'),_rs(700,1015,'A box of tissues. Used.'),_rs(640,490,'She looks hot and tired.')]
+_n3=[]
+for d in L3:
+    lb=d.get('label')
+    if lb in _ART3: d=_fm(d,ARTMAP3)
+    if lb=='Everybody lies': d=_fm(d,{k_:v_ for k_,v_ in ARTMAP3.items() if k_ in ('🦟','😷','🔴')})
+    if d['m']=='cover' and _ex('l3_a1_cover_stethoscope.jpg'): d=dict(d,cards=[dict(d['cards'][0],pic='l3_a1_cover_stethoscope.jpg'),dict(d['cards'][1],pic='l3_a2_cover_thermometer.jpg')])
+    if d['m']=='room' and _ex('l3_a0_room.jpg'): d=dict(d,img='l3_a0_room.jpg',spots=ROOM3)
+    _n3.append(d)
+L3=_n3
 # dial art + no-numbers flag for temperature (as L4)
 for d in L3:
     if d['m']=='dial' and d.get('label')=='Exercise · Higher or lower?':
@@ -875,6 +890,9 @@ for d in L3:
             if it['s'].startswith('Her temperature') or it['s'].startswith('Her breathing'): it['nt']=1
             a=_DA3.get((it['e'],it['now']))
             if a: it['art']=ART+a
+
+# 18 Nov (Nick): no instruction lines at the top of the pages (L3 and L4)
+for _d in L3+L4: _d.pop('pt',None)
 
 def _inject_audio(html_path,adir):
     """Recorded clips (ElevenLabs) keyed by exact spoken text. speechSynthesis.speak is wrapped: a matching line plays the clip,
