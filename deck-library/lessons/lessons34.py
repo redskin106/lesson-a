@@ -296,12 +296,37 @@ def _askb(pic,parts,lab,opt=False,mn=2): return dict(m='build',phase='STUDY',lab
 ASK_B1=_askb('☕',[Q('c4','How'),Q('c4','often'),Q('c2','do'),Q('c1','you'),Q('c2','drink'),Q('c3','coffee?')],'Exercise · Ask the patient (1)')
 ASK_B2=_askb('😴',[Q('c4','How'),Q('c4','long'),Q('c2','have'),Q('c1','you'),Q('c2','felt'),Q('c3','tired?')],'Exercise · Ask the patient (2)',True)
 TODAY4=dict(m='today',phase='STUDY',label='Today',min=1,emoji='stethoscope',title='Night-shift nurses',role='Today we are',rows=[[('c4','Say'),('c3','how bad')],[('c1','Say'),('c3','how long')],[('c2','might'),('c4',"can't"),('c3','because')]])
+
+# ---- 17 Nov round: comprehension-first audio exercises (Nick's notes p7, p9, p11) ----
+def _a(pic,say,ans,*w): return _q4(pic,'What does the nurse write?',ans,*w,say=say)
+SYM4=[[_a('🥱',"I can't keep my eyes open!",'She is exhausted.','She is dizzy.','She is shaky.'),
+  _a('😵‍💫','The room is spinning!','He feels dizzy.','He feels exhausted.','He feels shaky.'),
+  _a('🤲',"My hands won't stop shaking!",'Her hands are shaky.','Her hands are cold.','Her hands are sore.'),
+  _a('💓','Boom-boom-boom! My heart is racing!','Her heart is racing.','Her heart is slow.','Her heart is sore.')],
+ [_a('🥱','Three hours of sleep. Every night. I am so tired!','She sleeps very little.','She sleeps a lot.','She sleeps well.'),
+  _a('☕','After each coffee, my hands shake!','Her hands shake after she drinks coffee.','Her hands shake before she drinks coffee.','Her hands never shake.'),
+  _a('😵‍💫','When I stand up, the room spins.','She feels dizzy when she stands up.','She feels dizzy when she sits down.','She feels dizzy when she sleeps.'),
+  _a('💓','Racing heart… but I feel okay, nurse.','His heart is fast, but he feels okay.','His heart is slow, and he feels ill.','His heart is fast, and he feels very ill.')],
+ [_a('🥱','I am so tired… but in bed, I just stare at the ceiling.','She is exhausted, but she cannot sleep.','She is exhausted, and she sleeps well.','She is not tired.'),
+  _a('😵‍💫','I feel dizzy and my hands will not stop shaking.','He has two problems: dizzy and shaky hands.','He has one problem: dizzy.','He has no problems.'),
+  _a('☕','Two cups. Maybe three. Okay… eight.','She drinks much more coffee than she first says.','She drinks only two cups.','She does not drink coffee.'),
+  _a('💓','My heart will not slow down!','Her heart is racing and she cannot calm down.','Her heart is slow and calm.','Her heart has stopped.')]]
+HB4=[[_a('😕','Just a little pain. I can ignore it.','The pain is mild.','The pain is severe.','The pain is moderate.'),_a('😣','It hurts quite a lot. I need a pill.','The pain is moderate.','The pain is mild.','The pain is unbearable.'),_a('😭','It is the worst pain of my life!','The pain is unbearable.','The pain is mild.','The pain is moderate.')],
+ [_a('😖',"Eight out of ten. I can't sleep!",'His pain is severe.','His pain is mild.','He has no pain.'),_a('😕','Two out of ten. It is nothing.','Her pain is mild.','Her pain is severe.','Her pain is unbearable.'),_a('😣','Five out of ten. It hurts, but I can walk.','His pain is moderate.','His pain is mild.','His pain is unbearable.')],
+ [_a('😭','Yesterday it was okay. Today it is the worst pain of my life!','Her pain got much worse.','Her pain got better.','Her pain is the same.'),_a('😖',"It hurts very much. I can't work!",'He is in severe pain and cannot work.','He has mild pain and can work.','He has no pain and cannot work.'),_a('🙂','Nothing now. Last week, only a little.','Her pain is gone.','Her pain is getting worse.','Her pain is unbearable.')]]
+LONGEX=dict(m='choice',phase='STUDY',title='How long?',label='Exercise · How long?',aud=True,lvl=2,min=2,levels=_lv3(
+ [_a('☀️','I woke up like this this morning.','It started today.','It started two weeks ago.','It started last week.'),_a('🕑','I have been like this for two weeks.','It started two weeks ago.','It started two days ago.','It started today.'),_a('📚','It started when the exams started.','It started when the exams started.','It started when the exams finished.','It started yesterday.')],
+ [_a('📅','It began on Wednesday. Today is Friday.','It started two days ago.','It started two weeks ago.','It started two months ago.'),_a('🗓️','I have felt tired since Monday. Today is Thursday.','She has felt tired for three days.','She has felt tired for three weeks.','She has felt tired for one day.'),_a('🕑','Fourteen days. Every night, no sleep.','She has not slept well for two weeks.','She has not slept well for two days.','She has not slept well for four days.')],
+ [_a('📚','Before the exams, I slept well. Now I do not sleep.','The problem started with the exams.','The problem started before the exams.','The problem finished with the exams.'),_a('🤕','Yesterday I felt fine. Today my head is exploding!','The headache is new.','The headache is old.','She has no headache.'),_a('🌅','Every morning for a month, I wake up with a headache.','The headache is a daily problem for a month.','The headache started yesterday.','The headache happens once a year.')]))
+DIAL4=[_d('💓','Pulse: 110 beats per minute','60 to 100 beats per minute','Her pulse is',4),_d('☕','Coffee: 8 cups a day','4 or 5 cups a day','Her coffee intake is',5),_d('🛏️','Sleep: 3 hours a night','7 to 9 hours a night','Her sleep time is',1),_d('🌡️','Temperature: 36.8 °C','about 37 °C','Her temperature is',3),_d('💓','Pulse: 45 beats per minute','60 to 100 beats per minute','His pulse is',1),_d('☕','Coffee: 12 cups a day','4 or 5 cups a day','Her coffee intake is',6)]
+MIGHT_T=dict(MIGHT_T,lines=[dict(t='Clue: her hands shake after every coffee. They also shake after every meal.',c='amber'),dict(t=_MI('[[might]] be')+' <span style="color:#e8821a">the coffee. It might be low blood sugar.</span>',c='teal'),dict(t='Clue: she has no cough. She has no fever.',c='amber'),dict(t=_MI("[[can't]] be")+' <span style="color:#e8821a">flu.</span>',c='teal')])
+ASK_T=dict(ASK_T,pics=['☕','😴','🌙','🤕'])
 NEW_STUDY=[TODAY4,
  dict(m='teach',phase='STUDY',label='Teach · Symptoms',min=1,role='Four feelings',words=[('🥱','exhausted'),('😵‍💫','dizzy'),('🤲','shaky'),('💓','racing heart')]),
  dict(m='teach',phase='STUDY',label='Teach · Symptom sentences',min=2,role='Listen to the patient',pic='😵‍💫',tts=True,lines=[('She is exhausted.',"Ohhh… I can't keep my eyes open. I could sleep standing up!"),('He feels dizzy.','The room is spinning like a washing machine!'),('Her hands are shaky.',"Look at my hands! They won't stop shaking!"),('Her heart is racing.','My heart is racing, nurse. Boom-boom-boom!')]),
- dict(m='choice',phase='STUDY',title='Symptoms',label='Exercise · Symptoms',min=3,lvl=3,levels=lv(SYM4)),
+ dict(m='choice',phase='STUDY',title='Symptoms',label='Exercise · Symptoms',aud=True,min=3,lvl=3,levels=lv(SYM4)),
  dict(m='rungs',phase='STUDY',label='Teach · How bad?',min=1,title='How bad?',stops=BAD,start=2),
- dict(m='choice',phase='STUDY',title='How bad?',label='Exercise · How bad?',min=2,lvl=2,levels=lv(HB4)),
+ dict(m='choice',phase='STUDY',title='How bad?',label='Exercise · How bad?',aud=True,min=2,lvl=2,levels=lv(HB4)),
  dict(m='rungs',phase='STUDY',label='Teach · How long?',min=1,title='How long?',stops=LONG,start=3),
  LONGEX,
  dict(m='dial',phase='STUDY',label='Teach · The dial',min=3,title='How much higher? How much lower?',items=DIAL4),
@@ -333,7 +358,7 @@ for d in L4:
     elif lb=='"Doctor, I\'m too busy."': d=dict(d,min=6)
     _n4.append(d)
 _by={d.get('label'):d for d in _n4}
-_EXTRA=['Teach · The dials','Her week','Exercise · How often?','Exercise · Compare (than · the most)','Exercise · Say it with a dial (1)','Exercise · Say it with a dial (2)','Extra · Name the symptom','Extra · Read the label (how often, how much)']
+_EXTRA=['Teach · The dials','Her week','Exercise · How often?','Exercise · Compare (than · the most)','Exercise · Say it with a dial (1)','Exercise · Say it with a dial (2)']
 _i=[d.get('label') for d in _n4].index('Your toolkit')
 L4=_n4[:3]+NEW_STUDY+[dict(_by[l],optional=True) for l in _EXTRA if l in _by]+_n4[_i:]
 TABOO4=[d for d in L4 if d['m']=='taboo'][0]

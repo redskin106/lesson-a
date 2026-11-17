@@ -78,7 +78,10 @@ def choice_html(d,sid):
     for k,it in enumerate(I):
         rest=[t for t in it['opts'] if t!=it['ans']]; random.Random(k*7+len(it['q'])).shuffle(rest); rest.insert((k*2+len(d.get('title','')))%len(it['opts']),it['ans']); it=dict(it,opts=rest)
         o+='<div class="chi" style="display:none">'
-        if it.get('say'):
+        if it.get('say') and (it.get('aud') or d.get('aud')):
+            sv=f'<svg viewBox="0 0 630 600" width="630" style="display:block">{bubble_svg(24,22,582,230,"🔊  Listen",fs=56,tx=230)}{stick(230,560,1.55,"hold")}<text x="400" y="470" font-size="130">{it.get("pic","")}</text></svg>'
+            o+=glass(90,180,630,600,sv,r=56)+f'<div class="tch caud" data-say="{it["say"]}" style="position:absolute;left:90px;top:180px;width:630px;height:300px;z-index:4;cursor:pointer;border-radius:56px"></div>'
+        elif it.get('say'):
             sv=f'<svg viewBox="0 0 630 600" width="630" style="display:block">{bubble_svg(24,22,582,230,it["say"],fs=40,tx=230)}{stick(230,560,1.55,"hold")}<text x="400" y="470" font-size="130">{it.get("pic","")}</text></svg>'
             o+=glass(90,180,630,600,sv,r=56)
         else: o+=picx(it.get('pic','❓'),90,180,630,600,56)
@@ -119,7 +122,7 @@ def teach(d):
             x=90+i*(w+30); sa=f' data-say="{t}"' if tts else ''
             o+=stp(f'<div class="gl tch"{sa} style="left:{x}px;top:200px;width:{w}px;height:600px;border-radius:56px"><div style="position:absolute;left:0;right:0;top:50px;text-align:center;font-size:{int(w*.5)}px;line-height:1">{e}</div><div style="position:absolute;left:0;right:0;bottom:50px;text-align:center;font-family:O;font-weight:800;font-size:68px">{_ul(t)}</div></div>',i+1)
     else:
-        L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,640,56)
+        L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,640,56).replace('class="gl"','class="gl tpic"',1)
         sh=lambda x:(x['t'] if isinstance(x,dict) else x[0] if isinstance(x,(tuple,list)) else x).replace('<span','').replace('</span>','')
         fs=42 if max(len(sh(x)) for x in L)<60 else 38
         BG={'orange':'background:linear-gradient(135deg,#ffe6cc,#ffd2a6)','sky':'background:linear-gradient(135deg,#d9ecff,#c3e0ff)','rose':'background:linear-gradient(135deg,#ffe0ec,#ffcadd)','amber':'background:linear-gradient(135deg,#fff3c4,#ffe7a8)','teal':'background:linear-gradient(135deg,#d6fbea,#c4f3e6)'}
@@ -129,6 +132,7 @@ def teach(d):
                 body=f'<div style="flex:1;display:flex;align-items:center;gap:26px"><span class="sp" style="font-size:64px">🔊</span><div><div class="pt" style="display:none;font-family:P;font-weight:500;font-size:30px;color:#6a35e8;margin-bottom:6px">🗣️ {t[1]}</div><div class="an" style="display:none">{_ul(t[0])}</div></div></div>'; sa=f' data-say="{t[1]}" data-seq="1"'
             elif isinstance(t,dict): body=('<span style="flex:none;margin-right:26px;padding:6px 22px;border-radius:999px;background:#fff;font-size:30px;color:#6a35e8">'+t['k']+'</span>' if t.get('k') else '')+'<div>'+_ul(t['t'])+'</div>'; sa=''; ex=BG.get(t.get('c'),'')
             else: body='<div>'+_ul(t)+'</div>'; sa=f' data-say="{t}"' if tts else ''
+            if d.get('pics'): sa+=f' data-pic="{d["pics"][i]}"'
             o+=(lambda h,seq:h if seq else stp(h,i+1))(f'<div class="gl tch"{sa} style="left:780px;top:{y}px;width:1050px;height:{h}px;border-radius:48px;display:flex;align-items:center;padding:0 44px;box-sizing:border-box;font-family:O;font-weight:800;font-size:{fs}px;line-height:1.15;{ex}">{body}</div>',isinstance(t,(tuple,list)))
     if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:858px;width:1740px;text-align:center;font-size:36px">{d["hint"]}</div>'
     return o
@@ -267,11 +271,11 @@ def _dial_html(d,sid):
     sv+=f'<g class="nd" style="transform-origin:{cx}px {cy}px;transform:rotate(-90deg);transition:transform .9s cubic-bezier(.3,1.35,.5,1)"><polygon points="{cx-11},{cy} {cx+11},{cy} {cx},{cy-395}" fill="#1c1b2e"/></g><circle cx="{cx}" cy="{cy}" r="30" fill="#1c1b2e"/><circle cx="{cx}" cy="{cy}" r="11" fill="#fff"/>'
     o=header(d['phase'],d.get('title','How much?'),d.get('grad','violet'))
     o+=f'<div class="a" style="right:{130 if d.get("_lvg") else 90}px;top:60px;display:flex;gap:12px">'+''.join('<span class="chd" style="width:26px;height:26px;border-radius:50%"></span>' for _ in d['items'])+'</div>'
-    o+=f'<div class="a" style="left:90px;top:230px;width:900px"><svg viewBox="0 0 900 540" width="900">{sv}</svg></div>'
-    o+='<div class="gl dcard" style="left:1040px;top:190px;width:790px;height:170px;border-radius:48px"></div>'
-    o+='<div class="gl dsen" style="left:1040px;top:380px;width:790px;height:190px;border-radius:48px"></div>'
+    o+=f'<div class="a" style="left:90px;top:200px;width:780px"><svg viewBox="0 0 900 540" width="780">{sv}</svg></div>'
+    o+='<div class="gl dcard" style="left:90px;top:700px;width:780px;height:190px;border-radius:48px"></div>'
+    o+='<div class="gl dsen" style="left:910px;top:190px;width:920px;height:170px;border-radius:48px"></div>'
     sc=''.join(f'<g class="sc" data-z="{z}" style="display:none">{_dial_scene(z)}</g>' for z in range(7))
-    o+=f'<div class="gl dscn" style="left:1040px;top:590px;width:790px;height:330px;border-radius:48px;overflow:hidden"><svg viewBox="0 0 790 330" width="790" height="330" style="display:block"><line class="qq" x1="0" y1="205" x2="790" y2="205" stroke="#10a98d" stroke-width="7" stroke-dasharray="22 14"/><text class="qq" x="395" y="140" font-size="90" text-anchor="middle">❔</text>{sc}</svg></div>'
+    o+=f'<div class="gl dscn" style="left:910px;top:380px;width:920px;height:510px;border-radius:48px;overflow:hidden"><svg viewBox="0 0 790 330" width="920" height="510" style="display:block"><line class="qq" x1="0" y1="205" x2="790" y2="205" stroke="#10a98d" stroke-width="7" stroke-dasharray="22 14"/><text class="qq" x="395" y="140" font-size="90" text-anchor="middle">❔</text>{sc}</svg></div>'
     return o+f'<script type="application/json" id="d-{sid}">{_j.dumps({"items":d["items"]},ensure_ascii=False)}</script>'
 BUILD_EXT['dial']=_dial_html
 
@@ -343,7 +347,7 @@ EXT_CSS.append("""
 EXT_JS.append(r"""
 SXL.say=false;
 document.addEventListener('keydown',function(e){if(/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))return;if('123'.indexOf(e.key)<0||e.key==='')return;var m=document.querySelector('.sl.on .mdl[data-l="'+e.key+'"]');if(m)m.click()});
-document.addEventListener('click',function(e){var b=e.target.closest('[data-seq]');if(b&&b.classList.contains('tch')){var st=+(b.dataset.st||0);if(st===0){var pt=b.querySelector('.pt');if(pt)pt.style.display='block';b.dataset.st=1}else if(st===1){var an=b.querySelector('.an');if(an)an.style.display='block';b.dataset.st=2;P('pop');return}}
+document.addEventListener('click',function(e){var pb=e.target.closest('[data-pic]');if(pb){var pc=document.querySelector('.sl.on .tpic');if(pc){pc.textContent=pb.dataset.pic;pc.classList.remove('pp');void pc.offsetWidth;pc.classList.add('pp')}}var b=e.target.closest('[data-seq]');if(b&&b.classList.contains('tch')){var st=+(b.dataset.st||0);if(st===0){var pt=b.querySelector('.pt');if(pt)pt.style.display='block';b.dataset.st=1}else if(st===1){var an=b.querySelector('.an');if(an)an.style.display='block';b.dataset.st=2;P('pop');return}}
  var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;speechSynthesis.speak(u)}catch(x){}P('tick')}});
 /* temporary review skip: hide with ?noskip */
 if(!/noskip/.test(location.search)){var sk=$('#sk');sk.style.display='block';setInterval(function(){sk.style.visibility=(cur<slides.length-1)?'visible':'hidden'},300);sk.onclick=function(){var s=slides[cur];if(s)s.__done=1;P('tick');if(cur<slides.length-1)go(cur+1)}}
@@ -356,7 +360,7 @@ addEventListener('keydown',function(e){if(e.target&&/^(TEXTAREA|INPUT)$/.test(e.
 INIT.choice=function(s){
  var items=$$('.chi',s),dots=$$('.chd',s),k=0;
  function show(n){items.forEach(function(e,i){e.style.display=i===n?'block':'none'});dots.forEach(function(d,i){d.classList.toggle('on',i===n);d.classList.toggle('dn',i<n)});
-  var box=$('.cho-wrap',items[n]),arr=$$('.cho',items[n]);for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=arr[i];arr[i]=arr[j];arr[j]=t}arr.forEach(function(b){box.appendChild(b)})}
+  var box=$('.cho-wrap',items[n]),arr=$$('.cho',items[n]);for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=arr[i];arr[i]=arr[j];arr[j]=t}arr.forEach(function(b){box.appendChild(b)});var au=$('.caud',items[n]);if(au&&window.speechSynthesis){setTimeout(function(){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(au.dataset.say);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}},500)}}
  items.forEach(function(it,n){$$('.cho',it).forEach(function(b){b.onclick=function(){if(it.__ok)return;
   if(b.dataset.ok==='1'){it.__ok=1;b.classList.add('ok');$$('.cho',it).forEach(function(x){if(x!==b)x.classList.add('off')});P('pop');setTimeout(function(){P('tick')},90);
    try{var u=new SpeechSynthesisUtterance(b.textContent);u.lang='en-GB';u.rate=.85;speechSynthesis.cancel();if(SXL.say)speechSynthesis.speak(u)}catch(e){}
