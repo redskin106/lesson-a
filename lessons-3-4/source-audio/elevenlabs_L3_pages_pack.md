@@ -29,7 +29,7 @@ P10_05 | Narrator | [calm, clear] Her temperature is thirty-two degrees. Normal 
 P11_01 | Patient | [tired, friendly] Thirty-nine point two! Is that bad, nurse?
 P11_02 | Patient | [tired, friendly] My pulse? One hundred and four. My heart is going crazy!
 P11_03 | Patient | [tired, friendly] I breathe eighteen times a minute. I counted. I was bored.
-P11_04 | Narrator | [calm, clear] The lab says my platelets are ninety-five thousand. Is that a lot?
+P11_04 | Narrator | [calm, clear] The lab says my platelets are ninety-five thousand. The normal range is one hundred and fifty to four hundred and fifty thousand. Is that okay?
 P11_05 | Patient | [tired, friendly] Thirty-eight point one. Normal is thirty-seven… so a bit high?
 P11_06 | Patient | [tired, friendly] My pulse is forty-eight. Normal is sixty to one hundred. Am I a robot?
 P11_07 | Patient | [tired, friendly] My white cells are three thousand one hundred. Normal is four and a half to eleven thousand. They are tiny!
@@ -78,7 +78,7 @@ P19_08 | Patient | [tired, friendly] I have a rash, but not on my face, so measl
 P19_09 | Patient | [tired, friendly] My platelets are low, so maybe dengue. But we need a blood test first.
 P22_01 | Patient | [tired, friendly] I have a fever and red spots on my arms. Am I turning into a tomato?
 P22_02 | Patient | [tired, friendly] No cough. Not even a little one. My cat coughs more than me!
-P22_03 | Patient | [tired, friendly] A mosquito bit me a week ago, by the pond. A big one. Like a helicopter!
+P22_03 | Patient | [tired, friendly] A mosquito bit me a week ago, by the pond. A big one!
 P22_04 | Patient | [tired, friendly] Dengue?! How do you know? Are you a doctor?
 P22_05 | Patient | [tired, friendly] Okay, do the test. But please be quick. My cat is waiting!
 P23_01 | Patient | [tired, friendly] I only feel a little warm. Really!
