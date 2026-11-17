@@ -79,17 +79,17 @@ def choice_html(d,sid):
         rest=[t for t in it['opts'] if t!=it['ans']]; random.Random(k*7+len(it['q'])).shuffle(rest); rest.insert((k*2+len(d.get('title','')))%len(it['opts']),it['ans']); it=dict(it,opts=rest)
         o+='<div class="chi" style="display:none">'
         if it.get('say') and (it.get('aud') or d.get('aud')):
-            sv=f'<svg viewBox="0 0 630 600" width="630" style="display:block">{bubble_svg(24,22,582,230,"🔊  Tap to listen",fs=50,tx=230)}{stick(230,560,1.55,"hold")}<text x="400" y="470" font-size="130">{it.get("pic","")}</text></svg>'
-            o+=glass(90,180,630,600,sv,r=56)+f'<div class="tch caud" data-say="{it["say"]}" style="position:absolute;left:90px;top:180px;width:630px;height:300px;z-index:4;cursor:pointer;border-radius:56px"></div>'
+            sv=f'<svg viewBox="0 0 630 750" width="630" style="display:block">{bubble_svg(24,26,582,290,"🔊  Tap to listen",fs=54,tx=230)}{stick(230,715,1.85,"hold")}<text x="395" y="600" font-size="150">{it.get("pic","")}</text></svg>'
+            o+=glass(90,180,630,750,sv,r=56)+f'<div class="tch caud" data-say="{it["say"]}" style="position:absolute;left:90px;top:180px;width:630px;height:340px;z-index:4;cursor:pointer;border-radius:56px"></div>'
         elif it.get('say'):
-            sv=f'<svg viewBox="0 0 630 600" width="630" style="display:block">{bubble_svg(24,22,582,230,it["say"],fs=40,tx=230)}{stick(230,560,1.55,"hold")}<text x="400" y="470" font-size="130">{it.get("pic","")}</text></svg>'
-            o+=glass(90,180,630,600,sv,r=56)
+            sv=f'<svg viewBox="0 0 630 750" width="630" style="display:block">{bubble_svg(24,26,582,290,it["say"],fs=42,tx=230)}{stick(230,715,1.85,"hold")}<text x="395" y="600" font-size="150">{it.get("pic","")}</text></svg>'
+            o+=glass(90,180,630,750,sv,r=56)
         elif it.get('grid'):
             cells=''.join(f'<div style="text-align:center"><div style="font-family:O;font-weight:800;font-size:26px;color:#6a35e8">{a_}</div><div style="font-size:{it.get("gfs",48)}px;line-height:1.25;margin-top:6px">{b_}</div></div>' for a_,b_ in it['grid'])
-            o+=glass(90,180,630,600,f'<div style="height:100%;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:0 14px"><div style="text-align:center;font-size:90px">{it.get("pic","")}</div><div style="display:flex;justify-content:space-around;align-items:flex-start">{cells}</div></div>',r=56)
-        else: o+=picx(it.get('pic','❓'),90,180,630,600,56)
-        o+=f'<div class="gl" style="left:770px;top:190px;width:1060px;height:210px;box-sizing:border-box;border-radius:48px;padding:0 40px;display:flex;align-items:center;font-family:O;font-weight:800;font-size:40px;line-height:1.2;position:absolute">{it["q"]}</div>'
-        o+='<div class="a cho-wrap" style="left:770px;top:425px;width:1060px;display:flex;flex-direction:column;gap:14px">'+''.join(f'<button class="cho" data-ok="{1 if t==it["ans"] else 0}" style="font-size:38px;padding:16px 40px">{t}</button>' for t in it['opts'])+'</div></div>'
+            o+=glass(90,180,630,750,f'<div style="height:100%;display:flex;flex-direction:column;justify-content:center;gap:48px;padding:0 14px"><div style="text-align:center;font-size:90px">{it.get("pic","")}</div><div style="display:flex;justify-content:space-around;align-items:flex-start">{cells}</div></div>',r=56)
+        else: o+=picx(it.get('pic','❓'),90,180,630,750,56)
+        o+=f'<div class="gl" style="left:770px;top:190px;width:1060px;height:250px;box-sizing:border-box;border-radius:48px;padding:0 40px;display:flex;align-items:center;font-family:O;font-weight:800;font-size:40px;line-height:1.2;position:absolute">{it["q"]}</div>'
+        o+='<div class="a cho-wrap" style="left:770px;top:470px;width:1060px;display:flex;flex-direction:column;gap:22px">'+''.join(f'<button class="cho" data-ok="{1 if t==it["ans"] else 0}" style="font-size:40px;padding:30px 44px;min-height:{max(0,int((460-22*(len(it["opts"])-1))/len(it["opts"]))-70)}px">{t}</button>' for t in it['opts'])+'</div></div>'
     return o
 BUILD_EXT['choice']=choice_html
 # ---------------- task_card: one team task shown in lesson style, answers visible (review) ----------------
@@ -123,14 +123,14 @@ def teach(d):
         C=d['words']; n=len(C); w=int((1740-30*(n-1))/n)
         for i,(e,t) in enumerate(C):
             x=90+i*(w+30); sa=f' data-say="{t}"' if tts else ''
-            o+=stp(f'<div class="gl tch"{sa} style="left:{x}px;top:200px;width:{w}px;height:600px;border-radius:56px"><div style="position:absolute;left:0;right:0;top:50px;text-align:center;font-size:{int(w*.5)}px;line-height:1">{e}</div><div style="position:absolute;left:0;right:0;bottom:50px;text-align:center;font-family:O;font-weight:800;font-size:68px">{_ul(t)}</div></div>',i+1)
+            o+=stp(f'<div class="gl tch"{sa} style="left:{x}px;top:190px;width:{w}px;height:740px;border-radius:56px"><div style="position:absolute;left:0;right:0;top:90px;text-align:center;font-size:{int(w*.5)}px;line-height:1">{e}</div><div style="position:absolute;left:0;right:0;bottom:50px;text-align:center;font-family:O;font-weight:800;font-size:68px">{_ul(t)}</div></div>',i+1)
     else:
-        L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,640,56).replace('class="gl"','class="gl tpic"',1)
+        L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,740,56).replace('class="gl"','class="gl tpic"',1)
         sh=lambda x:(x['t'] if isinstance(x,dict) else x[0] if isinstance(x,(tuple,list)) else x).replace('<span','').replace('</span>','')
         fs=42 if max(len(sh(x)) for x in L)<60 else 38
         BG={'orange':'background:linear-gradient(135deg,#ffe6cc,#ffd2a6)','sky':'background:linear-gradient(135deg,#d9ecff,#c3e0ff)','rose':'background:linear-gradient(135deg,#ffe0ec,#ffcadd)','amber':'background:linear-gradient(135deg,#fff3c4,#ffe7a8)','teal':'background:linear-gradient(135deg,#d6fbea,#c4f3e6)'}
         for i,t in enumerate(L):
-            y=190+i*int(660/len(L)); h=int(660/len(L))-24; ex=''
+            y=190+i*int(740/len(L)); h=int(740/len(L))-26; ex=''
             if isinstance(t,(tuple,list)):
                 body=f'<div style="flex:1;display:flex;align-items:center;gap:26px"><span class="sp" style="font-size:64px">🔊</span><div><div class="pt" style="display:none;font-family:P;font-weight:500;font-size:30px;color:#6a35e8;margin-bottom:6px">🗣️ {t[1]}</div><div class="an" style="display:none">{_ul(t[0])}</div></div></div>'; sa=f' data-say="{t[1]}" data-seq="1"'
             elif isinstance(t,dict): body=('<span style="flex:none;margin-right:26px;padding:6px 22px;border-radius:999px;background:#fff;font-size:30px;color:#6a35e8">'+t['k']+'</span>' if t.get('k') else '')+'<div>'+_ul(t['t'])+'</div>'; sa=''; ex=BG.get(t.get('c'),'')
@@ -178,13 +178,13 @@ def rungs(d):
 def pairs(d):
     """Tap a clue, then its sentence. {'phase','title','pairs':[(clue,sentence)],'hint'}"""
     import random
-    Pr=d['pairs']; n=len(Pr); o=header(d['phase'],d.get('title','Match'),'violet'); h=int((700-14*(n-1))/n)
+    Pr=d['pairs']; n=len(Pr); o=header(d['phase'],d.get('title','Match'),'violet'); h=int((740-18*(n-1))/n)
     order=list(range(n)); random.Random(len(d.get('title',''))+n).shuffle(order)
     for i,(c_,s_) in enumerate(Pr):
-        o+=f'<div class="ptl gl" data-i="{i}" style="left:90px;top:{190+i*(h+14)}px;width:860px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:36px;line-height:1.2;background:linear-gradient(135deg,#fff3c4,#ffe7a8)">{c_}</div>'
+        o+=f'<div class="ptl gl" data-i="{i}" style="left:90px;top:{190+i*(h+18)}px;width:860px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;line-height:1.2;background:linear-gradient(135deg,#fff3c4,#ffe7a8)">{c_}</div>'
     for j,i in enumerate(order):
-        o+=f'<div class="ptr gl" data-i="{i}" style="left:990px;top:{190+j*(h+14)}px;width:840px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6)">{Pr[i][1]}</div>'
-    if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:920px;width:1740px;text-align:center;font-size:34px">{d["hint"]}</div>'
+        o+=f'<div class="ptr gl" data-i="{i}" style="left:990px;top:{190+j*(h+18)}px;width:840px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:44px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6)">{Pr[i][1]}</div>'
+    if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:938px;width:1740px;text-align:center;font-size:32px">{d["hint"]}</div>'
     return o
 
 @module('planb')
@@ -389,7 +389,7 @@ INIT.pairs=function(s){var L=$$('.ptl',s),R=$$('.ptr',s),sel=null,left=L.length;
  R.forEach(function(r){r.onclick=function(){if(r.__ok)return;if(!sel){P('tick');return}
   if(sel.dataset.i===r.dataset.i){sel.__ok=r.__ok=1;sel.style.outline='';sel.style.opacity=r.style.opacity=.6;sel.innerHTML='✔ '+sel.innerHTML;r.innerHTML='✔ '+r.innerHTML;sel=null;P('pop');if(--left==0){P('good');s.__done=1;$('#nx').classList.add('on')}}
   else{try{wrong(sel)}catch(e){}sel.style.outline='';sel=null}}})};
-INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop');var y=pn[+r.dataset.i].querySelector('.rsy');if(y&&window.speechSynthesis){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(y.dataset.say);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}}})};
+INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop')}})};
 /* ---- room of clues ---- */
 INIT.room=function(s){var cap=$('.rcap',s);$('#nx').classList.add('on');$$('.rsp',s).forEach(function(b){b.onclick=function(){b.classList.add('on');cap.textContent=b.dataset.t;P('pop')}})};
 /* ---- dial ---- */

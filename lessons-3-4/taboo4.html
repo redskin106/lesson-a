@@ -423,7 +423,7 @@ INIT.pairs=function(s){var L=$$('.ptl',s),R=$$('.ptr',s),sel=null,left=L.length;
  R.forEach(function(r){r.onclick=function(){if(r.__ok)return;if(!sel){P('tick');return}
   if(sel.dataset.i===r.dataset.i){sel.__ok=r.__ok=1;sel.style.outline='';sel.style.opacity=r.style.opacity=.6;sel.innerHTML='✔ '+sel.innerHTML;r.innerHTML='✔ '+r.innerHTML;sel=null;P('pop');if(--left==0){P('good');s.__done=1;$('#nx').classList.add('on')}}
   else{try{wrong(sel)}catch(e){}sel.style.outline='';sel=null}}})};
-INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop');var y=pn[+r.dataset.i].querySelector('.rsy');if(y&&window.speechSynthesis){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(y.dataset.say);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}}})};
+INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop')}})};
 /* ---- room of clues ---- */
 INIT.room=function(s){var cap=$('.rcap',s);$('#nx').classList.add('on');$$('.rsp',s).forEach(function(b){b.onclick=function(){b.classList.add('on');cap.textContent=b.dataset.t;P('pop')}})};
 /* ---- dial ---- */
