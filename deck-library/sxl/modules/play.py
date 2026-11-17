@@ -88,11 +88,11 @@ INIT.triage=function(s){var D=jd(s),B=D.buckets,I=pshuf(D.items),g=$('.pg',s),se
 INIT.label_reader=function(s){var D=jd(s),Q=D.qs,L=D.lab,st={k:0,n:Q.length};
  function sayCb(t,cb){var done=0;function go(){if(!done){done=1;cb()}}try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.8;u.onend=go;speechSynthesis.speak(u);setTimeout(go,Math.max(3500,t.length*95))}catch(e){go()}}
  st.draw=function(){pdots(s,st.k);var g=$('.pg',s),dn=0,w=0,qq=Q[st.k];g.innerHTML='';var lab=pmk('div','gl plab','<h3>'+L.title+'</h3>',g),rows={};
-  var q=pmk('div','gl pqq','<div style="font-size:120px;text-align:center">🎧</div><div class="qt" style="display:none">'+qq.q+'</div><button class="pbt" style="font-size:38px">🔊 Listen again</button>',g);
+  var q=pmk('div','gl pqq','<div style="font-size:120px;text-align:center">🎧</div><div class="qt" style="display:none">'+qq.q+'</div><button class="pbt" style="font-size:38px">🔊 Listen</button>',g);
   lab.style.opacity=0;lab.style.pointerEvents='none';lab.style.transition='opacity .5s';
   function reveal(){lab.style.opacity=1;lab.style.pointerEvents='auto';if(D.qtext!==false){var t=q.querySelector('.qt');if(t)t.style.display='block'}}
   L.lines.forEach(function(l){var b=pmk('button','pcd',(l.e?'<i>'+l.e+'</i>':'')+'<span>'+l.t+'</span>',lab);rows[l.id]=b;b.onclick=function(){if(dn)return;if(l.id===qq.a){dn=1;b.classList.add('ok');P('good');pstep(s,st,1700)}else{wrong(b);w++;if(w>=3)rows[qq.a].classList.add('glow')}}});
-  q.querySelector('button').onclick=function(){sayCb(qq.q,reveal)};sayCb(qq.q,reveal)};
+  q.querySelector('button').onclick=function(){sayCb(qq.q,reveal)}};
  st.draw()};
 /* taboo for nurses */
 INIT.taboo=function(s){var D=jd(s),Q=pshuf(D.items),lim=D.limit||3,done=0,N=D.items.length,shown=0,t=null,tm=D.secs||0,left=tm;pdots(s,0);

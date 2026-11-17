@@ -79,11 +79,14 @@ def choice_html(d,sid):
         rest=[t for t in it['opts'] if t!=it['ans']]; random.Random(k*7+len(it['q'])).shuffle(rest); rest.insert((k*2+len(d.get('title','')))%len(it['opts']),it['ans']); it=dict(it,opts=rest)
         o+='<div class="chi" style="display:none">'
         if it.get('say') and (it.get('aud') or d.get('aud')):
-            sv=f'<svg viewBox="0 0 630 600" width="630" style="display:block">{bubble_svg(24,22,582,230,"🔊  Listen",fs=56,tx=230)}{stick(230,560,1.55,"hold")}<text x="400" y="470" font-size="130">{it.get("pic","")}</text></svg>'
+            sv=f'<svg viewBox="0 0 630 600" width="630" style="display:block">{bubble_svg(24,22,582,230,"🔊  Tap to listen",fs=50,tx=230)}{stick(230,560,1.55,"hold")}<text x="400" y="470" font-size="130">{it.get("pic","")}</text></svg>'
             o+=glass(90,180,630,600,sv,r=56)+f'<div class="tch caud" data-say="{it["say"]}" style="position:absolute;left:90px;top:180px;width:630px;height:300px;z-index:4;cursor:pointer;border-radius:56px"></div>'
         elif it.get('say'):
             sv=f'<svg viewBox="0 0 630 600" width="630" style="display:block">{bubble_svg(24,22,582,230,it["say"],fs=40,tx=230)}{stick(230,560,1.55,"hold")}<text x="400" y="470" font-size="130">{it.get("pic","")}</text></svg>'
             o+=glass(90,180,630,600,sv,r=56)
+        elif it.get('grid'):
+            cells=''.join(f'<div style="text-align:center"><div style="font-family:O;font-weight:800;font-size:26px;color:#6a35e8">{a_}</div><div style="font-size:{it.get("gfs",48)}px;line-height:1.25;margin-top:6px">{b_}</div></div>' for a_,b_ in it['grid'])
+            o+=glass(90,180,630,600,f'<div style="height:100%;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:0 14px"><div style="text-align:center;font-size:90px">{it.get("pic","")}</div><div style="display:flex;justify-content:space-around;align-items:flex-start">{cells}</div></div>',r=56)
         else: o+=picx(it.get('pic','❓'),90,180,630,600,56)
         o+=f'<div class="gl" style="left:770px;top:190px;width:1060px;height:210px;box-sizing:border-box;border-radius:48px;padding:0 40px;display:flex;align-items:center;font-family:O;font-weight:800;font-size:40px;line-height:1.2;position:absolute">{it["q"]}</div>'
         o+='<div class="a cho-wrap" style="left:770px;top:425px;width:1060px;display:flex;flex-direction:column;gap:14px">'+''.join(f'<button class="cho" data-ok="{1 if t==it["ans"] else 0}" style="font-size:38px;padding:16px 40px">{t}</button>' for t in it['opts'])+'</div></div>'
@@ -169,6 +172,19 @@ def rungs(d):
         o+=(f'<div class="rgp" data-i="{i}" style="position:absolute;left:1230px;top:185px;width:600px;height:706px;opacity:{1 if i==st else 0};transition:opacity .3s;pointer-events:none">'
             f'<div style="text-align:center;font-size:200px;line-height:1;margin-top:40px">{s_["e"]}</div>'
             +(f'<div class="rsy" data-say="{s_["say"]}" style="margin:26px 36px 0;text-align:center;font-family:P;font-weight:500;font-size:30px;color:#6a35e8">🗣️ {s_["say"]}</div>' if s_.get('say') else '')+f'<div style="margin:22px 40px 0;text-align:center;font-family:O;font-weight:800;font-size:46px;line-height:1.2">{_ul(s_["sen"])}</div></div>')
+    return o
+
+@module('pairs')
+def pairs(d):
+    """Tap a clue, then its sentence. {'phase','title','pairs':[(clue,sentence)],'hint'}"""
+    import random
+    Pr=d['pairs']; n=len(Pr); o=header(d['phase'],d.get('title','Match'),'violet'); h=int((700-14*(n-1))/n)
+    order=list(range(n)); random.Random(len(d.get('title',''))+n).shuffle(order)
+    for i,(c_,s_) in enumerate(Pr):
+        o+=f'<div class="ptl gl" data-i="{i}" style="left:90px;top:{190+i*(h+14)}px;width:860px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:36px;line-height:1.2;background:linear-gradient(135deg,#fff3c4,#ffe7a8)">{c_}</div>'
+    for j,i in enumerate(order):
+        o+=f'<div class="ptr gl" data-i="{i}" style="left:990px;top:{190+j*(h+14)}px;width:840px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6)">{Pr[i][1]}</div>'
+    if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:920px;width:1740px;text-align:center;font-size:34px">{d["hint"]}</div>'
     return o
 
 @module('planb')
@@ -276,7 +292,7 @@ def _dial_html(d,sid):
     o+='<div class="gl dsen" style="left:910px;top:190px;width:920px;height:170px;border-radius:48px"></div>'
     sc=''.join(f'<g class="sc" data-z="{z}" style="display:none">{_dial_scene(z)}</g>' for z in range(7))
     o+=f'<div class="gl dscn" style="left:910px;top:380px;width:920px;height:510px;border-radius:48px;overflow:hidden"><svg viewBox="0 0 790 330" width="920" height="510" style="display:block"><line class="qq" x1="0" y1="205" x2="790" y2="205" stroke="#10a98d" stroke-width="7" stroke-dasharray="22 14"/><text class="qq" x="395" y="140" font-size="90" text-anchor="middle">❔</text>{sc}</svg></div>'
-    return o+f'<script type="application/json" id="d-{sid}">{_j.dumps({"items":d["items"]},ensure_ascii=False)}</script>'
+    return o+f'<script type="application/json" id="d-{sid}">{_j.dumps({"items":d["items"],"aud":bool(d.get("aud"))},ensure_ascii=False)}</script>'
 BUILD_EXT['dial']=_dial_html
 
 
@@ -360,7 +376,7 @@ addEventListener('keydown',function(e){if(e.target&&/^(TEXTAREA|INPUT)$/.test(e.
 INIT.choice=function(s){
  var items=$$('.chi',s),dots=$$('.chd',s),k=0;
  function show(n){items.forEach(function(e,i){e.style.display=i===n?'block':'none'});dots.forEach(function(d,i){d.classList.toggle('on',i===n);d.classList.toggle('dn',i<n)});
-  var box=$('.cho-wrap',items[n]),arr=$$('.cho',items[n]);for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=arr[i];arr[i]=arr[j];arr[j]=t}arr.forEach(function(b){box.appendChild(b)});var au=$('.caud',items[n]);if(au&&window.speechSynthesis){setTimeout(function(){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(au.dataset.say);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}},500)}}
+  var box=$('.cho-wrap',items[n]),arr=$$('.cho',items[n]);for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=arr[i];arr[i]=arr[j];arr[j]=t}arr.forEach(function(b){box.appendChild(b)});}
  items.forEach(function(it,n){$$('.cho',it).forEach(function(b){b.onclick=function(){if(it.__ok)return;
   if(b.dataset.ok==='1'){it.__ok=1;b.classList.add('ok');$$('.cho',it).forEach(function(x){if(x!==b)x.classList.add('off')});P('pop');setTimeout(function(){P('tick')},90);
    try{var u=new SpeechSynthesisUtterance(b.textContent);u.lang='en-GB';u.rate=.85;speechSynthesis.cancel();if(SXL.say)speechSynthesis.speak(u)}catch(e){}
@@ -368,6 +384,11 @@ INIT.choice=function(s){
   else{b.classList.add('nope');wrong(b)}}})});
  show(0)};
 
+INIT.pairs=function(s){var L=$$('.ptl',s),R=$$('.ptr',s),sel=null,left=L.length;$('#nx').classList.remove('on');
+ L.forEach(function(l){l.onclick=function(){if(l.__ok)return;L.forEach(function(x){x.style.outline=''});sel=(sel===l)?null:l;if(sel){l.style.outline='7px solid #9a5cff';P('tick')}}});
+ R.forEach(function(r){r.onclick=function(){if(r.__ok)return;if(!sel){P('tick');return}
+  if(sel.dataset.i===r.dataset.i){sel.__ok=r.__ok=1;sel.style.outline='';sel.style.opacity=r.style.opacity=.6;sel.innerHTML='✔ '+sel.innerHTML;r.innerHTML='✔ '+r.innerHTML;sel=null;P('pop');if(--left==0){P('good');s.__done=1;$('#nx').classList.add('on')}}
+  else{try{wrong(sel)}catch(e){}sel.style.outline='';sel=null}}})};
 INIT.rungs=function(s){var rg=$$('.rgr',s),pn=$$('.rgp',s),m=$('.rgm',s);rg.forEach(function(r){r.onclick=function(){m.style.top=(+r.dataset.y-10)+'px';pn.forEach(function(p){p.style.opacity=(p.dataset.i===r.dataset.i)?1:0});P('pop');var y=pn[+r.dataset.i].querySelector('.rsy');if(y&&window.speechSynthesis){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(y.dataset.say);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}}})};
 /* ---- room of clues ---- */
 INIT.room=function(s){var cap=$('.rcap',s);$('#nx').classList.add('on');$$('.rsp',s).forEach(function(b){b.onclick=function(){b.classList.add('on');cap.textContent=b.dataset.t;P('pop')}})};
@@ -380,10 +401,10 @@ INIT.dial=function(s){
  function sent(it,z){var w=W[z];return z===3?it.s+' normal.':it.s+' <b>'+w[0]+' '+w[1]+'</b> than normal.'}
  function show(){var it=I[k];done=0;nd.style.transform='rotate(-90deg)';scn(-1);zs.forEach(function(z){z.classList.remove('glow','dim')});
   dots.forEach(function(d,i){d.classList.toggle('on',i===k);d.classList.toggle('dn',i<k)});
-  card.innerHTML='<div>'+it.e+' '+it.now+'</div><small>Normal: '+it.normal+'</small>';sen.classList.remove('ok');
+  if(D.aud&&it.say)card.innerHTML='<div class="tch" data-say="'+it.say+'" style="cursor:pointer;text-align:center;font-size:52px">🔊 Tap to listen</div>';else card.innerHTML='<div>'+it.e+' '+it.now+'</div><small>Normal: '+it.normal+'</small>';sen.classList.remove('ok');
   sen.innerHTML='<div>'+it.s+' <u>&nbsp;</u> than normal.</div>'}
  zs.forEach(function(z){z.onclick=function(){if(done)return;var it=I[k],n=+z.dataset.z;nd.style.transform='rotate('+ang(n)+'deg)';scn(n);
-  if(n===it.z){done=1;z.classList.add('glow');zs.forEach(function(o){if(o!==z)o.classList.add('dim')});P('good');sen.classList.add('ok');sen.innerHTML='<div>'+sent(it,n)+'</div>';
+  if(n===it.z){done=1;z.classList.add('glow');zs.forEach(function(o){if(o!==z)o.classList.add('dim')});P('good');sen.classList.add('ok');sen.innerHTML='<div>'+sent(it,n)+'</div>';if(D.aud&&it.say)card.innerHTML='<div>'+it.e+' '+it.now+'</div><small>Normal: '+it.normal+'</small>';
    setTimeout(function(){if(k>=I.length-1){finish(s);return}k++;show()},3200)}
   else{P('tick');setTimeout(function(){if(!done){nd.style.transform='rotate(-90deg)';scn(-1)}},900);try{wrong(z)}catch(e){}}}});
  show()};
