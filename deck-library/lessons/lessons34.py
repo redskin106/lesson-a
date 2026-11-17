@@ -646,6 +646,179 @@ _gi=lambda o:[dict(pic=f['pic'],clip=_fixclip(f['n']),say=f['voice'].replace('"'
 _ci=next(i for i,d in enumerate(L4) if d.get('label')=='Thank you')
 L4.insert(_ci+1,dict(m='audio_all',phase='ACTIVATE',label='Teacher backup · all group voice notes',optional=True,min=1,title='All voice notes',groups=[_gi(o) for o in ('red','blue','green','yellow')],cols=['#ff5a6a','#2a8cf0','#19b38a','#f2a900']))
 L4.append(dict(m='boss',phase='ACTIVATE',label='Boss question (just for fun)',optional=True,min=3,**K.L4_BOSS,sec=90))
+# ================= L3 REBUILD (18 Nov): L4 patterns ported, more audio, more teaching points =================
+_PT3='💬 Tell your partner. Then tap.'
+SYM3=[[_a2('🌡️','I am so hot! Can I sleep in the fridge?','She has a fever.','She has a rash.','She has a cough.'),
+  _a2('😷','Cough, cough! The whole ward is moving away from me.','He has a cough.','He has a rash.','He has a fever.'),
+  _a2('🔴','Look at my arm! I look like a strawberry!','He has a rash on his arm.','He has a cough on his arm.','He has a fever on his arm.')],
+ [_a2('🥶','I am freezing… but my forehead is burning.','She has chills and a fever.','She has a rash and a fever.','She has a cough and chills.'),
+  _a2('🧴',"My arm… I can't stop scratching!",'His arm is itchy.','His arm is stiff.','His arm is cold.'),
+  _a2('🤕','My head, my eyes, my muscles… even my hair hurts!','Her head, her eyes and her muscles hurt.','Her head hurts, but her muscles are fine.','Her eyes hurt, but her head is fine.')],
+ [_a2('🍚','I have not eaten for two days. I do not want food.','She has no appetite.','She has a big appetite.','She is itchy.'),
+  _a2('🔴','Red spots on my arms. They itch, but my face is fine.','She has an itchy rash on her arms, but not on her face.','She has an itchy rash on her face, but not on her arms.','She has a rash on her arms and her face.'),
+  _a2('🦟','A mosquito bit me a week ago. Now I am sick.','She was bitten by a mosquito a week ago.','She bit a mosquito a week ago.','A mosquito was sick a week ago.')]]
+MORE3_W=dict(m='teach',phase='STUDY',label='Teach · More symptoms',min=1,role='Four more',words=[('🥶','chills'),('🧴','itchy'),('🫨','stiff'),('🍚','no appetite')])
+MORE3_S=dict(m='teach',phase='STUDY',label='Teach · More patient sentences',min=2,optional=True,role='Listen to the patient',pic='🥶',pics=['🥶','🧴','🫨','🍚'],tts=True,lines=[('She has chills.','I am freezing! But my forehead is burning.'),('His arm is itchy.',"I can't stop scratching!"),('His neck is stiff.','I cannot turn my head. It is so stiff!'),('She has no appetite.','I do not want food. Not even my favourite noodles.')])
+# --- the dial: one slide (demo, teaching ranges, art, spoken items), L3 content, "than normal" kept ---
+_ZG3={'pulse_hi':'slightly 101–120 · much 121–150 · dangerously over 150','pulse_lo':'slightly 50–59 · much 40–49 · dangerously under 40','temp_hi':'slightly 38–39 · much 39–40 · dangerously over 40','temp_lo':'slightly 35–36 · much 33–35 · dangerously under 33','breath':'normal: 12 to 20 breaths a minute','plat':'normal 150–450 thousand · low under 150 · very low under 50'}
+DIAL3=[_d('💓','Pulse: 104 beats per minute','60 to 100 beats per minute','Her pulse is',4),
+ _da('🌡️','Temperature: 41 °C','about 37 °C','Her temperature is',6,'Her temperature is forty-one degrees. Normal is about thirty-seven.'),
+ _d('🌡️','Temperature: 39.2 °C','about 37 °C','Her temperature is',5),
+ _da('🩸','Platelets: 95,000 per µL','150,000 to 450,000 per µL','Her platelets are',1,'Her platelets are ninety-five thousand. Normal is one hundred and fifty to four hundred and fifty thousand.'),
+ _d('🫁','Breathing: 16 breaths per minute','12 to 20 breaths per minute','Her breathing is',3),
+ _da('💓','Pulse: 130 beats per minute','60 to 100 beats per minute','Her pulse is',5,'Her pulse is one hundred and thirty. Normal is sixty to one hundred.'),
+ _da('🫁','Breathing: 40 breaths per minute','12 to 20 breaths per minute','Her breathing is',6,'She breathes forty times a minute. Normal is twelve to twenty.'),
+ _da('🌡️','Temperature: 32 °C','about 37 °C','Her temperature is',0,'Her temperature is thirty-two degrees. Normal is about thirty-seven.')]
+_DG3=[('pulse_hi',True),('temp_hi',0),('temp_hi',0),('plat',0),('breath',0),('pulse_hi',0),('breath',0),('temp_lo',0)]
+for _it,(_g,_dm) in zip(DIAL3,_DG3): _it['guide']=_ZG3[_g]; _it['demo']=bool(_dm)
+# --- listen and tick the numbers (units) ---
+NUM3=dict(m='choice',phase='STUDY',title='Listen: the number',label='Exercise · Listen and tick the numbers',aud=True,lvl=2,min=3,pt=_PT3,levels=_lv3(
+ [_a2('🌡️','Her temperature is thirty-nine point two degrees.','39.2 °C','29.2 °C','39.2 beats per minute'),_a2('💓','Her pulse is one hundred and four beats a minute.','104 beats per minute','140 beats per minute','104 °C'),_a2('🫁','She breathes eighteen times a minute.','18 breaths per minute','80 breaths per minute','18 °C')],
+ [_a2('🩸','Platelets: ninety-five thousand per microlitre.','95,000 per µL','9,500 per µL','950,000 per µL'),_a2('🌡️','Normal is about thirty-seven. Hers is thirty-eight point one.','Her temperature is 38.1 °C. Normal is 37 °C.','Her temperature is 38.1 °C. Normal is 36 °C.','Her temperature is 31.8 °C. Normal is 37 °C.'),_a2('💓','Her pulse is forty-eight. Normal is sixty to one hundred.','Her pulse is 48. Normal is 60 to 100.','Her pulse is 84. Normal is 60 to 100.','Her pulse is 48. Normal is 16 to 100.')],
+ [_a2('🩸','White cells: three thousand one hundred per microlitre. Normal is four and a half to eleven thousand.','White cells: 3,100 per µL. Normal: 4,500 to 11,000.','White cells: 31,000 per µL. Normal: 4,500 to 11,000.','White cells: 3,100 per µL. Normal: 45,000 to 110,000.'),_a2('🌡️','She says she feels a little warm. The thermometer says forty-one degrees!','The thermometer says 41 °C. That is dangerously high.','The thermometer says 14 °C. That is dangerously low.','The thermometer says 41 °C. That is normal.'),_a2('🫁','Breathing: twenty-one breaths a minute. Normal is twelve to twenty.','Her breathing is 21. It is slightly higher than normal.','Her breathing is 12. It is lower than normal.','Her breathing is 21. It is normal.')]))
+# --- asking history questions (teach + hear the answer, pick the question) ---
+HIST_T=dict(m='teach',phase='STUDY',label='Teach · Ask the patient',min=2,role='Good questions',pic='🩺',pics=['🌡️','🤕','😷','🦟'],lines=['How long have you had a fever?','Where does it hurt?','Do you have a cough?','Did a mosquito bite you?'])
+HIST_E=dict(m='choice',phase='STUDY',title='Which question?',label='Exercise · Hear the answer, pick the question',aud=True,lvl=2,min=3,pt=_PT3,levels=_lv3(
+ [dict(pic='🌡️',say='Three days.',q='Which question did the nurse ask?',ans='How long have you had a fever?',opts=['How long have you had a fever?','Where does it hurt?','Do you have a cough?']),
+  dict(pic='🤕',say='Behind my eyes. And my muscles.',q='Which question did the nurse ask?',ans='Where does it hurt?',opts=['Where does it hurt?','How long have you had a fever?','Did a mosquito bite you?']),
+  dict(pic='🦟',say='Yes, a lot. By the pond, a week ago.',q='Which question did the nurse ask?',ans='Did a mosquito bite you?',opts=['Did a mosquito bite you?','Do you have a cough?','Where does it hurt?'])],
+ [dict(pic='😷',say='No cough. Not once this week.',q='Which question did the nurse ask?',ans='Do you have a cough?',opts=['Do you have a cough?','Do you have a rash?','Did you have a cough?']),
+  dict(pic='🌡️',say='It started on Monday. So three days.',q='Which question did the nurse ask?',ans='When did the fever start?',opts=['When did the fever start?','Where does the fever start?','Who has a fever?']),
+  dict(pic='🍱',say='We all ate the same lunch. Nobody else is sick.',q='Which question did the nurse ask?',ans='Did your friends eat the same food?',opts=['Did your friends eat the same food?','Did you eat the same food?','Do your friends eat food?'])],
+ [dict(pic='💊',say='Paracetamol, yesterday. The fever went down, and then it came back.',q='Which question did the nurse ask?',ans='Did you take any medicine?',opts=['Did you take any medicine?','Do you take any medicine?','Did you make any medicine?']),
+  dict(pic='🏘️',say='Yes. Two people on my street had a fever last week.',q='Which question did the nurse ask?',ans='Is anyone else sick near you?',opts=['Is anyone else sick near you?','Are you sick near anyone else?','Is anyone sick else you?']),
+  dict(pic='💉',say='Two doses, in school. I have the card.',q='Which question did the nurse ask?',ans='Have you had the measles vaccine?',opts=['Have you had the measles vaccine?','Do you have the measles vaccine?','Have you got measles?'])]))
+# --- certainty ladder (can't → unlikely → might → probably → it is) ---
+CERT=[dict(word="can't",e='🚫',gloss='0%',sen="It [[can't]] be appendicitis.",say="It can't be appendicitis. I am sure."),
+ dict(word='unlikely',e='🤏',gloss='10–20%',sen='It is [[unlikely]] to be flu.',say='It is unlikely to be flu. Maybe one chance in ten.'),
+ dict(word='might',e='🤔',gloss='30–60%',sen='It [[might]] be dengue.',say='It might be dengue. Maybe.'),
+ dict(word='probably',e='👍',gloss='70–90%',sen='It is [[probably]] dengue.',say='It is probably dengue. I am nearly sure.'),
+ dict(word='it is',e='✅',gloss='100%',sen='It [[is]] dengue.',say='It is dengue. The test says so.')]
+CERT_T=dict(m='rungs',phase='STUDY',label='Teach · How sure?',min=2,title='How sure is the nurse?',stops=CERT,start=2)
+CERT_E=dict(m='choice',phase='STUDY',title='How sure?',label='Exercise · How sure?',aud=True,lvl=2,min=3,pt=_PT3,levels=_lv3(
+ [_a2('🚫',"It can't be appendicitis.",'The nurse is sure. It is not appendicitis.','The nurse is not sure.','It is appendicitis.'),_a2('🤔','It might be dengue.','The nurse is not sure. Maybe.','The nurse is sure.',"It can't be dengue."),_a2('✅','It is dengue.','The nurse is sure. It is dengue.','Maybe it is dengue.',"It can't be dengue.")],
+ [_a2('🤏','It is unlikely to be measles.','Measles: a small chance.','Measles: a very big chance.','Measles: 100%.'),_a2('👍','It is probably dengue.','Dengue: a big chance.','Dengue: a small chance.','Dengue: 0%.'),_a2('🤔','It might be flu, or it might be dengue.','The nurse has two ideas.','The nurse has one idea.','The nurse has no idea.')],
+ [_a2('🤏','It is unlikely to be flu, because she has no cough.','Flu: unlikely. The reason is no cough.','Flu: probably. The reason is no cough.','Flu: unlikely. The reason is a cough.'),_a2('👍','It is probably dengue, because she has a rash and a mosquito bite.','Dengue: probably. Two clues.','Dengue: unlikely. Two clues.','Dengue: probably. No clues.'),_a2('🚫',"It can't be appendicitis, because her belly does not hurt.",'Appendicitis: no. Her belly is fine.','Appendicitis: yes. Her belly hurts.','Appendicitis: maybe.')]))
+# --- might / can't: line-by-line picture teach, then the ball drill ---
+MIGHT3_T=dict(m='teach',phase='STUDY',label="Teach · Might, can't, because",min=1,role='Clue → sentence',pic='🦟',lines=[dict(k='🤔 Guessing',t='She was bitten by mosquitoes. She has a fever and a rash.',c='amber'),dict(k='→ might',t=_MS('[[might]] be','dengue.')+'<br>'+_MS('[[might]] be','measles.'),c='teal'),dict(k='🚫 Almost sure it is NOT',t='She has no cough. She has no runny nose.',c='amber'),dict(k="→ can't + because",t=_MS("[[can't]] be",'flu [[because]] she has no cough.'),c='teal')])
+_P3A=[('She has no cough.',"It can't be flu."),('Her belly does not hurt.',"It can't be appendicitis."),('She was bitten by mosquitoes.','It might be dengue.'),('She has a rash and a fever.','It might be measles.'),('She had two measles vaccines.',"It is unlikely to be measles.")]
+_P3B=[('She has no cough.',"It can't be flu because she has no cough."),('Her belly does not hurt.',"It can't be appendicitis because her belly does not hurt."),('She was bitten by mosquitoes.','It might be dengue because mosquitoes bit her.'),('She has a rash and a fever.','It might be measles because she has a rash and a fever.'),('She had two measles vaccines.','It is unlikely to be measles because she had two vaccines.')]
+PAIRS3=dict(m='pairs',phase='STUDY',label="Exercise · Might · can't",min=3,title='Clue → sentence',hint='⚽ Tap a clue. Pass the ball to a student.',ball=True,lvl=1,pairs=_P3A,levels=[{},{'hide':True},{'hide':True,'pairs':_P3B}])
+# --- ruling out (audio): "no cough" so "it can't be flu" ---
+RULE3=dict(m='choice',phase='STUDY',title='Ruling out',label='Exercise · Ruling out',aud=True,lvl=2,min=3,pt=_PT3,levels=_lv3(
+ [_a2('😷','No cough. No runny nose.',"It can't be flu.",'It might be flu.',"It can't be dengue."),_a2('🫄','Her belly is soft. It does not hurt.',"It can't be appendicitis.",'It might be appendicitis.',"It can't be a fever."),_a2('🍱','We ate the same food. Nobody else is sick.',"It can't be food poisoning.",'It might be food poisoning.',"It can't be a friend.")],
+ [_a2('😷','She has a fever, but she has no cough.',"It is unlikely to be flu.",'It is probably flu.','It is flu.'),_a2('👁️','Her eyes are not red. They are not watery.','It is unlikely to be measles.','It is probably measles.','It is measles.'),_a2('💉','She had two measles vaccines.','It is unlikely to be measles.','It is probably measles.','It is measles.')],
+ [_a2('😷','No cough, so it can not be flu.',"It can't be flu because she has no cough.","It might be flu because she has no cough.","It can't be flu because she has a cough."),_a2('🫄','Her belly does not hurt when I press it.',"It can't be appendicitis because her belly does not hurt.","It might be appendicitis because her belly hurts.","It can't be appendicitis because her belly hurts."),_a2('🌡️','Fever, rash and mosquito bites. No cough.','It is probably dengue because she has a rash and mosquito bites.','It is unlikely to be dengue because she has a rash.',"It can't be dengue because she has a fever.")]))
+# --- but / although / so (audio, optional) ---
+BAS3=dict(m='choice',phase='STUDY',title='But · although · so',label='Exercise · But · although · so',aud=True,optional=True,lvl=2,min=3,pt=_PT3,levels=_lv3(
+ [_a2('🌡️','She has a fever, but she has no cough.','She has a fever. She has no cough.','She has a fever and a cough.','She has no fever and no cough.'),_a2('🔴','She has a rash, but no fever.','She has a rash. She has no fever.','She has a rash and a fever.','She has no rash and no fever.'),_a2('😷','He has a cough, but he has no fever.','He has a cough. He has no fever.','He has a cough and a fever.','He has no cough.')],
+ [_a2('🌡️','Although she has a fever, she has no cough.','She has a fever. She has no cough.','She has no fever. She has a cough.','She has a fever and a cough.'),_a2('🦟','She was bitten by mosquitoes, so it might be dengue.','Mosquito bites are a reason for dengue.','Mosquito bites are a reason for flu.','Mosquito bites are not important.'),_a2('🍱','Her friends ate the same food, so it is unlikely to be food poisoning.','Her friends are not sick. So: food poisoning is unlikely.','Her friends are sick. So: food poisoning is likely.','Her friends ate nothing.')],
+ [_a2('🌡️','Although she has a high fever, her pulse is only slightly higher than normal.','Fever: high. Pulse: only a little higher.','Fever: low. Pulse: very high.','Fever: high. Pulse: very high.'),_a2('🔴','She has a rash, but not on her face, so measles is unlikely.','The rash is not on her face. So measles is unlikely.','The rash is on her face. So measles is likely.','She has no rash. So measles is likely.'),_a2('🩸','Her platelets are low, so it might be dengue, but we need a blood test.','Low platelets: maybe dengue. A blood test will tell.','Low platelets: sure it is dengue.','Low platelets: nothing to do.')]))
+# --- tests: teach + match ---
+TEST_T=dict(m='teach',phase='STUDY',label='Teach · Which test?',min=2,optional=True,role='Test → because',pic='🩸',pics=['🩸','🫁','💩','🧬'],lines=['We need a blood test because it would show the virus.','We need a chest X-ray because it would show the lungs.','We need a stool test because it would show food poisoning.','We need a urine test because it would show an infection.'])
+TEST_E=dict(m='pairs',phase='STUDY',label='Exercise · Which test?',min=2,optional=True,title='Question → test',hint='Tap the question. Then tap the test.',pairs=[('Is it dengue?','We need a blood test.'),('Is it pneumonia? She has a bad cough.','We need a chest X-ray.'),('Is it food poisoning?','We need a stool test.'),('Is it a kidney infection?','We need a urine test.')])
+# --- voice-message chat, L3 content ---
+CHAT3=dict(m='chat',phase='STUDY',label='Exercise · Patient chat (voice messages)',min=4,title='Voice messages',window=4,pt='🎧 Listen. Then answer as the nurse.',lines=[
+ ('P',dict(say='I have a fever and red spots on my arms. What is wrong with me?')),
+ ('N',[_Q('c2','Do you have'),_Q('c3','a cough?',True)],[('c3','a cough?'),('c3','a mosquito?'),('c3','a banana?')]),
+ ('P',dict(say='No cough. No runny nose. But my head and my eyes hurt.')),
+ ('N',[_Q('c1','It'),_Q('c2',"can't",True),_Q('c2','be'),_Q('c3','flu'),_Q('c4','because',True),_Q('c1','you have no cough.')],[('c2','might'),('c2',"can't"),('c4','because'),('c4','but')]),
+ ('P',dict(say='A mosquito bit me a week ago, by the pond.')),
+ ('N',[_Q('c1','It'),_Q('c2','might',True),_Q('c2','be'),_Q('c3','dengue'),_Q('c4','because',True),_Q('c1','a mosquito bit you.')],[('c2','might'),('c2',"can't"),('c4','because'),('c4','but')]),
+ ('P',dict(say='Is it really dengue? How do you know?')),
+ ('N',[_Q('c1','It is'),_Q('c2','probably',True),_Q('c3','dengue,'),_Q('c4','but',True),_Q('c1','we need a blood test.')],[('c2','probably'),('c2','never'),('c4','but'),('c4','so')]),
+ ('P',dict(say='Okay. Please do the test. Quickly, please.')),
+])
+# --- Everybody lies (L3) ---
+LIE3=dict(m='choice',phase='ACTIVATE',title='Everybody lies?',label='Everybody lies',aud=True,lvl=2,min=3,pt=_PT3,levels=_lv3(
+ [_tq('🌡️','I only feel a little warm.','The thermometer says: 41 °C.','No. She has a very high fever.','Yes. She tells the truth.'),
+  _tq('🦟','A mosquito? No, never.','Her friend says: she was bitten many times at the pond.','No. She was bitten.','Yes. She tells the truth.'),
+  _tq('😷','I have a terrible cough.','The nurse says: no cough.','No. She has no cough.','Yes. She tells the truth.')],
+ [_tq('💓','My heart is fine. Totally normal.','The monitor says: 104 beats per minute. Normal: 60 to 100.','Not really. Her pulse is higher than normal.','Yes. Her pulse is normal.','No. Her pulse is lower than normal.'),
+  _tq('🌡️','I have had a fever for two days.','The chart says: fever for three days.','No. It is three days.','Yes. She tells the truth.','No. It is one day.'),
+  _tq('🍱','Same lunch as my friends. Nobody else is sick.','Her friends say: we are all fine.','Yes. She tells the truth.','No. Her friends are sick.','No. She ate different food.')],
+ [_tq('🩸','My blood is perfect.','The lab says: platelets 95,000. Normal: 150,000 to 450,000.','No. Her platelets are much lower than normal.','Yes. Her blood is normal.','No. Her platelets are higher than normal.'),
+  _tq('🔴','The rash is on my face.','The nurse says: the rash is on her arms and chest, not her face.','No. The rash is not on her face.','Yes. The rash is on her face.','No. She has no rash.'),
+  _tq('💊','I took paracetamol and the fever never came back.','The nurse says: the fever went down, then came back.','No. The fever came back.','Yes. The fever stayed away.','No. She did not take paracetamol.')]))
+# --- toolkit chips ---
+_S,_V,_O,_B,_T='s','v','o','b','t'
+TOOL3_CHIPS=[
+ [[('Does',_V),('anyone',_S),('have',_V),('a voice note',_O),('about …?',_O)],[('Can',_V),('I',_S),('hear',_V),('your voice note?',_O)],[('What',_B),('does',_V),('it',_S),('say',_V),('about …?',_O)]],
+ [[('Her temperature',_S),('is',_V),('much higher than normal.',_O)],[('She',_S),('has',_V),('a rash',_O),('on her arms.',_T)],[('Her platelets',_S),('are',_V),('much lower than normal.',_O)]],
+ [[('It',_S),('might be',_V),('dengue',_O),('because …',_B)],[('It',_S),("can't be",_V),('flu',_O),('because',_B),('she',_S),('has',_V),('no cough.',_O)],[('It',_S),('is unlikely to be',_V),('measles',_O),('because …',_B)]]]
+# --- how the voice-note hunt works ---
+_H1=stick(100,395,1.2,'hold')+'<text x="165" y="330" font-size="86">🎧</text><text x="250" y="150" font-size="60" font-family="Outfit,sans-serif" font-weight="800" fill="#9a5cff">×3</text>'
+_H3=stick(130,395,1.2,'hold')+'<text x="195" y="330" font-size="86">🎧</text><text x="215" y="190" font-size="40" font-family="Outfit,sans-serif" font-weight="800" fill="#10a98d">Her pulse is 104.</text>'
+HUNT3_COMIC=[dict(svg=_H1,cap='Each group has 3 voice notes.'),dict(svg=_FP3,cap='One group asks the class.'),dict(svg=_H3,cap='Listen. Say it in a sentence.'),dict(svg=_P4,cap='Teacher taps. The board fills.')]
+# --- the 12 voice notes (numbered groups 1-4) ---
+_FIX3D=[('A2','🤕','Head, eyes, muscles','Patient','My head hurts… and behind my eyes. My muscles hurt too. Everything aches.','Her head, her eyes and her muscles hurt.'),
+ ('A3','😷','Cough','Patient','No. No cough. Not once this week.','She has no cough.'),
+ ('A4','🦟','Mosquitoes','Patient','Yes, a lot! In the garden, by the pond… about a week ago.','She was bitten by mosquitoes a week ago.'),
+ ('B1','🌡️','Temperature','Nurse','Her temperature is thirty-nine point two. Normal is about thirty-seven.','Her temperature is 39.2 °C. Normal is about 37 °C.'),
+ ('B2','💓','Pulse','Nurse','Her pulse is one hundred and four beats a minute. Normal is sixty to one hundred.','Her pulse is 104. Normal is 60 to 100.'),
+ ('B3','🩸','Blood test','Lab','Her platelets are ninety-five thousand. Normal is one hundred and fifty to four hundred and fifty thousand. White cells: three thousand one hundred. Normal is four and a half to eleven thousand.','Her platelets and white cells are lower than normal.'),
+ ('C1','🔴','Rash','Nurse','She has a red rash on her arms and on her chest. No rash on her face.','She has a rash on her arms and chest, but not on her face.'),
+ ('C2','👁️','Eyes','Doctor','Her eyes are not red. They are not watery.','Her eyes are not red or watery.'),
+ ('C3','🫄','Belly','Doctor','Her belly is soft. I press here… she says: no pain.','Her belly is soft. It does not hurt.'),
+ ('D1','💉','Vaccination','Nurse','Vaccination card… measles vaccine. Two doses.','She had two measles vaccines.'),
+ ('D2','🍱','Friend','Friend','We ate the same food at lunch. Nobody else is sick.','Her friends ate the same food. Nobody else is sick.'),
+ ('D3','🏘️','Neighbour','Neighbour','Two people on our street had a fever last week.','Two people on her street had a fever last week.')]
+_OWN3={'A':'red','B':'blue','C':'green','D':'yellow'}
+FIX3=[dict(n=i+1,id=cid,owner=_OWN3[cid[0]],pic=pc,topic=tp,who=wh,voice=v,fact=ft) for i,(cid,pc,tp,wh,v,ft) in enumerate(_FIX3D)]
+_BY3={f['id']:f for f in FIX3}
+_L3=[]
+for d in L3:
+    lb=d.get('label'); m=d['m']
+    if lb=='Eyes closed. Louder.' and _ex('l4_j1_eyes_closed.jpg'): d=dict(d,emoji='l4_j1_eyes_closed.jpg')
+    if m=='today': d=dict(d,rows=[[('c4','Ask'),('c3','the right question')],[('c1','Read'),('c3','the numbers')],[('c2','might'),('c4',"can't"),('c3','because')],[('c2','probably'),('c4','unlikely')]])
+    if lb=='Teach · Symptoms': _L3+= [d]; continue
+    if lb=='Teach · Symptom sentences': _L3+= [d,MORE3_W,MORE3_S,dict(m='choice',phase='STUDY',title='Symptoms',label='Exercise · Symptoms',aud=True,min=3,lvl=3,pt=_PT3,levels=lv(SYM3))]; continue
+    if lb in ('Exercise · Symptoms','Teach · Higher or lower','Teach · The dial','Exercise · Higher or lower?','Teach · Might, can\'t, because',"Exercise · Might · can't · because",'Teach · Ask the patient','Exercise · Ask the patient (1)','Exercise · Ask the patient (2)'):
+        if lb=='Teach · The dial': _L3+=[dict(m='dial',phase='STUDY',label='Exercise · Higher or lower?',min=4,title='How much higher? How much lower?',aud=True,items=DIAL3,pt=_PT3),NUM3]
+        elif lb=="Teach · Might, can't, because": _L3+=[HIST_T,HIST_E,CERT_T,CERT_E,MIGHT3_T,PAIRS3,RULE3,BAS3,TEST_T,TEST_E,CHAT3]
+        continue
+    if lb=='Your toolkit': d=dict(d,note=None,bubbles=False,chips=TOOL3_CHIPS,title='Your hunt toolkit')
+    if lb=='How the hunt works': d=dict(d,label='How the voice-note hunt works',title='How the voice-note hunt works',panels=HUNT3_COMIC)
+    if lb in ('Taboo for nurses','Plan B (teacher)'): continue
+    if lb=='Recap': d=dict(d,rows=[([('c1','She'),('c2','has'),('c3','chills and a rash.')],'symptoms'),([('c1','Her temperature'),('c2','is'),('c3','much higher than normal.')],'than'),([('c1','It'),('c2','is probably'),('c3','dengue.')],'probably'),([('c1','It'),('c2',"can't be"),('c3','flu because she has no cough.')],'because…'),([('c2','Have'),('c1','you'),('c3','had a fever?')],'ask')])
+    if lb=='Boss question (just for fun)':
+        _L3+=[dict(m='planb',phase='ACTIVATE',label='Plan B (teacher)',optional=True,min=1,title='Plan B · if you have time left',tiles=[dict(e='🩺',t='Tell the doctor',min='3–6 min',use='Spoken Situation, Background, Assessment.'),dict(e='🧩',t='Boss question',min='3 min',use='Fast finishers.'),dict(e='🗂️',t='Paper fallback',min='10 min',use='Tech fails: read the 12 voice-note sentences aloud from paper; groups still report them.')])]
+    if lb=='Case board · Find the illness':
+        d=dict(d,frames=['Does anyone have a voice note about …?','Yes, we do. Come and listen.','Is that a clue for flu?'],unit='clues found',clues=[dict(c,pic=_BY3[c['id']]['pic'],kind=None,topic=_BY3[c['id']]['topic'],text=_BY3[c['id']]['fact']) for c in d['clues']])
+    _L3.append(d)
+    if lb=='Your toolkit' : pass
+_ix3={d.get('label'):i for i,d in enumerate(_L3)}
+# Everybody lies goes before the toolkit (warm-up for the hunt)
+_L3.insert(_ix3['Your toolkit'],LIE3)
+_i3=[d.get('label') for d in _L3].index('How the voice-note hunt works')
+import base64 as _b3
+_qd3=lambda n:'data:image/png;base64,'+_b3.b64encode(open(f'/home/claude/lesson-a/lessons-3-4/source-art/print/qr3_{n}.png','rb').read()).decode()
+_L3.insert(_i3+1,dict(m='qr_groups',phase='ACTIVATE',label='Group QR codes',title='Scan your group',min=1,qrs=[_qd3(n) for n in '1234'],cols=['#ff5a6a','#2a8cf0','#19b38a','#f2a900']))
+# Taboo: in the deck, fixed order, L3 words (same module and art as L4)
+TABOO3=dict(TABOO4,items=[dict(w='fever',e='🌡️',no=['hot','temperature','thermometer','high']),dict(w='rash',e='🔴',no=['red','skin','spots','itchy']),dict(w='cough',e='😷',no=['throat','cold','sneeze','loud']),dict(w='headache',e='🤕',no=['head','pain','hurt','tablet']),dict(w='mosquito',e='🦟',no=['bite','insect','fly','blood']),dict(w='pulse',e='💓',no=['heart','beat','wrist','minute']),dict(w='vaccine',e='💉',no=['needle','injection','protect','arm']),dict(w='chills',e='🥶',no=['cold','shiver','freeze','shake'])])
+_j3=[d.get('label') for d in _L3].index('Case board · Find the illness')
+_L3.insert(_j3+1,TABOO3)
+# end matter: teacher backup page of all 12 voice notes after Thank you
+def _fixclip3(n):
+    f='/home/claude/lesson-a/lessons-3-4/source-audio/l3_hunt/L3_%02d.mp3'%n
+    return 'data:audio/mpeg;base64,'+_b3.b64encode(open(f,'rb').read()).decode() if _o3.path.exists(f) else ''
+_gi3=lambda o:[dict(pic=f['pic'],clip=_fixclip3(f['n']),say=f['voice'].replace('"','&quot;')) for f in FIX3 if f['owner']==o]
+_ct=next(i for i,d in enumerate(_L3) if d.get('label')=='Thank you')
+_L3.insert(_ct+1,dict(m='audio_all',phase='ACTIVATE',label='Teacher backup · all group voice notes',optional=True,min=1,title='All voice notes',groups=[_gi3(o) for o in ('red','blue','green','yellow')],cols=['#ff5a6a','#2a8cf0','#19b38a','#f2a900']))
+L3=_L3
+# timing: extras are optional so the core stays near the target (Nick decides what to run)
+_OPT3={'Exercise · Listen and tick the numbers':3,'Exercise · How sure?':2,'Tell the doctor (spoken)':3}
+_MIN3={'Teach · How sure?':1,'Teach · Ask the patient':1,'The room of clues':2}
+L3=[dict(d,optional=True,min=_OPT3[d['label']]) if d.get('label') in _OPT3 else dict(d,min=_MIN3[d['label']]) if d.get('label') in _MIN3 else d for d in L3]
+# dial art + no-numbers flag for temperature (as L4)
+for d in L3:
+    if d['m']=='dial' and d.get('label')=='Exercise · Higher or lower?':
+        _DA3={('💓','Pulse: 104 beats per minute'):'l4_i1_pulse_slightly_high.jpg',('💓','Pulse: 130 beats per minute'):'l4_c4_racing_heart.jpg',('🌡️','Temperature: 41 °C'):'l4_h3_fever_high.jpg',('🌡️','Temperature: 39.2 °C'):'l4_h3_fever_high.jpg',('🌡️','Temperature: 32 °C'):'l4_h1_thermometer.jpg'}
+        for it in d['items']:
+            if it['s'].startswith('Her temperature'): it['nt']=1
+            a=_DA3.get((it['e'],it['now']))
+            if a: it['art']=ART+a
+
 def _inject_audio(html_path,adir):
     """Recorded clips (ElevenLabs) keyed by exact spoken text. speechSynthesis.speak is wrapped: a matching line plays the clip,
     anything else falls back to the browser voice. Nothing in the slide data changes."""
@@ -665,5 +838,6 @@ if __name__=='__main__':
     print(build_interactive(L3,str(out/'lesson3_v2.html'),title='SkillsXLab · Lesson 3 · Which illness?'))
     print(build_interactive(L4,str(out/'lesson4_v2.html'),title='SkillsXLab · Lesson 4 · The Impossible Week'))
     _inject_audio(out/'lesson4_v2.html',out/'source-audio'/'l4_pages')
-    for n,t in ((3,TABOO3),(4,TABOO4)):
+    if (out/'source-audio'/'l3_pages'/'manifest.json').exists(): _inject_audio(out/'lesson3_v2.html',out/'source-audio'/'l3_pages')
+    for n,t in ((4,TABOO4),):
         print(build_interactive([dict(t,label='Taboo for nurses',optional=False)],str(out/f'taboo{n}.html'),title=f'SkillsXLab · Taboo for nurses · Lesson {n}'))
