@@ -623,7 +623,6 @@ _LF4=dict(m='listen_fix',phase='ACTIVATE',label='Listen and fix (night chart)',m
 _L=[]
 for d in L4:
     lb=d.get('label')
-    if lb=='Taboo for nurses': _L.append(_LF4)
     if lb=='Exercise · How bad?': d=dict(d,pt='')
     if lb=='Your toolkit': d=dict(d,note=None)
     if lb=='Case board · Fix the ward':
