@@ -750,7 +750,7 @@ TOOL3_CHIPS=[
 _H1=stick(100,395,1.2,'hold')+'<text x="165" y="330" font-size="86">🎧</text><text x="250" y="150" font-size="60" font-family="Outfit,sans-serif" font-weight="800" fill="#9a5cff">×3</text>'
 _H3=stick(130,395,1.2,'hold')+'<text x="195" y="330" font-size="86">🎧</text><text x="215" y="190" font-size="40" font-family="Outfit,sans-serif" font-weight="800" fill="#10a98d">Her pulse is 104.</text>'
 HUNT3_COMIC=[dict(svg=_H1,cap='Each group has 3 voice notes.'),dict(svg=_FP3,cap='One group asks the class.'),dict(svg=_H3,cap='Listen. Say it in a sentence.'),dict(svg=_P4,cap='Teacher taps. The board fills.')]
-HUNT3_COMIC[0]['img']='l4_d4_fix.jpg'; HUNT3_COMIC[1]['img']='l4_d3_ask.jpg'; HUNT3_COMIC[2]['img']='l4_d2_find.jpg'
+HUNT3_COMIC[0]['img']='l4_d4_fix.jpg'; HUNT3_COMIC[1]['img']='l4_d3_ask.jpg'; HUNT3_COMIC[2]['img']='l4_d2_find.jpg'; HUNT3_COMIC[3]['img']='l3_e4_board_fills.jpg'
 # --- the 12 voice notes (numbered groups 1-4) ---
 _FIX3D=[('A2','🤕','Head, eyes, muscles','Patient','My head hurts… and behind my eyes. My muscles hurt too. Everything aches.','Her head, her eyes and her muscles hurt.'),
  ('A3','😷','Cough','Patient','No. No cough. Not once this week.','She has no cough.'),
@@ -869,7 +869,7 @@ _OPT3={'Exercise · Listen and tick the numbers':3,'Exercise · How sure?':2}
 _MIN3={'Teach · How sure?':1,'Teach · Ask the patient':1,'The room of clues':2}
 L3=[dict(d,optional=True,min=_OPT3[d['label']]) if d.get('label') in _OPT3 else dict(d,min=_MIN3[d['label']]) if d.get('label') in _MIN3 else d for d in L3]
 # ---- 18 Nov: L3 art placed (Gemini batch 1), slots without art keep their emoji ----
-ARTMAP3={'🤒':'l3_b1_fever.jpg','🌡️':'l3_b1_fever.jpg','🤕':'l3_b2_headache.jpg','😷':'l3_b3_cough.jpg','🔴':'l3_b4_rash.jpg','🥶':'l3_b5_chills.jpg','🧴':'l3_b6_itchy.jpg','🫨':'l3_b7_stiff.jpg','🍚':'l3_b8_no_appetite.jpg','🦟':'l3_c1_mosquito_bite.jpg','🩸':'l3_c2_blood_test.jpg','🫁':'l3_c3_chest_xray.jpg','💩':'l3_c4_stool_test.jpg'}
+ARTMAP3={'🤒':'l3_b1_fever.jpg','🌡️':'l3_b1_fever.jpg','🤕':'l3_b2_headache.jpg','😷':'l3_b3_cough.jpg','🔴':'l3_b4_rash.jpg','🥶':'l3_b5_chills.jpg','🧴':'l3_b6_itchy.jpg','🫨':'l3_b7_stiff.jpg','🍚':'l3_b8_no_appetite.jpg','🦟':'l3_c1_mosquito_bite.jpg','🩸':'l3_c2_blood_test.jpg','🫁':'l3_c3_chest_xray.jpg','💩':'l3_c4_stool_test.jpg','🧬':'l3_c5_urine_test.jpg'}
 _ART3=('Teach · Symptoms','Teach · Symptom sentences','Teach · More symptoms','Teach · More patient sentences','Exercise · Symptoms','Teach · Ask the patient','Teach · Which test?')
 _s=700/1116.0
 def _rs(dx,dy,t): return dict(e='',x=int(243+dx*_s-56),y=int(dy*_s-56),t=t)
@@ -886,10 +886,11 @@ L3=_n3
 # dial art + no-numbers flag for temperature (as L4)
 for d in L3:
     if d['m']=='dial' and d.get('label')=='Exercise · Higher or lower?':
-        _DA3={('💓','Pulse: 104 beats per minute'):'l4_i1_pulse_slightly_high.jpg',('💓','Pulse: 130 beats per minute'):'l4_c4_racing_heart.jpg',('🌡️','Temperature: 41 °C'):'l4_h3_fever_high.jpg',('🌡️','Temperature: 39.2 °C'):'l4_h3_fever_high.jpg',('🌡️','Temperature: 32 °C'):'l4_h1_thermometer.jpg'}
+        _DA3={('💓','Pulse: 104 beats per minute'):'l4_i1_pulse_slightly_high.jpg',('💓','Pulse: 130 beats per minute'):'l4_c4_racing_heart.jpg',('🌡️','Temperature: 41 °C'):'l4_h3_fever_high.jpg',('🌡️','Temperature: 39.2 °C'):'l3_d1_temp_39.jpg',('🌡️','Temperature: 32 °C'):'l3_d5_temp_low.jpg'}
         for it in d['items']:
             if it['s'].startswith('Her temperature') or it['s'].startswith('Her breathing'): it['nt']=1
             a=_DA3.get((it['e'],it['now']))
+            if not a: a={('🩸','Platelets: 95,000 per µL'):'l3_d4_platelets_low.jpg',('🫁','Breathing: 16 breaths per minute'):'l3_d2_breathing_normal.jpg',('🫁','Breathing: 40 breaths per minute'):'l3_d3_breathing_fast.jpg'}.get((it['e'],it['now']))
             if a: it['art']=ART+a
 
 # 18 Nov (Nick): no instruction lines at the top of the pages (L3 and L4)
