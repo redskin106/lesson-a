@@ -869,8 +869,8 @@ _OPT3={'Exercise · Listen and tick the numbers':3,'Exercise · How sure?':2}
 _MIN3={'Teach · How sure?':1,'Teach · Ask the patient':1,'The room of clues':2}
 L3=[dict(d,optional=True,min=_OPT3[d['label']]) if d.get('label') in _OPT3 else dict(d,min=_MIN3[d['label']]) if d.get('label') in _MIN3 else d for d in L3]
 # ---- 18 Nov: L3 art placed (Gemini batch 1), slots without art keep their emoji ----
-ARTMAP3={'🤒':'l3_b1_fever.jpg','🌡️':'l3_b1_fever.jpg','🤕':'l3_b2_headache.jpg','😷':'l3_b3_cough.jpg','🔴':'l3_b4_rash.jpg','🥶':'l3_b5_chills.jpg','🧴':'l3_b6_itchy.jpg','🫨':'l3_b7_stiff.jpg','🍚':'l3_b8_no_appetite.jpg','🦟':'l3_c1_mosquito_bite.jpg','🩸':'l3_c2_blood_test.jpg','🫁':'l3_c3_chest_xray.jpg','💩':'l3_c4_stool_test.jpg','🧬':'l3_c5_urine_test.jpg'}
-_ART3=('Teach · Symptoms','Teach · Symptom sentences','Teach · More symptoms','Teach · More patient sentences','Exercise · Symptoms','Teach · Ask the patient','Teach · Which test?')
+ARTMAP3={'🍱':'l3_f1_shared_lunch.jpg','👁️':'l3_f2_eyes_fine.jpg','💉':'l3_f3_vaccine_two.jpg','🤒':'l3_b1_fever.jpg','🌡️':'l3_b1_fever.jpg','🤕':'l3_b2_headache.jpg','😷':'l3_b3_cough.jpg','🔴':'l3_b4_rash.jpg','🥶':'l3_b5_chills.jpg','🧴':'l3_b6_itchy.jpg','🫨':'l3_b7_stiff.jpg','🍚':'l3_b8_no_appetite.jpg','🦟':'l3_c1_mosquito_bite.jpg','🩸':'l3_c2_blood_test.jpg','🫁':'l3_c3_chest_xray.jpg','💩':'l3_c4_stool_test.jpg','🧬':'l3_c5_urine_test.jpg'}
+_ART3=('Teach · Symptoms','Teach · Symptom sentences','Teach · More symptoms','Teach · More patient sentences','Exercise · Symptoms','Teach · Ask the patient','Teach · Which test?','Exercise · Hear the answer, pick the question','Exercise · Ruling out','Exercise · But · although · so')
 _s=700/1116.0
 def _rs(dx,dy,t): return dict(e='',x=int(243+dx*_s-56),y=int(dy*_s-56),t=t)
 ROOM3=[_rs(255,590,'A thermometer: 39.2 °C.'),_rs(395,690,'Paracetamol. Two tablets yesterday.'),_rs(1255,230,'A calendar. Days are crossed out.'),_rs(1740,430,'Her lunch. She did not eat much.'),_rs(1310,545,'A sleepy cat.'),_rs(700,1015,'A box of tissues. Used.'),_rs(640,490,'She looks hot and tired.')]
