@@ -46,7 +46,7 @@ def page4(idx,L=4):
 def teacher(L=4):
     FX=_m.FIX3 if L==3 else _m.FIX
     sec=''.join(f'<div class="g" style="color:{ORDER[i][2]}">Group {ORDER[i][1]}</div><div style="--c:{ORDER[i][2]}">{notes([f for f in FX if f["owner"]==ORDER[i][0]],L)}</div>' for i in range(4))
-    return f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fix the ward · teacher</title><style>{CSS}</style></head><body><div class="top"><h1 style="margin:0;font-size:26px">All 12 voice notes (teacher laptop)</h1></div>{sec}<script>{JS}</script></body></html>'
+    return f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{'Fix the ward' if L==4 else 'Voice-note hunt'} · teacher</title><style>{CSS}</style></head><body><div class="top"><h1 style="margin:0;font-size:26px">All 12 voice notes (teacher laptop)</h1></div>{sec}<script>{JS}</script></body></html>'
 import glob as _g
 for _f in _g.glob(os.path.join(out,'l4-*.html')): os.remove(_f)
 open(os.path.join(out,'l4-teacher.html'),'w').write(teacher())
