@@ -265,6 +265,8 @@ def room(d):
     o+='</div><div class="a rcap" style="left:90px;top:885px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:46px;height:56px;color:#1c1b2e"></div>'
     return o
 
+BUILD_EXT['room']=lambda d,sid=None: room(d)
+
 @module('qr_groups')
 def qr_groups(d):
     """{'phase','title','qrs':[data-uri x4],'cols':[colour x4]} four big group codes in a row"""
