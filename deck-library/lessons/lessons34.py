@@ -886,6 +886,7 @@ for d in L3:
         for _a,_b in (('It is dengue.','[[It is dengue.]]'),('for three days','for [[three days]]'),('on her arms and chest','on her [[arms and chest]]'),('Her platelets','Her [[platelets]]'),('lower than normal','[[lower than normal]]'),('bitten by mosquitoes','bitten by [[mosquitoes]]'),("It can't be flu, because she has no cough","It [[can't]] be flu, because she has [[no cough]]"),("It can't be appendicitis, because her belly does not hurt","It [[can't]] be appendicitis, because her belly does [[not hurt]]")):
             _rv=_rv.replace(_a,_b,1)
         d=dict(d,reveal=_r3.sub(r'\[\[(.+?)\]\]',r'<span class="ulw">\1</span>',_rv))
+    if lb=='Taboo for nurses' and _ex('l4_k1_taboo_words_only.jpg'): d=dict(d,introArt=ART+'l4_k1_taboo_words_only.jpg')  # same intro picture as L4 (no emoji monkey)
     if lb=='Everybody lies': d=_fm(d,{k_:v_ for k_,v_ in ARTMAP3.items() if k_ in ('🦟','😷','🔴')})
     if d['m']=='cover' and _ex('l3_a1_cover_stethoscope.jpg'): d=dict(d,cards=[dict(d['cards'][0],pic='l3_a1_cover_stethoscope.jpg'),dict(d['cards'][1],pic='l3_a2_cover_thermometer.jpg')])
     if d['m']=='room' and _ex('l3_a0_room.jpg'): d=dict(d,img='l3_a0_room.jpg',spots=ROOM3)
