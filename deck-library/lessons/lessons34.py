@@ -883,6 +883,8 @@ for d in L3:
     if d['m']=='room' and _ex('l3_a0_room.jpg'): d=dict(d,img='l3_a0_room.jpg',spots=ROOM3)
     _n3.append(d)
 L3=_n3
+# 18 Nov (Nick): cut p11 (numbers), p15 (How sure? exercise) and Everybody lies from L3
+L3=[d for d in L3 if d.get('label') not in ('Exercise · Listen and tick the numbers','Exercise · How sure?','Everybody lies')]
 # dial art + no-numbers flag for temperature (as L4)
 for d in L3:
     if d['m']=='dial' and d.get('label')=='Exercise · Higher or lower?':
