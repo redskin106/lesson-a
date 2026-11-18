@@ -878,6 +878,8 @@ _n3=[]
 for d in L3:
     lb=d.get('label')
     if lb in _ART3: d=_fm(d,ARTMAP3)
+    if lb=='Teach · Ask the patient' and d.get('pics'): d=dict(d,pic=d['pics'][0])  # no emoji flash before the art
+    if lb=="Teach · Might, can't, because": d=dict(d,pic='l3_c1_mosquito_bite.jpg')
     if lb=='Everybody lies': d=_fm(d,{k_:v_ for k_,v_ in ARTMAP3.items() if k_ in ('🦟','😷','🔴')})
     if d['m']=='cover' and _ex('l3_a1_cover_stethoscope.jpg'): d=dict(d,cards=[dict(d['cards'][0],pic='l3_a1_cover_stethoscope.jpg'),dict(d['cards'][1],pic='l3_a2_cover_thermometer.jpg')])
     if d['m']=='room' and _ex('l3_a0_room.jpg'): d=dict(d,img='l3_a0_room.jpg',spots=ROOM3)
