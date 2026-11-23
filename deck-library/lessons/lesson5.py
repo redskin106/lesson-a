@@ -124,6 +124,20 @@ RECAP=[
    dict(e='📝',t='Board notes',min='always',use='During Activate 1, write what they could not say. Use these for the Recap.')]),
 ]
 
+
+# ------------------------------------------------------------------ VARIANT: RPG Activate 2 (all four teams act in every scene)
+def sc(n,scene,problem,teams,after,**kw):
+    return dict(m='rpg_scene',phase='ACTIVATE',label=f'RPG scene {n} · {problem}',min=3.5,clock=CK['A2'],gear=4,num=n,scene=scene,problem=problem,teams=[dict(gear=g,eg=e) for g,e in teams],after=after,**kw)
+A2_RPG=[
+ dict(m='story',phase='ACTIVATE',label='Story · 11 pm outbreak',min=1,clock=CK['A2'],gear=4,role='Outbreak!',pics=['⛈️','🌑','🦠','🚨'],big='Outbreak!',lines=['Four teams. Four gears.','Number 1s speak first.']),
+ sc(1,'🌑','The lights go out.',[('schedule','We are meeting at the exit at midnight.'),('promise','I will find a torch.'),('trap','If the guard comes, we will hide.'),('excuse','We were going to use the lift, but the power is off.')],('🔦','Torch found. The crew moves.')),
+ sc(2,'🔒','The door is locked.',[('schedule','We are climbing through the window at 11:30.'),('promise','I will carry the ladder.'),('trap','If the window is stuck, we will break it.'),('excuse','We were going to use the key, but it is lost.')],('🪟','Through the window. One floor to go.')),
+ sc(3,'🚨','The alarm rings.',[('schedule','We are running to the stairs now.'),('promise','I will turn off the alarm.'),('trap','If the doctors come, we will say we are cleaning.'),('excuse','We were going to be quiet, but the alarm is so loud.')],('🤫','Alarm off. Nobody saw a thing.')),
+ sc(4,'🩹','Someone has symptoms.',[('schedule','We are checking everyone at 10:45.'),('promise','I will ask the pharmacist.'),('trap','If it is contagious, we will quarantine them.'),('excuse','We were going to leave, but one is sick.')],('🧟','The pharmacist! Alone at 10:45. Bitten.')),
+ dict(m='reveal',phase='ACTIVATE',label='Reveal · the bitten one',min=1,clock=CK['A2'],gear=4,title='Who is bitten?',pic='🧑‍⚕️',answer='Pharmacist',grad='rose',note='Alone at 10:45. A bandage on one hand. Remember the picture at 7 pm? 🩹'),
+]
+L5_RPG=ENGAGE+A1+STUDY+A2_RPG+RECAP
+
 L5=ENGAGE+A1+STUDY+A2+RECAP
 
 # ------------------------------------------------------------------ printable cards
@@ -141,6 +155,7 @@ if __name__=='__main__':
     install_chrome()
     out=HERE.parent.parent/'lessons-5'; out.mkdir(exist_ok=True)
     print(build_interactive(L5,str(out/'lesson5_v1.html'),title='SkillsXLab · Lesson 5 · The Night Shift (grey box)'))
+    print(build_interactive(L5_RPG,str(out/'lesson5_rpg_v1.html'),title='SkillsXLab · Lesson 5 · The Night Shift (RPG Activate 2)'))
     a1,a2=_cards()
     print(cards_page(a1,'L5 mingle cards · round 1',str(out/'lesson5_cards_round1.html')))
     print(cards_page(a2,'L5 mingle cards · round 2',str(out/'lesson5_cards_round2.html')))

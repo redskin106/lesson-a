@@ -138,6 +138,28 @@ def excuse_pp(d):
     o+=_timer(int(d.get('sec',4)),720,adj=False,w=420)
     return o
 
+
+TEAMC=['#e0304a','#2a6ae0','#10a98d','#e89200']
+FRAMES={'schedule':[('c1','We'),('c2','are …ing'),('c3','at …')],'promise':[('c1','I'),('c2','will'),('c3','…')],'trap':[('c4','If'),('c1','…,'),('c2',"we'll"),('c3','…')],'excuse':[('c1','We'),('c2','were going to'),('c3','…'),('c4','but…')]}
+@module('rpg_scene')
+def rpg_scene(d):
+    """One RPG scene, ALL four teams act. scene=emoji, problem=text, num=scene number (= which seat number speaks),
+    teams=[{'gear':'schedule|promise|trap|excuse','eg':'sample answer (teacher)'}] x4, after=(emoji,line) consequence."""
+    o=header(d['phase'],d.get('role',f'Scene {d["num"]}'),'rose')
+    o+=stp(glass(90,185,640,675,f'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:0 30px;box-sizing:border-box"><div style="font-size:290px;line-height:1">{d["scene"]}</div><div style="font-family:O;font-weight:800;font-size:50px;text-align:center;line-height:1.1;color:#1c1b2e">{d["problem"]}</div></div>',r=60),1)
+    gi={g:e for e,g in GEARS}
+    for k,t in enumerate(d['teams']):
+        x=770+(k%2)*540; y=185+(k//2)*345
+        frame=''.join(ch(c,tx,34,'4px 16px') for c,tx in FRAMES[t['gear']])
+        eg=f'<div data-s="6" class="sh" style="font-family:P;font-weight:600;font-size:30px;color:#0b6b55;line-height:1.2;margin-top:12px">e.g. {t["eg"]}</div>'
+        body=(f'<div style="padding:22px 26px;box-sizing:border-box;height:100%"><div style="display:flex;align-items:center;gap:16px"><span style="width:46px;height:46px;border-radius:14px;background:{TEAMC[k]}"></span><span style="font-size:66px;line-height:1">{gi[t["gear"]]}</span>'
+              f'<span style="margin-left:auto;font-family:O;font-weight:800;font-size:34px;color:#fff;padding:4px 20px;border-radius:999px;background:{TEAMC[k]}">#{d["num"]} speaks</span></div>'
+              f'<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px">{frame}</div>{eg}</div>')
+        o+=stp(glass(x,y,520,330,body,r=44),2+k)
+    e,l=d['after']
+    o+=stp(f'<div class="gl" style="left:90px;top:885px;width:1740px;height:105px;border-radius:52px;display:flex;align-items:center;gap:30px;padding:0 44px;box-sizing:border-box"><span style="font-size:70px;line-height:1">{e}</span><span style="font-family:O;font-weight:800;font-size:44px;color:#1c1b2e">{l}</span></div>',7)
+    return o
+
 # ---------------- printable cards (A4, 2 x 4 per page, cut lines) ----------------
 def cards_page(cards,title,out):
     """cards=[{'who':emoji,'rows':[(label,emoji)],'foot':text}] -> standalone printable html"""
