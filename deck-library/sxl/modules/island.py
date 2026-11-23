@@ -25,8 +25,9 @@ def item_pick(d):
         star='<span style="position:absolute;right:14px;top:8px;font-size:40px">⭐</span>' if d.get('star')==i else ''
         o+=stp(f'<div class="gl ipk" data-i="{i}" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">{star}<span style="font-size:108px;line-height:1.05;height:112px;display:flex;align-items:center">{emo(e)}</span><span style="font-family:O;font-weight:800;font-size:28px;color:#1c1b2e;white-space:nowrap">{n}</span></div>',2)
     sec=int(d.get('sec',240))
-    o+=stp(f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:690px;width:400px;text-align:center;font-family:O;font-weight:800;font-size:120px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',3)
+    o+=stp(f'<div class="a tclock" data-sec="{sec}" data-step="60" data-min="60" style="left:90px;top:690px;width:400px;text-align:center;font-family:O;font-weight:800;font-size:120px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',3)
     o+=stp(f'<div class="a tstart" style="left:510px;top:702px;width:140px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="46" height="46" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>',3)
+    o+=stp(ADJ(220,830,60),3)
     rp=''.join(f'<div class="ipr{" on" if k==0 else ""}" data-cap="{cap}" data-ban="{ban}" data-p="{(d.get('prompts') or ['']*9)[k]}" style="display:flex;align-items:center;gap:14px;padding:8px 34px;border-radius:999px;background:rgba(255,255,255,.8);border:4px solid #fff;font-family:O;font-weight:800;font-size:40px;color:#1c1b2e;cursor:pointer;box-shadow:0 8px 18px rgba(80,60,160,.14)"><span style="color:#6a35e8">{k+1}</span>{t}</div>' for k,(t,cap,ban) in enumerate(d['rounds']))
     o+=stp(f'<div class="a" style="left:690px;top:870px;width:1140px;display:flex;gap:18px;justify-content:center">{rp}</div>',4)
     return o
@@ -55,8 +56,8 @@ def next_event(d):
         return (f'<div class="gl nxs {cls}" style="left:950px;top:{y}px;width:880px;height:{h}px;border-radius:50px">'
                 f'<span style="position:absolute;left:26px;top:{h//2-45}px;width:90px;height:90px;border-radius:50%;{GR};display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:52px">{n}</span>'
                 f'<span style="position:absolute;left:136px;top:{h//2-42}px;font-size:84px;line-height:1">{e}</span>{inner}</div>')
-    tm=(f'<div class="a tclock" data-sec="{sec}" style="left:270px;top:22px;width:330px;text-align:center;font-family:O;font-weight:800;font-size:120px;line-height:1"><span class="grad">0:{sec:02d}</span></div>'
-        f'<div class="a tstart" style="left:650px;top:34px;width:140px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="46" height="46" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>')
+    tm=(f'<div class="a tclock" data-sec="{sec}" data-step="15" data-min="15" style="left:250px;top:22px;width:300px;text-align:center;font-family:O;font-weight:800;font-size:120px;line-height:1"><span class="grad">0:{sec:02d}</span></div>'
+        f'<div class="a tstart" style="left:565px;top:34px;width:120px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="46" height="46" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>'+ADJ(700,38,15).replace('width:96px','width:70px').replace('left:700px','left:700px').replace('left:808px','left:778px'))
     o+=stepbox(320,160,1,'🗣️',tm,'sA')
     fr=ch('c4','If we had …,',30,'4px 14px')+ch('c1','we would …',30,'4px 14px')+ch('c2','because …',30,'4px 14px')
     dots=''.join(f'<span class="nxd1" style="width:76px;height:76px;border-radius:50%;background:{TEAMC[k]};opacity:.3;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:42px;color:#fff;cursor:pointer;user-select:none">{k+1}</span>' for k in range(4))
@@ -93,8 +94,13 @@ def rule(d):
     return o
 
 
-TIMER=lambda sec,x,y,st:(stp(f'<div class="a tclock" data-sec="{sec}" style="left:{x}px;top:{y}px;width:400px;text-align:center;font-family:O;font-weight:800;font-size:100px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',st)
-    +stp(f'<div class="a tstart" style="left:{x+420}px;top:{y+6}px;width:130px;height:96px;border-radius:48px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="44" height="44" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>',st))
+def ADJ(x,y,step=60):
+    lab=lambda sg:('+' if sg>0 else '−')+(str(step//60) if step%60==0 else str(step))
+    return ''.join(f'<div class="a tadj" data-d="{sg}" style="left:{x+k*108}px;top:{y}px;width:96px;height:84px;border-radius:42px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.88);border:4px solid #fff;color:#6a35e8;font-family:O;font-weight:800;font-size:36px;box-shadow:0 8px 18px rgba(80,60,160,.16);cursor:pointer;user-select:none">{lab(sg)}</div>' for k,sg in enumerate((-1,1)))
+def TIMER(sec,x,y,st,step=60):
+    return (stp(f'<div class="a tclock" data-sec="{sec}" data-step="{step}" data-min="{step}" style="left:{x}px;top:{y}px;width:400px;text-align:center;font-family:O;font-weight:800;font-size:100px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',st)
+    +stp(f'<div class="a tstart" style="left:{x+420}px;top:{y+6}px;width:130px;height:96px;border-radius:48px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="44" height="44" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>',st)
+    +stp(ADJ(x+570,y+12,step),st))
 CHIP='display:flex;align-items:center;gap:14px;padding:10px 30px;border-radius:999px;background:rgba(255,255,255,.88);border:4px solid #fff;font-family:O;font-weight:800;font-size:38px;white-space:nowrap;color:#1c1b2e;box-shadow:0 8px 18px rgba(80,60,160,.14)'
 
 
@@ -123,20 +129,20 @@ def castaway_taboo(d):
     o=header(d['phase'],d.get('role','Castaway Taboo'),'amber')+NOFIT
     if mk=='make':
         card='<div style="width:330px;height:420px;border-radius:36px;background:#fff;border:6px solid #ff9f1c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transform:rotate(-4deg);box-shadow:0 16px 30px rgba(80,60,160,.25)"><div style="font-size:120px;line-height:1">❓</div><div style="font-family:O;font-weight:800;font-size:34px;color:#1c1b2e;border-bottom:5px solid #1c1b2e;width:220px;height:46px"></div>'+''.join('<div style="display:flex;gap:12px;align-items:center"><span style="font-size:44px">🚫</span><span style="width:190px;height:6px;background:#bbb;border-radius:3px"></span></div>' for _ in range(3))+'</div>'
-        o+=stp(glass(90,185,560,640,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">'+card+'<div style="font-size:90px;line-height:1">✏️ ×3</div></div>',r=60),1)
-        W=d['words']; w=190; h=176; g=14
+        o+=stp(glass(90,185,560,765,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">'+card+'<div style="font-size:90px;line-height:1">✏️ ×3</div></div>',r=60),1)
+        W=d['words']; w=214; h=222; g=16
         for i,(e,n) in enumerate(W):
             x=690+(i%5)*(w+g); y=185+(i//5)*(h+g)
-            o+=stp(f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:40px;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:92px;line-height:1.05">{emo(e)}</span><span style="font-family:O;font-weight:800;font-size:26px;color:#1c1b2e">{n}</span></div>',2)
-        o+=stp(f'<div class="a" style="left:690px;top:590px;width:1140px;display:flex;gap:14px;justify-content:center"><div style="{CHIP}"><span style="color:#6a35e8">1</span>✏️ one word</div><div style="{CHIP}"><span style="color:#6a35e8">2</span>🚫 three banned</div><div style="{CHIP}"><span style="color:#6a35e8">3</span>🃏 three cards</div></div>',3)
-        o+=TIMER(int(d.get('sec',240)),690,700,4)
+            o+=stp(f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff"><span style="font-size:118px;line-height:1.05;height:124px;display:flex;align-items:center">{emo(e)}</span><span style="font-family:O;font-weight:800;font-size:30px;color:#1c1b2e">{n}</span></div>',2)
+        o+=stp(f'<div class="a" style="left:690px;top:700px;width:1140px;display:flex;gap:18px;justify-content:center"><div style="{CHIP}"><span style="color:#6a35e8">1</span>✏️ one word</div><div style="{CHIP}"><span style="color:#6a35e8">2</span>🚫 three banned</div><div style="{CHIP}"><span style="color:#6a35e8">3</span>🃏 three cards</div></div>',3)
+        o+=TIMER(int(d.get('sec',240)),780,830,4)
         return o
-    o+=stp(glass(90,185,560,640,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><div style="font-size:120px;line-height:1;white-space:nowrap">🃏➡️👥</div><div style="font-size:120px;line-height:1">🔄</div><div style="font-size:90px;line-height:1;white-space:nowrap">🗣️👂👂👂</div></div>',r=60),1)
+    o+=stp(glass(90,185,560,765,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px"><div style="font-size:120px;line-height:1;white-space:nowrap">🃏➡️👥</div><div style="font-size:120px;line-height:1">🔄</div><div style="font-size:90px;line-height:1;white-space:nowrap">🗣️👂👂👂</div></div>',r=60),1)
     F=d['frames']
-    o+=stp(f'<div class="a" style="left:690px;top:185px;width:1140px;display:flex;flex-direction:column;gap:16px;align-items:stretch">'+''.join(f'<div style="{CHIP};font-size:46px;justify-content:center"><span style="font-size:56px">{e}</span>{t}</div>' for e,t in F)+'</div>',2)
+    o+=stp(f'<div class="a" style="left:690px;top:185px;width:1140px;display:flex;flex-direction:column;gap:22px;align-items:stretch">'+''.join(f'<div style="{CHIP};font-size:46px;justify-content:center;padding:18px 30px"><span style="font-size:60px">{e}</span>{t}</div>' for e,t in F)+'</div>',2)
     G=int(d.get('goal',12))
-    o+=stp(f'<div class="a" style="left:690px;top:520px;width:1140px;display:flex;align-items:center;justify-content:center;gap:34px"><div class="tbm" style="width:130px;height:130px;border-radius:65px;display:flex;align-items:center;justify-content:center;font-size:70px;color:#fff;cursor:pointer;{GR}">−</div><div class="tbc" data-goal="{G}" style="font-family:O;font-weight:800;font-size:110px;color:#1c1b2e;min-width:520px;text-align:center">✅ 0 / {G}</div><div class="tbp" style="width:130px;height:130px;border-radius:65px;display:flex;align-items:center;justify-content:center;font-size:76px;color:#fff;cursor:pointer;{GR}">+</div></div>',3)
-    o+=TIMER(int(d.get('sec',360)),690,700,4)
+    o+=stp(f'<div class="a" style="left:690px;top:625px;width:1140px;display:flex;align-items:center;justify-content:center;gap:34px"><div class="tbm" style="width:130px;height:130px;border-radius:65px;display:flex;align-items:center;justify-content:center;font-size:70px;color:#fff;cursor:pointer;{GR}">−</div><div class="tbc" data-goal="{G}" style="font-family:O;font-weight:800;font-size:110px;color:#1c1b2e;min-width:520px;text-align:center">✅ 0 / {G}</div><div class="tbp" style="width:130px;height:130px;border-radius:65px;display:flex;align-items:center;justify-content:center;font-size:76px;color:#fff;cursor:pointer;{GR}">+</div></div>',3)
+    o+=TIMER(int(d.get('sec',360)),780,810,4)
     return o
 
 
@@ -152,7 +158,7 @@ def if_chain(d):
     sl=''.join(f'<div class="icl" style="width:112px;height:112px;border-radius:30px;background:rgba(255,255,255,.55);border:4px dashed #b9b2e8;display:flex;align-items:center;justify-content:center;font-size:62px;opacity:.55">{"🏠" if i==G-1 else "·"}</div>' for i in range(G))
     o+=stp(f'<div class="a icg" data-goal="{G}" style="left:90px;top:640px;width:1740px;display:flex;gap:14px;justify-content:center">{sl}</div>',3)
     o+=stp(f'<div class="a icr" style="left:90px;top:770px;width:1740px;display:flex;gap:26px;justify-content:center"><div class="icn" style="{CHIP};cursor:pointer;font-size:46px">🎲 New start</div><div class="icb" style="width:380px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:46px;color:#fff;cursor:pointer;{GR}">🔗 Next link ▶</div><div class="icx" style="{CHIP};cursor:pointer;font-size:46px">↩️ Dropped</div></div>',4)
-    o+=TIMER(int(d.get('sec',240)),700,880,5)
+    o+=TIMER(int(d.get('sec',240)),700,895,5)
     return o
 
 
