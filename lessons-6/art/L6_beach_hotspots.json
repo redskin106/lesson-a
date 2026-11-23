@@ -1,7 +1,79 @@
-{"size":[1024,765],"note":"boxes x0,y0,x1,y1 in picture pixels; differences between before and after","diffs":[
-{"id":"tent","what":"The tent is gone.","box":[258,283,545,450]},
-{"id":"canoe","what":"The canoe is upside down.","box":[675,335,965,500]},
-{"id":"fire","what":"The fire is out.","box":[495,390,660,535]},
-{"id":"crate","what":"There is a crate.","box":[738,445,860,570]},
-{"id":"bucket","what":"The bucket is on its side.","box":[133,554,309,687]},
-{"id":"gull","what":"One gull is gone.","box":[676,64,730,92]}]}
+{
+ "size": [
+  1024,
+  765
+ ],
+ "note": "boxes x0,y0,x1,y1 in picture pixels; differences between before and after",
+ "diffs": [
+  {
+   "id": "tent",
+   "what": "The tent is gone.",
+   "box": [
+    258,
+    283,
+    545,
+    450
+   ]
+  },
+  {
+   "id": "canoe",
+   "what": "The canoe is upside down.",
+   "box": [
+    675,
+    335,
+    965,
+    500
+   ]
+  },
+  {
+   "id": "fire",
+   "what": "The fire is out.",
+   "box": [
+    495,
+    390,
+    660,
+    535
+   ]
+  },
+  {
+   "id": "crate",
+   "what": "There is a crate.",
+   "box": [
+    738,
+    445,
+    860,
+    570
+   ]
+  },
+  {
+   "id": "bucket",
+   "what": "The bucket is on its side.",
+   "box": [
+    133,
+    554,
+    309,
+    687
+   ]
+  },
+  {
+   "id": "gull",
+   "what": "One gull is gone.",
+   "box": [
+    676,
+    64,
+    730,
+    92
+   ]
+  },
+  {
+   "id": "coconut",
+   "what": "There is one coconut, not three.",
+   "box": [
+    315,
+    98,
+    403,
+    184
+   ]
+  }
+ ]
+}

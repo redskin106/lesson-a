@@ -30,7 +30,7 @@ ENGAGE=[
  dict(m='story',phase='ENGAGE',label='Cold open · storm and wreck',min=1,role='Last night',pics=['⛈️','🚢','🌊','🏝️'],big='Washed ashore.',lines=['The ship sank in the storm.','Sixteen people reached the island.','The supply boat passes once.','At sunset.'],**C('E')),
  dict(m='teach',phase='ENGAGE',label='Words · stranded rescue shipwreck',min=1.5,role='Three words',words=[('🏝️','stranded'),('🚁','rescue'),('🚢','shipwreck')],**C('E')),
  dict(m='spot_art',phase='ENGAGE',label='Spot what changed · the beach',min=2,role='Look. What changed after the storm?',before='L6_beach_before.png',after='L6_beach_after.png',
-      hot=[('The tent is gone!',(258,283,545,450)),('The canoe is upside down.',(675,335,965,500)),('The fire is out.',(495,390,660,535)),('There is a crate.',(738,445,860,570)),('The bucket is on its side.',(133,554,309,687)),('One gull is gone.',(676,64,730,92))],**C('E')),
+      hot=[('The tent is gone!',(258,283,545,450)),('The canoe is upside down.',(675,335,965,500)),('The fire is out.',(495,390,660,535)),('There is a crate.',(738,445,860,570)),('The bucket is on its side.',(133,554,309,687)),('One gull is gone.',(676,64,730,92)),('There is one coconut, not three.',(315,98,403,184))],**C('E')),
 ]
 
 # 15 items: survival, comfort, one phone (for the "no phone" round), one absurd item (piano, starred)
