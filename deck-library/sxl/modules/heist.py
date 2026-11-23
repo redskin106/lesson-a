@@ -18,10 +18,10 @@ GEARS=[('🗓️','schedule'),('🤝','promise'),('🪤','trap'),('🧯','excuse
 def chrome(d):
     o=''
     if d.get('clock'):
-        o+=f'<div class="a chrome hclk" style="right:330px;top:54px"><span>🕰️</span> {d["clock"]}</div>'
+        o+=f'<div class="a chrome hclk" style="right:330px;top:54px"><span>{d.get("cicon","🕰️")}</span> {d["clock"]}</div>'
     if d.get('gear') is not None:
         n=d['gear']
-        cells=''.join(f'<span class="hg{" on" if i<n else ""}{" nw" if d.get("gear_new") and i==n-1 else ""}">{e}</span>' for i,(e,_) in enumerate(GEARS))
+        cells=''.join(f'<span class="hg{" on" if i<n else ""}{" nw" if d.get("gear_new") and i==n-1 else ""}">{e}</span>' for i,(e,_) in enumerate(d.get('gset') or GEARS))
         o+=f'<div class="a chrome hgear" style="left:430px;top:1006px">{cells}</div>'
     return o
 
