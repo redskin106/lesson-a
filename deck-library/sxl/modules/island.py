@@ -88,6 +88,52 @@ def rule(d):
     return o
 
 
+TIMER=lambda sec,x,y,st:(stp(f'<div class="a tclock" data-sec="{sec}" style="left:{x}px;top:{y}px;width:400px;text-align:center;font-family:O;font-weight:800;font-size:100px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',st)
+    +stp(f'<div class="a tstart" style="left:{x+420}px;top:{y+6}px;width:130px;height:96px;border-radius:48px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="44" height="44" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>',st))
+CHIP='display:flex;align-items:center;gap:14px;padding:10px 30px;border-radius:999px;background:rgba(255,255,255,.88);border:4px solid #fff;font-family:O;font-weight:800;font-size:38px;white-space:nowrap;color:#1c1b2e;box-shadow:0 8px 18px rgba(80,60,160,.14)'
+
+
+@module('castaway_taboo')
+def castaway_taboo(d):
+    """Castaway Taboo, made by the teams. mode='make': each team writes 3 paper cards (word + 3 banned words). mode='play': swap cards, one describer, words only; shared counter to goal.
+    words = ideas [(emoji,name)], frames = describer starters, goal = shared cards to guess."""
+    mk=d.get('mode','make')
+    o=header(d['phase'],d.get('role','Castaway Taboo'),'amber')+NOFIT
+    if mk=='make':
+        card='<div style="width:330px;height:420px;border-radius:36px;background:#fff;border:6px solid #ff9f1c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transform:rotate(-4deg);box-shadow:0 16px 30px rgba(80,60,160,.25)"><div style="font-size:120px;line-height:1">❓</div><div style="font-family:O;font-weight:800;font-size:34px;color:#1c1b2e;border-bottom:5px solid #1c1b2e;width:220px;height:46px"></div>'+''.join('<div style="display:flex;gap:12px;align-items:center"><span style="font-size:44px">🚫</span><span style="width:190px;height:6px;background:#bbb;border-radius:3px"></span></div>' for _ in range(3))+'</div>'
+        o+=stp(glass(90,185,560,640,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">'+card+'<div style="font-size:90px;line-height:1">✏️ ×3</div></div>',r=60),1)
+        W=d['words']; w=190; h=176; g=14
+        for i,(e,n) in enumerate(W):
+            x=690+(i%5)*(w+g); y=185+(i//5)*(h+g)
+            o+=stp(f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:40px;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:92px;line-height:1.05">{e}</span><span style="font-family:O;font-weight:800;font-size:26px;color:#1c1b2e">{n}</span></div>',2)
+        o+=stp(f'<div class="a" style="left:690px;top:590px;width:1140px;display:flex;gap:14px;justify-content:center"><div style="{CHIP}"><span style="color:#6a35e8">1</span>✏️ one word</div><div style="{CHIP}"><span style="color:#6a35e8">2</span>🚫 three banned</div><div style="{CHIP}"><span style="color:#6a35e8">3</span>🃏 three cards</div></div>',3)
+        o+=TIMER(int(d.get('sec',240)),690,700,4)
+        return o
+    o+=stp(glass(90,185,560,640,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><div style="font-size:120px;line-height:1;white-space:nowrap">🃏➡️👥</div><div style="font-size:120px;line-height:1">🔄</div><div style="font-size:90px;line-height:1;white-space:nowrap">🗣️👂👂👂</div></div>',r=60),1)
+    F=d['frames']
+    o+=stp(f'<div class="a" style="left:690px;top:185px;width:1140px;display:flex;flex-direction:column;gap:16px;align-items:stretch">'+''.join(f'<div style="{CHIP};font-size:46px;justify-content:center"><span style="font-size:56px">{e}</span>{t}</div>' for e,t in F)+'</div>',2)
+    G=int(d.get('goal',12))
+    o+=stp(f'<div class="a" style="left:690px;top:520px;width:1140px;display:flex;align-items:center;justify-content:center;gap:34px"><div class="tbm" style="width:130px;height:130px;border-radius:65px;display:flex;align-items:center;justify-content:center;font-size:70px;color:#fff;cursor:pointer;{GR}">−</div><div class="tbc" data-goal="{G}" style="font-family:O;font-weight:800;font-size:110px;color:#1c1b2e;min-width:520px;text-align:center">✅ 0 / {G}</div><div class="tbp" style="width:130px;height:130px;border-radius:65px;display:flex;align-items:center;justify-content:center;font-size:76px;color:#fff;cursor:pointer;{GR}">+</div></div>',3)
+    o+=TIMER(int(d.get('sec',360)),690,700,4)
+    return o
+
+
+@module('if_chain')
+def if_chain(d):
+    """If-Chain: a ball passes round the team; each person says a result and the next starts from it. Teacher taps +link per correct link.
+    starters = [(emoji, sentence)], goal = links to get home."""
+    o=header(d['phase'],d.get('role','If-Chain'),'amber')+NOFIT
+    S=d['starters']; G=int(d.get('goal',12))
+    o+=f'<div class="icd" style="display:none">{_h.escape(json.dumps(S))}</div>'
+    o+=stp(f'<div class="gl icard" style="left:90px;top:185px;width:700px;height:430px;border-radius:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;box-sizing:border-box"><div class="ice" style="font-size:190px;line-height:1">🎲</div><div class="ict" style="font-family:O;font-weight:800;font-size:50px;text-align:center;color:#1c1b2e;line-height:1.15">Press 🎲 to start</div></div>',1)
+    o+=stp(f'<div class="a" style="left:830px;top:185px;width:1000px;display:flex;flex-direction:column;gap:14px"><div style="{CHIP};justify-content:center"><span style="font-size:52px">⚽</span>If I … , I would …</div><div style="{CHIP};justify-content:center"><span style="font-size:52px">🔗</span>If I did that, I would …</div></div>',2)
+    sl=''.join(f'<div class="icl" style="width:112px;height:112px;border-radius:30px;background:rgba(255,255,255,.55);border:4px dashed #b9b2e8;display:flex;align-items:center;justify-content:center;font-size:62px;opacity:.55">{"🏠" if i==G-1 else "·"}</div>' for i in range(G))
+    o+=stp(f'<div class="a icg" data-goal="{G}" style="left:90px;top:640px;width:1740px;display:flex;gap:14px;justify-content:center">{sl}</div>',3)
+    o+=stp(f'<div class="a icr" style="left:90px;top:770px;width:1740px;display:flex;gap:26px;justify-content:center"><div class="icn" style="{CHIP};cursor:pointer;font-size:46px">🎲 New start</div><div class="icb" style="width:380px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:46px;color:#fff;cursor:pointer;{GR}">🔗 Next link ▶</div><div class="icx" style="{CHIP};cursor:pointer;font-size:46px">↩️ Dropped</div></div>',4)
+    o+=TIMER(int(d.get('sec',240)),700,880,5)
+    return o
+
+
 EXT_CSS.append("""
 .ipk.sel{box-shadow:0 0 0 10px #ff9f1c!important;background:rgba(255,236,190,.95)!important}.ipk.sel:after{content:"✔";position:absolute;right:12px;top:4px;font-size:40px;color:#10a98d}
 .ipk.off{opacity:.25;filter:grayscale(1);pointer-events:none}
@@ -131,4 +177,19 @@ document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!
   $('.nxbk',s).onclick=function(ev){ev.stopPropagation();if(ph>0){phase(ph-1);if(ph===0){steps.forEach(function(x){x.classList.remove('cur')});btn.textContent=LAB[0]}P('tick')}else if(ix>-1){ix--;show();if(ix>=0)phase(3)}};
   s.__nxdeck=deck;s.__nxix=function(){return ix};show()}
  var iv=setInterval(function(){$$('.sl').forEach(setup)},400);})();
+
+document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!s)return;
+ var c=$('.tbc',s);
+ if(c){var pl=e.target.closest('.tbp'),mi=e.target.closest('.tbm');
+  if(pl||mi){var g=+c.dataset.goal,n=Math.max(0,Math.min(g,(+c.dataset.n||0)+(pl?1:-1)));c.dataset.n=n;
+   c.textContent=n>=g?'⛵ '+n+' / '+g:'✅ '+n+' / '+g;P(n>=g?'good':pl?'pop':'tick');e.stopPropagation();return}}
+ var ic=$('.icg',s);
+ if(ic){var G=+ic.dataset.goal,ls=$$('.icl',s);s.__n=s.__n||0;
+  function paint(){ls.forEach(function(x,i){var on=i<s.__n;x.style.opacity=on||i===G-1?1:.55;x.style.background=on?'#fff':'rgba(255,255,255,.55)';x.style.border=on?'4px solid #2bd9b6':'4px dashed #b9b2e8';x.textContent=i===G-1?'🏠':on?'🔗':'·'});
+   if(s.__n>=G-1){$('.ict',s).textContent='🏠 Home! The chain saved us.';$('.ice',s).textContent='⛵'}}
+  if(e.target.closest('.icb')){if(s.__n<G-1){s.__n++;P('pop')}else P('good');paint();e.stopPropagation();return}
+  if(e.target.closest('.icx')){s.__n=Math.max(0,s.__n-1);paint();P('boop');e.stopPropagation();return}
+  if(e.target.closest('.icn')){var D=JSON.parse($('.icd',s).textContent);s.__st=s.__st||D.slice().sort(function(){return Math.random()-.5});var k=s.__st.shift();if(!k){s.__st=D.slice().sort(function(){return Math.random()-.5});k=s.__st.shift()}
+   $('.ice',s).textContent=k[0];$('.ict',s).textContent=k[1];if(s.__treset)s.__treset();P('pop');e.stopPropagation();return}}
+},true);
 """)

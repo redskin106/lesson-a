@@ -138,10 +138,20 @@ RECAP=[
    dict(e='📵',t='No phones',min='swap',use='Print the 15 item cards, pairs choose on paper.'),
    dict(e='⏱️',t='Running long',min='-4 min',use='Skip Block 5 and the first-conditional review. Use 3 event rounds.'),
    dict(e='⏩',t='Running short',min='+4 min',use='Do the optional stretch block. Draw a 5th event round.'),
+   dict(e='🃏',t='Games (optional)',min='+4 to +10',use='Castaway Taboo (teams make cards, then play) before What next? · If-Chain as the last 4 minutes. Swap in for the optional block.'),
    dict(e='📝',t='Board notes',min='always',use='During Activate 1, write what they could not say. Use these for the Recap.')]),
 ]
 
-L6=ENGAGE+A1+STUDY+A2+RECAP
+GAMES=[
+ dict(m='castaway_taboo',mode='make',phase='ACTIVATE',label='Game · Castaway Taboo 1: make the cards',min=4,optional=True,role='Castaway Taboo · make',
+      words=[('🔦','flashlight'),('🪢','rope'),('🔥','matches'),('💧','water'),('🥫','tinned food'),('🪞','mirror'),('⛺','tent'),('🎣','fishing rod'),('🩹','first-aid kit'),('📻','radio')],sec=240,**C('A2',4)),
+ dict(m='castaway_taboo',mode='play',phase='ACTIVATE',label='Game · Castaway Taboo 2: swap and play',min=6,optional=True,role='Castaway Taboo · play',
+      frames=[('🗣️','You use it to …'),('🏝️','On an island, it would help us …'),('🔍','You find it in / on / near …')],goal=12,sec=360,**C('A2',4)),
+ dict(m='if_chain',phase='RECAP',label='Game · If-Chain',min=4,optional=True,role='If-Chain',goal=12,sec=240,
+      starters=[('🚤','If I had a boat, I would sail home.'),('📻','If I had a radio, I would call for help.'),('🔥','If we had matches, we would make a fire.'),('🦈','If I saw a shark, I would stay on the raft.'),('🌧️','If it rained, I would collect water.'),('🍍','If I were hungry, I would catch a fish.')],**C('R',4)),
+]
+
+L6=ENGAGE+A1+STUDY+A2[:1]+GAMES[:2]+A2[1:]+GAMES[2:]+RECAP
 
 if __name__=='__main__':
     install_chrome()
