@@ -241,7 +241,8 @@ def pairs(d):
     """Tap a clue, then its sentence. {'phase','title','pairs':[(clue,sentence)],'hint'}"""
     import random
     Pr=d['pairs']; n=len(Pr); o=header(d['phase'],d.get('title','Match'),'violet'); h=int((680-18*(n-1))/n)
-    order=list(range(n)); random.Random(len(d.get('title',''))+n).shuffle(order)
+    order=list(range(n)); _r=random.Random(len(d.get('title',''))+n); _r.shuffle(order)
+    while n>1 and any(order[k]==k for k in range(n)): _r.shuffle(order)
     PO=bool(d.get('picOnly')); PW=520
     for i,(c_,s_) in enumerate(Pr):
         o+=f'<div class="ptl gl" data-i="{i}" style="left:90px;top:{190+i*(h+18)}px;width:{PW if PO else 860}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;{"justify-content:center;" if PO else ""}padding:0 {10 if PO else 36}px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;line-height:1.2;background:{"#fff;border:6px solid #ffd978" if PO else "linear-gradient(135deg,#fff3c4,#ffe7a8)"}">{(f'<span style="font-size:{h-44}px;line-height:1">{emo(c_.split(" ",1)[0])}</span>' if PO else _bp(c_,d,110,34))}</div>'

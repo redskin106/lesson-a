@@ -38,7 +38,7 @@ ITEMS=[('L6_flashlight.png','flashlight'),('L6_rope.png','rope'),('L6_matches.pn
 A1=[
  dict(m='story',phase='ACTIVATE',label='Story · 4:30 pm the question',min=.5,role='Before the storm',pics=['L6_sc_bags.png','L6_backpack.png','❓'],big='What would you bring?',lines=['A trip to an island.'],**C('A1',0)),
  dict(m='item_pick',phase='ACTIVATE',label='What would you bring and why',min=8.5,role='Tell your partner. What would you bring?',items=ITEMS,
-      rounds=[('Choose 3',3,-1),('No phone',3,11),('Keep 1',1,-1)],star=14,sec=240,**C('A1',0)),
+      rounds=[('Choose 3',3,-1),('No phone',3,11),('Keep 1',1,-1)],prompts=['What would you bring? Why?','No phone! What now? Why?','Only one. Which? Why?'],star=14,sec=240,**C('A1',0)),
 ]
 
 STUDY=[
@@ -107,7 +107,8 @@ STUDY=[
  rule('What would you do if',3,role='The rule',tag=('❓','Ask about an imagined situation','imag'),
       formula=[('c4','What'),('c2','would'),('c1','you'),('c3','do'),('c4','if you + past simple?')],
       why=[('❓','We ask what a person would do in an imagined situation.'),('🗣️','We answer: I would + verb.')],pic='🐒',
-      eg=[('🐒','What would you do if you saw a monkey?'),('🍌','I would give it a banana.')]),
+      eg=[('🐒','What would you do if you saw a monkey? I would give it a banana.')],
+      prompts=[('L6_p_hungry.png','if you were hungry?'),('L6_ev_shark_raft.png','if you saw a shark?'),('L6_p_cold.png','if you were cold?')]),
  rec('What would you do if','Ask and answer.',
    [Q('L6_snake.png','___ would you do if you saw a snake?','What','Who'),
     Q('L6_ev_rain_fire.png','What would you ___ if it rained all day?','do','did'),
@@ -118,9 +119,9 @@ STUDY=[
    [Q('L6_helicopter.png','Choose the best question.','What would you do if a helicopter flew over us?','What would you do if a helicopter will fly over us?','What you would do if a helicopter flew over us?','What would you did if a helicopter flew over us?'),
     Q('L6_biscuits.png','Answer: Would you share your last biscuit?','Yes, I would, because we need to stay strong together.','Yes, I would to, because we need to stay strong together.','Yes, I will would, because we need to stay strong.','Yes, I would share, because we are need to stay strong.'),
     Q('L6_map.png','Choose the best question.','Where would you go if you had a boat?','Where you would go if you had a boat?','Where would you went if you had a boat?','Where would you go if you would have a boat?')],3),
- dict(m='mingle',phase='STUDY',label='Mingle · Island interview',min=2,role='Island interview',card=dict(who='L6_sc_island_far.png',rows=[('a shark','L6_ev_shark_raft.png'),('a storm','L6_sc_storm.png'),('a ship','L6_sc_sunset_boat.png')],hi=0),steps=['🚶','🗣️','🔄'],line='Ask 3 classmates. Then swap.',sec=180,**C('S',4)),
+ dict(m='mingle',phase='STUDY',label='Mingle · Island interview',min=2,role='Island interview',card=dict(who='L6_sc_island_far.png',rows=[('a shark','L6_ev_shark_raft.png'),('a storm','L6_sc_storm.png'),('a ship','L6_sc_sunset_boat.png')],hi=0),steps=['🚶','🗣️','🔄'],caps=['Stand up. Find a classmate.','Ask. Listen.','Swap. Find a new one.'],line='Ask 3 classmates.',sub='What would you do if you saw a shark? I would …',sec=180,**C('S',4)),
  # --- block 5 optional
- dict(m='teach',phase='STUDY',label='Stretch · past continuous backstory',min=1.5,optional=True,role='Say it harder',pic='L6_x_sailboat.png',pics=['L6_x_sailboat.png','L6_p_tired.png','❓'],tts=True,lines=['I was sailing when the storm hit.','We were sleeping when the ship hit a rock.','What were you doing when it happened?'],**C('S',4)),
+ dict(m='teach',phase='STUDY',label='Stretch · what were you doing?',min=1.5,optional=True,role='Challenge · before the storm',pic='L6_x_sailboat.png',pics=['L6_x_sailboat.png','L6_p_tired.png','L6_sc_sinking.png'],tts=True,lines=['I was sailing when the storm hit.','We were sleeping when the ship hit a rock.','What were you doing when it happened?'],**C('S',4)),
 ]
 
 DECK_FIRST=('L6_ev_storm_shelter.png','The storm took our shelter.','bad')
@@ -128,7 +129,8 @@ DECK_MIDS=[('L6_ev_crate.png','A crate washes ashore.','good'),('L6_ev_ankle.png
 DECK_LAST=('L6_ev_boat_sunset.png','The boat is coming!','fin')
 A2=[
  dict(m='story',phase='ACTIVATE',label='Story · 5:30 pm the island fights back',min=1,role='Back on the island',pics=['L6_sc_island_far.png','L6_sc_sunset_boat.png','L6_x_sailboat.png','❓'],big='One more hour.',lines=['Things will happen.','Teams: huddle, then answer.'],**C('A2',4)),
- dict(m='next_event',phase='ACTIVATE',label='What next? · event deck',min=12,role='What next?',first=DECK_FIRST,mids=DECK_MIDS,last=DECK_LAST,rounds=3,sec=45,**C('A2',4)),
+ dict(m='howto',phase='ACTIVATE',label='How it works · What next?',min=1,role='How it works',steps=[('L6_ev_shark_raft.png','A problem appears.'),('👥','Team talk. 45 seconds.'),('🎤','Say your idea.'),('✋','Class vote.')],line='If we had …, we would … because …',**C('A2',4)),
+ dict(m='next_event',phase='ACTIVATE',label='What next? · event deck',min=11,role='What next?',first=DECK_FIRST,mids=DECK_MIDS,last=DECK_LAST,rounds=3,sec=45,**C('A2',4)),
  dict(m='reveal',phase='ACTIVATE',label='Reveal · rescued',min=1,title='Rescued!',pic='L6_x_sailboat.png',answer='All safe.',grad='teal',note='Our ideas got us rescued.',**C('A2',4)),
 ]
 

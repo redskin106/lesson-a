@@ -17,7 +17,7 @@ def item_pick(d):
     Tap a tile = a pair's pick (up to the round's cap). Teacher taps a round pill: 1 choose three, 2 no phone (the phone greys out), 3 keep one."""
     o=header(d['phase'],d.get('role','What would you bring?'),'amber')+NOFIT
     o+=stp(glass(90,185,560,470,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><div style="font-size:210px;line-height:1">🏝️</div>'
-        '<div style="font-size:110px;line-height:1">🎒 ❓</div>'
+        f'<div class="ipp" style="font-family:O;font-weight:800;font-size:46px;line-height:1.1;text-align:center;color:#1c1b2e;padding:0 24px;min-height:100px;display:flex;align-items:center">{(d.get("prompts") or ["What would you bring? Why?"])[0]}</div>'
         f'<div class="ipc" style="font-family:O;font-weight:800;font-size:60px;color:#6a35e8">0 / {d["rounds"][0][1]}</div></div>',r=60),1)
     I=d['items']; w=216; h=206; g=15
     for i,(e,n) in enumerate(I):
@@ -27,7 +27,7 @@ def item_pick(d):
     sec=int(d.get('sec',240))
     o+=stp(f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:690px;width:400px;text-align:center;font-family:O;font-weight:800;font-size:120px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',3)
     o+=stp(f'<div class="a tstart" style="left:510px;top:702px;width:140px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="46" height="46" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>',3)
-    rp=''.join(f'<div class="ipr{" on" if k==0 else ""}" data-cap="{cap}" data-ban="{ban}" style="display:flex;align-items:center;gap:14px;padding:8px 34px;border-radius:999px;background:rgba(255,255,255,.8);border:4px solid #fff;font-family:O;font-weight:800;font-size:40px;color:#1c1b2e;cursor:pointer;box-shadow:0 8px 18px rgba(80,60,160,.14)"><span style="color:#6a35e8">{k+1}</span>{t}</div>' for k,(t,cap,ban) in enumerate(d['rounds']))
+    rp=''.join(f'<div class="ipr{" on" if k==0 else ""}" data-cap="{cap}" data-ban="{ban}" data-p="{(d.get('prompts') or ['']*9)[k]}" style="display:flex;align-items:center;gap:14px;padding:8px 34px;border-radius:999px;background:rgba(255,255,255,.8);border:4px solid #fff;font-family:O;font-weight:800;font-size:40px;color:#1c1b2e;cursor:pointer;box-shadow:0 8px 18px rgba(80,60,160,.14)"><span style="color:#6a35e8">{k+1}</span>{t}</div>' for k,(t,cap,ban) in enumerate(d['rounds']))
     o+=stp(f'<div class="a" style="left:690px;top:870px;width:1140px;display:flex;gap:18px;justify-content:center">{rp}</div>',4)
     return o
 
@@ -77,7 +77,7 @@ def rule(d):
     tc={'real':'linear-gradient(135deg,#ffe29a,#ffb347)','imag':'linear-gradient(135deg,#d6c7ff,#a9c7ff)'}[kind]
     o+=stp(f'<div class="a" style="left:90px;top:170px;height:70px;padding:0 34px;border-radius:999px;background:{tc};display:flex;align-items:center;gap:14px;font-family:O;font-weight:800;font-size:38px;color:#1c1b2e"><span style="font-size:46px;line-height:1">{emo(te)}</span>{tt}</div>',1)
     o+=stp(glass(90,255,1740,150,f'<div style="height:100%;display:flex;align-items:center;justify-content:center;gap:14px">{"".join(ch(c,t,56,"8px 30px") for c,t in d["formula"])}</div>',r=64),1,pills=True)
-    W=d['why']; n=len(W); E=d['eg']; ne=len(E); exh=110 if ne>1 else 130
+    W=d['why']; n=len(W); E=d['eg']; PR=d.get('prompts'); ne=len(E)+(1 if PR else 0); exh=110 if ne>1 else 130
     avail=555-ne*(exh+14)-14; rh=min(150,int((avail-16*(n-1))/n))
     for i,(e,t) in enumerate(W):
         o+=stp(glass(90,430+i*(rh+16),1060,rh,f'<div style="height:100%;display:flex;align-items:center;gap:24px;padding:0 34px;box-sizing:border-box"><span style="font-size:{min(78,rh-40)}px;line-height:1;flex:none">{emo(e)}</span><span style="font-family:O;font-weight:800;font-size:36px;line-height:1.18;color:#1c1b2e">{t}</span></div>',r=48),2+i)
@@ -87,12 +87,32 @@ def rule(d):
     for k,(e,s_) in enumerate(E):
         body=(''.join(ch(c,t,38,"4px 14px") for c,t in s_) if isinstance(s_,(list,tuple)) else f'<span style="font-family:O;font-weight:800;font-size:40px;line-height:1.15;color:#1c1b2e">{s_}</span>')
         o+=stp(f'<div class="gl" style="left:90px;top:{ey+k*(exh+14)}px;width:1740px;height:{exh}px;border-radius:52px;display:flex;align-items:center;gap:22px;padding:0 34px;box-sizing:border-box;background:linear-gradient(135deg,#d6fbea,#c4f3e6)"><span style="font-size:64px;line-height:1;flex:none">{emo(e)}</span><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">{body}</div></div>',2+n)
+    if PR:
+        k=len(E); chips=''.join(f'<div style="{CHIP};font-size:34px;padding:6px 22px 6px 12px"><span style="font-size:60px;line-height:1">{emo(e)}</span>{t}</div>' for e,t in PR)
+        o+=stp(f'<div class="gl" style="left:90px;top:{ey+k*(exh+14)}px;width:1740px;height:{exh}px;border-radius:52px;display:flex;align-items:center;gap:22px;padding:0 34px;box-sizing:border-box;background:linear-gradient(135deg,#ffe9c9,#ffd9b0)"><span style="font-family:O;font-weight:800;font-size:38px;color:#1c1b2e;flex:none">Ask your partner:</span><div style="display:flex;gap:14px;align-items:center">{chips}</div></div>',3+n)
     return o
 
 
 TIMER=lambda sec,x,y,st:(stp(f'<div class="a tclock" data-sec="{sec}" style="left:{x}px;top:{y}px;width:400px;text-align:center;font-family:O;font-weight:800;font-size:100px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',st)
     +stp(f'<div class="a tstart" style="left:{x+420}px;top:{y+6}px;width:130px;height:96px;border-radius:48px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="44" height="44" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>',st))
 CHIP='display:flex;align-items:center;gap:14px;padding:10px 30px;border-radius:999px;background:rgba(255,255,255,.88);border:4px solid #fff;font-family:O;font-weight:800;font-size:38px;white-space:nowrap;color:#1c1b2e;box-shadow:0 8px 18px rgba(80,60,160,.14)'
+
+
+@module('howto')
+def howto(d):
+    """Explain an activity with pictures before it starts. steps=[(pic,caption)] (3-4), line = the one sentence under the pictures. Steps appear one by one."""
+    o=header(d['phase'],d.get('role','How it works'),'amber')+NOFIT
+    S=d['steps']; n=len(S); gap=70; w=int((1740-gap*(n-1))/n)
+    for i,(pc,cap) in enumerate(S):
+        x=90+i*(w+gap)
+        o+=stp(f'<div class="gl" style="left:{x}px;top:190px;width:{w}px;height:520px;border-radius:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 16px;box-sizing:border-box">'
+               f'<span style="position:absolute;left:22px;top:18px;width:68px;height:68px;border-radius:50%;{GR};display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:40px">{i+1}</span>'
+               f'<span style="font-size:{min(230,w-70)}px;line-height:1.05;height:{min(250,w-50)}px;display:flex;align-items:center;justify-content:center">{emo(pc)}</span>'
+               f'<span style="font-family:O;font-weight:800;font-size:40px;line-height:1.1;text-align:center;color:#1c1b2e">{cap}</span></div>',i+1)
+        if i<n-1: o+=stp(f'<div class="a" style="left:{x+w+8}px;top:400px;width:{gap-16}px;text-align:center;font-size:52px;line-height:1;color:#6a35e8">➜</div>',i+1)
+    if d.get('line'): o+=stp(f'<div class="a" style="left:90px;top:770px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:60px;line-height:1.1;color:#1c1b2e">{d["line"]}</div>',n+1)
+    return o
+
 
 
 @module('castaway_taboo')
@@ -170,7 +190,7 @@ document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!
   if(k.classList.contains('sel')){k.classList.remove('sel');P('tick')}else if(n<cap){k.classList.add('sel');P('pop')}else{P('boop')}
   var c=$('.ipc',s);if(c)c.textContent=$$('.ipk.sel',s).length+' / '+cap;return}
  var rp=e.target.closest('.ipr');
- if(rp){$$('.ipr',s).forEach(function(x){x.classList.toggle('on',x===rp)});var cap2=+rp.dataset.cap,ban=+rp.dataset.ban;s.__cap=cap2;
+ if(rp){$$('.ipr',s).forEach(function(x){x.classList.toggle('on',x===rp)});var cap2=+rp.dataset.cap,ban=+rp.dataset.ban;s.__cap=cap2;var pp=$('.ipp',s);if(pp&&rp.dataset.p)pp.textContent=rp.dataset.p;
   $$('.ipk',s).forEach(function(x){x.classList.toggle('off',+x.dataset.i===ban);if(+x.dataset.i===ban)x.classList.remove('sel')});
   var sel=$$('.ipk.sel',s);while(sel.length>cap2){sel.pop().classList.remove('sel')}
   $('.ipc',s).textContent=$$('.ipk.sel',s).length+' / '+cap2;P('pop');return}
