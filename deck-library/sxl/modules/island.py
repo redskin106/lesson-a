@@ -128,8 +128,7 @@ def castaway_taboo(d):
     mk=d.get('mode','make')
     o=header(d['phase'],d.get('role','Castaway Taboo'),'amber')+NOFIT
     if mk=='make':
-        card='<div style="width:330px;height:420px;border-radius:36px;background:#fff;border:6px solid #ff9f1c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transform:rotate(-4deg);box-shadow:0 16px 30px rgba(80,60,160,.25)"><div style="font-size:120px;line-height:1">❓</div><div style="font-family:O;font-weight:800;font-size:34px;color:#1c1b2e;border-bottom:5px solid #1c1b2e;width:220px;height:46px"></div>'+''.join('<div style="display:flex;gap:12px;align-items:center"><span style="font-size:44px">🚫</span><span style="width:190px;height:6px;background:#bbb;border-radius:3px"></span></div>' for _ in range(3))+'</div>'
-        o+=stp(glass(90,185,560,765,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">'+card+'<div style="font-size:90px;line-height:1">✏️ ×3</div></div>',r=60),1)
+        o+=stp(glass(90,185,560,765,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px"><span style="font-size:330px;line-height:1;display:flex;height:340px;align-items:center">'+emo('L6_t_card.png')+'</span><span style="font-size:230px;line-height:1;display:flex;height:200px;align-items:center">'+emo('L6_t_three_cards.png')+'</span></div>',r=60),1)
         W=d['words']; w=214; h=222; g=16
         for i,(e,n) in enumerate(W):
             x=690+(i%5)*(w+g); y=185+(i//5)*(h+g)
@@ -137,7 +136,7 @@ def castaway_taboo(d):
         o+=stp(f'<div class="a" style="left:690px;top:700px;width:1140px;display:flex;gap:18px;justify-content:center"><div style="{CHIP}"><span style="color:#6a35e8">1</span>✏️ one word</div><div style="{CHIP}"><span style="color:#6a35e8">2</span>🚫 three banned</div><div style="{CHIP}"><span style="color:#6a35e8">3</span>🃏 three cards</div></div>',3)
         o+=TIMER(int(d.get('sec',240)),780,830,4)
         return o
-    o+=stp(glass(90,185,560,765,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px"><div style="font-size:120px;line-height:1;white-space:nowrap">🃏➡️👥</div><div style="font-size:120px;line-height:1">🔄</div><div style="font-size:90px;line-height:1;white-space:nowrap">🗣️👂👂👂</div></div>',r=60),1)
+    o+=stp(glass(90,185,560,765,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px"><span style="font-size:250px;line-height:1;display:flex;height:260px;align-items:center">'+emo('L6_t_swap_teams.png')+'</span><span style="font-size:260px;line-height:1;display:flex;height:260px;align-items:center">'+emo('L6_t_describe.png')+'</span></div>',r=60),1)
     F=d['frames']
     o+=stp(f'<div class="a" style="left:690px;top:185px;width:1140px;display:flex;flex-direction:column;gap:22px;align-items:stretch">'+''.join(f'<div style="{CHIP};font-size:46px;justify-content:center;padding:18px 30px"><span style="font-size:60px">{e}</span>{t}</div>' for e,t in F)+'</div>',2)
     G=int(d.get('goal',12))
@@ -153,7 +152,7 @@ def if_chain(d):
     o=header(d['phase'],d.get('role','If-Chain'),'amber')+NOFIT
     S=d['starters']; G=int(d.get('goal',12))
     o+=f'<div class="icd" style="display:none">{_h.escape(json.dumps(S))}</div>'
-    o+=stp(f'<div class="gl icard" style="left:90px;top:185px;width:700px;height:430px;border-radius:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;box-sizing:border-box"><div class="ice" style="font-size:190px;line-height:1">🎲</div><div class="ict" style="font-family:O;font-weight:800;font-size:50px;text-align:center;color:#1c1b2e;line-height:1.15">Press 🎲 to start</div></div>',1)
+    o+=stp(f'<div class="gl icard" style="left:90px;top:185px;width:700px;height:430px;border-radius:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;box-sizing:border-box"><div class="ice" style="font-size:230px;line-height:1;height:240px;display:flex;align-items:center">{emo("L6_i_dice.png")}</div><div class="ict" style="font-family:O;font-weight:800;font-size:50px;text-align:center;color:#1c1b2e;line-height:1.15">Press 🎲 to start</div></div>',1)
     o+=stp(f'<div class="a" style="left:830px;top:185px;width:1000px;display:flex;flex-direction:column;gap:14px"><div style="{CHIP};justify-content:center"><span style="font-size:52px">⚽</span>If I … , I would …</div><div style="{CHIP};justify-content:center"><span style="font-size:52px">🔗</span>If I did that, I would …</div></div>',2)
     sl=''.join(f'<div class="icl" style="width:112px;height:112px;border-radius:30px;background:rgba(255,255,255,.55);border:4px dashed #b9b2e8;display:flex;align-items:center;justify-content:center;font-size:62px;opacity:.55">{"🏠" if i==G-1 else "·"}</div>' for i in range(G))
     o+=stp(f'<div class="a icg" data-goal="{G}" style="left:90px;top:640px;width:1740px;display:flex;gap:14px;justify-content:center">{sl}</div>',3)

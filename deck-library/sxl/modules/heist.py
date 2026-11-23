@@ -97,7 +97,7 @@ def mingle(d):
     o+=stp(glass(90,185,540,640,card,r=48,ex='transform:rotate(-3deg)'),1)
     st=d.get('steps',['🚶','🗣️','🤝'])
     for i,e in enumerate(st):
-        o+=stp(f'<div class="gl" style="left:{700+i*380}px;top:230px;width:340px;height:340px;border-radius:64px;display:flex;align-items:center;justify-content:center;font-size:{150 if d.get('caps') else 190}px;{'flex-direction:column;gap:8px' if d.get('caps') else ''}">{e}{('<span style="font-family:O;font-weight:800;font-size:36px;line-height:1.05;color:#1c1b2e;text-align:center">'+d['caps'][i]+'</span>') if d.get('caps') else ''}</div>',2+i)
+        o+=stp(f'<div class="gl" style="left:{700+i*380}px;top:230px;width:340px;height:340px;border-radius:64px;display:flex;align-items:center;justify-content:center;font-size:{170 if d.get('caps') else 190}px;{'flex-direction:column;gap:8px' if d.get('caps') else ''}">{emo(e)}{('<span style="font-family:O;font-weight:800;font-size:36px;line-height:1.05;color:#1c1b2e;text-align:center">'+d['caps'][i]+'</span>') if d.get('caps') else ''}</div>',2+i)
     if d.get('line'): o+=stp(f'<div class="a h" style="left:700px;top:620px;width:1130px;font-size:72px;text-align:center;line-height:1.05">{d["line"]}</div>',2)
     if d.get('sub'): o+=stp(f'<div class="a" style="left:700px;top:740px;width:1130px;text-align:center;font-family:O;font-weight:800;font-size:44px;line-height:1.2;color:#6a35e8">{d["sub"]}</div>',3)
     o+=_timer(int(d.get('sec',300)),850,w=500)
