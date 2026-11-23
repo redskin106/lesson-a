@@ -61,8 +61,8 @@ def next_event(d):
     o+=stepbox(320,160,1,'🗣️',tm,'sA')
     fr=ch('c4','If we had …,',30,'4px 14px')+ch('c1','we would …',30,'4px 14px')+ch('c2','because …',30,'4px 14px')
     dots=''.join(f'<span class="nxd1" style="width:76px;height:76px;border-radius:50%;background:{TEAMC[k]};opacity:.3;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:42px;color:#fff;cursor:pointer;user-select:none">{k+1}</span>' for k in range(4))
-    o+=stepbox(500,190,2,'🎤',f'<div class="a" style="left:250px;top:20px;width:620px;display:flex;gap:8px;flex-wrap:nowrap">{fr}</div><div class="a" style="left:250px;top:96px;width:620px;display:flex;gap:16px;align-items:center">{dots}<span style="font-family:O;font-weight:800;font-size:30px;color:#4a3a8a;margin-left:10px">2–3 teams</span></div>','sB')
-    o+=stepbox(710,100,3,'✋','<div class="a" style="left:250px;top:26px;font-family:O;font-weight:800;font-size:42px;color:#1c1b2e">Which idea helps most?</div>','sC')
+    o+=stepbox(500,190,2,'🎤',f'<div class="a" style="left:250px;top:20px;width:620px;display:flex;gap:8px;flex-wrap:nowrap">{fr}</div><div class="a" style="left:250px;top:96px;width:620px;display:flex;gap:16px;align-items:center">{dots}<span style="font-family:O;font-weight:800;font-size:30px;color:#4a3a8a;margin-left:10px">1 idea per team</span></div>','sB')
+    o+=stepbox(710,100,3,'✋','<div class="a" style="left:250px;top:26px;font-family:O;font-weight:800;font-size:38px;color:#1c1b2e">Vote. Not your own team.</div>','sC')
     o+=('<div class="a nxbtn" style="left:90px;top:850px;width:820px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:60px;cursor:pointer;user-select:none;'+GR+'">What next? ▶</div>'
         '<div class="a nxbk" style="left:950px;top:865px;width:130px;height:90px;border-radius:45px;display:flex;align-items:center;justify-content:center;font-size:48px;cursor:pointer;background:rgba(255,255,255,.85);border:4px solid #fff;color:#6a35e8;user-select:none">◀</div>'
         '<div class="a nxpos" style="left:1110px;top:880px;font-family:O;font-weight:800;font-size:40px;color:#4a3a8a">0 / 0</div>')
@@ -116,7 +116,8 @@ def howto(d):
                f'<span style="font-size:{min(230,w-70)}px;line-height:1.05;height:{min(250,w-50)}px;display:flex;align-items:center;justify-content:center">{emo(pc)}</span>'
                f'<span style="font-family:O;font-weight:800;font-size:40px;line-height:1.1;text-align:center;color:#1c1b2e">{cap}</span></div>',i+1)
         if i<n-1: o+=stp(f'<div class="a" style="left:{x+w+8}px;top:400px;width:{gap-16}px;text-align:center;font-size:52px;line-height:1;color:#6a35e8">➜</div>',i+1)
-    if d.get('line'): o+=stp(f'<div class="a" style="left:90px;top:770px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:60px;line-height:1.1;color:#1c1b2e">{d["line"]}</div>',n+1)
+    if d.get('line'): o+=stp(f'<div class="a" style="left:90px;top:760px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:60px;line-height:1.1;color:#1c1b2e">{d["line"]}</div>',n+1)
+    if d.get('sec'): o+=TIMER(int(d['sec']),700,880,4)
     return o
 
 
