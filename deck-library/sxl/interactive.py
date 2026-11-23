@@ -14,7 +14,7 @@ def _b64(path, kind):
     if kind == 'font': return 'data:font/woff2;base64,' + base64.b64encode(open(path, 'rb').read()).decode()
     im = Image.open(path)
     if kind == 'art' and im.mode in ('RGBA', 'LA', 'P') and 'transparency' in im.info or kind == 'art' and im.mode in ('RGBA', 'LA'):
-        im = im.convert('RGBA'); im.thumbnail((560, 560)); im = im.quantize(colors=48, method=Image.Quantize.FASTOCTREE); b = io.BytesIO(); im.save(b, 'PNG', optimize=True)
+        im = im.convert('RGBA'); bg = Image.new('RGBA', im.size, (255, 255, 255, 255)); bg.alpha_composite(im); im = bg.convert('RGB'); im.thumbnail((560, 560)); im = im.quantize(colors=48); b = io.BytesIO(); im.save(b, 'PNG', optimize=True)
         return 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
     if kind == 'art':
         im = im.convert('RGB'); im.thumbnail((760, 760)); b = io.BytesIO(); im.save(b, 'JPEG', quality=70)
@@ -268,7 +268,7 @@ button{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #pv{position:absolute;left:40px;bottom:18px;z-index:40;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.7);color:#6a35e8;font:800 36px O;display:flex;align-items:center;justify-content:center;opacity:.55}
 #cnt{position:absolute;left:116px;bottom:32px;z-index:40;font:700 24px/30px O;color:#6a6a7e}
 .sl.night{background:#0b0a10;color:#f6f3ff}.night .mu{color:#a9a3cc}.night .gl,.night .tag,.night .pill{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18)}.night .grad{background:linear-gradient(90deg,#c9a2ff,#ff8cc6);-webkit-background-clip:text;color:transparent}
-.vh{opacity:0;transform:translateY(24px) scale(.97)}.vs{transition:opacity .45s,transform .5s cubic-bezier(.2,.9,.3,1.2)}.vh.vs{opacity:0}
+.vh:has(img){transform:none!important}.vh{opacity:0;transform:translateY(24px) scale(.97)}.vs{transition:opacity .45s,transform .5s cubic-bezier(.2,.9,.3,1.2)}.vh.vs{opacity:0}
 .gl.tp{animation:pu .5s}
 .sx{transition:opacity .45s,transform .5s cubic-bezier(.2,.9,.3,1.2),filter .4s}.sx.sh{opacity:0;transform:translateY(22px) scale(.96);pointer-events:none}.sx.dim{opacity:.38;filter:saturate(.5)}
 .chip.pin{opacity:0;transform:scale(.4)}.chip.pp{animation:moc .5s cubic-bezier(.2,1.6,.4,1)}

@@ -92,8 +92,8 @@ def spot_change(d):
 def mingle(d):
     """Mingle instructions. card={'who':emoji,'rows':[(time,emoji)],'hi':row index to match},steps=[emoji..],sec. Printable cards: cards_page()."""
     c=d['card']; o=header(d['phase'],d.get('role','Find your crew'),'teal')
-    rows=''.join(f'<div style="display:flex;align-items:center;gap:26px;padding:10px 26px;border-radius:30px;{"background:linear-gradient(135deg,#d6fbea,#9fe8c4);" if i==c.get("hi",1) else "background:rgba(255,255,255,.7);"}"><span style="font-family:O;font-weight:800;font-size:46px;color:#1c1b2e;width:170px">{t}</span><span style="font-size:76px;line-height:1">{e}</span></div>' for i,(t,e) in enumerate(c['rows']))
-    card=f'<div style="display:flex;flex-direction:column;gap:18px;padding:30px 36px;height:100%;box-sizing:border-box"><div style="font-size:120px;line-height:1;text-align:center">{c["who"]}</div>{rows}</div>'
+    rows=''.join(f'<div style="display:flex;align-items:center;gap:26px;padding:10px 26px;border-radius:30px;{"background:linear-gradient(135deg,#d6fbea,#9fe8c4);" if i==c.get("hi",1) else "background:rgba(255,255,255,.7);"}"><span style="font-family:O;font-weight:800;font-size:46px;color:#1c1b2e;width:170px">{t}</span><span style="font-size:76px;line-height:1">{emo(e)}</span></div>' for i,(t,e) in enumerate(c['rows']))
+    card=f'<div style="display:flex;flex-direction:column;gap:18px;padding:30px 36px;height:100%;box-sizing:border-box"><div style="font-size:120px;line-height:1;text-align:center">{emo(c["who"])}</div>{rows}</div>'
     o+=stp(glass(90,185,540,640,card,r=48,ex='transform:rotate(-3deg)'),1)
     st=d.get('steps',['🚶','🗣️','🤝'])
     for i,e in enumerate(st):

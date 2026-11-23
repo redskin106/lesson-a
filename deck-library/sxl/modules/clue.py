@@ -107,7 +107,7 @@ def reveal(d):
     o=header(d['phase'],d.get('title','The answer'),'teal')
     o+=stp(picx(d['pic'],110,190,640,640,56),1)
     o+=stp(f'<div class="a" style="left:830px;top:300px">{grad_chip(d.get("grad","teal"),d["answer"],140,"14px 60px")}</div>',2,pills=True)
-    if d.get('note'): o+=stp(glass(830,520,1000,310,f'<div style="padding:34px 44px;font-family:P;font-weight:500;font-size:42px;line-height:1.45">{d["note"]}</div>',r=52),3)
+    if d.get('note'): o+=stp(glass(830,520,1000,{210 if len(d["note"])<60 else 310},f'<div style="height:100%;display:flex;align-items:center;padding:0 44px;box-sizing:border-box;font-family:O;font-weight:800;font-size:{54 if len(d["note"])<60 else 42}px;line-height:1.3">{d["note"]}</div>',r=52),3)
     return o
 
 # ---------------- choice: levelled one-at-a-time practice ----------------
@@ -177,7 +177,8 @@ def teach(d):
             o+=stp(f'<div class="gl tch"{sa} style="left:{x}px;top:190px;width:{w}px;height:740px;border-radius:56px">{ea}</div>',2*i+1)
             o+=stp(f'<div class="a" style="left:{x}px;top:{190+740-140}px;width:{w}px;text-align:center;font-family:O;font-weight:800;font-size:68px;line-height:1.1">{_ul(t)}</div>',2*i+2)
     else:
-        L=d['lines']; o+=picx(d.get('pic','❓'),90,190,640,740,56).replace('class="gl"','class="gl tpic"',1)
+        L=d['lines']; _p0=d.get('pic','❓')
+        o+=(f'<div class="gl tpic" style="left:90px;top:190px;width:640px;height:740px;border-radius:56px;display:block;padding:34px;box-sizing:border-box;background:#fff"><img src="{ART}{_p0}" style="width:100%;height:100%;object-fit:contain;display:block"></div>' if _isart(_p0) and _p0.startswith('L6_') else picx(_p0,90,190,640,740,56).replace('class="gl"','class="gl tpic"',1))
         sh=lambda x:(x['t'] if isinstance(x,dict) else x[0] if isinstance(x,(tuple,list)) else x).replace('<span','').replace('</span>','')
         fs=42 if max(len(sh(x)) for x in L)<60 else 38
         BG={'orange':'background:linear-gradient(135deg,#ffe6cc,#ffd2a6)','sky':'background:linear-gradient(135deg,#d9ecff,#c3e0ff)','rose':'background:linear-gradient(135deg,#ffe0ec,#ffcadd)','amber':'background:linear-gradient(135deg,#fff3c4,#ffe7a8)','teal':'background:linear-gradient(135deg,#d6fbea,#c4f3e6)'}
@@ -241,10 +242,11 @@ def pairs(d):
     import random
     Pr=d['pairs']; n=len(Pr); o=header(d['phase'],d.get('title','Match'),'violet'); h=int((680-18*(n-1))/n)
     order=list(range(n)); random.Random(len(d.get('title',''))+n).shuffle(order)
+    PO=bool(d.get('picOnly')); PW=520
     for i,(c_,s_) in enumerate(Pr):
-        o+=f'<div class="ptl gl" data-i="{i}" style="left:90px;top:{190+i*(h+18)}px;width:860px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;line-height:1.2;background:linear-gradient(135deg,#fff3c4,#ffe7a8)">{_bp(c_,d,110,34)}</div>'
+        o+=f'<div class="ptl gl" data-i="{i}" style="left:90px;top:{190+i*(h+18)}px;width:{PW if PO else 860}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;{"justify-content:center;" if PO else ""}padding:0 {10 if PO else 36}px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;line-height:1.2;background:{"#fff;border:6px solid #ffd978" if PO else "linear-gradient(135deg,#fff3c4,#ffe7a8)"}">{(f'<span style="font-size:{h-44}px;line-height:1">{emo(c_.split(" ",1)[0])}</span>' if PO else _bp(c_,d,110,34))}</div>'
     for j,i in enumerate(order):
-        o+=f'<div class="ptr gl{' hid' if d.get('hide') else ''}" data-i="{i}" style="left:990px;top:{190+j*(h+18)}px;width:840px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:44px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6)">{_bp_s(Pr[i][0],d)}<span class="ptx">{Pr[i][1]}</span></div>'
+        o+=f'<div class="ptr gl{' hid' if d.get('hide') else ''}" data-i="{i}" style="left:{90+PW+40 if PO else 990}px;top:{190+j*(h+18)}px;width:{1740-PW-40 if PO else 840}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:44px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6)">{'' if PO else _bp_s(Pr[i][0],d)}<span class="ptx">{Pr[i][1]}</span></div>'
     if d.get('ball'): o+=f'<div class="a pbn" data-d="{d["hint"]}" style="left:90px;top:890px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:40px;color:#6a35e8">{d["hint"]}</div>'
     elif d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:895px;width:1740px;text-align:center;font-size:32px">{d["hint"]}</div>'
     return o

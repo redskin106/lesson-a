@@ -13,7 +13,7 @@ CI={'E':'☀️','A1':'☀️','S':'🌤️','A2':'🌇','R':'🌅'}
 GS=[('🎒','item'),('☁️','wish'),('🫵','advice'),('❓','question')]
 def C(k,g=None,**kw):
     d=dict(clock=CK[k],cicon=CI[k],gset=GS)
-    if g is not None: d['gear']=g
+    # gear tracker removed 24 Nov (Nick: not necessary)
     d.update(kw); return d
 def Q(pic,q,ans,*wrong): return dict(pic=pic,q=q,opts=[ans,*wrong],ans=ans)
 def rec(title,hint,bz,sv,gd,gear,**kw):
@@ -23,7 +23,7 @@ def teach(label,role,pics,lines,gear,**kw):
     return dict(m='teach',phase='STUDY',label='Teach · '+label,min=1.5,role=role,pic=pics[0],pics=pics,tts=True,lines=lines,**C('S',gear),**kw)
 def rule(label,gear,**kw): return dict(m='rule',phase='STUDY',label='Rule · '+label,min=.5,**C('S',gear),**kw)
 def produce(label,title,pairs,gear,**kw):
-    return dict(m='pairs',phase='STUDY',label='Produce · '+label,min=1.5,title=title,pairs=pairs,ball=True,bigpic=True,hint='Throw the ball. Answer in a full sentence.',**C('S',gear,gear_new=True),**kw)
+    return dict(m='pairs',phase='STUDY',label='Produce · '+label,min=1.5,title=title,pairs=pairs,ball=True,bigpic=True,hint='Throw the ball. Answer in a full sentence.',picOnly=True,**C('S',gear),**kw)
 
 ENGAGE=[
  dict(m='cover',phase='ENGAGE',label='Cover',title='Lesson <span class="grad">6</span>',phases=['Engage','Study','Activate','Recap'],active=0,cards=[dict(pic='L6_sc_island_far.png',x=1010,y=150,w=330,h=430,r=-7),dict(pic='L6_sc_sunset_boat.png',x=1380,y=330,w=330,h=430,r=6)]),
@@ -118,7 +118,7 @@ STUDY=[
    [Q('L6_helicopter.png','Choose the best question.','What would you do if a helicopter flew over us?','What would you do if a helicopter will fly over us?','What you would do if a helicopter flew over us?','What would you did if a helicopter flew over us?'),
     Q('L6_biscuits.png','Answer: Would you share your last biscuit?','Yes, I would, because we need to stay strong together.','Yes, I would to, because we need to stay strong together.','Yes, I will would, because we need to stay strong.','Yes, I would share, because we are need to stay strong.'),
     Q('L6_map.png','Choose the best question.','Where would you go if you had a boat?','Where you would go if you had a boat?','Where would you went if you had a boat?','Where would you go if you would have a boat?')],3),
- produce('What would you do if','Island interview',[('L6_ev_shark_raft.png a shark','What would you do if you saw a shark? I would get out of the water.'),('L6_sc_storm.png a big storm','What would you do if there was a big storm? I would go into the cave.'),('L6_sc_sunset_boat.png a ship far away','What would you do if you saw a ship far away? I would light a fire.')],4),
+ dict(m='mingle',phase='STUDY',label='Mingle · Island interview',min=2,role='Island interview',card=dict(who='L6_sc_island_far.png',rows=[('a shark','L6_ev_shark_raft.png'),('a storm','L6_sc_storm.png'),('a ship','L6_sc_sunset_boat.png')],hi=0),steps=['🚶','🗣️','🔄'],line='Ask 3 classmates. Then swap.',sec=180,**C('S',4)),
  # --- block 5 optional
  dict(m='teach',phase='STUDY',label='Stretch · past continuous backstory',min=1.5,optional=True,role='Say it harder',pic='L6_x_sailboat.png',pics=['L6_x_sailboat.png','L6_p_tired.png','❓'],tts=True,lines=['I was sailing when the storm hit.','We were sleeping when the ship hit a rock.','What were you doing when it happened?'],**C('S',4)),
 ]
@@ -129,13 +129,13 @@ DECK_LAST=('L6_ev_boat_sunset.png','The boat is coming!','fin')
 A2=[
  dict(m='story',phase='ACTIVATE',label='Story · 5:30 pm the island fights back',min=1,role='Back on the island',pics=['L6_sc_island_far.png','L6_sc_sunset_boat.png','L6_x_sailboat.png','❓'],big='One more hour.',lines=['Things will happen.','Teams: huddle, then answer.'],**C('A2',4)),
  dict(m='next_event',phase='ACTIVATE',label='What next? · event deck',min=12,role='What next?',first=DECK_FIRST,mids=DECK_MIDS,last=DECK_LAST,rounds=3,sec=45,**C('A2',4)),
- dict(m='reveal',phase='ACTIVATE',label='Reveal · rescued',min=1,title='Rescued!',pic='L6_x_sailboat.png',answer='All safe.',grad='teal',note='Every team saved the island.',**C('A2',4)),
+ dict(m='reveal',phase='ACTIVATE',label='Reveal · rescued',min=1,title='Rescued!',pic='L6_x_sailboat.png',answer='All safe.',grad='teal',note='Our ideas got us rescued.',**C('A2',4)),
 ]
 
 RECAP=[
  dict(m='recap',phase='RECAP',label='Recap · then and now',min=2,emoji='L6_sc_island_far',
       rows=[([('c1','I'),('c2','would'),('c3','bring'),('c4','a rope')],'what would you bring'),([('c4','If'),('c1','we had a rope,'),('c2','we'),('c3','would build a raft')],'wish'),([('c4','If'),('c1','I were you,'),('c2','I'),('c3','would stay')],'advice'),([('c4','What'),('c2','would'),('c1','you do'),('c3','if you saw a ship?')],'question')],**C('R',4)),
- dict(m='story',phase='RECAP',label='Story · sunset coda',min=1,role='Sunset',pics=['L6_sc_sunset_boat.png','L6_x_sailboat.png','L6_x_wave_hand.png'],big='If we had stayed…',lines=['…we would have missed the boat.'],**C('R',4)),
+ dict(m='story',phase='RECAP',label='Story · sunset coda',min=1,role='Sunset',pics=['L6_sc_island_far.png','L6_sc_sunset_boat.png','L6_x_sailboat.png','L6_x_wave_hand.png'],big='If we had stayed…',lines=['…we would have missed the boat.'],**C('R',4)),
  dict(m='closing',phase='EXIT',label='Thank you',min=1,stack=True,line1='Thank',line2='you!',sub='See you next time.',emoji='L6_x_wave_hand'),
  dict(m='planb',phase='STUDY',label='Teacher · Plan B',optional=True,title='Plan B (teacher only)',tiles=[
    dict(e='📵',t='No phones',min='swap',use='Print the 15 item cards, pairs choose on paper.'),
@@ -154,7 +154,9 @@ GAMES=[
       starters=[('🚤','If I had a boat, I would sail home.'),('📻','If I had a radio, I would call for help.'),('🔥','If we had matches, we would make a fire.'),('🦈','If I saw a shark, I would stay on the raft.'),('🌧️','If it rained, I would collect water.'),('🍍','If I were hungry, I would catch a fish.')],**C('R',4)),
 ]
 
-L6=ENGAGE+A1+STUDY+A2[:1]+GAMES[:2]+A2[1:]+GAMES[2:]+RECAP
+# Activate 2: What next? > Rescued! > (optional) Castaway Taboo. After the Thank you: optional If-Chain, then Plan B.
+_clo=next(i for i,x in enumerate(RECAP) if x['m']=='closing')
+L6=ENGAGE+A1+STUDY+A2[1:]+GAMES[:2]+RECAP[:_clo+1]+GAMES[2:]+RECAP[_clo+1:]
 
 if __name__=='__main__':
     install_chrome()

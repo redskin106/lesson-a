@@ -46,7 +46,7 @@ def em(n,x,y,w,r=0): return f'<img class="e" src="{EM(n)}" style="left:{x}px;top
 import re as _re
 def emo(s):
     """inline art: every L6_<name>.png token in s becomes an image 1em tall (so it scales with the surrounding font-size)"""
-    return _re.sub(r'L6_[A-Za-z0-9_]+\.png',lambda m:f'<img src="{ART}{m.group(0)}" style="height:1em;width:auto;max-width:2.4em;object-fit:contain;vertical-align:middle;display:inline-block">',s) if isinstance(s,str) else s
+    return _re.sub(r'L6_[A-Za-z0-9_]+\.png',lambda m:f'<img src="{ART}{m.group(0)}" style="height:1em;width:auto;max-width:2.4em;object-fit:contain;vertical-align:middle;display:inline-block;border-radius:.12em;background:#fff">',s) if isinstance(s,str) else s
 ch=lambda c,t,fs=64,p='10px 34px':f'<span class="chip {c}" style="font-size:{fs}px;padding:{p};border-radius:44px">{t}</span>'
 def grad_chip(g,t,fs=44,p='8px 34px'): return f'<span class="chip" style="font-size:{fs}px;padding:{p};border-radius:999px;background:{GRAD.get(g,g)}">{t}</span>'
 def gap(col,w,t='…',h=104,fs=40): return f'<div style="width:{w}px;height:{h}px;border-radius:44px;border:5px dashed {col};display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:{fs}px;color:{col}">{t}</div>'
