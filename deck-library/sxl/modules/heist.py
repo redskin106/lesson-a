@@ -64,7 +64,8 @@ def story(d):
     if big: o+=f'<div class="a h" style="left:1000px;top:190px;width:830px;font-size:96px;line-height:1.02">{big}</div>'
     y=(380 if len(big)<16 else 480) if big else 230
     for k,t in enumerate(d.get('lines',[])):
-        o+=stp(f'<div class="gl" style="left:1000px;top:{y+k*150}px;width:830px;height:126px;border-radius:50px;display:flex;align-items:center;padding:0 40px;box-sizing:border-box;font-family:O;font-weight:800;font-size:42px;line-height:1.15;color:#1c1b2e">{t}</div>',1+k)
+        _sy=(d.get('says') or {}).get(k,t)
+        o+=stp(f'<div class="gl" data-say="{_sy.replace(chr(34),"&quot;")}" style="left:1000px;top:{y+k*150}px;width:830px;height:126px;border-radius:50px;display:flex;align-items:center;padding:0 40px;box-sizing:border-box;font-family:O;font-weight:800;font-size:42px;line-height:1.15;color:#1c1b2e">{t}</div>',1+k)
     return o
 
 @module('spot_change')

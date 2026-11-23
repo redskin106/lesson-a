@@ -138,7 +138,7 @@ A2=[
 RECAP=[
  dict(m='recap',phase='RECAP',label='Recap · then and now',min=2,emoji='L6_sc_island_far',
       rows=[([('c1','I'),('c2','would'),('c3','bring'),('c4','a rope')],'what would you bring'),([('c4','If'),('c1','we had a rope,'),('c2','we'),('c3','would build a raft')],'wish'),([('c4','If'),('c1','I were you,'),('c2','I'),('c3','would stay')],'advice'),([('c4','What'),('c2','would'),('c1','you do'),('c3','if you saw a ship?')],'question')],**C('R',4)),
- dict(m='story',phase='RECAP',label='Story · sunset coda',min=1,role='Sunset',pics=['L6_sc_island_far.png','L6_sc_sunset_boat.png','L6_x_sailboat.png','L6_x_wave_hand.png'],big='If we had stayed…',lines=['…we would have missed the boat.'],**C('R',4)),
+ dict(m='story',phase='RECAP',label='Story · sunset coda',min=1,role='Sunset',pics=['L6_sc_island_far.png','L6_sc_sunset_boat.png','L6_x_sailboat.png','L6_x_wave_hand.png'],big='If we had stayed…',lines=['…we would have missed the boat.'],says={0:'If we had stayed… we would have missed the boat.'},**C('R',4)),
  dict(m='closing',phase='EXIT',label='Thank you',min=1,stack=True,line1='Thank',line2='you!',sub='See you next time.',emoji='handshake'),
  dict(m='planb',phase='STUDY',label='Teacher · Plan B',optional=True,title='Plan B (teacher only)',tiles=[
    dict(e='📵',t='No phones',min='swap',use='Print the 15 item cards, pairs choose on paper.'),
@@ -160,7 +160,15 @@ GAMES=[
 _clo=next(i for i,x in enumerate(RECAP) if x['m']=='closing')
 L6=ENGAGE+A1+STUDY+A2[1:]+GAMES[:2]+RECAP[:_clo+1]+GAMES[2:]+RECAP[_clo+1:]
 
+def _texts():
+    t=[]
+    for x in L6:
+        if x['m'] in ('teach','story'): t+=[l for l in x.get('lines',[])]+list((x.get('says') or {}).values())
+        if x['m']=='pairs': t+=[b for a,b in x['pairs']]
+    return t
 if __name__=='__main__':
+    from sxl import audio
+    audio.register(HERE.parent.parent/'lessons-6'/'audio',_texts())
     install_chrome()
     out=HERE.parent.parent/'lessons-6'; out.mkdir(exist_ok=True)
     print(build_interactive(L6,str(out/'lesson6_v1.html'),title='SkillsXLab · Lesson 6 · Washed Ashore (grey box)'))

@@ -402,6 +402,7 @@ var INIT={};
   var vm=$('.vm',r);
   if(D.gapn[i]){bar.innerHTML=D.banks[i];bar.style.visibility='visible';bar.__r=r}else if(vm){bar.style.visibility='hidden';speak(vm,function(){wait(700).then(next)})}else{bar.style.visibility='hidden';wait(D.pace||1100).then(next)}}
  function speak(vm,cb){var t=vm.dataset.say,dn=0,go=function(){if(!dn){dn=1;if(cb)cb()}};
+  if(window.SXLsay&&SXLsay(t,go))return;
   try{if(!window.speechSynthesis)throw 0;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.85;u.onend=go;u.onerror=function(){vm.classList.add('rv');go()};speechSynthesis.speak(u);setTimeout(go,Math.max(4000,t.length*120))}catch(e){vm.classList.add('rv');setTimeout(go,2500)}}
  th.addEventListener('click',function(e){var v=e.target.closest('.vm');if(v){P('tick');speak(v)}});
  s.__tx=function(){var v=$$('.row.show .vm',th);return v.length?v[v.length-1].dataset.say:''};
@@ -541,7 +542,7 @@ INIT.view=function(s){
  var stp=$$('[data-s]',s);
  if(stp.length){stp.forEach(function(e){e.classList.add('sx','sh');if(e.dataset.pills)$$('.chip',e).forEach(function(c){c.classList.add('pin')})});
   var mx=Math.max.apply(null,stp.map(function(e){return +e.dataset.s})),ix=1;
-  s.__adv=function(){if(ix>mx)return false;var g=0;stp.forEach(function(e){if(+e.dataset.s===ix){e.classList.remove('sh');if(e.dataset.pic&&window.__sxlPic)window.__sxlPic(e);g=Math.max(g,+(e.dataset.g||0));if(e.dataset.pills){var cs=$$('.chip',e);cs.forEach(function(c,j){setTimeout(function(){c.classList.remove('pin');c.classList.add('pp');P(j%2?'tick':'pop')},260*j+150)})}}});
+  s.__adv=function(){if(ix>mx)return false;var g=0;stp.forEach(function(e){if(+e.dataset.s===ix){e.classList.remove('sh');if(e.dataset.pic&&window.__sxlPic)window.__sxlPic(e);if(e.dataset.say&&window.SXLsay)SXLsay(e.dataset.say);g=Math.max(g,+(e.dataset.g||0));if(e.dataset.pills){var cs=$$('.chip',e);cs.forEach(function(c,j){setTimeout(function(){c.classList.remove('pin');c.classList.add('pp');P(j%2?'tick':'pop')},260*j+150)})}}});
    if(ix===mx){stp.forEach(function(e){e.classList.remove('dim')})}else if(g){stp.forEach(function(e){if(e.dataset.g&&+e.dataset.g<g)e.classList.add('dim')})}
    if(ix===1)P('open');else if(!stp.some(function(e){return +e.dataset.s===ix&&e.dataset.pills}))P('pop');ix++;if(ix>mx)P('good');return true};
   s.addEventListener('click',function(e){if(e.target.closest('.vsp,.tstart,.tadj,.pkc,.spinbtn,.dstop,.vplay,.nxbtn,.nxbk,.nxd1,.nxs,.ipk,.ipr,.tbp,.tbm,.icb,.icn,.icx'))return;s.__adv()});}
@@ -604,7 +605,7 @@ def build_interactive(spec, out, title='SkillsXLab · interactive slice'):
             f'<style>{css("day")}{CSS_EXTRA}{''.join(core.EXT_CSS)}</style></head><body><div id="stage">{secs}'
             '<div id="ctl"><button id="gt" title="Settings"><svg width="32" height="32" viewBox="-16 -16 32 32"><g fill="#6a35e8"><circle r="9.5"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(0)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(45)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(90)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(135)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(180)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(225)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(270)"/><rect x="-2.8" y="-14" width="5.6" height="7" rx="1.6" transform="rotate(315)"/></g><circle r="4" fill="#fff"/></svg></button><button id="sf">Sound: On</button><button id="ck">Clock</button><button id="rp">Report</button><button id="mo">Motion: On</button><div id="bgs"></div></div><button id="pv"><svg width="30" height="30" viewBox="0 0 44 44"><path d="M36 22H10M20 11L9 22L20 33" fill="none" stroke="#6a35e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="sk" style="display:none">Skip ›</button><button id="nx"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M8 22H34M24 11L35 22L24 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="cnt"></div><div id="clk"></div><button id="aa" title="Show the words (teacher)">Aa</button><div id="trp"></div></div><div id="rpt"></div>'
             +vov_markup(spec)
-            +f'<script>{SFX_JS}</script><script>{APP_JS.replace('go(0);', ''.join(core.EXT_JS)+'go(0);') if False else APP_JS[:APP_JS.rindex('go(0);')]+''.join(core.EXT_JS)+'go(0);'}</script></body></html>')
+            +__import__('sxl.audio',fromlist=['x']).script()+f'<script>{SFX_JS}</script><script>{APP_JS.replace('go(0);', ''.join(core.EXT_JS)+'go(0);') if False else APP_JS[:APP_JS.rindex('go(0);')]+''.join(core.EXT_JS)+'go(0);'}</script></body></html>')
     html = re.sub(r'<img (?=[^>]*src="file:///home/claude/work/lesson/art/)', '<img data-z="1" ', html)
     html = inline_assets(html)
     pathlib.Path(out).write_text(html, encoding='utf-8')
