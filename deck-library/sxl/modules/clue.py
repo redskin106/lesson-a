@@ -224,6 +224,15 @@ def rungs(d):
             +(f'<div class="rsy" data-say="{s_["say"]}" style="margin:26px 36px 0;text-align:center;font-family:P;font-weight:500;font-size:30px;color:#6a35e8">{s_["say"]}</div>' if s_.get('say') else '')+f'<div style="margin:22px 40px 0;text-align:center;font-family:O;font-weight:800;font-size:46px;line-height:1.2">{_ul(s_["sen"])}</div></div>')
     return o
 
+def _bp(c,d,fs,gap):
+    """bigpic: a clue like '🧴 sun cream' shows the emoji large and the words beside it"""
+    if not d.get('bigpic') or ' ' not in c: return c
+    e,t=c.split(' ',1)
+    return f'<span style="font-size:{fs}px;line-height:1;margin-right:{gap}px">{e}</span><span>{t}</span>'
+def _bp_s(c,d):
+    if not d.get('bigpic') or ' ' not in c: return ''
+    return f'<span style="font-size:70px;line-height:1;margin-right:22px;flex:none">{c.split(" ",1)[0]}</span>'
+
 @module('pairs')
 def pairs(d):
     """Tap a clue, then its sentence. {'phase','title','pairs':[(clue,sentence)],'hint'}"""
@@ -231,9 +240,9 @@ def pairs(d):
     Pr=d['pairs']; n=len(Pr); o=header(d['phase'],d.get('title','Match'),'violet'); h=int((680-18*(n-1))/n)
     order=list(range(n)); random.Random(len(d.get('title',''))+n).shuffle(order)
     for i,(c_,s_) in enumerate(Pr):
-        o+=f'<div class="ptl gl" data-i="{i}" style="left:90px;top:{190+i*(h+18)}px;width:860px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;line-height:1.2;background:linear-gradient(135deg,#fff3c4,#ffe7a8)">{c_}</div>'
+        o+=f'<div class="ptl gl" data-i="{i}" style="left:90px;top:{190+i*(h+18)}px;width:860px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;line-height:1.2;background:linear-gradient(135deg,#fff3c4,#ffe7a8)">{_bp(c_,d,110,34)}</div>'
     for j,i in enumerate(order):
-        o+=f'<div class="ptr gl{' hid' if d.get('hide') else ''}" data-i="{i}" style="left:990px;top:{190+j*(h+18)}px;width:840px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:44px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6)"><span class="ptx">{Pr[i][1]}</span></div>'
+        o+=f'<div class="ptr gl{' hid' if d.get('hide') else ''}" data-i="{i}" style="left:990px;top:{190+j*(h+18)}px;width:840px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:44px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6)">{_bp_s(Pr[i][0],d)}<span class="ptx">{Pr[i][1]}</span></div>'
     if d.get('ball'): o+=f'<div class="a pbn" data-d="{d["hint"]}" style="left:90px;top:890px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:40px;color:#6a35e8">{d["hint"]}</div>'
     elif d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:895px;width:1740px;text-align:center;font-size:32px">{d["hint"]}</div>'
     return o
@@ -473,7 +482,7 @@ g.dz{stroke:none}g.dz.dim{opacity:1;filter:grayscale(.85) brightness(1.1)}.dz{cu
 EXT_JS.append(r"""
 SXL.say=false;
 document.addEventListener('keydown',function(e){if(/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))return;if('123'.indexOf(e.key)<0||e.key==='')return;var m=document.querySelector('.sl.on .mdl[data-l="'+e.key+'"]');if(m)m.click()});
-window.__sxlPic=function(pb){var pc=document.querySelector('.sl.on .tpic');if(pc){var pv=pb.dataset.pic;if(/^(file:|data:image)|\.jpg$/.test(pv)){pc.style.display='block';pc.style.padding='10px';pc.style.fontSize='';pc.innerHTML='<img src="'+pv+'" style="width:100%;height:100%;object-fit:cover;border-radius:46px;display:block;background:#fff">'}else{pc.style.display='flex';pc.style.padding='0';pc.style.fontSize='352px';pc.textContent=pv}pc.classList.remove('pp');void pc.offsetWidth;pc.classList.add('pp')}}
+window.__sxlPic=function(pb){var pc=document.querySelector('.sl.on .tpic');if(pc){var pv=pb.dataset.pic;if(/^(file:|data:image)|\.jpg$/.test(pv)){pc.style.display='block';pc.style.padding='10px';pc.style.fontSize='';pc.innerHTML='<img src="'+pv+'" style="width:100%;height:100%;object-fit:cover;border-radius:46px;display:block;background:#fff">'}else{pc.style.display='flex';pc.style.padding='0';var nn=Array.from(pv).filter(function(c){return c.charCodeAt(0)>255}).length;pc.style.fontSize=(nn<=1?352:nn===2?230:150)+'px';pc.textContent=pv}pc.classList.remove('pp');void pc.offsetWidth;pc.classList.add('pp')}}
 document.addEventListener('click',function(e){var pb=e.target.closest('[data-pic]');if(pb)window.__sxlPic(pb);var b=e.target.closest('[data-seq]');if(b&&b.classList.contains('tch')){var st=+(b.dataset.st||0);if(st===0){var pt=b.querySelector('.pt');if(pt)pt.style.display='block';b.dataset.st=1}else if(st===1){var an=b.querySelector('.an');if(an)an.style.display='block';b.dataset.st=2;P('pop');return}}
  var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){var dl=b.classList.contains('dtl'),shw=function(){if(dl&&!b.__t){b.__t=1;b.style.fontSize='40px';b.style.lineHeight='1.3';b.innerHTML='\uD83D\uDD0A '+b.dataset.say}};try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;if(dl){u.onend=shw;setTimeout(shw,Math.max(3500,b.dataset.say.length*110))}speechSynthesis.speak(u)}catch(x){shw()}P('tick')}});
 document.addEventListener('click',function(e){var b=e.target.closest('.vsp');if(!b)return;e.stopPropagation();P('tick');var a=b.dataset.a;if(a){try{if(window.__va)window.__va.pause();window.__va=new Audio(a);window.__va.play()}catch(x){}}});

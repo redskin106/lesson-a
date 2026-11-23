@@ -40,7 +40,7 @@ def today(d):
     for i,r in enumerate(d['rows']):
         cs,ic=(r['chips'],r.get('icon')) if isinstance(r,dict) else (r,None)
         row=chiprow(cs,fs,'8px 30px','16px')
-        if ic: row=f'<div style="display:flex;gap:28px;align-items:center"><img src="{EM(ic)}" style="width:110px;{sh()}">{row}</div>'
+        if ic: row=(f'<div style="display:flex;gap:28px;align-items:center"><span style="font-size:{96 if len([c for c in ic if ord(c)>255 and ord(c)!=0xFE0F])<2 else 58}px;line-height:1;width:150px;text-align:center;flex:none;white-space:nowrap">{ic}</span>{row}</div>' if ic.isascii()==False else f'<div style="display:flex;gap:28px;align-items:center"><img src="{EM(ic)}" style="width:110px;{sh()}">{row}</div>')
         rows+=stp(f'<div class="rw">{row}</div>',i+2,pills=True)
     return (header(d['phase'],d.get('role','Today we learn'),'violet')
       +'<div class="gl" style="left:90px;top:168px;width:1740px;height:740px;border-radius:72px"></div>'
