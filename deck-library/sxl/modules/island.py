@@ -61,7 +61,7 @@ def next_event(d):
     o+=stepbox(320,160,1,'🗣️',tm,'sA')
     fr=ch('c4','If we had …,',30,'4px 14px')+ch('c1','we would …',30,'4px 14px')+ch('c2','because …',30,'4px 14px')
     dots=''.join(f'<span class="nxd1" style="width:76px;height:76px;border-radius:50%;background:{TEAMC[k]};opacity:.3;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:42px;color:#fff;cursor:pointer;user-select:none">{k+1}</span>' for k in range(4))
-    o+=stepbox(500,190,2,'🎤',f'<div class="a" style="left:250px;top:20px;width:620px;display:flex;gap:8px;flex-wrap:nowrap">{fr}</div><div class="a" style="left:250px;top:96px;width:620px;display:flex;gap:16px;align-items:center">{dots}<span style="font-family:O;font-weight:800;font-size:30px;color:#4a3a8a;margin-left:10px">1 idea per team</span></div>','sB')
+    o+=stepbox(500,190,2,'🎤',f'<div class="a" style="left:250px;top:20px;width:620px;display:flex;gap:8px;flex-wrap:nowrap">{fr}</div><div class="a" style="left:250px;top:96px;width:620px;display:flex;gap:16px;align-items:center">{dots}<span style="font-family:O;font-weight:800;font-size:30px;color:#4a3a8a;margin-left:10px">1 idea each · ⭐ speaks first</span></div>','sB')
     o+=stepbox(710,100,3,'✋','<div class="a" style="left:250px;top:26px;font-family:O;font-weight:800;font-size:38px;color:#1c1b2e">Vote. Not your own team.</div>','sC')
     o+=('<div class="a nxbtn" style="left:90px;top:850px;width:820px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:60px;cursor:pointer;user-select:none;'+GR+'">What next? ▶</div>'
         '<div class="a nxbk" style="left:950px;top:865px;width:130px;height:90px;border-radius:45px;display:flex;align-items:center;justify-content:center;font-size:48px;cursor:pointer;background:rgba(255,255,255,.85);border:4px solid #fff;color:#6a35e8;user-select:none">◀</div>'
@@ -117,7 +117,7 @@ def howto(d):
                f'<span style="font-family:O;font-weight:800;font-size:40px;line-height:1.1;text-align:center;color:#1c1b2e">{cap}</span></div>',i+1)
         if i<n-1: o+=stp(f'<div class="a" style="left:{x+w+8}px;top:400px;width:{gap-16}px;text-align:center;font-size:52px;line-height:1;color:#6a35e8">➜</div>',i+1)
     if d.get('line'): o+=stp(f'<div class="a" style="left:90px;top:760px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:60px;line-height:1.1;color:#1c1b2e">{d["line"]}</div>',n+1)
-    if d.get('sec'): o+=TIMER(int(d['sec']),700,880,4)
+    if d.get('sec'): o+=TIMER(int(d['sec']),700,880,4,int(d.get('tstep',60)))
     return o
 
 
@@ -185,6 +185,8 @@ EXT_CSS.append("""
 .ipk.off{opacity:.25;filter:grayscale(1);pointer-events:none}
 .ipr.on{box-shadow:0 0 0 8px #ff9f1c!important;background:#fff4d6!important}
 .nxd1.on{opacity:1!important;box-shadow:0 0 0 6px #fff}
+.nxd1.first{opacity:.85!important;outline:6px solid #ffb703;outline-offset:5px;position:relative}
+.nxd1.first::after{content:'⭐';position:absolute;right:-14px;top:-22px;font-size:34px}
 .nxs{opacity:.4;transition:opacity .35s,transform .35s,box-shadow .35s}.nxs.cur{opacity:1;box-shadow:0 0 0 8px #ff9f1c,0 16px 34px rgba(80,60,160,.2)!important;transform:scale(1.015)}
 .nxcard.bad{box-shadow:0 0 0 10px #ff6b78!important}.nxcard.good{box-shadow:0 0 0 10px #2bd9b6!important}.nxcard.fin{box-shadow:0 0 0 10px #ffd166!important}
 .nxcard.pop .nxe{animation:nxp .5s ease-out 1}@keyframes nxp{0%{transform:scale(.4) rotate(-12deg)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
@@ -216,7 +218,7 @@ document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!
    else{(function(v){var e=$('.nxe',s);if(/\.png$/.test(v)){e.innerHTML='<img src="'+(D.art[v]||v)+'" style="max-height:290px;max-width:760px;object-fit:contain">'}else{e.textContent=v}})(c[0]);$('.nxt',s).textContent=c[1];$('.nxk',s).textContent=c[2]==='bad'?'⚠️':c[2]==='good'?'🍀':'🌅';card.className='gl nxcard '+(c[2]==='bad'?'bad':c[2]==='good'?'good':'fin');void card.offsetWidth;card.classList.add('pop')}
    var f=ix<0?0:ix/(deck.length-1);sun.style.left=(240+f*1330)+'px';sun.textContent=SUN[Math.min(SUN.length-1,Math.round(f*(SUN.length-1)))];
    $('.nxpos',s).textContent=(ix+1)+' / '+deck.length;ph=0;steps.forEach(function(x){x.classList.remove('cur')});
-   $$('.nxd1',s).forEach(function(x){x.classList.remove('on')});
+   $$('.nxd1',s).forEach(function(x,k){x.classList.remove('on');x.classList.toggle('first',ix>=0&&k===ix%4)});
    btn.textContent=ix<0?'What next? ▶':LAB[0];if(s.__treset)s.__treset()}
   function phase(p){ph=p;steps.forEach(function(x,k){x.classList.toggle('cur',k===p-1)});
    var last=ix>=deck.length-1;btn.textContent=p>=3?(last?'⛵ Boat!':'What next? ▶'):LAB[p];if(p===1&&s.__tauto)s.__tauto()}
