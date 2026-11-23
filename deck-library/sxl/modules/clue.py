@@ -154,7 +154,9 @@ def task_card(d):
 
 # ---------------- teach: watch, listen, repeat (no tapping to answer, nothing to get wrong) ----------------
 def _isart(p): return isinstance(p,str) and '.' in p and len(p)<48 and p.rsplit('.',1)[-1] in ('jpg','png','jpeg')
-def _artimg(p,r=40,fit='cover'): return f'<img src="{ART}{p}" style="width:100%;height:100%;object-fit:{fit};border-radius:{r}px;display:block;background:#fff">'
+def _artimg(p,r=40,fit='cover'):
+    if p.startswith('L6_'): fit='contain'
+    return f'<img src="{ART}{p}" style="width:100%;height:100%;object-fit:{fit};border-radius:{r}px;display:block;background:#fff">'
 
 def _ul(t):
     import re
@@ -228,10 +230,10 @@ def _bp(c,d,fs,gap):
     """bigpic: a clue like '🧴 sun cream' shows the emoji large and the words beside it"""
     if not d.get('bigpic') or ' ' not in c: return c
     e,t=c.split(' ',1)
-    return f'<span style="font-size:{fs}px;line-height:1;margin-right:{gap}px">{e}</span><span>{t}</span>'
+    return f'<span style="font-size:{fs}px;line-height:1;margin-right:{gap}px">{emo(e)}</span><span>{t}</span>'
 def _bp_s(c,d):
     if not d.get('bigpic') or ' ' not in c: return ''
-    return f'<span style="font-size:70px;line-height:1;margin-right:22px;flex:none">{c.split(" ",1)[0]}</span>'
+    return f'<span style="font-size:70px;line-height:1;margin-right:22px;flex:none">{emo(c.split(" ",1)[0])}</span>'
 
 @module('pairs')
 def pairs(d):
@@ -482,7 +484,7 @@ g.dz{stroke:none}g.dz.dim{opacity:1;filter:grayscale(.85) brightness(1.1)}.dz{cu
 EXT_JS.append(r"""
 SXL.say=false;
 document.addEventListener('keydown',function(e){if(/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))return;if('123'.indexOf(e.key)<0||e.key==='')return;var m=document.querySelector('.sl.on .mdl[data-l="'+e.key+'"]');if(m)m.click()});
-window.__sxlPic=function(pb){var pc=document.querySelector('.sl.on .tpic');if(pc){var pv=pb.dataset.pic;if(/^(file:|data:image)|\.jpg$/.test(pv)){pc.style.display='block';pc.style.padding='10px';pc.style.fontSize='';pc.innerHTML='<img src="'+pv+'" style="width:100%;height:100%;object-fit:cover;border-radius:46px;display:block;background:#fff">'}else{pc.style.display='flex';pc.style.padding='0';var nn=Array.from(pv).filter(function(c){return c.charCodeAt(0)>255}).length;pc.style.fontSize=(nn<=1?352:nn===2?230:150)+'px';pc.textContent=pv}pc.classList.remove('pp');void pc.offsetWidth;pc.classList.add('pp')}}
+window.__sxlPic=function(pb){var pc=document.querySelector('.sl.on .tpic');if(pc){var pv=pb.dataset.pic;if(/^(file:|data:image)|\.(jpg|png)$/.test(pv)){pc.style.display='block';pc.style.padding='10px';pc.style.fontSize='';pc.innerHTML='<img src="'+pv+'" style="width:100%;height:100%;object-fit:'+(/\.png$/.test(pv)?'contain':'cover')+';border-radius:46px;display:block;background:#fff">'}else{pc.style.display='flex';pc.style.padding='0';var nn=Array.from(pv).filter(function(c){return c.charCodeAt(0)>255}).length;pc.style.fontSize=(nn<=1?352:nn===2?230:150)+'px';pc.textContent=pv}pc.classList.remove('pp');void pc.offsetWidth;pc.classList.add('pp')}}
 document.addEventListener('click',function(e){var pb=e.target.closest('[data-pic]');if(pb)window.__sxlPic(pb);var b=e.target.closest('[data-seq]');if(b&&b.classList.contains('tch')){var st=+(b.dataset.st||0);if(st===0){var pt=b.querySelector('.pt');if(pt)pt.style.display='block';b.dataset.st=1}else if(st===1){var an=b.querySelector('.an');if(an)an.style.display='block';b.dataset.st=2;P('pop');return}}
  var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){var dl=b.classList.contains('dtl'),shw=function(){if(dl&&!b.__t){b.__t=1;b.style.fontSize='40px';b.style.lineHeight='1.3';b.innerHTML='\uD83D\uDD0A '+b.dataset.say}};try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;if(dl){u.onend=shw;setTimeout(shw,Math.max(3500,b.dataset.say.length*110))}speechSynthesis.speak(u)}catch(x){shw()}P('tick')}});
 document.addEventListener('click',function(e){var b=e.target.closest('.vsp');if(!b)return;e.stopPropagation();P('tick');var a=b.dataset.a;if(a){try{if(window.__va)window.__va.pause();window.__va=new Audio(a);window.__va.play()}catch(x){}}});

@@ -55,11 +55,11 @@ def story(d):
     P=d.get('pics',['🏥']); n=len(P)
     o+=stp(glass(90,180,860,760,'',r=64),1)
     cols=2 if n>1 else 1
-    sz=int(min(860/cols,760/((n+1)//2 if n>1 else 1))*.62)
+    sz=int(min(860/cols,760/((n+1)//2 if n>1 else 1))*(.9 if any(str(q).startswith('L6_') for q in P) else .62))
     for i,e in enumerate(P):
         r_,c_=(i//cols,i%cols); rows=(n+cols-1)//cols
         x=90+(860/cols)*c_+((860/cols)-sz)/2; y=180+(760/rows)*r_+((760/rows)-sz)/2
-        o+=stp(f'<div class="a" style="left:{int(x)}px;top:{int(y)}px;width:{sz}px;height:{sz}px;font-size:{int(sz*.85)}px;line-height:{sz}px;text-align:center">{e}</div>',1+i)
+        o+=stp(f'<div class="a" style="left:{int(x)}px;top:{int(y)}px;width:{sz}px;height:{sz}px;font-size:{int(sz*.85)}px;line-height:{sz}px;text-align:center">'+(f'<img src="{ART}{e}" style="width:100%;height:100%;object-fit:contain">' if e.startswith('L6_') else e)+'</div>',1+i)
     big=d.get('big')
     if big: o+=f'<div class="a h" style="left:1000px;top:190px;width:830px;font-size:96px;line-height:1.02">{big}</div>'
     y=(380 if len(big)<16 else 480) if big else 230

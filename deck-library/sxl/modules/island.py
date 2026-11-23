@@ -23,7 +23,7 @@ def item_pick(d):
     for i,(e,n) in enumerate(I):
         x=690+(i%5)*(w+g); y=185+(i//5)*(h+g)
         star='<span style="position:absolute;right:14px;top:8px;font-size:40px">⭐</span>' if d.get('star')==i else ''
-        o+=stp(f'<div class="gl ipk" data-i="{i}" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">{star}<span style="font-size:108px;line-height:1.05">{e}</span><span style="font-family:O;font-weight:800;font-size:28px;color:#1c1b2e;white-space:nowrap">{n}</span></div>',2)
+        o+=stp(f'<div class="gl ipk" data-i="{i}" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">{star}<span style="font-size:108px;line-height:1.05;height:112px;display:flex;align-items:center">{emo(e)}</span><span style="font-family:O;font-weight:800;font-size:28px;color:#1c1b2e;white-space:nowrap">{n}</span></div>',2)
     sec=int(d.get('sec',240))
     o+=stp(f'<div class="a tclock" data-sec="{sec}" style="left:90px;top:690px;width:400px;text-align:center;font-family:O;font-weight:800;font-size:120px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',3)
     o+=stp(f'<div class="a tstart" style="left:510px;top:702px;width:140px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="46" height="46" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>',3)
@@ -38,6 +38,7 @@ def next_event(d):
     One button walks the round: What next? (card) > Huddle (45 s timer starts) > Answers (2-3 teams, team dots) > Vote (hands) > What next?"""
     o=header(d['phase'],d.get('role','What next?'),'rose')+NOFIT
     data=dict(first=d['first'],mids=d['mids'],last=d['last'],rounds=d.get('rounds',3))
+    data['art']={c[0]:ART+c[0] for c in [data['first'],data['last'],*data['mids']] if str(c[0]).startswith('L6_')}
     o+=f'<script type="application/json" class="nxd">{_h.escape(json.dumps(data),False)}</script>'
     o+=('<div class="gl" style="left:90px;top:180px;width:1740px;height:110px;border-radius:55px"></div>'
         '<div class="a" style="left:150px;top:218px;font-size:58px;line-height:1">🏝️</div>'
@@ -46,7 +47,7 @@ def next_event(d):
         '<div class="a nxsun" style="left:240px;top:196px;font-size:88px;line-height:1;transition:left .9s ease">☀️</div>')
     o+=('<div class="gl nxcard" style="left:90px;top:320px;width:820px;height:490px;border-radius:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:0 30px;box-sizing:border-box">'
         '<span class="nxk" style="position:absolute;right:34px;top:22px;font-size:70px"></span>'
-        '<span class="nxe" style="display:block;height:250px;font-size:200px;line-height:250px">🌴</span>'
+        '<span class="nxe" style="display:flex;align-items:center;justify-content:center;height:290px;font-size:200px;line-height:290px">🌴</span>'
         '<span class="nxt" style="font-family:O;font-weight:800;font-size:56px;text-align:center;line-height:1.1;color:#1c1b2e">Press What next?</span></div>')
     sec=int(d.get('sec',45))
     def stepbox(y,h,n,e,inner,cls):
@@ -73,18 +74,18 @@ def rule(d):
     o=header(d['phase'],d.get('role','The rule'),'violet')+NOFIT
     te,tt,kind=d['tag']
     tc={'real':'linear-gradient(135deg,#ffe29a,#ffb347)','imag':'linear-gradient(135deg,#d6c7ff,#a9c7ff)'}[kind]
-    o+=stp(f'<div class="a" style="left:90px;top:170px;height:70px;padding:0 34px;border-radius:999px;background:{tc};display:flex;align-items:center;gap:14px;font-family:O;font-weight:800;font-size:38px;color:#1c1b2e"><span style="font-size:46px;line-height:1">{te}</span>{tt}</div>',1)
+    o+=stp(f'<div class="a" style="left:90px;top:170px;height:70px;padding:0 34px;border-radius:999px;background:{tc};display:flex;align-items:center;gap:14px;font-family:O;font-weight:800;font-size:38px;color:#1c1b2e"><span style="font-size:46px;line-height:1">{emo(te)}</span>{tt}</div>',1)
     o+=stp(glass(90,255,1740,150,f'<div style="height:100%;display:flex;align-items:center;justify-content:center;gap:14px">{"".join(ch(c,t,56,"8px 30px") for c,t in d["formula"])}</div>',r=64),1,pills=True)
     W=d['why']; n=len(W); E=d['eg']; ne=len(E); exh=110 if ne>1 else 130
     avail=555-ne*(exh+14)-14; rh=min(150,int((avail-16*(n-1))/n))
     for i,(e,t) in enumerate(W):
-        o+=stp(glass(90,430+i*(rh+16),1060,rh,f'<div style="height:100%;display:flex;align-items:center;gap:24px;padding:0 34px;box-sizing:border-box"><span style="font-size:{min(78,rh-40)}px;line-height:1;flex:none">{e}</span><span style="font-family:O;font-weight:800;font-size:36px;line-height:1.18;color:#1c1b2e">{t}</span></div>',r=48),2+i)
+        o+=stp(glass(90,430+i*(rh+16),1060,rh,f'<div style="height:100%;display:flex;align-items:center;gap:24px;padding:0 34px;box-sizing:border-box"><span style="font-size:{min(78,rh-40)}px;line-height:1;flex:none">{emo(e)}</span><span style="font-family:O;font-weight:800;font-size:36px;line-height:1.18;color:#1c1b2e">{t}</span></div>',r=48),2+i)
     pic=d.get('pic','')
-    o+=stp(glass(1190,430,640,n*(rh+16)-16,f'<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:{190 if len(pic)<=3 else 120}px;line-height:1">{pic}</div>',r=64),2)
+    o+=stp(glass(1190,430,640,n*(rh+16)-16,f'<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:{230 if pic.startswith('L6_') else 190 if len(pic)<=3 else 120}px;line-height:1">{emo(pic)}</div>',r=64),2)
     ey=430+n*(rh+16)+14
     for k,(e,s_) in enumerate(E):
         body=(''.join(ch(c,t,38,"4px 14px") for c,t in s_) if isinstance(s_,(list,tuple)) else f'<span style="font-family:O;font-weight:800;font-size:40px;line-height:1.15;color:#1c1b2e">{s_}</span>')
-        o+=stp(f'<div class="gl" style="left:90px;top:{ey+k*(exh+14)}px;width:1740px;height:{exh}px;border-radius:52px;display:flex;align-items:center;gap:22px;padding:0 34px;box-sizing:border-box;background:linear-gradient(135deg,#d6fbea,#c4f3e6)"><span style="font-size:64px;line-height:1;flex:none">{e}</span><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">{body}</div></div>',2+n)
+        o+=stp(f'<div class="gl" style="left:90px;top:{ey+k*(exh+14)}px;width:1740px;height:{exh}px;border-radius:52px;display:flex;align-items:center;gap:22px;padding:0 34px;box-sizing:border-box;background:linear-gradient(135deg,#d6fbea,#c4f3e6)"><span style="font-size:64px;line-height:1;flex:none">{emo(e)}</span><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">{body}</div></div>',2+n)
     return o
 
 
@@ -181,8 +182,8 @@ document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!
   for(var i=mids.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=mids[i];mids[i]=mids[j];mids[j]=t}
   var deck=[D.first].concat(mids.slice(0,D.rounds),[D.last]),ix=-1,ph=0,card=$('.nxcard',s),sun=$('.nxsun',s),btn=$('.nxbtn',s),steps=[$('.sA',s),$('.sB',s),$('.sC',s)];
   function show(){var c=deck[ix];
-   if(!c){$('.nxe',s).textContent='🌴';$('.nxt',s).textContent='Press What next?';$('.nxk',s).textContent='';card.className='gl nxcard'}
-   else{$('.nxe',s).textContent=c[0];$('.nxt',s).textContent=c[1];$('.nxk',s).textContent=c[2]==='bad'?'⚠️':c[2]==='good'?'🍀':'🌅';card.className='gl nxcard '+(c[2]==='bad'?'bad':c[2]==='good'?'good':'fin');void card.offsetWidth;card.classList.add('pop')}
+   if(!c){$('.nxe',s).innerHTML='';$('.nxe',s).textContent='🌴';$('.nxt',s).textContent='Press What next?';$('.nxk',s).textContent='';card.className='gl nxcard'}
+   else{(function(v){var e=$('.nxe',s);if(/\.png$/.test(v)){e.innerHTML='<img src="'+(D.art[v]||v)+'" style="max-height:290px;max-width:760px;object-fit:contain">'}else{e.textContent=v}})(c[0]);$('.nxt',s).textContent=c[1];$('.nxk',s).textContent=c[2]==='bad'?'⚠️':c[2]==='good'?'🍀':'🌅';card.className='gl nxcard '+(c[2]==='bad'?'bad':c[2]==='good'?'good':'fin');void card.offsetWidth;card.classList.add('pop')}
    var f=ix<0?0:ix/(deck.length-1);sun.style.left=(240+f*1330)+'px';sun.textContent=SUN[Math.min(SUN.length-1,Math.round(f*(SUN.length-1)))];
    $('.nxpos',s).textContent=(ix+1)+' / '+deck.length;ph=0;steps.forEach(function(x){x.classList.remove('cur')});
    $$('.nxd1',s).forEach(function(x){x.classList.remove('on')});
