@@ -160,6 +160,46 @@ def rpg_scene(d):
     o+=stp(f'<div class="gl" style="left:90px;top:885px;width:1740px;height:105px;border-radius:52px;display:flex;align-items:center;gap:30px;padding:0 44px;box-sizing:border-box"><span style="font-size:70px;line-height:1">{e}</span><span style="font-family:O;font-weight:800;font-size:44px;color:#1c1b2e">{l}</span></div>',7)
     return o
 
+
+import html as _h
+@module('debate_scene')
+def debate_scene(d):
+    """Team debate on its feet, whole class votes. scene=emoji, problem, team=0..3, routes=[{e,t,ok:(e,t),ko:(e,t)}] x2, sec=60.
+    Teacher taps the route the team chose, the class votes go / no-go (hands), teacher taps the vote: go shows the success, no-go shows what would have happened."""
+    o=header(d['phase'],d.get('role',f'Scene {d["num"]}'),'rose')
+    o+=stp(glass(90,185,520,520,f'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 24px;box-sizing:border-box"><div style="font-size:230px;line-height:1">{d["scene"]}</div><div style="font-family:O;font-weight:800;font-size:46px;text-align:center;line-height:1.1;color:#1c1b2e">{d["problem"]}</div></div>',r=56),1)
+    for i,r in enumerate(d['routes']):
+        a=lambda k:_h.escape(r[k][0],True); b=lambda k:_h.escape(r[k][1],True)
+        o+=stp(f'<div class="gl drt" data-ok-e="{a("ok")}" data-ok-t="{b("ok")}" data-ko-e="{a("ko")}" data-ko-t="{b("ko")}" style="left:{640+i*600}px;top:185px;width:590px;height:300px;border-radius:52px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><span style="position:absolute;left:24px;top:18px;font-family:O;font-weight:800;font-size:52px;color:#6a35e8">{"AB"[i]}</span><span style="font-size:140px;line-height:1">{r["e"]}</span><span style="font-family:O;font-weight:800;font-size:44px;color:#1c1b2e;text-align:center;padding:0 20px">{r["t"]}</span></div>',1)
+    fr=ch('c1','I think we should…',38,'6px 22px')+ch('c4','But if we…,',38,'6px 22px')+ch('c2','…they will…',38,'6px 22px')+ch('c3',"OK, we'll…",38,'6px 22px')
+    o+=stp(f'<div class="a" style="left:640px;top:510px;width:1190px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center">{fr}</div>',1)
+    tc=TEAMC[d['team']]
+    sp=''.join(f'<span class="dsp" style="width:84px;height:84px;border-radius:50%;background:{tc};opacity:.35;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;cursor:pointer;user-select:none"></span>' for _ in range(4))
+    o+=stp(f'<div class="a" style="left:90px;top:730px;width:520px;display:flex;gap:18px;justify-content:center;align-items:center">{sp}</div>',2)
+    sec=int(d.get('sec',60))
+    o+=stp(f'<div class="a tclock" data-sec="{sec}" style="left:640px;top:610px;width:420px;text-align:center;font-family:O;font-weight:800;font-size:130px;line-height:1"><span class="grad">{sec//60}:{sec%60:02d}</span></div>',2)
+    o+=stp(f'<div class="a tstart" style="left:1080px;top:625px;width:140px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;{GR}"><svg width="46" height="46" viewBox="0 0 56 56"><path d="M16 8 L48 28 L16 48 Z" fill="#fff"/></svg></div>',2)
+    o+=stp(f'<div class="a" style="left:1240px;top:640px;width:590px;text-align:center;font-family:O;font-weight:800;font-size:40px;color:{tc}">Team {d["team"]+1} stands. Everyone speaks.</div>',2)
+    o+=stp('<div class="a" style="left:90px;top:870px;width:520px;display:flex;gap:30px;justify-content:center"><div class="dvote" data-v="go" style="width:230px;height:120px;border-radius:60px;background:linear-gradient(135deg,#2bd9b6,#10a98d);color:#fff;font-size:70px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.9">👍</div><div class="dvote" data-v="no" style="width:230px;height:120px;border-radius:60px;background:linear-gradient(135deg,#ff6b78,#d62f48);color:#fff;font-size:70px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.9">👎</div></div>',3)
+    o+='<div class="gl dout" style="left:640px;top:790px;width:1190px;height:200px;border-radius:56px;display:flex;align-items:center;gap:36px;padding:0 50px;box-sizing:border-box"><span class="oe" style="font-size:120px;line-height:1"></span><span class="ot" style="font-family:O;font-weight:800;font-size:50px;line-height:1.15;color:#1c1b2e"></span></div>'
+    return o
+
+@module('guess_class')
+def guess_class(d):
+    """Class-vs-teacher Guess Who. suspects=[{e,n,a:{key:bool}}], attrs=[{k,e,t}], secret=index, budget=8, frame text.
+    The class asks with the frame, teacher taps the matching clue chip: the screen answers YES/NO and greys out suspects. Tap a face to accuse."""
+    o=header(d['phase'],d.get('role','Who is bitten?'),'rose')
+    S=d['suspects']; n=len(S)
+    for i,sp in enumerate(S):
+        o+=f'<div class="gl gcs" data-i="{i}" data-a="{_h.escape(json.dumps(sp["a"]),True)}" style="left:{90+i*(int(1740/n))}px;top:185px;width:{int(1740/n)-20}px;height:360px;border-radius:48px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><span style="font-size:170px;line-height:1">{sp["e"]}</span><span style="font-family:O;font-weight:800;font-size:38px;color:#1c1b2e">{sp["n"]}</span></div>'
+    o+=f'<div class="a gcsec" data-s="{d.get("secret",0)}" data-b="{d.get("budget",8)}" style="left:90px;top:575px;width:420px;text-align:center;font-family:O;font-weight:800;font-size:44px;color:#6a35e8">Questions left: <span class="gcb" style="font-size:90px;vertical-align:middle">{d.get("budget",8)}</span></div>'
+    o+='<div class="gl gcans" style="left:90px;top:700px;width:420px;height:250px;border-radius:56px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:110px;color:#6a35e8">?</div>'
+    o+=f'<div class="a" style="left:560px;top:575px;width:1270px;text-align:center;font-family:O;font-weight:800;font-size:40px;color:#4a3a8a">{d.get("frame","Is he / she …?")} <span style="font-size:30px;font-weight:600">(teacher: tap the clue the class asks about)</span></div>'
+    cs=''.join(f'<div class="gcq" data-k="{a["k"]}" style="display:flex;align-items:center;gap:14px;padding:10px 26px;border-radius:999px;background:rgba(255,255,255,.8);border:4px solid #fff;font-family:O;font-weight:800;font-size:36px;color:#1c1b2e;cursor:pointer;box-shadow:0 8px 18px rgba(80,60,160,.14)"><span style="font-size:56px;line-height:1">{a["e"]}</span>{a["t"]}</div>' for a in d['attrs'])
+    o+=f'<div class="a" style="left:560px;top:690px;width:1270px;display:flex;flex-wrap:wrap;gap:16px;justify-content:center">{cs}</div>'
+    o+='<div class="a gcwin" style="left:90px;top:960px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:44px;color:#10a98d;height:50px"></div>'
+    return o
+
 # ---------------- printable cards (A4, 2 x 4 per page, cut lines) ----------------
 def cards_page(cards,title,out):
     """cards=[{'who':emoji,'rows':[(label,emoji)],'foot':text}] -> standalone printable html"""
@@ -171,6 +211,8 @@ def cards_page(cards,title,out):
     open(out,'w').write(html); return out
 
 EXT_CSS.append("""
+.drt.pick{box-shadow:0 0 0 10px #ff9f1c!important}.dsp.on{opacity:1!important}.dsp.on:after{content:"✔"}.dvote.pick{transform:scale(1.15);box-shadow:0 0 0 8px #fff}.dout{opacity:0;transition:opacity .4s}.dout.on{opacity:1}
+.gcs.out{opacity:.22;filter:grayscale(1)}.gcq.used{opacity:.3;pointer-events:none}.gcans.yes{color:#10a98d!important}.gcans.no{color:#d62f48!important}
 .hclk{font-family:O;font-weight:800;font-size:34px;color:#4a3a8a;padding:8px 30px;border-radius:999px;background:rgba(255,255,255,.72);border:3px solid #fff;box-shadow:0 8px 18px rgba(80,60,160,.16);white-space:nowrap}
 .hgear{display:flex;gap:16px;padding:6px 22px;border-radius:999px;background:rgba(255,255,255,.55);border:3px solid #fff}
 .hg{font-size:38px;line-height:1.3;opacity:.22;filter:grayscale(1);transition:all .4s}.hg.on{opacity:1;filter:none}.hg.nw{animation:hgp 1.6s ease-out 1}@keyframes hgp{0%{transform:scale(.6)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
@@ -178,6 +220,17 @@ EXT_CSS.append("""
 .sdf{cursor:pointer;border-radius:30px;pointer-events:auto}.sdf.found{background:rgba(255,200,60,.35);box-shadow:0 0 0 8px #ff9f1c;animation:none}
 """)
 EXT_JS.append(r"""
+document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!s)return;
+ var r=e.target.closest('.drt'),v=e.target.closest('.dvote'),sp=e.target.closest('.dsp');
+ function upd(){if(!(s.__r&&s.__v))return;var k=s.__v==='go'?'ok':'ko',o=$('.dout',s);$('.oe',o).textContent=s.__r.dataset[k+'E'];$('.ot',o).textContent=s.__r.dataset[k+'T'];o.classList.add('on');P(k==='ok'?'good':'boop')}
+ if(r){$$('.drt',s).forEach(function(x){x.classList.toggle('pick',x===r)});s.__r=r;P('pop');upd();return}
+ if(v){$$('.dvote',s).forEach(function(x){x.classList.toggle('pick',x===v)});s.__v=v.dataset.v;P('pop');upd();return}
+ if(sp){sp.classList.toggle('on');P('tick');return}
+ var q=e.target.closest('.gcq');if(q&&s.querySelector('.gcsec')){var sec=$('.gcsec',s),sx=+sec.dataset.s,S=$$('.gcs',s),A=JSON.parse(S[sx].dataset.a),k=q.dataset.k,ans=!!A[k];q.classList.add('used');
+  var b=$('.gcb',s);b.textContent=Math.max(0,(+b.textContent)-1);var an=$('.gcans',s);an.textContent=ans?'YES':'NO';an.className='gl gcans '+(ans?'yes':'no');P(ans?'good':'boop');
+  S.forEach(function(x){var a=JSON.parse(x.dataset.a);if(!!a[k]!==ans)x.classList.add('out')});return}
+ var c=e.target.closest('.gcs');if(c&&s.querySelector('.gcsec')){var sec2=$('.gcsec',s),sx2=+sec2.dataset.s;if(+c.dataset.i===sx2){$('.gcwin',s).textContent='🎉 Yes! The pharmacist is bitten!';$$('.gcs',s).forEach(function(x){if(x!==c)x.classList.add('out')});c.style.boxShadow='0 0 0 12px #2bd9b6';P('good')}else{c.classList.add('out');P('boop');var b2=$('.gcb',s);b2.textContent=Math.max(0,(+b2.textContent)-1)}}
+},true);
 document.addEventListener('click',function(e){var b=e.target.closest('.sdf');if(!b)return;var s=b.closest('.sl');if(!s||b.classList.contains('found'))return;b.classList.add('found');P('pop');
  var c=$('.hcount',s),n=+c.dataset.n,f=$$('.sdf.found',s).length;c.textContent=f+' / '+n;var cap=$('.hcap',s);if(cap)cap.textContent=(b.dataset.t||'');if(f>=n)P('good')},true);
 """)

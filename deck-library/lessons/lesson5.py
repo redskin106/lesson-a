@@ -138,6 +138,26 @@ A2_RPG=[
 ]
 L5_RPG=ENGAGE+A1+STUDY+A2_RPG+RECAP
 
+# ------------------------------------------------------------------ VARIANT: debate Activate 2 (team debates on its feet, whole class votes, Guess Who finale)
+def dsc(n,team,scene,problem,routes,**kw):
+    return dict(m='debate_scene',phase='ACTIVATE',label=f'Debate scene {n} · {problem}',min=3,clock=CK['A2'],gear=4,num=n,team=team,scene=scene,problem=problem,routes=routes,**kw)
+def R(e,t,ok,ko): return dict(e=e,t=t,ok=ok,ko=ko)
+A2_DEBATE=[
+ dict(m='story',phase='ACTIVATE',label='Story · 11 pm outbreak',min=1,clock=CK['A2'],gear=4,role='Outbreak!',pics=['⛈️','🌑','🦠','🚨'],big='Outbreak!',lines=['One team debates. The class votes.','Everyone speaks.']),
+ dsc(1,0,'🌑','The lights go out.',[R('🔦','Find the torches',('🔦','Torches on. The crew moves.'),('🔋','We were going to use the torches, but the batteries are dead.')),R('🕯️','Wait for the lights',('💡','The lights come back. Easy.'),('🧟','We were going to wait, but something is moving in the dark.'))]),
+ dsc(2,1,'🔒','The door is locked.',[R('🪟','Climb through the window',('🪟','Through the window. One floor to go.'),('🪜','We were going to climb, but the ladder is too short.')),R('🔨','Break the door',('🚪','The door opens. Nobody heard.'),('🔔','We were going to break the door, but the alarm rings.'))]),
+ dsc(3,2,'🚨','The alarm rings.',[R('🏃','Run to the stairs',('🏃','Down the stairs. Nobody follows.'),('🧑‍✈️','We were going to run, but the guard is on the stairs.')),R('🤫','Hide in the lab',('🧪','Safe in the lab. The alarm stops.'),('🧟','We were going to hide, but the lab is not empty.'))]),
+ dsc(4,3,'🔦','The guard is coming.',[R('🧹','Pretend to clean',('🧹','"Good work!" says the guard.'),('🧽','We were going to clean, but we have no mop.')),R('🚪','Hide in the cupboard',('🤫','The guard walks past.'),('🙈','We were going to hide, but the cupboard is full.'))]),
+ dict(m='guess_class',phase='ACTIVATE',label='Guess Who · who is bitten?',min=4,clock=CK['A2'],gear=4,role='Who is bitten?',secret=0,budget=8,frame='Is he / she …?',
+   suspects=[dict(e='🧑‍⚕️',n='Pharmacist',a=dict(alone=True,bandage=True,working=True,symptoms=True,ground=True)),
+             dict(e='🧑‍🔬',n='Lab tech',a=dict(alone=False,bandage=False,working=True,symptoms=False,ground=False)),
+             dict(e='🧑‍🍳',n='Cook',a=dict(alone=True,bandage=False,working=False,symptoms=True,ground=True)),
+             dict(e='🧑‍🔧',n='Porter',a=dict(alone=False,bandage=False,working=True,symptoms=False,ground=True)),
+             dict(e='🧑‍🚒',n='Lift engineer',a=dict(alone=False,bandage=False,working=True,symptoms=False,ground=False))],
+   attrs=[dict(k='alone',e='🧍',t='alone at 10:45'),dict(k='bandage',e='🩹',t='a bandage'),dict(k='working',e='🛠️',t='working at 10:45'),dict(k='symptoms',e='🤒',t='symptoms'),dict(k='ground',e='🛗',t='on the ground floor')]),
+]
+L5_DEBATE=ENGAGE+A1+STUDY+A2_DEBATE+RECAP
+
 L5=ENGAGE+A1+STUDY+A2+RECAP
 
 # ------------------------------------------------------------------ printable cards
@@ -156,6 +176,7 @@ if __name__=='__main__':
     out=HERE.parent.parent/'lessons-5'; out.mkdir(exist_ok=True)
     print(build_interactive(L5,str(out/'lesson5_v1.html'),title='SkillsXLab · Lesson 5 · The Night Shift (grey box)'))
     print(build_interactive(L5_RPG,str(out/'lesson5_rpg_v1.html'),title='SkillsXLab · Lesson 5 · The Night Shift (RPG Activate 2)'))
+    print(build_interactive(L5_DEBATE,str(out/'lesson5_debate_v1.html'),title='SkillsXLab · Lesson 5 · The Night Shift (debate Activate 2)'))
     a1,a2=_cards()
     print(cards_page(a1,'L5 mingle cards · round 1',str(out/'lesson5_cards_round1.html')))
     print(cards_page(a2,'L5 mingle cards · round 2',str(out/'lesson5_cards_round2.html')))
