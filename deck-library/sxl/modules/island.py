@@ -16,8 +16,8 @@ def item_pick(d):
     """items = 15 x (emoji,name); rounds = [(label,cap,ban_index_or_-1)]; sec = pair-work timer; star = index of the absurd item.
     Tap a tile = a pair's pick (up to the round's cap). Teacher taps a round pill: 1 choose three, 2 no phone (the phone greys out), 3 keep one."""
     o=header(d['phase'],d.get('role','What would you bring?'),'amber')+NOFIT
-    o+=stp(glass(90,185,560,470,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><div style="font-size:210px;line-height:1">🏝️</div>'
-        f'<div class="ipp" style="font-family:O;font-weight:800;font-size:46px;line-height:1.1;text-align:center;color:#1c1b2e;padding:0 24px;min-height:100px;display:flex;align-items:center">{(d.get("prompts") or ["What would you bring? Why?"])[0]}</div>'
+    o+=stp(glass(90,185,560,470,'<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><img src="'+ART+'L6_i_bring_why.png" style="width:350px;height:261px;object-fit:contain;border-radius:20px;background:#fff">'
+        f'<div class="ipp" style="font-family:O;font-weight:800;font-size:40px;line-height:1.1;text-align:center;color:#1c1b2e;padding:0 24px;min-height:90px;display:flex;align-items:center">{(d.get("prompts") or ["What would you bring? Why?"])[0]}</div>'
         f'<div class="ipc" style="font-family:O;font-weight:800;font-size:60px;color:#6a35e8">0 / {d["rounds"][0][1]}</div></div>',r=60),1)
     I=d['items']; w=216; h=206; g=15
     for i,(e,n) in enumerate(I):
