@@ -323,7 +323,7 @@ function fitSlide(s,redo){
  var st=$('#stage'),k=st.getBoundingClientRect().width/1920||1,sd=s.style.display,sv=s.style.visibility,was=s.classList.contains('on');
  if(!was){s.style.display='block';s.style.visibility='hidden'}
  var s0=st.getBoundingClientRect().top,kids=Array.prototype.slice.call(s.children).filter(function(e){
-  if(e.tagName==='SCRIPT'||e.classList.contains('orb')||e.classList.contains('tag')||e.classList.contains('mdls'))return false;
+  if(e.tagName==='SCRIPT'||e.classList.contains('orb')||e.classList.contains('tag')||e.classList.contains('mdls')||e.classList.contains('chrome'))return false;
   var r=e.getBoundingClientRect();if(r.height&&(r.top-s0)/k<100)return false;return true}),shown=[];
  kids.forEach(function(e){if(e.classList.contains('chi')&&!shown.length&&e.style.display==='none'){e.style.display='block';shown.push(e)}});
  var top=1e9,bot=-1e9;
@@ -541,7 +541,7 @@ INIT.view=function(s){
    if(ix===mx){stp.forEach(function(e){e.classList.remove('dim')})}else if(g){stp.forEach(function(e){if(e.dataset.g&&+e.dataset.g<g)e.classList.add('dim')})}
    if(ix===1)P('open');else if(!stp.some(function(e){return +e.dataset.s===ix&&e.dataset.pills}))P('pop');ix++;if(ix>mx)P('good');return true};
   s.addEventListener('click',function(e){if(e.target.closest('.vsp,.tstart,.tadj,.pkc,.spinbtn,.dstop,.vplay'))return;s.__adv()});}
- var kids=$$(':scope > *',s).filter(function(e){return !e.hasAttribute('data-s')&&!e.classList.contains('orb')&&!e.querySelector('.tag')&&!e.classList.contains('tag')&&e.tagName!=='SCRIPT'});
+ var kids=$$(':scope > *',s).filter(function(e){return !e.hasAttribute('data-s')&&!e.classList.contains('chrome')&&!e.classList.contains('orb')&&!e.querySelector('.tag')&&!e.classList.contains('tag')&&e.tagName!=='SCRIPT'});
  var skip=false;kids.forEach(function(k){k.classList.add('vh')});
  var i=0;function step(){if(i>=kids.length){s.__done=1;wait(300).then(function(){if(cur<slides.length-1)$('#nx').classList.add('on')});return}
   var k=kids[i++];k.classList.add('vs');k.classList.remove('vh');if(i%2==1&&i<9)P('tick');var d=kids.length>14?70:150;(skip||SXL.cfg.off?Promise.resolve():wait(d)).then(step)}
@@ -556,7 +556,7 @@ INIT.view=function(s){
   function row_(g){var r=$('.pfrow[data-g="'+g+'"]',s);var f=$('.pfrm',s);f.style.display='block';$$('.pfrow[data-g="'+g+'"]',s).forEach(function(r){r.style.display='flex';r.classList.remove('pp');void r.offsetWidth;r.classList.add('pp')})}
   function put_(k,txt){var sl=$('[data-slot="'+k+'"]',s);if(!sl)return;$('.op',sl).style.display='none';var f=$('.fl',sl);f.style.display='';var ch=$('.chip',f);if(ch)ch.textContent=txt;f.classList.remove('pp');void f.offsetWidth;f.classList.add('pp')}
   var v=c.dataset.v.split('|');if(g==='p'){put_('p0',v[0]);row_('p')}else{put_('c0',v[0]);put_('c1',v[1]+'?');put_('c3',v[2]);put_('c1b',v[1]+'.');row_('c')}P('pop');setTimeout(function(){P('tick')},90)}});
- var ts=$('.tstart',s);if(ts){var tc=$('.tclock',s),left=+tc.dataset.sec,iv2=null;var tshow=function(){tc.innerHTML='<span class="grad">'+Math.floor(left/60)+':'+('0'+left%60).slice(-2)+'</span>'};$$('.tadj',s).forEach(function(b){b.onclick=function(e){e.stopPropagation();left=Math.max(60,left+(+b.dataset.d));tc.classList.remove('tp');tshow();P('tick')}});ts.onclick=function(){if(iv2){clearInterval(iv2);iv2=null;return}P('tick');iv2=setInterval(function(){left--;tshow();if(left<=0){clearInterval(iv2);iv2=null;P('done');tc.classList.add('tp')}},1000)}}
+ var ts=$('.tstart',s);if(ts){var tc=$('.tclock',s),left=+tc.dataset.sec,iv2=null;var tshow=function(){tc.innerHTML='<span class="grad">'+Math.floor(left/60)+':'+('0'+left%60).slice(-2)+'</span>'};$$('.tadj',s).forEach(function(b){b.onclick=function(e){e.stopPropagation();left=Math.max(60,left+(+b.dataset.d));tc.classList.remove('tp');tshow();P('tick')}});ts.onclick=function(){if(iv2){clearInterval(iv2);iv2=null;return}if(left<=0){left=+tc.dataset.sec;tshow()}P('tick');iv2=setInterval(function(){left--;tshow();if(left<=0){clearInterval(iv2);iv2=null;P('done');tc.classList.add('tp')}},1000)}}
  if($('.rgr',s)&&INIT.rungs)INIT.rungs(s); if($('.ptl',s)&&INIT.pairs)INIT.pairs(s);
  $$('.dstop',s).forEach(function(d){d.style.cursor='pointer';d.onclick=function(e){e.stopPropagation();d.classList.remove('tp');void d.offsetWidth;d.classList.add('tp');P('pop')}});
 };
