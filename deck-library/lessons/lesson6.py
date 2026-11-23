@@ -86,6 +86,10 @@ STUDY=[
  produce('If we had','Make a wish',[('L6_life_ring.png life ring','If we had a life ring, we would rescue our friend in the sea.'),('L6_flashlight.png flashlight','If we had a flashlight, we would explore the cave.'),('L6_phone.png a phone','If we had a phone, we would call the coast guard.')],2),
  # --- block 3: advice
  teach('If I were you','Block 3 · If I were you',['L6_sc_island_far.png','L6_x_no_seawater.png','L6_x_big_fire.png','L6_x_point.png'],['If I were you, I would stay on the beach.','If I were you, I would not drink sea water.','If I were you, I would make a big fire.','What would you do if you were me?'],2),
+ rule('If I were you',2,role='The rule',optional=True,tag=('💭','Advice · imaginary','imag'),
+      formula=[('c4','If'),('c1','I were you,'),('c2','I would'),('c3','+ verb')],
+      why=[('💬','We give advice to a friend.'),('🪞','We imagine: I am in your place.'),('✅','Say "were", not "was", after I.')],pic='L6_x_point.png',
+      eg=[('L6_mushroom.png',[('c4','If'),('c1','I were you,'),('c2','I would'),('c3','not eat it.')])]),
  rec('If I were you','Give advice.',
    [Q('L6_ev_shark_raft.png','There is a shark. If I ___ you, I would stay out of the water.','were','was'),
     Q('L6_ev_rain_fire.png','It is raining. If I were you, I ___ find shelter.','would','will'),

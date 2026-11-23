@@ -47,6 +47,7 @@ def next_event(d):
         '<div class="a nxsun" style="left:240px;top:196px;font-size:88px;line-height:1;transition:left .9s ease">☀️</div>')
     o+=('<div class="gl nxcard" style="left:90px;top:320px;width:820px;height:490px;border-radius:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:0 30px;box-sizing:border-box">'
         '<span class="nxk" style="position:absolute;right:34px;top:22px;font-size:70px"></span>'
+        '<span class="nxkeep" style="position:absolute;left:30px;top:22px;display:none;align-items:center;gap:8px;padding:6px 18px 6px 10px;border-radius:999px;background:rgba(255,255,255,.85);border:4px solid #fff;font-family:O;font-weight:800;font-size:30px;color:#4a3a8a"></span>'
         '<span class="nxe" style="display:flex;align-items:center;justify-content:center;height:290px;font-size:200px;line-height:290px">🌴</span>'
         '<span class="nxt" style="font-family:O;font-weight:800;font-size:56px;text-align:center;line-height:1.1;color:#1c1b2e">Press What next?</span></div>')
     sec=int(d.get('sec',45))
@@ -182,6 +183,9 @@ document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!
   for(var i=mids.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=mids[i];mids[i]=mids[j];mids[j]=t}
   var deck=[D.first].concat(mids.slice(0,D.rounds),[D.last]),ix=-1,ph=0,card=$('.nxcard',s),sun=$('.nxsun',s),btn=$('.nxbtn',s),steps=[$('.sA',s),$('.sB',s),$('.sC',s)];
   function show(){var c=deck[ix];
+   (function(){var k=$('.nxkeep',s),t=document.querySelectorAll('.sl[data-mod=item_pick] .ipk.sel img'),h='';
+    for(var q=0;q<t.length;q++)h+='<img src="'+t[q].src+'" style="height:64px;width:auto;border-radius:10px">';
+    if(h&&c){k.innerHTML=h+'<span>our item</span>';k.style.display='flex'}else k.style.display='none'})();
    if(!c){$('.nxe',s).innerHTML='';$('.nxe',s).textContent='🌴';$('.nxt',s).textContent='Press What next?';$('.nxk',s).textContent='';card.className='gl nxcard'}
    else{(function(v){var e=$('.nxe',s);if(/\.png$/.test(v)){e.innerHTML='<img src="'+(D.art[v]||v)+'" style="max-height:290px;max-width:760px;object-fit:contain">'}else{e.textContent=v}})(c[0]);$('.nxt',s).textContent=c[1];$('.nxk',s).textContent=c[2]==='bad'?'⚠️':c[2]==='good'?'🍀':'🌅';card.className='gl nxcard '+(c[2]==='bad'?'bad':c[2]==='good'?'good':'fin');void card.offsetWidth;card.classList.add('pop')}
    var f=ix<0?0:ix/(deck.length-1);sun.style.left=(240+f*1330)+'px';sun.textContent=SUN[Math.min(SUN.length-1,Math.round(f*(SUN.length-1)))];
