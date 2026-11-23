@@ -134,6 +134,24 @@ def if_chain(d):
     return o
 
 
+@module('spot_art')
+def spot_art(d):
+    """Spot the difference with two real pictures. before/after = art file names (1024x765), hot = [(label,(x0,y0,x1,y1))] in picture pixels.
+    The teacher taps the right-hand picture where the class points; each hotspot lights once, count and caption as in spot_change."""
+    o=header(d['phase'],d.get('role','Look. What changed?'),'amber')+NOFIT
+    w=860; iw=w-20; sc=iw/1024; h=int(765*sc)+20; y0=185
+    o+=stp(art(90,y0,w,h,d['before'],r=40,label=d['before'],fit='contain'),1)
+    o+=stp(art(970,y0,w,h,d['after'],r=40,label=d['after'],fit='contain'),2)
+    hs=''
+    for lab,(a,b,c,e) in d['hot']:
+        hs+=f'<div class="a sdf" data-t="{lab}" data-c="0" style="left:{int(970+10+a*sc)}px;top:{int(y0+10+b*sc)}px;width:{int((c-a)*sc)}px;height:{int((e-b)*sc)}px;border-radius:30px"></div>'
+    o+=stp('<div class="a hscn" style="left:0;top:0;width:1920px;height:1080px;pointer-events:none">'+hs+'</div>',2)
+    n=len(d['hot'])
+    o+=f'<div class="a hcount" data-n="{n}" style="left:810px;top:{y0+h+14}px;width:300px;text-align:center;font-family:O;font-weight:800;font-size:58px;color:#6a35e8">0 / {n}</div>'
+    o+=f'<div class="a hcap" style="left:90px;top:{y0+h+86}px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:40px;color:#1c1b2e;height:50px"></div>'
+    return o
+
+
 EXT_CSS.append("""
 .ipk.sel{box-shadow:0 0 0 10px #ff9f1c!important;background:rgba(255,236,190,.95)!important}.ipk.sel:after{content:"✔";position:absolute;right:12px;top:4px;font-size:40px;color:#10a98d}
 .ipk.off{opacity:.25;filter:grayscale(1);pointer-events:none}

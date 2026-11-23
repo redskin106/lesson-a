@@ -368,7 +368,7 @@ $('#sf').onclick=function(){var on=SXLSound.toggle();this.textContent='Sound: '+
 function wrong(el){P('boop');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
 function put(slotEl){$('.op',slotEl).style.display='none';var f=$('.fl',slotEl);f.style.display='inline-block';f.classList.add('mo');P('pop');setTimeout(function(){P('tick')},90)}
 /* ---- generic tap-to-zoom on pictures (about half the screen), animated from the picture's own spot ---- */
-(function(){var NOZ='.cn,.pkc,.bk,.drag,.dlr,.dpb,.cbt,.slot,.room,[data-nz]',busy=0;
+(function(){var NOZ='.cn,.pkc,.bk,.drag,.dlr,.dpb,.cbt,.slot,.room,[data-nz],[data-mod=spot_art] img',busy=0;
  function cur(){return document.querySelector('.sl.on')}
  function kk(s){return s.getBoundingClientRect().width/1920}
  function from(z,im,s){var img=z.querySelector('img'),tr=img.getBoundingClientRect(),sr=im.getBoundingClientRect(),k=kk(s);

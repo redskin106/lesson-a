@@ -29,10 +29,8 @@ ENGAGE=[
  dict(m='cover',phase='ENGAGE',label='Cover',title='Lesson <span class="grad">6</span>',phases=['Engage','Study','Activate','Recap'],active=0,cards=[dict(pic='🏝️',x=1010,y=150,w=330,h=430,r=-7),dict(pic='🌅',x=1380,y=330,w=330,h=430,r=6)]),
  dict(m='story',phase='ENGAGE',label='Cold open · storm and wreck',min=1,role='Last night',pics=['⛈️','🚢','🌊','🏝️'],big='Washed ashore.',lines=['The ship sank in the storm.','Sixteen people reached the island.','The supply boat passes once.','At sunset.'],**C('E')),
  dict(m='teach',phase='ENGAGE',label='Words · stranded rescue shipwreck',min=1.5,role='Three words',words=[('🏝️','stranded'),('🚁','rescue'),('🚢','shipwreck')],**C('E')),
- dict(m='spot_change',phase='ENGAGE',label='Spot what changed · the beach',min=2,role='Look. What changed after the storm?',
-      base=[('🌴',40,40),('⛺',260,50),('🛶',480,40),('🪣',50,230),('🔥',290,250),('🐚',500,240),('🪵',50,430),('🦀',300,440)],
-      diffs=[(1,None,'The tent is gone!',0),(2,'🪵','the boat is a log',0),(4,'💨','the fire is out',0),(6,'🧰','a crate washed up',0)],
-      extra=[('📻',540,440,'a radio on the sand… working?')],**C('E')),
+ dict(m='spot_art',phase='ENGAGE',label='Spot what changed · the beach',min=2,role='Look. What changed after the storm?',before='L6_beach_before.png',after='L6_beach_after.png',
+      hot=[('The tent is gone!',(258,283,545,450)),('The canoe is upside down.',(675,335,965,500)),('The fire is out.',(495,390,660,535)),('There is a crate.',(738,445,860,570)),('The bucket is on its side.',(133,554,309,687)),('One gull is gone.',(676,64,730,92))],**C('E')),
 ]
 
 # 15 items: survival, comfort, one phone (for the "no phone" round), one absurd item (piano, starred)
