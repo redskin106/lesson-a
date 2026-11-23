@@ -82,7 +82,7 @@ def rule(d):
     for i,(e,t) in enumerate(W):
         o+=stp(glass(90,430+i*(rh+16),1060,rh,f'<div style="height:100%;display:flex;align-items:center;gap:24px;padding:0 34px;box-sizing:border-box"><span style="font-size:{min(78,rh-40)}px;line-height:1;flex:none">{emo(e)}</span><span style="font-family:O;font-weight:800;font-size:36px;line-height:1.18;color:#1c1b2e">{t}</span></div>',r=48),2+i)
     pic=d.get('pic','')
-    o+=stp(glass(1190,430,640,n*(rh+16)-16,f'<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:{230 if pic.startswith('L6_') else 190 if len(pic)<=3 else 120}px;line-height:1">{emo(pic)}</div>',r=64),2)
+    o+=stp(glass(1190,430,640,n*(rh+16)-16,f'<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:{300 if pic.startswith('L6_') else 190 if len(pic)<=3 else 120}px;line-height:1">{emo(pic)}</div>',r=64),2)
     ey=430+n*(rh+16)+14
     for k,(e,s_) in enumerate(E):
         body=(''.join(ch(c,t,38,"4px 14px") for c,t in s_) if isinstance(s_,(list,tuple)) else f'<span style="font-family:O;font-weight:800;font-size:40px;line-height:1.15;color:#1c1b2e">{s_}</span>')
@@ -107,7 +107,7 @@ def castaway_taboo(d):
         W=d['words']; w=190; h=176; g=14
         for i,(e,n) in enumerate(W):
             x=690+(i%5)*(w+g); y=185+(i//5)*(h+g)
-            o+=stp(f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:40px;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:92px;line-height:1.05">{e}</span><span style="font-family:O;font-weight:800;font-size:26px;color:#1c1b2e">{n}</span></div>',2)
+            o+=stp(f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:40px;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:92px;line-height:1.05">{emo(e)}</span><span style="font-family:O;font-weight:800;font-size:26px;color:#1c1b2e">{n}</span></div>',2)
         o+=stp(f'<div class="a" style="left:690px;top:590px;width:1140px;display:flex;gap:14px;justify-content:center"><div style="{CHIP}"><span style="color:#6a35e8">1</span>✏️ one word</div><div style="{CHIP}"><span style="color:#6a35e8">2</span>🚫 three banned</div><div style="{CHIP}"><span style="color:#6a35e8">3</span>🃏 three cards</div></div>',3)
         o+=TIMER(int(d.get('sec',240)),690,700,4)
         return o

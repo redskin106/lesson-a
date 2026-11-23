@@ -13,6 +13,9 @@ from . import pagesel  # page selector (G or click the counter)
 def _b64(path, kind):
     if kind == 'font': return 'data:font/woff2;base64,' + base64.b64encode(open(path, 'rb').read()).decode()
     im = Image.open(path)
+    if kind == 'art' and im.mode in ('RGBA', 'LA', 'P') and 'transparency' in im.info or kind == 'art' and im.mode in ('RGBA', 'LA'):
+        im = im.convert('RGBA'); im.thumbnail((560, 560)); im = im.quantize(colors=48, method=Image.Quantize.FASTOCTREE); b = io.BytesIO(); im.save(b, 'PNG', optimize=True)
+        return 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
     if kind == 'art':
         im = im.convert('RGB'); im.thumbnail((760, 760)); b = io.BytesIO(); im.save(b, 'JPEG', quality=70)
         return 'data:image/jpeg;base64,' + base64.b64encode(b.getvalue()).decode()

@@ -29,7 +29,6 @@ ENGAGE=[
  dict(m='cover',phase='ENGAGE',label='Cover',title='Lesson <span class="grad">6</span>',phases=['Engage','Study','Activate','Recap'],active=0,cards=[dict(pic='L6_sc_island_far.png',x=1010,y=150,w=330,h=430,r=-7),dict(pic='L6_sc_sunset_boat.png',x=1380,y=330,w=330,h=430,r=6)]),
  dict(m='story',phase='ENGAGE',label='Cold open · storm and wreck',min=1,role='Last night',pics=['L6_sc_storm.png','L6_sc_sinking.png','L6_sc_wreckage.png','L6_sc_island_far.png'],big='Washed ashore.',lines=['The ship sank in the storm.','Sixteen people reached the island.','The supply boat passes once.','At sunset.'],**C('E')),
  dict(m='story',phase='ENGAGE',label='Cold open · look and predict',min=1,optional=True,role='Look',pics=['L6_sc_wreckage.png','L6_sc_island_far.png','L6_p_hungry.png','❓'],big='What do you see?',lines=['Tell your partner: three things.','What happened?','What do they need?'],**C('E')),
- dict(m='teach',phase='ENGAGE',label='Words · stranded rescue shipwreck',min=1.5,role='Three words',words=[('L6_w_stranded.png','stranded'),('L6_w_rescue.png','rescue'),('L6_w_shipwreck.png','shipwreck')],**C('E')),
  dict(m='spot_art',phase='ENGAGE',label='Spot what changed · the beach',min=2,role='Look. What changed after the storm?',before='L6_beach_before.png',after='L6_beach_after.png',
       hot=[('The tent is gone!',(258,283,545,450)),('The canoe is upside down.',(675,335,965,500)),('The fire is out.',(495,390,660,535)),('There is a crate.',(738,445,860,570)),('The bucket is on its side.',(133,554,309,687)),('One gull is gone.',(676,64,730,92)),('There is one coconut, not three.',(315,98,403,184))],**C('E')),
 ]
@@ -44,7 +43,8 @@ A1=[
 
 STUDY=[
  dict(m='today',phase='STUDY',label='Today',min=1,emoji='L6_sc_island_far',title='If we had…',role='Today we say',
-      rows=[dict(icon='L6_backpack.png',chips=[('c1','I'),('c2','would'),('c3','bring'),('c4','a rope')]),dict(icon='L6_x_raft_logs.png',chips=[('c4','If'),('c1','we had a rope,'),('c2','we'),('c3','would build a raft')]),dict(icon='L6_x_point.png',chips=[('c4','If'),('c1','I were you,'),('c2','I'),('c3','would stay')]),dict(icon='❓',chips=[('c4','What'),('c2','would'),('c1','you do'),('c3','if you saw a ship?')])],fs=46,tfs=84,**C('S',0)),
+      rows=[dict(icon='L6_backpack.png',chips=[('c1','I'),('c2','would'),('c3','bring'),('c4','a rope')]),dict(icon='L6_x_raft_logs.png',chips=[('c4','If'),('c1','we had a rope,'),('c2','we'),('c3','would build a raft')]),dict(icon='L6_x_point.png',chips=[('c4','If'),('c1','I were you,'),('c2','I'),('c3','would stay')]),dict(icon='❓',chips=[('c4','What'),('c2','would'),('c1','you do'),('c3','if you saw a ship?')])],fs=42,tfs=84,**C('S',0)),
+ dict(m='teach',phase='STUDY',label='Words · stranded rescue shipwreck',min=1.5,role='Three words for the story',words=[('L6_w_stranded.png','stranded'),('L6_w_rescue.png','rescue'),('L6_w_shipwreck.png','shipwreck')],**C('S',0)),
  dict(m='teach',phase='STUDY',label='Words · signal shelter raft',min=1.5,role='Three more words',words=[('L6_w_signal.png','signal'),('L6_w_shelter.png','shelter'),('L6_w_raft.png','raft')],**C('S',0)),
  # optional: first conditional, written down as a rule
  rule('first conditional review',0,optional=True,role='Quick review · real situations',tag=('☀️','Real · it can happen','real'),
@@ -103,7 +103,7 @@ STUDY=[
     Q('L6_p_tired.png','A friend is very tired. Choose the advice.','If I were you, I would take a rest.','If I were you, I would took a rest.','If I was you, I would take a rest.','If I were you, I take a rest.')],2),
  produce('If I were you','Give advice',[('L6_p_hurt_ankle.png hurt ankle','If I were you, I would sit down and rest.'),('L6_p_very_hot.png very hot','If I were you, I would find some shade.'),('L6_p_afraid_night.png afraid at night','If I were you, I would stay close to the fire.')],3),
  # --- block 4: questions
- teach('What would you do if','Block 4 · What would you do if…?',['L6_x_ship_far.png','L6_x_meal.png','L6_x_swimmer_far.png','L6_x_wave_hand.png'],['What would you do if you saw a ship?','What would you do if you were hungry?','Would you swim to the next island? No, I would not.','If I saw a ship, I would wave.'],3),
+ teach('What would you do if','Block 4 · What would you do if…?',['L6_sc_sunset_boat.png','L6_x_meal.png','L6_x_swimmer_far.png','L6_x_wave_hand.png'],['What would you do if you saw a ship?','What would you do if you were hungry?','Would you swim to the next island? No, I would not.','If I saw a ship, I would wave.'],3),
  rule('What would you do if',3,role='The rule',tag=('❓','Ask about an imagined situation','imag'),
       formula=[('c4','What'),('c2','would'),('c1','you'),('c3','do'),('c4','if you + past simple?')],
       why=[('❓','We ask what a person would do in an imagined situation.'),('🗣️','We answer: I would + verb.')],pic='🐒',
@@ -118,7 +118,7 @@ STUDY=[
    [Q('L6_helicopter.png','Choose the best question.','What would you do if a helicopter flew over us?','What would you do if a helicopter will fly over us?','What you would do if a helicopter flew over us?','What would you did if a helicopter flew over us?'),
     Q('L6_biscuits.png','Answer: Would you share your last biscuit?','Yes, I would, because we need to stay strong together.','Yes, I would to, because we need to stay strong together.','Yes, I will would, because we need to stay strong.','Yes, I would share, because we are need to stay strong.'),
     Q('L6_map.png','Choose the best question.','Where would you go if you had a boat?','Where you would go if you had a boat?','Where would you went if you had a boat?','Where would you go if you would have a boat?')],3),
- produce('What would you do if','Island interview',[('L6_ev_shark_raft.png a shark','What would you do if you saw a shark? I would get out of the water.'),('L6_sc_storm.png a big storm','What would you do if there was a big storm? I would go into the cave.'),('L6_x_ship_far.png a ship far away','What would you do if you saw a ship far away? I would light a fire.')],4),
+ produce('What would you do if','Island interview',[('L6_ev_shark_raft.png a shark','What would you do if you saw a shark? I would get out of the water.'),('L6_sc_storm.png a big storm','What would you do if there was a big storm? I would go into the cave.'),('L6_sc_sunset_boat.png a ship far away','What would you do if you saw a ship far away? I would light a fire.')],4),
  # --- block 5 optional
  dict(m='teach',phase='STUDY',label='Stretch · past continuous backstory',min=1.5,optional=True,role='Say it harder',pic='L6_x_sailboat.png',pics=['L6_x_sailboat.png','L6_p_tired.png','❓'],tts=True,lines=['I was sailing when the storm hit.','We were sleeping when the ship hit a rock.','What were you doing when it happened?'],**C('S',4)),
 ]
@@ -139,15 +139,15 @@ RECAP=[
  dict(m='closing',phase='EXIT',label='Thank you',min=1,stack=True,line1='Thank',line2='you!',sub='See you next time.',emoji='L6_x_wave_hand'),
  dict(m='planb',phase='STUDY',label='Teacher · Plan B',optional=True,title='Plan B (teacher only)',tiles=[
    dict(e='📵',t='No phones',min='swap',use='Print the 15 item cards, pairs choose on paper.'),
-   dict(e='⏱️',t='Running long',min='-4 min',use='Skip Block 5 and the first-conditional review. Use 3 event rounds.'),
-   dict(e='⏩',t='Running short',min='+4 min',use='Do the optional stretch block. Draw a 5th event round.'),
-   dict(e='🃏',t='Games (optional)',min='+4 to +10',use='Castaway Taboo (teams make cards, then play) before What next? · If-Chain as the last 4 minutes. Swap in for the optional block.'),
+   dict(e='⏱️',t='Running long',min='-4 min',use='Skip every optional slide. Use 3 event rounds.'),
+   dict(e='⏩',t='Running short',min='+4 min',use='Add the optional rule and stretch slides. Draw a 5th round.'),
+   dict(e='🃏',t='Games (optional)',min='+4 to +10',use='Castaway Taboo before What next?, or If-Chain as the last 4 minutes.'),
    dict(e='📝',t='Board notes',min='always',use='During Activate 1, write what they could not say. Use these for the Recap.')]),
 ]
 
 GAMES=[
  dict(m='castaway_taboo',mode='make',phase='ACTIVATE',label='Game · Castaway Taboo 1: make the cards',min=4,optional=True,role='Castaway Taboo · make',
-      words=[('🔦','flashlight'),('🪢','rope'),('🔥','matches'),('💧','water'),('🥫','tinned food'),('🪞','mirror'),('⛺','tent'),('🎣','fishing rod'),('🩹','first-aid kit'),('📻','radio')],sec=240,**C('A2',4)),
+      words=[('L6_flashlight.png','flashlight'),('L6_rope.png','rope'),('L6_matches.png','matches'),('L6_water.png','water'),('L6_tinned_food.png','tinned food'),('L6_mirror.png','mirror'),('L6_tent.png','tent'),('L6_fishing_rod.png','fishing rod'),('L6_first_aid_kit.png','first-aid kit'),('L6_radio.png','radio')],sec=240,**C('A2',4)),
  dict(m='castaway_taboo',mode='play',phase='ACTIVATE',label='Game · Castaway Taboo 2: swap and play',min=6,optional=True,role='Castaway Taboo · play',
       frames=[('🗣️','You use it to …'),('🏝️','On an island, it would help us …'),('🔍','You find it in / on / near …')],goal=12,sec=360,**C('A2',4)),
  dict(m='if_chain',phase='RECAP',label='Game · If-Chain',min=4,optional=True,role='If-Chain',goal=12,sec=240,
