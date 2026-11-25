@@ -41,12 +41,12 @@ def phase_orbs(p,k=1.5):
     return ''.join(f'<div class="orb" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;background:{c}"></div>' for c,x,y,w,h in cs)
 
 # ---------- primitives ----------
-EM=lambda n:(ART if n.startswith('L6_') else E)+f'{n}.png'
+EM=lambda n:(ART if n.startswith(('L5_','L6_')) else E)+f'{n}.png'
 def em(n,x,y,w,r=0): return f'<img class="e" src="{EM(n)}" style="left:{x}px;top:{y}px;width:{w}px;transform:rotate({r}deg)">'
 import re as _re
 def emo(s):
     """inline art: every L6_<name>.png token in s becomes an image 1em tall (so it scales with the surrounding font-size)"""
-    return _re.sub(r'L6_[A-Za-z0-9_]+\.png',lambda m:f'<img src="{ART}{m.group(0)}" style="height:1em;width:auto;max-width:2.4em;object-fit:contain;vertical-align:middle;display:inline-block;border-radius:.12em;background:#fff">',s) if isinstance(s,str) else s
+    return _re.sub(r'L[56]_[A-Za-z0-9_]+\.png',lambda m:f'<img src="{ART}{m.group(0)}" style="height:1em;width:auto;max-width:2.4em;object-fit:contain;vertical-align:middle;display:inline-block;border-radius:.12em;background:#fff">',s) if isinstance(s,str) else s
 ch=lambda c,t,fs=64,p='10px 34px':f'<span class="chip {c}" style="font-size:{fs}px;padding:{p};border-radius:44px">{t}</span>'
 def grad_chip(g,t,fs=44,p='8px 34px'): return f'<span class="chip" style="font-size:{fs}px;padding:{p};border-radius:999px;background:{GRAD.get(g,g)}">{t}</span>'
 def gap(col,w,t='…',h=104,fs=40): return f'<div style="width:{w}px;height:{h}px;border-radius:44px;border:5px dashed {col};display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:{fs}px;color:{col}">{t}</div>'
@@ -57,7 +57,7 @@ def header(phase,role=None,rg='violet'):
     return h+'</div>'
 def pic(x,y,w,h,f,r=40,fit='cover'):
     if not os.path.exists('/home/claude/work/lesson/art/'+f): return ph(x,y,w,h,f,r=r)
-    if f.startswith('L6_'): fit='contain'
+    if f.startswith(('L5_','L6_')): fit='contain'
     return f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:{r}px;padding:10px"><img src="{ART}{f}" style="width:100%;height:100%;object-fit:{fit};background:#fff;border-radius:{r-10}px;display:block"></div>'
 def ph(x,y,w,h,label,fs=32,r=56,dim=False):
     return f'<div class="gl" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;border-radius:{r}px;padding:14px;{"opacity:.55;" if dim else ""}"><div style="width:100%;height:100%;border-radius:{r-16}px;background:linear-gradient(135deg,#c8ceda,#9aa5b8);border:4px dashed #6a6a7e;display:flex;align-items:center;justify-content:center;font-size:{fs}px;color:#4a5a6e;text-align:center;line-height:1.3;padding:16px">{label}</div></div>'

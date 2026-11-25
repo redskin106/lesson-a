@@ -1,0 +1,485 @@
+{
+ "lesson": "lesson5",
+ "assets": [
+  {
+   "id": "L5_A_01",
+   "text": "The nurse is checking the beds at nine fifteen.",
+   "tag": "calm, neutral",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_A_02",
+   "text": "The cleaner is checking the beds at nine thirty.",
+   "tag": "calm, neutral",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_A_03",
+   "text": "The nurse is not checking the beds tonight.",
+   "tag": "calm, neutral",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_01",
+   "text": "Haven Hospital. Six fifty-eight p.m. Shift change.",
+   "tag": "hushed, tense",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_02",
+   "text": "Ward three. Five patients are asleep.",
+   "tag": "quiet, uneasy",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_03",
+   "text": "Something is there.",
+   "tag": "whispered, alarmed",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_04",
+   "text": "It is only a coat.",
+   "tag": "relieved, a little amused",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_05",
+   "text": "Someone is hiding in the building.",
+   "tag": "low, ominous",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_06",
+   "text": "Someone is in the building.",
+   "tag": "calm, expectant",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_07",
+   "text": "We do not know who.",
+   "tag": "calm, expectant",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_08",
+   "text": "Midnight is coming.",
+   "tag": "slow, building tension",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_09",
+   "text": "Eleven p.m. One hour left.",
+   "tag": "grave, steady",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_10",
+   "text": "The lab door was open at ten forty-five. But one crew says they were inside…",
+   "tag": "low, suspicious",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_11",
+   "text": "He was going to escape by the lift, but… the coat had wings.",
+   "tag": "astonished, then wry",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_12",
+   "text": "We were going to catch him, but he glided away.",
+   "tag": "reflective, wry",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_B_13",
+   "text": "To be continued.",
+   "tag": "slow, teasing",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_C_01",
+   "text": "One slot is empty: 10:45. Who is missing?",
+   "tag": "curious, quiet",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_C_02",
+   "text": "A crumpled note: a clock at midnight and the lift.",
+   "tag": "hushed, curious",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_C_03",
+   "text": "A white coat. A name tag: Dr. Volkov. A stethoscope on the wrong hook.",
+   "tag": "slow, meaningful",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_C_04",
+   "text": "A half-packed bag. A strange gadget on the floor.",
+   "tag": "uneasy, quiet",
+   "speaker": "Narrator",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_01",
+   "text": "Mia is meeting the courier at ten.",
+   "tag": "warm, matter-of-fact",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_02",
+   "text": "Dan and Ben are fixing the lift at ten thirty.",
+   "tag": "warm, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_03",
+   "text": "Joy is not cooking tonight.",
+   "tag": "light, relaxed",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_04",
+   "text": "Is Pat working late? Yes, he is.",
+   "tag": "curious, inviting",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_05",
+   "text": "The Stranger has a packed bag. He is going to leave.",
+   "tag": "thoughtful, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_06",
+   "text": "The lights went out. I will get a torch.",
+   "tag": "quick, decisive",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_07",
+   "text": "Mia has the schedule. She is going to call the courier.",
+   "tag": "warm, matter-of-fact",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_08",
+   "text": "There is no tea. I will make some.",
+   "tag": "light, decisive",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_09",
+   "text": "If you open the door, the alarm will ring.",
+   "tag": "careful, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_10",
+   "text": "If we cut the cable, the lift will not move.",
+   "tag": "careful, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_11",
+   "text": "If you press the red button, everyone will wake up.",
+   "tag": "worried, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_12",
+   "text": "What will happen if I press it?",
+   "tag": "curious, inviting",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_13",
+   "text": "Dr. Volkov was going to take the lift, but it stopped.",
+   "tag": "thoughtful, a little disappointed",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_14",
+   "text": "I was going to call, but the line was dead.",
+   "tag": "rueful, light",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_15",
+   "text": "They were going to help, but the door was locked.",
+   "tag": "sympathetic",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_D_16",
+   "text": "Were you going to come? Yes, but…",
+   "tag": "curious, gentle",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_E_01",
+   "text": "Pat is going to call the courier at nine.",
+   "tag": "warm, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_E_02",
+   "text": "There is no sugar. I will go to the shop.",
+   "tag": "light, decisive",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_E_03",
+   "text": "Nobody can drive. OK, I will take the van.",
+   "tag": "calm, decisive",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_E_04",
+   "text": "If the door is open, the alarm will ring.",
+   "tag": "calm, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_E_05",
+   "text": "If the battery dies, the lights will go out.",
+   "tag": "calm, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_E_06",
+   "text": "If you touch the vial, the lab will lock.",
+   "tag": "careful, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_F_01",
+   "text": "Volkov will escape unless we lock the window.",
+   "tag": "clear, firm",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_F_02",
+   "text": "Before midnight, we will find him.",
+   "tag": "clear, determined",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_F_03",
+   "text": "As soon as the lights come on, we will go.",
+   "tag": "relieved, clear",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_F_04",
+   "text": "At midnight, he will be standing in the lift.",
+   "tag": "slow, tense",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_F_05",
+   "text": "This time tomorrow, we will be sleeping.",
+   "tag": "warm, light",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  },
+  {
+   "id": "L5_F_06",
+   "text": "Where will you be waiting?",
+   "tag": "curious, inviting",
+   "speaker": "Coach",
+   "voice": "teach",
+   "emotion": "neutral",
+   "status": "pending",
+   "file": ""
+  }
+ ]
+}

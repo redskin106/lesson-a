@@ -40,12 +40,12 @@ def today(d):
     for i,r in enumerate(d['rows']):
         cs,ic=(r['chips'],r.get('icon')) if isinstance(r,dict) else (r,None)
         row=chiprow(cs,fs,'8px 30px','16px')
-        if ic: row=(f'<div style="display:flex;gap:28px;align-items:center"><span style="font-size:{96 if len([c for c in ic if ord(c)>255 and ord(c)!=0xFE0F])<2 else 58}px;line-height:1;width:150px;text-align:center;flex:none;white-space:nowrap">{emo(ic)}</span>{row}</div>' if (ic.isascii()==False or ic.startswith('L6_')) else f'<div style="display:flex;gap:28px;align-items:center"><img src="{EM(ic)}" style="width:110px;{sh()}">{row}</div>')
+        if ic: row=(f'<div style="display:flex;gap:28px;align-items:center"><span style="font-size:{96 if len([c for c in ic if ord(c)>255 and ord(c)!=0xFE0F])<2 else 58}px;line-height:1;width:150px;text-align:center;flex:none;white-space:nowrap">{emo(ic)}</span>{row}</div>' if (ic.isascii()==False or ic.startswith(('L5_','L6_'))) else f'<div style="display:flex;gap:28px;align-items:center"><img src="{EM(ic)}" style="width:110px;{sh()}">{row}</div>')
         rows+=stp(f'<div class="rw">{row}</div>',i+2,pills=True)
     return (header(d['phase'],d.get('role','Today we learn'),'violet')
       +'<div class="gl" style="left:90px;top:168px;width:1740px;height:740px;border-radius:72px"></div>'
       +f'<div class="a" style="left:200px;top:168px;width:1520px;height:740px;display:flex;align-items:center;gap:90px">'
-      +stp((f'<img src="{EM(d["emoji"])}" style="width:340px;border-radius:44px;background:#fff;padding:16px;box-sizing:border-box;box-shadow:0 14px 30px rgba(80,60,160,.22)">' if d["emoji"].startswith('L6_') else f'<img src="{EM(d["emoji"])}" style="width:300px;{sh()}">'),1)
+      +stp((f'<img src="{EM(d["emoji"])}" style="width:340px;border-radius:44px;background:#fff;padding:16px;box-sizing:border-box;box-shadow:0 14px 30px rgba(80,60,160,.22)">' if d["emoji"].startswith(('L5_','L6_')) else f'<img src="{EM(d["emoji"])}" style="width:300px;{sh()}">'),1)
       +f'<div style="display:flex;flex-direction:column;gap:44px;align-items:flex-start">'+stp(f'<div style="font-family:O;font-weight:800;font-size:{tfs}px;color:#1c1b2e;white-space:nowrap;line-height:1">{d["title"]}</div>',1)
       +rows+'</div></div>')
 
@@ -293,7 +293,7 @@ def recap(d):
     if d.get('side'):
         o+=stp('<div class="gl" style="left:1080px;top:240px;width:750px;height:660px;border-radius:72px"></div>',nr+1)
         for k,q in enumerate(d['side']): o+=stp(f'<div class="a" style="left:1100px;top:{300+k*150}px;width:710px;display:flex;gap:10px;justify-content:center">'+''.join(ch(a,b,44,'8px 22px') for a,b in q)+'</div>',nr+1+k,pills=True)
-    if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:{1480 if d["emoji"].startswith("L6_") else 1520}px;top:{300 if not d.get("side") else 770}px;width:{(340 if d["emoji"].startswith("L6_") else 260) if not d.get("side") else 190}px;{"border-radius:36px;background:#fff;padding:14px;box-sizing:border-box;box-shadow:0 14px 30px rgba(80,60,160,.22)" if d["emoji"].startswith("L6_") else sh()}">',nr+len(d.get('side') or [])+(0 if d.get('side') else 1))
+    if d.get('emoji'): o+=stp(f'<img src="{EM(d["emoji"])}" style="position:absolute;left:{1480 if d["emoji"].startswith(('L5_','L6_')) else 1520}px;top:{300 if not d.get("side") else 770}px;width:{(340 if d["emoji"].startswith(('L5_','L6_')) else 260) if not d.get("side") else 190}px;{"border-radius:36px;background:#fff;padding:14px;box-sizing:border-box;box-shadow:0 14px 30px rgba(80,60,160,.22)" if d["emoji"].startswith(('L5_','L6_')) else sh()}">',nr+len(d.get('side') or [])+(0 if d.get('side') else 1))
     return o+'<div class="a mu" style="left:1010px;bottom:14px;font-size:18px">Emoji: Microsoft Fluent Emoji (MIT)</div>'
 
 @module('rules')

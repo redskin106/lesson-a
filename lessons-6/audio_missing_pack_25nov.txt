@@ -1,0 +1,7 @@
+# speaker Coach  (Eleven v4; paste only these lines. Save each clip named as its sentence.)
+# --- Lesson 6 (p14 Produce · I would bring) ---
+L6_M_01 | [calm, neutral] I would bring sun cream because the sun would be strong.
+L6_M_02 | [calm, neutral] I would bring a kite because it could be a signal.
+L6_M_03 | [calm, neutral] I would bring a teddy bear because it would make me feel safer.
+# --- Lesson 5 (the one still missing) ---
+L5_M_01 | [calm, neutral] If it rains, the floor will be wet.

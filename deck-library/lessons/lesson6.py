@@ -38,7 +38,7 @@ ITEMS=[('L6_flashlight.png','flashlight'),('L6_rope.png','rope'),('L6_matches.pn
 A1=[
  dict(m='story',phase='ACTIVATE',label='Story · 4:30 pm the question',min=.5,role='Before the storm',pics=['L6_sc_bags.png','L6_backpack.png','❓'],big='What would you bring?',lines=['A trip to an island.'],**C('A1',0)),
  dict(m='item_pick',phase='ACTIVATE',label='What would you bring and why',min=8.5,role='Tell your partner. What would you bring?',items=ITEMS,
-      rounds=[('Choose 3',3,-1),('No phone',3,11),('Keep 1',1,-1)],prompts=['What would you bring? Why?','No phone! What now? Why?','Only one. Which? Why?'],star=14,sec=240,**C('A1',0)),
+      free=True,prompts=['What would you bring? Why?'],sec=240,**C('A1',0)),
 ]
 
 STUDY=[
@@ -67,7 +67,7 @@ STUDY=[
    [Q('L6_piano.png','On a desert island, I would not bring a piano because ___','it would be too heavy.','it is would too heavy.','would be heavy it.'),
     Q('L6_phone.png','On a desert island, I would not bring my phone because ___','there would be no signal.','there is would no signal.','no signal would be there is.'),
     Q('L6_salt.png','On a desert island, I would bring salt because ___','the food would taste better.','the food tastes would better.','the food would to taste better.')],0),
- produce('I would bring','Say what you would bring',[('L6_sun_cream.png sun cream','I would bring sun cream because the sun would be strong.'),('L6_kite.png a kite','I would bring a kite because it could be a signal.'),('L6_teddy_bear.png a teddy bear','I would bring a teddy bear because it would make me feel safer.')],1),
+ produce('I would bring','Say what you would bring',[('L6_sun_cream.png sun cream','I would bring sun cream because the sun would be strong.'),('L6_kite.png a kite','I would bring a kite because it could be a signal.'),('L6_teddy_bear.png a teddy bear','I would bring a teddy bear because it would make me feel safer.')],1,hint=''),
  # --- block 2: second conditional (core)
  teach('If we had','Block 2 · If we had…',['L6_x_raft_logs.png','L6_tinned_food.png','L6_x_sailboat.png','L6_phone.png'],['If we had a rope, we would build a raft.','If we had some food, we would not be hungry.','If I had a boat, I would sail home.','If you had a phone, what would you do?'],1),
  rule('If we had',1,role='The rule',tag=('☁️','Imaginary · unlikely','imag'),
@@ -84,8 +84,8 @@ STUDY=[
    [Q('L6_net.png','Choose the correct sentence.','If we had a net, we would catch fish.','If we would have a net, we would catch fish.','If we had a net, we will catch fish.','If we have a net, we would catch fish.'),
     Q('L6_map.png','Choose the correct sentence.','If I had a map, I would not be lost.','If I had a map, I will not be lost.','If I would have a map, I would not be lost.','If I had a map, I would not to be lost.'),
     Q('L6_ev_rain_fire.png','Choose the correct sentence.','If it did not rain, we would have no water.','If it does not rain, we would have no water.','If it did not rain, we will have no water.','If it did not rain, we would to have no water.')],1),
- produce('If we had (listen)','Make a wish',[('L6_life_ring.png life ring','If we had a life ring, we would rescue our friend in the sea.'),('L6_flashlight.png flashlight','If we had a flashlight, we would explore the cave.'),('L6_phone.png a phone','If we had a phone, we would call the coast guard.')],2,listen=True,ball=False,hint='Tap a picture. Listen. Find the sentence.'),
- dict(m='howto',phase='STUDY',label='Stand-up break',min=1,role='Stand up',steps=[('L6_i_mingle.png','Stand up. Walk to someone far away.'),('L6_i_pair_talk.png','Say one sentence: I would … / If we had …'),('L6_i_swap_cards.png','Swap. Sit down.')],line='One minute. Then sit.',sec=60,tstep=15,**C('S',2)),
+ produce('If we had (listen)','Listen. Which picture?',[('🔊 audio 1','If we had a life ring, we would rescue our friend in the sea.'),('🔊 audio 2','If we had a flashlight, we would explore the cave.'),('🔊 audio 3','If we had a phone, we would call the coast guard.')],2,listen=True,ball=False,rpics=['L6_life_ring.png','L6_flashlight.png','L6_phone.png'],hint='Tap a sound. Listen. Tap its picture.'),
+ dict(m='howto',phase='STUDY',label='Stand-up break',min=1,role='Stand up',steps=[('L6_i_mingle.png','Stand up. Walk to someone new.'),('L6_i_pair_talk.png','Say one sentence: I would … / If we had …'),('L6_i_swap_cards.png','Swap. Sit down.')],dialog=[(0,'What would you bring?'),(1,'I would bring water because I would be thirsty.')],**C('S',2)),
  # --- block 3: advice
  teach('If I were you','Block 3 · If I were you',['L6_sc_island_far.png','L6_x_no_seawater.png','L6_x_big_fire.png','L6_x_point.png'],['If I were you, I would stay on the beach.','If I were you, I would not drink sea water.','If I were you, I would make a big fire.','What would you do if you were me?'],2),
  rule('If I were you',2,role='The rule',optional=True,tag=('💭','Advice · imaginary','imag'),
@@ -165,6 +165,7 @@ def _texts():
     for x in L6:
         if x['m'] in ('teach','story'): t+=[l for l in x.get('lines',[])]+list((x.get('says') or {}).values())
         if x['m']=='pairs': t+=[b for a,b in x['pairs']]
+        if x['m']=='howto': t+=[tx for _,tx in x.get('dialog',[])]
     return t
 if __name__=='__main__':
     from sxl import audio

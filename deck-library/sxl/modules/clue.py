@@ -117,7 +117,10 @@ def choice_html(d,sid):
     o+=f'<div class="a" style="right:{(130 if d.get("_lvg") else 90)}px;top:60px;display:flex;gap:12px">'+''.join(f'<span class="chd" style="width:26px;height:26px;border-radius:50%"></span>' for _ in I)+'</div>'
     import random
     for k,it in enumerate(I):
-        rest=[t for t in it['opts'] if t!=it['ans']]; random.Random(k*7+len(it['q'])).shuffle(rest); rest.insert((k*2+len(d.get('title','')))%len(it['opts']),it['ans']); it=dict(it,opts=rest)
+        rest=[t for t in it['opts'] if t!=it['ans']]; _rg=random.Random(f'{sid}|{k}|{it["q"]}'); _rg.shuffle(rest)
+        _no=len(it['opts']); _pos=_rg.randrange(_no)
+        if _no>1 and _pos==globals().get('_PREV_POS',-1): _pos=(_pos+1+_rg.randrange(_no-1))%_no   # never the same slot twice in a row
+        globals()['_PREV_POS']=_pos; rest.insert(_pos,it['ans']); it=dict(it,opts=rest)
         o+='<div class="chi" style="display:none">'
         if it.get('say') and it.get('grid') and (it.get('aud') or d.get('aud')):
             cells=''.join(f'<div style="text-align:center"><div style="font-family:O;font-weight:800;font-size:28px;color:#6a35e8">{a_}</div><div style="font-size:{it.get("gfs",48)}px;line-height:1.2;margin-top:8px">{b_}</div></div>' for a_,b_ in it['grid'])
@@ -155,7 +158,7 @@ def task_card(d):
 # ---------------- teach: watch, listen, repeat (no tapping to answer, nothing to get wrong) ----------------
 def _isart(p): return isinstance(p,str) and '.' in p and len(p)<48 and p.rsplit('.',1)[-1] in ('jpg','png','jpeg')
 def _artimg(p,r=40,fit='cover'):
-    if p.startswith('L6_'): fit='contain'
+    if p.startswith(('L5_','L6_')): fit='contain'
     return f'<img src="{ART}{p}" style="width:100%;height:100%;object-fit:{fit};border-radius:{r}px;display:block;background:#fff">'
 
 def _ul(t):
@@ -178,7 +181,7 @@ def teach(d):
             o+=stp(f'<div class="a" style="left:{x}px;top:{190+740-140}px;width:{w}px;text-align:center;font-family:O;font-weight:800;font-size:68px;line-height:1.1">{_ul(t)}</div>',2*i+2)
     else:
         L=d['lines']; _p0=d.get('pic','❓')
-        o+=(f'<div class="gl tpic" style="left:90px;top:190px;width:640px;height:740px;border-radius:56px;display:block;padding:34px;box-sizing:border-box;background:#fff"><img src="{ART}{_p0}" style="width:100%;height:100%;object-fit:contain;display:block"></div>' if _isart(_p0) and _p0.startswith('L6_') else picx(_p0,90,190,640,740,56).replace('class="gl"','class="gl tpic"',1))
+        o+=(f'<div class="gl tpic" style="left:90px;top:190px;width:640px;height:740px;border-radius:56px;display:block;padding:34px;box-sizing:border-box;background:#fff"><img src="{ART}{_p0}" style="width:100%;height:100%;object-fit:contain;display:block"></div>' if _isart(_p0) and _p0.startswith(('L5_','L6_')) else picx(_p0,90,190,640,740,56).replace('class="gl"','class="gl tpic"',1))
         sh=lambda x:(x['t'] if isinstance(x,dict) else x[0] if isinstance(x,(tuple,list)) else x).replace('<span','').replace('</span>','')
         fs=42 if max(len(sh(x)) for x in L)<60 else 38
         BG={'orange':'background:linear-gradient(135deg,#ffe6cc,#ffd2a6)','sky':'background:linear-gradient(135deg,#d9ecff,#c3e0ff)','rose':'background:linear-gradient(135deg,#ffe0ec,#ffcadd)','amber':'background:linear-gradient(135deg,#fff3c4,#ffe7a8)','teal':'background:linear-gradient(135deg,#d6fbea,#c4f3e6)'}
@@ -188,7 +191,7 @@ def teach(d):
                 body=f'<div style="flex:1;display:flex;align-items:center;gap:26px"><span class="sp" style="font-size:64px"><i class="sico"></i></span><div><div class="pt" style="display:none;font-family:P;font-weight:500;font-size:30px;color:#6a35e8;margin-bottom:6px">{t[1]}</div><div class="an" style="display:none">{_ul(t[0])}</div></div></div>'; sa=f' data-say="{t[1]}" data-seq="1"'
             elif isinstance(t,dict): body=('<span style="flex:none;margin-right:26px;padding:6px 22px;border-radius:999px;background:#fff;font-size:30px;color:#6a35e8">'+t['k']+'</span>' if t.get('k') else '')+'<div>'+_ul(t['t'])+'</div>'; sa=''; ex=BG.get(t.get('c'),'')
             else: body='<div>'+_ul(t)+'</div>'; sa=f' data-say="{t}"' if tts else ''
-            if d.get('pics'): sa+=f' data-pic="{ART+d["pics"][i] if _isart(d["pics"][i]) else d["pics"][i]}"'
+            if d.get('pics'): sa+=f' data-pic="{ART+d["pics"][i] if _isart(d["pics"][i]) else d["pics"][i]}"'+(' data-ct="1"' if str(d["pics"][i]).startswith(('L5_','L6_')) else '')
             o+=(lambda h,seq:h if seq else stp(h,i+1))(f'<div class="gl tch"{sa} style="left:780px;top:{y}px;width:1050px;height:{h}px;border-radius:48px;display:flex;align-items:center;padding:0 44px;box-sizing:border-box;font-family:O;font-weight:800;font-size:{fs}px;line-height:1.15;{ex}">{body}</div>',isinstance(t,(tuple,list)))
     if d.get('hint'): o+=f'<div class="a mu" style="left:90px;top:858px;width:1740px;text-align:center;font-size:36px">{d["hint"]}</div>'
     return o
@@ -248,7 +251,7 @@ def pairs(d):
     for i,(c_,s_) in enumerate(Pr):
         o+=f'<div class="ptl gl" data-i="{i}"{(' data-say="'+__import__("html").escape(s_,True)+'"') if d.get('listen') else ''}{' data-nz="1"' if (d.get('listen') or d.get('hide')) else ''} style="left:90px;top:{190+i*(h+18)}px;width:{PW if PO else 860}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;{"justify-content:center;" if PO else ""}padding:0 {10 if PO else 36}px;box-sizing:border-box;font-family:O;font-weight:800;font-size:40px;line-height:1.2;background:{"#fff;border:6px solid #ffd978" if PO else "linear-gradient(135deg,#fff3c4,#ffe7a8)"}">{(f'<span style="font-size:{h-44}px;line-height:1">{emo(c_.split(" ",1)[0])}</span>' if PO else _bp(c_,d,110,34))}</div>'
     for j,i in enumerate(order):
-        o+=f'<div class="ptr gl{' hid' if d.get('hide') else ''}" data-i="{i}" style="left:{90+PW+40 if PO else 990}px;top:{190+j*(h+18)}px;width:{1740-PW-40 if PO else 840}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:44px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6)">{'' if PO else _bp_s(Pr[i][0],d)}<span class="ptx">{Pr[i][1]}</span></div>'
+        o+=f'<div class="ptr gl{' hid' if d.get('hide') else ''}" data-i="{i}" style="left:{90+PW+40 if PO else 990}px;top:{190+j*(h+18)}px;width:{1740-PW-40 if PO else 840}px;height:{h}px;border-radius:44px;cursor:pointer;display:flex;align-items:center;padding:0 36px;box-sizing:border-box;font-family:O;font-weight:800;font-size:44px;color:#0b6b55;background:linear-gradient(135deg,#d6fbea,#c4f3e6){';justify-content:center' if d.get('rpics') else ''}">{'' if PO else _bp_s(Pr[i][0],d)}{('<span style="font-size:'+str(h-34)+'px;line-height:1;display:flex">'+emo(d['rpics'][i])+'</span><span class="ptx" style="display:none">'+Pr[i][1]+'</span>') if d.get('rpics') else '<span class="ptx">'+Pr[i][1]+'</span>'}</div>'
     if d.get('listen'): o+='<span class="plis" style="display:none"></span>'
     if d.get('ball'): o+=f'<div class="a" style="left:420px;top:884px;font-size:72px;line-height:1;display:flex;align-items:center">{emo("L6_i_throw_ball.png")}</div>'
     if d.get('ball'): o+=f'<div class="a pbn" data-d="{d["hint"]}" style="left:90px;top:890px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:40px;color:#6a35e8">{d["hint"]}</div>'
@@ -490,9 +493,9 @@ g.dz{stroke:none}g.dz.dim{opacity:1;filter:grayscale(.85) brightness(1.1)}.dz{cu
 EXT_JS.append(r"""
 SXL.say=false;
 document.addEventListener('keydown',function(e){if(/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))return;if('123'.indexOf(e.key)<0||e.key==='')return;var m=document.querySelector('.sl.on .mdl[data-l="'+e.key+'"]');if(m)m.click()});
-window.__sxlPic=function(pb){var pc=document.querySelector('.sl.on .tpic');if(pc){var pv=pb.dataset.pic;if(/^(file:|data:image)|\.(jpg|png)$/.test(pv)){pc.style.display='block';var ct=/\.png$|^data:image\/png/.test(pv);pc.style.padding=ct?'34px':'10px';pc.style.fontSize='';pc.innerHTML='<img src="'+pv+'" style="width:100%;height:100%;object-fit:'+(ct?'contain':'cover')+';border-radius:46px;display:block;background:#fff">'}else{pc.style.display='flex';pc.style.padding='0';var nn=Array.from(pv).filter(function(c){return c.charCodeAt(0)>255}).length;pc.style.fontSize=(nn<=1?352:nn===2?230:150)+'px';pc.textContent=pv}pc.classList.remove('pp');void pc.offsetWidth;pc.classList.add('pp')}}
+window.__sxlPic=function(pb){var pc=document.querySelector('.sl.on .tpic');if(pc){var pv=pb.dataset.pic;if(/^(file:|data:image)|\.(jpg|png)$/.test(pv)){pc.style.display='block';var ct=pb.dataset.ct==='1'||/\.png$|^data:image\/png/.test(pv);pc.style.padding=ct?'34px':'10px';pc.style.fontSize='';pc.innerHTML='<img src="'+pv+'" style="width:100%;height:100%;object-fit:'+(ct?'contain':'cover')+';border-radius:46px;display:block;background:#fff">'}else{pc.style.display='flex';pc.style.padding='0';var nn=Array.from(pv).filter(function(c){return c.charCodeAt(0)>255}).length;pc.style.fontSize=(nn<=1?352:nn===2?230:150)+'px';pc.textContent=pv}pc.classList.remove('pp');void pc.offsetWidth;pc.classList.add('pp')}}
 document.addEventListener('click',function(e){var pb=e.target.closest('[data-pic]');if(pb)window.__sxlPic(pb);var b=e.target.closest('[data-seq]');if(b&&b.classList.contains('tch')){var st=+(b.dataset.st||0);if(st===0){var pt=b.querySelector('.pt');if(pt)pt.style.display='block';b.dataset.st=1}else if(st===1){var an=b.querySelector('.an');if(an)an.style.display='block';b.dataset.st=2;P('pop');return}}
- var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){var dl=b.classList.contains('dtl'),shw=function(){if(dl&&!b.__t){b.__t=1;b.style.fontSize='40px';b.style.lineHeight='1.3';b.innerHTML='\uD83D\uDD0A '+b.dataset.say}};try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;if(dl){u.onend=shw;setTimeout(shw,Math.max(3500,b.dataset.say.length*110))}speechSynthesis.speak(u)}catch(x){shw()}P('tick')}});
+ var b=e.target.closest('[data-say]');if(b&&b.classList.contains('tch')){var dl=b.classList.contains('dtl'),shw=function(){if(dl&&!b.__t){b.__t=1;b.style.fontSize='40px';b.style.lineHeight='1.3';b.innerHTML='\uD83D\uDD0A '+b.dataset.say}};try{if(window.SXLsay&&SXLsay(b.dataset.say,dl?shw:null)){if(dl)setTimeout(shw,Math.max(3500,b.dataset.say.length*110))}else{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.8;if(dl){u.onend=shw;setTimeout(shw,Math.max(3500,b.dataset.say.length*110))}speechSynthesis.speak(u)}}catch(x){shw()}P('tick')}});
 document.addEventListener('click',function(e){var b=e.target.closest('.vsp');if(!b)return;e.stopPropagation();P('tick');var a=b.dataset.a;if(a){try{if(window.__va)window.__va.pause();window.__va=new Audio(a);window.__va.play()}catch(x){}}});
 document.addEventListener('click',function(e){var d=e.target.closest('.chd');if(!d)return;var sl=d.closest('.sl');if(!sl||!sl.__jump)return;e.stopPropagation();var i=Array.prototype.indexOf.call(d.parentNode.children,d);P('tick');sl.__jump(i)},true);
 /* teacher aid: Aa shows the words of the audio line on screen (no-audio fallback) */
@@ -513,7 +516,7 @@ INIT.choice=function(s){
   var box=$('.cho-wrap',items[n]),arr=$$('.cho',items[n]);for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=arr[i];arr[i]=arr[j];arr[j]=t}arr.forEach(function(b){box.appendChild(b)});var au=$('.caud',items[n]);if(au){box.style.transition='opacity .5s';box.style.opacity=0;box.style.pointerEvents='none';au.style.cursor='pointer';au.onclick=function(){var rv=function(){box.style.opacity=1;box.style.pointerEvents='auto';};P('tick');try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(au.dataset.say),dn=0,go=function(){if(!dn){dn=1;rv()}};u.lang='en-GB';u.rate=.85;u.onend=go;speechSynthesis.speak(u);setTimeout(go,Math.max(3500,au.dataset.say.length*110))}catch(e){rv()}}}}
  items.forEach(function(it,n){$$('.cho',it).forEach(function(b){b.onclick=function(){if(it.__ok)return;
   if(b.dataset.ok==='1'){it.__ok=1;dots[n]&&dots[n].classList.add('dn');b.classList.add('ok');$$('.cho',it).forEach(function(x){if(x!==b)x.classList.add('off')});P('pop');setTimeout(function(){P('tick')},90);
-   try{var u=new SpeechSynthesisUtterance(b.textContent);u.lang='en-GB';u.rate=.85;speechSynthesis.cancel();if(SXL.say)speechSynthesis.speak(u)}catch(e){}
+   try{if(SXL.say&&window.SXLsay&&SXLsay(b.textContent))return;var u=new SpeechSynthesisUtterance(b.textContent);u.lang='en-GB';u.rate=.85;speechSynthesis.cancel();if(SXL.say)speechSynthesis.speak(u)}catch(e){}
    if(items.every(function(x){return x.__ok}))finish(s);else setTimeout(function(){if(k!==n)return;k=Math.min(n+1,items.length-1);if(items[k].__ok){var q=items.findIndex(function(x){return !x.__ok});if(q>-1)k=q}show(k)},900)}
   else{b.classList.add('nope');wrong(b)}}})});
  s.__jump=function(i){var it=items[i];it.__ok=0;$$('.cho',it).forEach(function(b){b.classList.remove('ok','off','nope')});k=i;show(i)};
@@ -525,7 +528,7 @@ INIT.pairs=function(s){var L=$$('.ptl',s),R=$$('.ptr',s),sel=null,left=L.length,
  function reveal(l){var r=R.filter(function(x){return x.dataset.i===l.dataset.i})[0];r.classList.remove('hid');r.style.pointerEvents='';return r}
  L.forEach(function(l){l.onclick=function(){if(l.__ok)return;
   if(hid&&sel===l){var r=reveal(l);l.__ok=r.__ok=1;l.style.outline='';var PC=['linear-gradient(135deg,#ffd6e8,#ffb8d6)','linear-gradient(135deg,#cfe6ff,#a9d1ff)','linear-gradient(135deg,#d8f5c4,#b9e89c)','linear-gradient(135deg,#ffdcb8,#ffc58a)','linear-gradient(135deg,#e3d4ff,#c9b0ff)'],cc=PC[(5-left)%5];l.style.background=r.style.background=cc;l.style.color=r.style.color='#1c1b2e';l.innerHTML='\u2714 '+l.innerHTML;sel=null;P('pop');bsay('\uD83D\uDD01 Everybody repeats.');if(--left==0){P('good');s.__done=1;$('#nx').classList.add('on')}else setTimeout(function(){bsay(bn?bn.dataset.d:'')},3500);return}
-  L.forEach(function(x){x.style.outline=''});sel=(sel===l)?null:l;if(sel){l.style.outline='7px solid #9a5cff';P('tick');if(l.dataset.say&&s.querySelector('.plis')){if(window.SXLsay&&SXLsay(l.dataset.say)){}else{var nov=function(){var h=$('.mu',s);if(h)h.textContent='\uD83D\uDD07 No voice found in this browser. Try Chrome or Edge.'};try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(l.dataset.say);u.lang='en-GB';u.rate=.85;u.onerror=nov;speechSynthesis.speak(u);setTimeout(function(){if(!speechSynthesis.speaking&&!speechSynthesis.getVoices().length)nov()},700)}catch(e){nov()}}}bsay(hid?'\u26BD Ball to a student. Say the sentence. Tap the clue again to check.':'\u26BD Ball to a student. Say the sentence. Then tap it.')}else bsay(bn?bn.dataset.d:'')}});
+  L.forEach(function(x){x.style.outline=''});sel=(sel===l&&!s.querySelector('.plis'))?null:l;if(sel){l.style.outline='7px solid #9a5cff';P('tick');if(l.dataset.say&&s.querySelector('.plis')){if(window.SXLsay&&SXLsay(l.dataset.say)){}else{var nov=function(){var h=$('.mu',s);if(h)h.textContent='\uD83D\uDD07 No voice found in this browser. Try Chrome or Edge.'};try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(l.dataset.say);u.lang='en-GB';u.rate=.85;u.onerror=nov;speechSynthesis.speak(u);setTimeout(function(){if(!speechSynthesis.speaking&&!speechSynthesis.getVoices().length)nov()},700)}catch(e){nov()}}}bsay(hid?'\u26BD Ball to a student. Say the sentence. Tap the clue again to check.':'\u26BD Ball to a student. Say the sentence. Then tap it.')}else bsay(bn?bn.dataset.d:'')}});
  R.forEach(function(r){r.onclick=function(){if(r.__ok)return;if(!sel){P('tick');return}
   if(sel.dataset.i===r.dataset.i){sel.__ok=r.__ok=1;sel.style.outline='';var PC=['linear-gradient(135deg,#ffd6e8,#ffb8d6)','linear-gradient(135deg,#cfe6ff,#a9d1ff)','linear-gradient(135deg,#d8f5c4,#b9e89c)','linear-gradient(135deg,#ffdcb8,#ffc58a)','linear-gradient(135deg,#e3d4ff,#c9b0ff)'],cc=PC[(5-left)%5];sel.style.background=r.style.background=cc;sel.style.color=r.style.color='#1c1b2e';sel.innerHTML='✔ '+sel.innerHTML;r.innerHTML='✔ '+r.innerHTML;sel=null;P('pop');bsay('\uD83D\uDD01 Everybody repeats.');if(--left==0){P('good');s.__done=1;$('#nx').classList.add('on')}else setTimeout(function(){bsay(bn?bn.dataset.d:'')},3500)}
   else{try{wrong(sel)}catch(e){}sel.style.outline='';sel=null}}})};
@@ -566,7 +569,7 @@ INIT.boss=function(s){
 INIT.case_board=function(s){
  var D=JSON.parse($('#d-'+s.dataset.id).textContent),ok={},won=false,tw=false;
  var sus=$('.cbsus',s),grid=$('.cbgrid',s),cnt=$('.cbcount',s),bar=$('.cbbar',s),m=$('.cbm',s),mb=$('.cbmb',s),twb=$('.cbtw',s),qb=$('.cbq',s);
- function say(t){try{if(!SXL.say)return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+ function say(t){try{if(!SXL.say)return;if(window.SXLsay&&SXLsay(t))return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
  function clue(id){return id==='TW'?D.twist:D.clues.filter(function(c){return c.id===id})[0]}
  function fx(){var f={};D.suspects.forEach(function(x){f[x[0]]={f:0,a:0}});Object.keys(ok).forEach(function(id){var c=clue(id),e=c.fx||{};for(var k in e){if(f[k])f[k][e[k]==='for'?'f':'a']++}});return f}
  function txt(c){return (D.hunt&&c.short)?c.short:(c.dials?('<b>'+(c.topic||'')+'</b>'):(c.text||'').replace(/\n/g,'<br>'))}
@@ -607,9 +610,9 @@ INIT.case_board=function(s){
 
 
 INIT.audio_all=function(s){
- var cur=null;function stop(){if(cur){cur.pause();cur=null}if(window.speechSynthesis)speechSynthesis.cancel();$$('.aab.on',s).forEach(function(x){x.classList.remove('on')})}
- $$('.aab',s).forEach(function(b){b.onclick=function(){var was=b.classList.contains('on');stop();if(was)return;b.classList.add('on');
-  var c=b.dataset.clip;if(c){cur=new Audio(c);cur.onended=function(){b.classList.remove('on')};cur.play()}else if(window.speechSynthesis){var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.85;u.onend=function(){b.classList.remove('on')};speechSynthesis.speak(u)}}});
+ var cur=null;function stop(){if(cur){cur.pause();cur=null}try{if(window.__sxla)window.__sxla.pause()}catch(e){}if(window.speechSynthesis)speechSynthesis.cancel();$$('.aab.on',s).forEach(function(x){x.classList.remove('on')})}
+ $$('.aab',s).forEach(function(b){b.onclick=function(){stop();b.classList.add('on');
+  var c=b.dataset.clip;if(!c&&window.SXLsay&&SXLsay(b.dataset.say,function(){b.classList.remove('on')}))return;if(c){cur=new Audio(c);cur.onended=function(){b.classList.remove('on')};cur.play()}else if(window.speechSynthesis){var u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';u.rate=.85;u.onend=function(){b.classList.remove('on')};speechSynthesis.speak(u)}}});
  $('#nx').classList.add('on')};
 """)
 

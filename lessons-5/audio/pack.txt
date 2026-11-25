@@ -1,0 +1,51 @@
+# speaker Coach
+L5_A_01 | [calm, neutral] The nurse is checking the beds at nine fifteen.
+L5_A_02 | [calm, neutral] The cleaner is checking the beds at nine thirty.
+L5_A_03 | [calm, neutral] The nurse is not checking the beds tonight.
+# speaker Narrator
+L5_B_01 | [hushed, tense] Haven Hospital. Six fifty-eight p.m. Shift change.
+L5_B_02 | [quiet, uneasy] Ward three. Five patients are asleep.
+L5_B_03 | [whispered, alarmed] Something is there.
+L5_B_04 | [relieved, a little amused] It is only a coat.
+L5_B_05 | [low, ominous] Someone is hiding in the building.
+L5_B_06 | [calm, expectant] Someone is in the building.
+L5_B_07 | [calm, expectant] We do not know who.
+L5_B_08 | [slow, building tension] Midnight is coming.
+L5_B_09 | [grave, steady] Eleven p.m. One hour left.
+L5_B_10 | [low, suspicious] The lab door was open at ten forty-five. But one crew says they were inside…
+L5_B_11 | [astonished, then wry] He was going to escape by the lift, but… the coat had wings.
+L5_B_12 | [reflective, wry] We were going to catch him, but he glided away.
+L5_B_13 | [slow, teasing] To be continued.
+L5_C_01 | [curious, quiet] One slot is empty: 10:45. Who is missing?
+L5_C_02 | [hushed, curious] A crumpled note: a clock at midnight and the lift.
+L5_C_03 | [slow, meaningful] A white coat. A name tag: Dr. Volkov. A stethoscope on the wrong hook.
+L5_C_04 | [uneasy, quiet] A half-packed bag. A strange gadget on the floor.
+# speaker Coach
+L5_D_01 | [warm, matter-of-fact] Mia is meeting the courier at ten.
+L5_D_02 | [warm, clear] Dan and Ben are fixing the lift at ten thirty.
+L5_D_03 | [light, relaxed] Joy is not cooking tonight.
+L5_D_04 | [curious, inviting] Is Pat working late? Yes, he is.
+L5_D_05 | [thoughtful, clear] The Stranger has a packed bag. He is going to leave.
+L5_D_06 | [quick, decisive] The lights went out. I will get a torch.
+L5_D_07 | [warm, matter-of-fact] Mia has the schedule. She is going to call the courier.
+L5_D_08 | [light, decisive] There is no tea. I will make some.
+L5_D_09 | [careful, clear] If you open the door, the alarm will ring.
+L5_D_10 | [careful, clear] If we cut the cable, the lift will not move.
+L5_D_11 | [worried, clear] If you press the red button, everyone will wake up.
+L5_D_12 | [curious, inviting] What will happen if I press it?
+L5_D_13 | [thoughtful, a little disappointed] Dr. Volkov was going to take the lift, but it stopped.
+L5_D_14 | [rueful, light] I was going to call, but the line was dead.
+L5_D_15 | [sympathetic] They were going to help, but the door was locked.
+L5_D_16 | [curious, gentle] Were you going to come? Yes, but…
+L5_E_01 | [warm, clear] Pat is going to call the courier at nine.
+L5_E_02 | [light, decisive] There is no sugar. I will go to the shop.
+L5_E_03 | [calm, decisive] Nobody can drive. OK, I will take the van.
+L5_E_04 | [calm, clear] If the door is open, the alarm will ring.
+L5_E_05 | [calm, clear] If the battery dies, the lights will go out.
+L5_E_06 | [careful, clear] If you touch the vial, the lab will lock.
+L5_F_01 | [clear, firm] Volkov will escape unless we lock the window.
+L5_F_02 | [clear, determined] Before midnight, we will find him.
+L5_F_03 | [relieved, clear] As soon as the lights come on, we will go.
+L5_F_04 | [slow, tense] At midnight, he will be standing in the lift.
+L5_F_05 | [warm, light] This time tomorrow, we will be sleeping.
+L5_F_06 | [curious, inviting] Where will you be waiting?

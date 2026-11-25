@@ -1,0 +1,16 @@
+# speaker Narrator  (Eleven v4; paste only these lines. Save each clip named as its sentence.)
+L5_V3_01 | [hushed, tense] At midnight, he is going to open the vent.
+L5_V3_02 | [hushed, tense] The antidote is gone. One slot is empty: ten forty-five.
+L5_V3_03 | [hushed, tense] A crumpled note: a clock at midnight and the lift. Sabotage!
+L5_V3_04 | [urgent] Doctor Volkov! Stop!
+L5_V3_05 | [urgent] He is running to the lift. But the lift is stuck!
+# speaker Coach
+L5_V3_06 | [calm, neutral] Where were you at ten forty-five?
+L5_V3_07 | [friendly] In the lab. And you?
+L5_V3_08 | [friendly] In the lab! Same crew.
+L5_V3_09 | [calm, neutral] If someone sabotages the phone, we will use the radio.
+L5_V3_10 | [calm, neutral] If the patient is contagious, we will quarantine him.
+L5_V3_11 | [calm, neutral] We were going to give him the antidote, but it had side effects.
+# optional bonus slide
+L5_V3_12 | [calm, neutral] If we lock the door, what will you do?
+L5_V3_13 | [playful] If you lock the door, I will use the window.

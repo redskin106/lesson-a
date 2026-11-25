@@ -5,6 +5,7 @@ import re, json, base64, io, os, pathlib
 from . import core as _c
 from PIL import Image
 from . import core
+import os
 from .core import *
 from .modules import chat as C
 from .modules.chat import gapchip, AV
@@ -17,7 +18,7 @@ def _b64(path, kind):
         im = im.convert('RGBA'); bg = Image.new('RGBA', im.size, (255, 255, 255, 255)); bg.alpha_composite(im); im = bg.convert('RGB'); im.thumbnail((560, 560)); im = im.quantize(colors=48); b = io.BytesIO(); im.save(b, 'PNG', optimize=True)
         return 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
     if kind == 'art':
-        im = im.convert('RGB'); im.thumbnail((760, 760)); b = io.BytesIO(); im.save(b, 'JPEG', quality=70)
+        im = im.convert('RGB'); im.thumbnail((1500, 1500) if os.path.basename(path).startswith('L5_sc_') else (760, 760)); b = io.BytesIO(); im.save(b, 'JPEG', quality=74 if os.path.basename(path).startswith('L5_sc_') else 70)
         return 'data:image/jpeg;base64,' + base64.b64encode(b.getvalue()).decode()
     b = io.BytesIO(); im.thumbnail((200, 200)); im.save(b, 'PNG', optimize=True)
     return 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
@@ -386,6 +387,7 @@ function put(slotEl){$('.op',slotEl).style.display='none';var f=$('.fl',slotEl);
   z.style.opacity=0;img.style.transform=from(z,z.__src,s);setTimeout(function(){z.classList.remove('on')},360);return true}
  window.SXLzoom=open;
  document.addEventListener('click',function(e){var z=e.target.closest('.zoomv.gz.on');if(z){e.stopPropagation();close();return}
+  if(e.target.closest('#ctl,#nx,#pv,#sk,#cnt,#clk,#aa,#trp,#rpt'))return;
   var im=null,st=document.elementsFromPoint(e.clientX,e.clientY);
   for(var q=0;q<st.length&&!im;q++){var c=st[q];if(c.tagName!=='IMG'||c.dataset.z!=='1')continue;var ok=true;for(var n=c;n&&n!==document.body;n=n.parentElement){var cs=getComputedStyle(n);if(parseFloat(cs.opacity)<.1||cs.visibility==='hidden'){ok=false;break}}if(ok)im=c}
   if(!im)return;var s=cur();if(!s||!s.contains(im))return;var m=s.dataset.mod;if(m==='cover'||m==='title_card'||m==='closing')return;

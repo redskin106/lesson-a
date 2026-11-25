@@ -55,11 +55,11 @@ def story(d):
     P=d.get('pics',['🏥']); n=len(P)
     o+=stp(glass(90,180,860,760,'',r=64),1)
     cols=2 if n>1 else 1
-    sz=int(min(860/cols,760/((n+1)//2 if n>1 else 1))*(.9 if any(str(q).startswith('L6_') for q in P) else .62))
+    sz=int(min(860/cols,760/((n+1)//2 if n>1 else 1))*(.9 if any(str(q).startswith(('L5_','L6_')) for q in P) else .62))
     for i,e in enumerate(P):
         r_,c_=(i//cols,i%cols); rows=(n+cols-1)//cols
         x=90+(860/cols)*c_+((860/cols)-sz)/2; y=180+(760/rows)*r_+((760/rows)-sz)/2
-        o+=stp(f'<div class="a" style="left:{int(x)}px;top:{int(y)}px;width:{sz}px;height:{sz}px;font-size:{int(sz*.85)}px;line-height:{sz}px;text-align:center">'+(f'<img src="{ART}{e}" style="width:100%;height:100%;object-fit:contain">' if e.startswith('L6_') else e)+'</div>',1+i)
+        o+=stp(f'<div class="a" style="left:{int(x)}px;top:{int(y)}px;width:{sz}px;height:{sz}px;font-size:{int(sz*.85)}px;line-height:{sz}px;text-align:center">'+(f'<img src="{ART}{e}" style="width:100%;height:100%;object-fit:contain">' if e.startswith(('L5_','L6_')) else e)+'</div>',1+i)
     big=d.get('big')
     if big: o+=f'<div class="a h" style="left:1000px;top:190px;width:830px;font-size:96px;line-height:1.02">{big}</div>'
     y=(380 if len(big)<16 else 480) if big else 230
@@ -131,17 +131,23 @@ def trap_chain(d):
 
 @module('excuse_pp')
 def excuse_pp(d):
-    """Excuse Ping-Pong. chars=[(emoji,name)], plans=[(plan text,emoji)], sec=4. Tap start: 4 seconds to shout the excuse."""
+    """Excuse Ping-Pong. chars=[(emoji,name)], plans=[(plan text,emoji)], example=[(char index,line)] = a worked exchange shown first (no timer).
+    Click steps: the two characters, the worked exchange (question, then excuse), then the plan prompts."""
     o=header(d['phase'],d.get('role','Excuse ping-pong'),'rose'); st=1
     for i,(e,n) in enumerate(d['chars']):
         o+=stp(f'<div class="gl" style="left:{90+i*330}px;top:190px;width:300px;height:380px;border-radius:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><span style="font-size:170px;line-height:1">{e}</span><span style="font-family:O;font-weight:800;font-size:34px;text-align:center;color:#1c1b2e;padding:0 12px">{n}</span></div>',1)
+    ex=d.get('example') or []
+    for k,(ci,t) in enumerate(ex):
+        e=d['chars'][ci][0]; left=(ci==0)
+        o+=stp(f'<div class="gl" style="left:{790 if left else 890}px;top:{190+k*150}px;width:940px;height:128px;border-radius:50px;display:flex;align-items:center;gap:22px;padding:0 28px;box-sizing:border-box"><span style="font-size:78px;line-height:1">{e}</span><span style="font-family:O;font-weight:800;font-size:40px;line-height:1.15;color:#1c1b2e">{t}</span></div>',2)
+    base=190+len(ex)*150+(30 if ex else 0)
+    gap=(980-base)//max(1,len(d['plans'])) if d['plans'] else 0; gap=min(gap,130)
     for k,(t,e) in enumerate(d['plans']):
-        o+=stp(f'<div class="gl" style="left:790px;top:{190+k*130}px;width:1040px;height:112px;border-radius:50px;display:flex;align-items:center;gap:14px;padding:0 24px;box-sizing:border-box;white-space:nowrap"><span style="font-size:60px;line-height:1">{e}</span>'+ch('c1','We',36,'2px 16px')+ch('c2','were going to',36,'2px 16px')+ch('c3',t,36,'2px 16px')+ch('c4','but…',36,'2px 16px')+'</div>',2+k)
-    o+=_timer(int(d.get('sec',4)),720,adj=False,w=420)
+        o+=stp(f'<div class="gl" style="left:790px;top:{base+k*gap}px;width:1040px;height:{min(112,gap-14)}px;border-radius:50px;display:flex;align-items:center;gap:14px;padding:0 24px;box-sizing:border-box;white-space:nowrap"><span style="font-size:60px;line-height:1">{e}</span>'+ch('c1','We',36,'2px 16px')+ch('c2','were going to',36,'2px 16px')+ch('c3',t,36,'2px 16px')+ch('c4','but…',36,'2px 16px')+'</div>',3)
     return o
 
 
-TEAMC=['#e0304a','#2a6ae0','#10a98d','#e89200']
+TEAMC=['#e0304a','#2a6ae0','#10a98d','#e89200','#9a5cff']
 FRAMES={'schedule':[('c1','We'),('c2','are …ing'),('c3','at …')],'promise':[('c1','I'),('c2','will'),('c3','…')],'trap':[('c4','If'),('c1','…,'),('c2',"we'll"),('c3','…')],'excuse':[('c1','We'),('c2','were going to'),('c3','…'),('c4','but…')]}
 @module('rpg_scene')
 def rpg_scene(d):
@@ -205,11 +211,41 @@ def guess_class(d):
 # ---------------- printable cards (A4, 2 x 4 per page, cut lines) ----------------
 def cards_page(cards,title,out):
     """cards=[{'who':emoji,'rows':[(label,emoji)],'foot':text}] -> standalone printable html"""
-    cs=''.join('<div class="c"><div class="w">'+c['who']+'</div>'+''.join(f'<div class="r"><b>{a}</b><i>{b}</i></div>' for a,b in c['rows'])+(f'<div class="f">{c["foot"]}</div>' if c.get('foot') else '')+f'<div class="n">{k+1}</div></div>' for k,c in enumerate(cards))
+    import re as _re,base64 as _b64,os as _os
+    def _img(t):
+        def f(m):
+            pth='/home/claude/work/lesson/art/'+m.group(0)
+            if not _os.path.exists(pth): return m.group(0)
+            return '<img src="data:image/png;base64,'+_b64.b64encode(open(pth,'rb').read()).decode()+'" style="height:1em;vertical-align:middle">'
+        return _re.sub(r'L[56]_[A-Za-z0-9_]+\.png',f,t)
+    cs=''.join('<div class="c"><div class="w">'+_img(c['who'])+'</div>'+''.join(f'<div class="r"><b>{a}</b><i>{_img(b)}</i></div>' for a,b in c['rows'])+(f'<div class="f">{c["foot"]}</div>' if c.get('foot') else '')+f'<div class="n">{k+1}</div></div>' for k,c in enumerate(cards))
     html=(f'<!doctype html><meta charset="utf-8"><title>{title}</title><style>@page{{size:A4;margin:8mm}}body{{margin:0;font-family:Arial,sans-serif}}'
-          '.g{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:66mm;gap:0;page-break-after:auto}.c{border:1px dashed #999;padding:5mm;box-sizing:border-box;position:relative;break-inside:avoid}'
-          '.w{font-size:20mm;text-align:center;line-height:1}.r{display:flex;align-items:center;gap:6mm;margin-top:2mm;font-size:6mm}.r b{width:20mm}.r i{font-style:normal;font-size:12mm}.f{font-size:5mm;margin-top:3mm;text-align:center}.n{position:absolute;right:3mm;bottom:2mm;font-size:3mm;color:#bbb}'
+          '.g{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:68mm;gap:0;page-break-after:auto}.c{border:1px dashed #999;padding:3mm 5mm;box-sizing:border-box;position:relative;break-inside:avoid}'
+          '.w{font-size:15mm;text-align:center;line-height:1}.r{display:flex;align-items:center;gap:6mm;margin-top:1mm;font-size:6mm}.r b{width:20mm}.r i{font-style:normal;font-size:10mm;line-height:1.1}.f{font-size:4.2mm;margin-top:1.5mm;text-align:center}.n{position:absolute;right:3mm;bottom:2mm;font-size:3mm;color:#bbb}'
           f'</style><div class="g">{cs}</div>')
+    open(out,'w').write(html); return out
+
+def cards_sheet(cards,slip,title,out,foot='Same pictures = same crew.'):
+    """18 crew cards on ONE A4 page (3 x 6) + the secret slip as a strip at the bottom. cards=[{who,rows:[(time,pic)]}]; slip=dict(who,rows,foot)"""
+    import re as _re,base64 as _b64,os as _os
+    def _img(t):
+        def f(m):
+            pth='/home/claude/work/lesson/art/'+m.group(0)
+            if not _os.path.exists(pth): return m.group(0)
+            return '<img src="data:image/png;base64,'+_b64.b64encode(open(pth,'rb').read()).decode()+'">'
+        return _re.sub(r'L[56]_[A-Za-z0-9_]+\.png',f,t)
+    cs=''.join('<div class="c"><div class="w">'+_img(c['who'])+'</div><div class="t">'+''.join(f'<div class="k"><b>{a}</b><i>{_img(b)}</i></div>' for a,b in c['rows'])+f'</div><div class="n">{k+1}</div></div>' for k,c in enumerate(cards))
+    sl='<div class="c sp"><div class="w">'+_img(slip['who'])+'</div><div class="t">'+''.join(f'<div class="k"><b>{a}</b><i>{_img(b)}</i></div>' for a,b in slip['rows'])+'</div><div class="n">secret</div></div>'
+    html=(f'<!doctype html><meta charset="utf-8"><title>{title}</title><style>@page{{size:A4;margin:8mm}}*{{box-sizing:border-box}}body{{margin:0;font-family:Arial,sans-serif;width:194mm;height:281mm;overflow:hidden}}'
+      '.g{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(7,38mm);height:266mm}'
+      '.c{border:1px dashed #999;position:relative;padding:2mm 3mm;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:1mm}'
+      '.w{font-size:8mm;line-height:1;text-align:center;margin-bottom:2.5mm}.w img{height:1em;vertical-align:middle}'
+      '.t{display:flex;justify-content:space-around;align-items:flex-end}.k{display:flex;flex-direction:column;align-items:center;gap:.5mm;width:33%}'
+      '.k b{font-size:3.4mm;color:#444}.k i{font-style:normal;font-size:13mm;line-height:1}.k i img{height:1em;width:1em;object-fit:contain;vertical-align:middle}'
+      '.n{position:absolute;right:2mm;bottom:1mm;font-size:2.6mm;color:#bbb}'
+      f'.cap{{font-size:3mm;text-align:center;color:#666;line-height:1.3;margin-top:1mm}}'
+      '.sp{border:1.5px solid #333}'
+      f'</style><div class="g">{cs}{sl}</div><div class="cap">{foot} Cut along the dashed lines. One card each. Card 19 (solid border, detective) = the Stranger\'s secret cover story. Card 18 is the Stranger\'s real day. '+slip["foot"]+'</div>')
     open(out,'w').write(html); return out
 
 EXT_CSS.append("""
@@ -235,4 +271,59 @@ document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!
 },true);
 document.addEventListener('click',function(e){var b=e.target.closest('.sdf');if(!b)return;var s=b.closest('.sl');if(!s||b.classList.contains('found'))return;b.classList.add('found');P('pop');
  var c=$('.hcount',s),n=+c.dataset.n,f=$$('.sdf.found',s).length;c.textContent=f+' / '+n;var cap=$('.hcap',s);if(cap)cap.textContent=(b.dataset.t||'');if(f>=n)P('good')},true);
+""")
+
+
+# ---------------------------------------------------------------- v3: mingle worked example + suspect board (Activate 2, 18 students)
+def _mini_card(c,hi,x,rot):
+    rows=''.join(f'<div style="display:flex;align-items:center;gap:18px;padding:6px 20px;border-radius:26px;{"background:linear-gradient(135deg,#d6fbea,#9fe8c4);" if i==hi else "background:rgba(255,255,255,.7);"}"><span style="font-family:O;font-weight:800;font-size:36px;color:#1c1b2e;width:120px">{t}</span><span style="font-size:70px;line-height:1">{emo(e)}</span></div>' for i,(t,e) in enumerate(c['rows']))
+    return glass(x,185,500,560,f'<div style="display:flex;flex-direction:column;gap:14px;padding:22px 26px;height:100%;box-sizing:border-box"><div style="font-size:100px;line-height:1;text-align:center">{emo(c["who"])}</div>{rows}</div>',r=44,ex=f'transform:rotate({rot}deg)')
+
+@module('mingle_ex')
+def mingle_ex(d):
+    """Worked example for the mingle: two cards side by side (same picture on the highlighted row), then the exchange in speech bubbles, then 'same crew'.
+    cards=[card,card], hi=row index, dialog=[(0|1,text)], done=text"""
+    o=header(d['phase'],d.get('role','Example'),'teal')
+    A,B=d['cards']; hi=d.get('hi',1)
+    o+=stp(_mini_card(A,hi,90,-2),1)+stp(_mini_card(B,hi,620,2),2)
+    for k,(who,tx) in enumerate(d['dialog']):
+        col=('linear-gradient(135deg,#ffd6e8,#ffb8d6)','linear-gradient(135deg,#cfe6ff,#a9d1ff)')[who%2]
+        o+=stp(f'<div class="a" style="left:1160px;top:{200+k*150}px;width:680px;height:124px;border-radius:62px;background:{col};display:flex;align-items:center;padding:0 40px;box-sizing:border-box;font-family:O;font-weight:800;font-size:42px;line-height:1.1;color:#1c1b2e;cursor:pointer;box-shadow:0 8px 20px rgba(80,60,160,.15)" onclick="window.SXLsay&&SXLsay(this.textContent)">{tx}</div>',3+k)
+    n=len(d['dialog'])
+    o+=stp(f'<div class="a" style="left:1160px;top:{200+n*150+10}px;width:680px;text-align:center;font-family:O;font-weight:800;font-size:60px;color:#0b6b55">✔ {d.get("done","Same crew!")}</div>',3+n)
+    o+=stp('<div class="a" style="left:90px;top:790px;width:1030px;text-align:center;font-family:O;font-weight:800;font-size:44px;color:#6a35e8">Only the 10:45 picture matters.</div>',2)
+    return o
+
+PLACES=['L5_cr_lab.png','L5_cr_kitchen.png','L5_cr_lift.png','L5_cr_pharmacy.png','L5_cr_corridor.png']
+@module('suspect_board')
+def suspect_board(d):
+    """Detective board: suspects A-D (the crew the curveball points at). Tap a cell to cycle the place the detective pairs report; tap a letter to vote; Reveal shows the banner.
+    n=suspects, places=[art], q=[(time label)], reveal=text"""
+    n=d.get('n',4); Pl=d.get('places',PLACES); Q=d.get('q',['10:00','11:30'])
+    o=header(d['phase'],d.get('role','Find the Stranger'),'rose')
+    h=150; gap=16
+    for i in range(n):
+        y=185+i*(h+gap)
+        cells=''.join(f'<span style="font-family:O;font-weight:800;font-size:44px;color:#1c1b2e;width:150px;text-align:right">{t}</span><div class="gl sbc" data-nz="1" data-i="-1" style="position:relative;width:150px;height:130px;border-radius:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:110px;line-height:1;background:#fff"><span class="sbp" style="font-family:O;font-weight:800;font-size:80px;color:#b9b2e8">?</span></div>' for t in Q)
+        o+=(f'<div class="a sbr" data-r="{i}" style="left:90px;top:{y}px;width:1000px;height:{h}px;display:flex;align-items:center;gap:22px">'
+            f'<div class="sbl" style="width:120px;height:120px;border-radius:50%;background:{TEAMC[i%5]};color:#fff;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:70px;cursor:pointer;flex:none">{"ABCDEF"[i]}</div>{cells}</div>')
+    o+=f'<script type="application/json" class="sbd">{json.dumps(Pl)}</script>'+''.join(f'<img class="sbi" data-nz="1" data-n="{p_}" src="{ART}{p_}" style="display:none">' for p_ in Pl if p_.endswith('.png'))
+    o+=('<div class="a" style="left:1170px;top:185px;width:660px;display:flex;flex-direction:column;gap:20px">'
+        +''.join(f'<div class="gl" style="position:relative;height:130px;border-radius:44px;display:flex;align-items:center;gap:22px;padding:0 34px;box-sizing:border-box;font-family:O;font-weight:800;font-size:36px;line-height:1.1;color:#1c1b2e"><span style="font-size:76px;display:flex">{emo(e)}</span>{t}</div>' for e,t in d.get('frames',[]))
+        +'</div>')
+    o+=(('' if d.get('novote') else f'<div class="a sbv" style="left:1170px;top:640px;width:660px;height:110px;border-radius:55px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:44px;color:#4a3a8a;background:rgba(255,255,255,.7);border:4px dashed #b9b2e8">Tap a letter to vote</div>')
+        +f'<div class="a sbrv" style="left:1170px;top:790px;width:660px;height:120px;border-radius:60px;display:flex;align-items:center;justify-content:center;font-family:O;font-weight:800;font-size:54px;cursor:pointer;{GR}">🕵️ Reveal</div>'
+        f'<div class="a sbbn" style="left:90px;top:900px;width:1740px;text-align:center;font-family:O;font-weight:800;font-size:56px;color:#d62f48;opacity:0;transition:opacity .5s">{d.get("reveal","The Stranger had a different card!")}</div>')
+    return o
+
+EXT_JS.append(r"""
+document.addEventListener('click',function(e){var s=e.target.closest('.sl');if(!s||!s.querySelector('.sbd'))return;
+ var P_=JSON.parse(s.querySelector('.sbd').textContent),c=e.target.closest('.sbc');
+ if(c){var k=+c.dataset.i+1;if(k>=P_.length)k=-1;c.dataset.i=k;
+  if(k<0)c.innerHTML='<span style="font-family:O;font-weight:800;font-size:80px;color:#b9b2e8">?</span>';
+  else if(/\.png$/.test(P_[k])){var src=s.querySelector('.sbi[data-n="'+P_[k]+'"]');c.innerHTML='<img src="'+(src?src.src:'')+'" style="width:120px;height:120px;object-fit:contain">'}else c.textContent=P_[k]
+  P('tick');e.stopPropagation();return}
+ var l=e.target.closest('.sbl');if(l){$$('.sbl',s).forEach(function(x){x.style.boxShadow='';x.style.opacity=l===x?1:.5});l.style.boxShadow='0 0 0 10px #ff9f1c';var vb=$('.sbv',s);if(vb)vb.textContent='Our vote: '+l.textContent;P('pop');e.stopPropagation();return}
+ if(e.target.closest('.sbrv')){$('.sbbn',s).style.opacity=1;P('good');e.stopPropagation();return}
+},true);
 """)
