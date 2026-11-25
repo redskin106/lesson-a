@@ -192,7 +192,7 @@ def _cards():
             cards.append(dict(who=faces[k],rows=[('10:00',a),('10:45',b),('11:30',d)],foot='Same pictures = same crew.')); k+=1
     cards.append(dict(who=faces[k],rows=[('10:00','L5_j_sleep.png'),('10:45','L5_j_tests.png'),('11:30','L5_j_microscope.png')],foot='Same pictures = same crew.'))  # the Stranger: only 10:45 matches the lab crew
     return cards
-GREY_SLIP=[dict(who='L5_i_stranger.png',rows=[('10:00','L5_j_call.png'),('10:45','L5_j_tests.png'),('11:30','L5_j_eat.png')],foot='You are the Stranger. Pretend to be in the lab crew: say the pictures on this card. Tell nobody.')]  # the cover story = the lab crew's day
+GREY_SLIP=[dict(who='L5_i_stranger.png',rows=[('10:00','L5_j_call.png'),('10:45','L5_j_tests.png'),('11:30','❓')],foot='You are the Stranger. Say what the lab crew says at 10:00 and 10:45. At 11:30 make something up. Tell nobody.')]  # the cover story = the lab crew's day
 
 def _texts():
     t=[]
